@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<project>
+  <pomVersion>3</pomVersion>
+  <name>ca</name>
+  <id>ca</id>
+  <groupId>excelsiorg</groupId>
+  <currentVersion>0.1</currentVersion>
+  <organization>
+    <name>excelsiorg</name>
+    <url>http://www.excelsi.org/</url>
+  </organization>
+  <inceptionYear>2006</inceptionYear>
+  <package>org.excelsi.ca</package>
+
+  <shortDescription>cellular automata</shortDescription>
+
+  <description>
+  </description>
+
+  <url>http://www.excelsi.org/</url>
+  <siteAddress>www.excelsi.org</siteAddress>
+  <siteDirectory>
+    /public_html/code/ca
+  </siteDirectory>
+  <distributionDirectory>
+    /public_html/code/ca
+  </distributionDirectory>
+
+  <versions>
+    <version>
+      <id>0.1</id>
+      <name>0.1</name>
+      <tag>0.1</tag>
+    </version>
+  </versions>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <url>http://www.junit.org/</url>
+    </dependency>
+    <dependency>
+      <groupId>beanshell</groupId>
+      <artifactId>bsh</artifactId>
+      <version>2.0b4</version>
+      <url>http://www.beanshell.org/</url>
+      <properties>
+        <jar.manifest.classpath>true</jar.manifest.classpath>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>javassist</groupId>
+      <artifactId>javassist</artifactId>
+      <version>3.4</version>
+      <url>http://www.csg.is.titech.ac.jp/~chiba/javassist/</url>
+      <properties>
+        <jar.manifest.classpath>true</jar.manifest.classpath>
+      </properties>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <sourceDirectory>src/main</sourceDirectory>
+    <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
+
+    <unitTest>
+      <includes>
+        <include>**/Test*.java</include>
+      </includes>
+    </unitTest>
+
+    <resources>
+      <resource>
+        <directory>${basedir}/src</directory>
+        <includes>
+          <include>**/*.xml</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
+</project>

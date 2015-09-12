@@ -1,0 +1,9 @@
+--- !!org.excelsi.gimmal.Config
+props:
+  metaShell: &metaShell !!org.excelsi.solace.MetaShell
+    root: '${user.home}/.solace'
+  shellFactory: &shell !!org.excelsi.solace.GShellFactory
+    metaShell: *metaShell
+app: !!org.excelsi.solace.Solace
+    metaConsole: !!org.excelsi.solace.Tabs
+        shellFactory: *shell
