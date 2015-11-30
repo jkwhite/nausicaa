@@ -17,7 +17,7 @@ public class Runner {
 
     public int go() throws IOException {
         final Process p = _pb.start();
-        new Thread() {
+        new Thread("stdout") {
             public void run() {
                 try {
                     BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -31,7 +31,7 @@ public class Runner {
                 }
             }
         }.start();
-        new Thread() {
+        new Thread("stderr") {
             public void run() {
                 try {
                     BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));

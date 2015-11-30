@@ -1,5 +1,5 @@
 org:  excelsiorg
-proj: automatron
+proj: nausicaa
 ver:  1.0
 lang: Java
 type:
@@ -24,5 +24,7 @@ uses:
     - batik-1.7.jar
     - batik-awt-util-1.7.jar
     - imgscalr-lib-4.2.jar
-main: org.excelsi.ca.Viewer
+main: org.excelsi.nausicaa.NViewer
+#main: org.excelsi.ca.Viewer
 sysargs: -XX:-OmitStackTraceInFastThrow -Dcom.sun.management.jmxremote -Xmx12g -d64
+# -agentlib:hprof=heap=sites,cpu=samples,depth=8

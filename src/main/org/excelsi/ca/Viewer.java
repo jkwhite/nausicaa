@@ -1265,9 +1265,10 @@ public class Viewer extends JFrame {
                                         }
                                     }
                                     if(createWebm) {
-                                        // ffmpeg -y -f image2 -threads 3 -i frame-%d.png -c:v libvpx -crf 10 -b:v 1M -c:a libvorbis -deadline best output.webm
+                                        // ffmpeg -y -r 30 -f image2 -threads 4 -i frame-%d.png -c:v libvpx -crf 4 -b:v 12M -qmin 0 -qmax 50 -deadline best output.webm
                                         Runner pb1 = new Runner(
                                             "ffmpeg", "-y",
+                                            "-loglevel", "fatal",
                                             "-r", frameRate+"",
                                             "-f", "image2",
                                             "-threads", "4",

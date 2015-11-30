@@ -87,7 +87,7 @@ public class Animation extends Thread implements ViewerListener {
                 if(_steps>0&&--_steps==0) {
                     break;
                 }
-                long sleeps = start+100-end;
+                long sleeps = start+50-end;
                 if(sleeps>0) {
                     //System.err.println("sleep for "+sleeps);
                     sleep(sleeps);
@@ -118,7 +118,7 @@ public class Animation extends Thread implements ViewerListener {
                 if(_steps>0&&--_steps==0) {
                     break;
                 }
-                long sleeps = start+100-end;
+                long sleeps = start+50-end;
                 if(sleeps>0) {
                     sleep(sleeps);
                 }
