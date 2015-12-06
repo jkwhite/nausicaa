@@ -47,6 +47,7 @@ public abstract class AbstractIndexedRuleset implements IndexedRuleset {
     }
 
     @Override public IndexedRule merge(IndexedRule rule1, IndexedRule rule2) {
+        final IndexedRule meta = rule1.getMetarule()!=null?rule1.getMetarule():rule2.getMetarule();
         Archetype a1 = rule1.getPattern().archetype();
         Archetype a2 = rule2.getPattern().archetype();
         Archetype a = a1.asColors(a1.colors()+a2.colors()-1);
@@ -87,7 +88,7 @@ public abstract class AbstractIndexedRuleset implements IndexedRuleset {
                     }
                 });
             });
-        });
+        }).withMetarule(meta);
     }
 
     protected final Archetype archetype() {

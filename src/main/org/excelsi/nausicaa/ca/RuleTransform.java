@@ -22,8 +22,13 @@ public class RuleTransform implements Transform {
         Rule root = c.getRule();
         //Rule m = root.origin().random(c.getRandom()).next();
         if(root instanceof IndexedRule) {
+            IndexedRule ir = (IndexedRule) root;
             System.err.println(_m.name()+" mutating rule "+root.humanize());
-            CA after = c.mutate(_m.mutateIndexedRule((IndexedRule)root), _rand);
+            IndexedRule mut = _m.mutateIndexedRule(ir);
+            if(ir.getMetarule()!=null) {
+                mut = mut.withMetarule(_m.mutateIndexedRule(ir.getMetarule()));
+            }
+            CA after = c.mutate(mut, _rand);
             System.err.println(_m.name()+" produced rule "+after.getRule().humanize());
             return after;
         }

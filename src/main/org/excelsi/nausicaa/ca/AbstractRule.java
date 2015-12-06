@@ -10,6 +10,7 @@ import java.io.*;
 
 public abstract class AbstractRule extends WritableImagePlane implements Rule {
     protected Flags _options = new Flags();
+    private Mutagen _mutagen = null; //Genetics.swap();
 
 
     public AbstractRule(int x, int y) {
@@ -40,6 +41,9 @@ public abstract class AbstractRule extends WritableImagePlane implements Rule {
         throw new UnsupportedOperationException();
     }
 
+    @Override public void tick() {
+    }
+
     @Override public String humanize() {
         return toString();
     }
@@ -50,6 +54,14 @@ public abstract class AbstractRule extends WritableImagePlane implements Rule {
 
     @Override public Iterator<Plane> frameIterator(Plane initial) {
         throw new UnsupportedOperationException();
+    }
+
+    public final void setMutagen(Mutagen m) {
+        _mutagen = m;
+    }
+
+    protected final Mutagen mutagen() {
+        return _mutagen;
     }
 
     protected static class Flags implements java.io.Serializable {

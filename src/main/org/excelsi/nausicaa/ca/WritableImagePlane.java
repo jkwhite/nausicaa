@@ -1,6 +1,7 @@
 package org.excelsi.nausicaa.ca;
 
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
@@ -36,6 +37,10 @@ public class WritableImagePlane implements Plane {
         return new WritableImagePlane(_creator, _width, _height);
     }
 
+    @Override public Plane scale(float scale) {
+        throw new UnsupportedOperationException();
+    }
+
     public int getWidth() {
         return _width;
     }
@@ -56,6 +61,10 @@ public class WritableImagePlane implements Plane {
     }
 
     public java.awt.Image toImage(int width, int height) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public BufferedImage toBufferedImage() {
         throw new UnsupportedOperationException();
     }
 

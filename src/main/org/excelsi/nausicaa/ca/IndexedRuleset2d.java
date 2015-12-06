@@ -42,7 +42,10 @@ public class IndexedRuleset2d extends AbstractIndexedRuleset {
 
             @Override
             public Rule next() {
-                return new IndexedRule2d(Patterns.random(archetype(), r), IndexedRuleset2d.this);
+                return new IndexedRule2d(Patterns.random(archetype(), r),
+                    IndexedRuleset2d.this,
+                    (IndexedRule2d) new ThickenAll().mutateIndexedRule(new IndexedRule2d(Patterns.random(archetype(), r), IndexedRuleset2d.this))
+                );
             }
 
             @Override
@@ -67,6 +70,6 @@ public class IndexedRuleset2d extends AbstractIndexedRuleset {
     }
 
     @Override public IndexedRule custom(IndexedRule source, IndexedPattern.BinaryTransform transform) {
-        return new IndexedRule2d(source.getPattern().transform(archetype(), transform), this);
+        return new IndexedRule2d(source.getPattern().transform(archetype(), transform), this, (IndexedRule2d) source.getMetarule());
     }
 }

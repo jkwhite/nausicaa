@@ -366,7 +366,7 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction gen = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.generateLarge(NViewer.this);
+                _a.generateToFile(NViewer.this);
             }
         };
         JMenuItem genl = auto.add(gen);

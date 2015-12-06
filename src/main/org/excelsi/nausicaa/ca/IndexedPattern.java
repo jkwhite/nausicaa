@@ -6,7 +6,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 
-public class IndexedPattern {
+public final class IndexedPattern {
     private final Archetype _a;
     private final long _id;
     private final int _length;
@@ -31,8 +31,22 @@ public class IndexedPattern {
         return _id;
     }
 
-    public byte next(int pattern) {
+    public byte next(final int pattern) {
         return _target[pattern];
+    }
+
+    public byte next(final int pattern, final int offset) {
+        int p = pattern + offset;
+        while(p>=_target.length) {
+            p -= _target.length;
+        }
+        return _target[p];
+        //int b = (_target[pattern]+offset) % _a.colors();
+        //int b = (_target[pattern]+offset);
+        //if(b>=_a.colors()) {
+            //b = (_a.colors()-1);
+        //}
+        //return (byte) b;
     }
 
     public int length() {
@@ -50,8 +64,16 @@ public class IndexedPattern {
         return new IndexedPattern(_a, 0, _length, newTarget);
     }
 
+    public IndexedPattern copy() {
+        return transform((a, t)->{});
+    }
+
     public void inspect(Transform t) {
         t.modulate(_a, _target);
+    }
+
+    public void mutate(Mutagen m) {
+        m.mutate(_a, _target);
     }
 
     public IndexedPattern transform(Archetype a, BinaryTransform t) {

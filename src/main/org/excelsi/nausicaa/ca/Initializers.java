@@ -8,7 +8,8 @@ import java.io.IOException;
 
 public enum Initializers {
     random((byte)0),
-    single((byte)1);
+    single((byte)1),
+    neapolitan((byte)2);
 
     private final byte _id;
 
@@ -24,6 +25,8 @@ public enum Initializers {
         switch(this) {
             case single:
                 return new SingleInitializer();
+            case neapolitan:
+                return new NeapolitanInitializer();
             case random:
             default:
                 return new RandomInitializer();

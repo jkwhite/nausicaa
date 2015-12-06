@@ -9,6 +9,7 @@ import java.util.Iterator;
 public class IndexedRule2d extends AbstractRule implements IndexedRule {
     private final IndexedPattern _p;
     private final IndexedRuleset2d _origin;
+    private final IndexedRule2d _meta;
 
 
     public IndexedRule2d(IndexedPattern p) {
@@ -16,13 +17,37 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
     }
 
     public IndexedRule2d(IndexedPattern p, IndexedRuleset2d origin) {
+        this(p, origin, null);
+    }
+
+    public IndexedRule2d(IndexedPattern p, IndexedRuleset2d origin, IndexedRule2d metarule) {
         super(p.archetype().patternLength(), 1);
         _p = p;
         _origin = origin!=null?origin:new IndexedRuleset2d(p.archetype());
+        //_meta = metarule;
+        //if(_meta!=null) {
+            //System.err.println("META: "+_meta.humanize());
+        //}
+        //else {
+            //System.err.println("META: null");
+        //}
+        _meta = null;
+    }
+
+    @Override public IndexedRule getMetarule() {
+        return _meta;
+    }
+
+    @Override public IndexedRule withMetarule(IndexedRule meta) {
+        return new IndexedRule2d(_p, _origin, (IndexedRule2d) meta);
     }
 
     @Override public IndexedRule2d derive(IndexedPattern pattern) {
-        return new IndexedRule2d(pattern, _origin);
+        return new IndexedRule2d(pattern, _origin, _meta);
+    }
+
+    @Override public IndexedRule2d derive(IndexedPattern.Transform transform) {
+        return new IndexedRule2d(_p.transform(transform), _origin, _meta!=null?_meta.derive(transform):null);
     }
 
     @Override public IndexedPattern getPattern() {
@@ -66,7 +91,7 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
         private final int _y1;
         private final int _x2;
         private final int _y2;
-        private final IndexedPattern _p;
+        private final IndexedPattern _wp;
         private final int _size;
         private final int[] _prev;
         private final byte[] _pattern;
@@ -77,13 +102,13 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
             _y1 = y1;
             _x2 = x2;
             _y2 = y2;
-            _p = p;
-            _size = _p.archetype().size();
-            final int colors = _p.archetype().colors();
-            _prev = new int[(int)Math.pow(2*_size+1, _p.archetype().dims())];
+            _wp = p;
+            _size = _wp.archetype().size();
+            final int colors = _wp.archetype().colors();
+            _prev = new int[(int)Math.pow(2*_size+1, _wp.archetype().dims())];
             _pattern = new byte[_prev.length];
 
-            _pow = new int[_p.length()];
+            _pow = new int[_wp.length()];
             for(int i=0;i<_pow.length;i++) {
                 _pow[_pow.length-1-i] = (int) Math.pow(colors, i);
             }
@@ -94,6 +119,10 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
         public void frame(final Plane p1, final Plane p2) {
             int counts = 0;
             //System.err.println(String.format("dims: %d,%d,%d,%d", _y1, _y2, _x1, _x2));
+            int mw = p1.getWidth()/2;
+            int mh = p1.getHeight()/2;
+            int tw = p1.getWidth();
+            int th = p1.getHeight();
             for(int i=_y1;i<_y2;i++) {
                 for(int j=_x1;j<_x2;j++) {
                     counts++;
@@ -106,23 +135,74 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
                         //System.err.println(String.format("prev[%d]=%d, pow[%d]=%d", k, _prev[k], k, _pow[k]));
                     }
                     //System.err.println(idx+" ");
-                    p2.setCell(j, i, _p.next(idx));
-                    //p2.setCell(j, i, Rand.om.nextInt(2));
+                    //p2.setCell(j, i, _wp.next(idx));
+                    //p2.setCell(j, i, _wp.next(idx, distance(tw, th, mw, mh, i, j)));
+                    p2.setCell(j, i, _wp.next(idx));
                 }
             }
+            mutateRule();
             //System.err.println("set "+counts+" cells");
+        }
+
+        public void frame(final Plane p1, final Plane p2, final Plane meta) {
+            int counts = 0;
+            //System.err.println(String.format("dims: %d,%d,%d,%d", _y1, _y2, _x1, _x2));
+            int mw = p1.getWidth()/2;
+            int mh = p1.getHeight()/2;
+            int tw = p1.getWidth();
+            int th = p1.getHeight();
+            int toff = 0;
+            for(int i=_y1;i<_y2;i++) {
+                for(int j=_x1;j<_x2;j++) {
+                    counts++;
+                    //System.err.println(String.format("working: %d,%d", j, i));
+                    p1.getBlock(_prev, j-_size, i-1, /*dx*/ 3, /*dy*/ 3, 0);
+                    int idx = 0;
+                    for(int k=0;k<_prev.length;k++) {
+                        _pattern[k] = (byte) (_prev[k]);
+                        idx += _prev[k] * _pow[k];
+                        //System.err.println(String.format("prev[%d]=%d, pow[%d]=%d", k, _prev[k], k, _pow[k]));
+                    }
+                    //System.err.println(idx+" ");
+                    //p2.setCell(j, i, _wp.next(idx));
+                    p2.setCell(j, i, _wp.next(idx, distance(tw, th, mw, mh, i, j)));
+                    //int off = meta.getCell(j, i);
+                    //toff += off;
+                    //p2.setCell(j, i, _wp.next(idx, off));
+                }
+            }
+            mutateRule();
+            //System.err.println("set "+counts+" cells");
+            //System.err.println("total offsets: "+toff);
+        }
+
+        private final int distance(int tw, int th, int mw, int mh, int i, int j) {
+            return (int) (Math.sqrt((mw-i)*(mw-i) + (mh-j)*(mh-j))/10);
+        }
+
+        private void mutateRule() {
+            if(mutagen()!=null) {
+                _wp.mutate(mutagen());
+            }
         }
     }
 
     public Iterator<Plane> frameIterator(final Plane c) {
+        final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c):null;
         return new Iterator<Plane>() {
             Plane p1 = c;
             Plane p2 = c.copy();
             Plane tmp;
-            final Worker w = new Worker(_p, 0, 0, c.getWidth(), c.getHeight());
+            final Worker w = new Worker(_p.copy(), 0, 0, c.getWidth(), c.getHeight());
 
             @Override public Plane next() {
-                w.frame(p1, p2);
+                if(metarator!=null) {
+                    Plane meta = metarator.next();
+                    w.frame(p1, p2, meta);
+                }
+                else {
+                    w.frame(p1, p2);
+                }
                 tmp = p1;
                 p1 = p2;
                 p2 = tmp;
@@ -150,34 +230,6 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
             p2 = tmp;
         }
         return 0f;
-        /*
-        final int w = c.getWidth();
-        final int h = c.getHeight();
-        final int size = _p.archetype().size();
-        final int colors = _p.archetype().colors();
-
-        int[] prev = new int[2*size+1];
-        byte[] pattern = new byte[prev.length];
-
-        int[] pow = new int[_p.length()];
-        for(int i=0;i<pow.length;i++) {
-            pow[pow.length-1-i] = (int) Math.pow(colors, i);
-        }
-
-        for(int i=start;i<end;i++) {
-            for(int j=0;j<w;j++) {
-                c.getBlock(prev, j-size, i-1, prev.length, 1, 0);
-                int idx = 0;
-                for(int k=0;k<prev.length;k++) {
-                    pattern[k] = (byte) (prev[k]);
-                    idx += prev[k] * pow[k];
-                }
-                c.setCell(j, i, _p.next(idx));
-                //System.err.print(".");
-            }
-        }
-        return 0f;
-        */
     }
 
     @Override public void write(DataOutputStream dos) throws IOException {

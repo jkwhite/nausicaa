@@ -1,7 +1,10 @@
 package org.excelsi.nausicaa;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Config {
@@ -12,6 +15,7 @@ public class Config {
     private float _scale = 1f;
     private long _animationDelay = 100;
     private boolean _forceSymmetry = true;
+    private final Map<String,Object> _variables = new HashMap<>();
     private String _dir = System.getProperty("user.home");
 
 
@@ -63,7 +67,6 @@ public class Config {
     public void setAnimationDelay(long delay) {
         if(_animationDelay!=delay) {
             _animationDelay = delay;
-            System.err.println("setting animationDelay="+delay);
             notify("animationDelay");
         }
     }
@@ -88,6 +91,15 @@ public class Config {
 
     public String getDir() {
         return _dir;
+    }
+
+    public void setVariable(String name, Object o) {
+        _variables.put(name, o);
+    }
+
+    public <T> T getVariable(String name, T dvalue) {
+        T t = (T) _variables.get(name);
+        return t!=null?t:dvalue;
     }
 
     private void notify(final String p) {

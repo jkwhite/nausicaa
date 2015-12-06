@@ -171,7 +171,8 @@ public class Actions {
         v.getConfig().setAnimationDelay(Math.min(10000, Math.max(3, (int)(v.getConfig().getAnimationDelay()*1.5))));
     }
 
-    public void generateLarge(NViewer v) {
+    public void generateToFile(NViewer v) {
+        new JCAGenerator(v, v.getActiveCA(), v.getConfig());
     }
 
     public void resizeCA(NViewer v) {

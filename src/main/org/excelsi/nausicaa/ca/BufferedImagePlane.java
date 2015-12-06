@@ -77,6 +77,14 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
         return _i.getScaledInstance(width, height, Image.SCALE_SMOOTH);
     }
 
+    @Override public Plane scale(float scale) {
+        return new BufferedImagePlane(Scalr.resize(_i, Scalr.Method.ULTRA_QUALITY, (int)(getWidth()*scale), (int)(getWidth()*scale), Scalr.OP_ANTIALIAS /*, Scalr.OP_BRIGHTER*/));
+    }
+
+    @Override public BufferedImage toBufferedImage() {
+        return _i;
+    }
+
     public javafx.scene.image.Image toJfxImage() {
         throw new UnsupportedOperationException();
     }
@@ -85,7 +93,7 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
         return _scale;
     }
 
-    public BufferedImagePlane scale(float scale) {
+    public BufferedImagePlane withScale(float scale) {
         _scale = scale;
         return this;
     }
@@ -170,19 +178,7 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
     }
 
     @Override public void save(String filename) throws IOException {
-        File file = new File(filename);
-        if(file.getName().endsWith(".gif")) {
-            ImageIO.write(_i, "png", file);
-        }
-        else if(file.getName().endsWith(".jpg")) {
-            ImageIO.write(_i, "jpg", file);
-        }
-        else {
-            if(!file.getName().endsWith(".png")) {
-                file = new File(file.toString()+".png");
-            }
-            ImageIO.write(_i, "png", file);
-        }
+        Pipeline.write(_i, filename);
     }
 
     /*

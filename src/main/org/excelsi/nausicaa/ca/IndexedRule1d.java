@@ -20,8 +20,20 @@ public class IndexedRule1d extends AbstractRule implements IndexedRule {
         _origin = origin!=null?origin:new IndexedRuleset1d(p.archetype());
     }
 
+    @Override public IndexedRule getMetarule() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public IndexedRule withMetarule(IndexedRule meta) {
+        throw new UnsupportedOperationException();
+    }
+
     @Override public IndexedRule1d derive(IndexedPattern pattern) {
         return new IndexedRule1d(pattern, _origin);
+    }
+
+    @Override public IndexedRule1d derive(IndexedPattern.Transform transform) {
+        return new IndexedRule1d(_p.transform(transform), _origin);
     }
 
     @Override public IndexedPattern getPattern() {
