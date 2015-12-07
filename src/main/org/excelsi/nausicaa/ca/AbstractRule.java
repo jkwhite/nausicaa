@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.BitSet;
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
 import java.io.*;
 
 
@@ -52,7 +53,7 @@ public abstract class AbstractRule extends WritableImagePlane implements Rule {
         return toString();
     }
 
-    @Override public Iterator<Plane> frameIterator(Plane initial) {
+    @Override public Iterator<Plane> frameIterator(Plane initial, ExecutorService pool) {
         throw new UnsupportedOperationException();
     }
 

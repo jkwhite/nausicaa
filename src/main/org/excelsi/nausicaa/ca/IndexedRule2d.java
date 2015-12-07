@@ -4,6 +4,9 @@ package org.excelsi.nausicaa.ca;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 
 public class IndexedRule2d extends AbstractRule implements IndexedRule {
@@ -112,7 +115,7 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
             for(int i=0;i<_pow.length;i++) {
                 _pow[_pow.length-1-i] = (int) Math.pow(colors, i);
             }
-            //System.err.println(String.format("worker dims: %dx%d+%dx%d", _x1, _y1, _x2, _y2));
+            System.err.println(String.format("worker dims: %dx%d+%dx%d", _x1, _y1, _x2, _y2));
             //System.err.println(String.format("prev array size: %d, pow array size: %d", _prev.length, _pow.length));
         }
 
@@ -187,22 +190,45 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
         }
     }
 
-    public Iterator<Plane> frameIterator(final Plane c) {
-        final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c):null;
+    public Iterator<Plane> frameIterator(final Plane c, final ExecutorService pool) {
+        final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c,pool):null;
+        final int block = 1000;
+        int nworkers = c.getHeight()/block + (c.getHeight()%block>0?1:0);
+        final Worker[] workers = new Worker[nworkers];
+        for(int i=0;i<workers.length;i++) {
+            workers[i] = new Worker(_p, 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block));
+        }
+        final Future[] futures = new Future[workers.length];
+        System.err.println("frame workers: "+workers.length);
         return new Iterator<Plane>() {
             Plane p1 = c;
             Plane p2 = c.copy();
             Plane tmp;
-            final Worker w = new Worker(_p.copy(), 0, 0, c.getWidth(), c.getHeight());
+            //final Worker w = new Worker(_p.copy(), 0, 0, c.getWidth(), c.getHeight());
+            //final Worker w = new Worker(_p, 0, 0, c.getWidth(), c.getHeight());
 
             @Override public Plane next() {
-                if(metarator!=null) {
-                    Plane meta = metarator.next();
-                    w.frame(p1, p2, meta);
+                //if(metarator!=null) {
+                    //Plane meta = metarator.next();
+                    //w.frame(p1, p2, meta);
+                //}
+                //else {
+                    //w.frame(p1, p2);
+                //}
+                final Plane frameP1 = p1;
+                final Plane frameP2 = p2;
+                for(int i=0;i<workers.length;i++) {
+                    final int w = i;
+                    futures[i] = pool.submit(()->workers[w].frame(frameP1, frameP2));
                 }
-                else {
-                    w.frame(p1, p2);
+                try {
+                    for(int i=0;i<futures.length;i++) {
+                        futures[i].get();
+                    }
                 }
+                catch(InterruptedException|ExecutionException e) {
+                }
+                //w.frame(p1, p2);
                 tmp = p1;
                 p1 = p2;
                 p2 = tmp;

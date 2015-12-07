@@ -9,6 +9,8 @@ import java.io.IOException;
 import javax.swing.*;
 import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 import org.excelsi.nausicaa.ca.*;
 
 
@@ -213,9 +215,9 @@ public class JCAGenerator extends JDialog {
                                     //initCA(c, _r);
                                     CA c = ca.size(w, h);
                                     //Iterator<CA> cas = ((Multirule2D)_r).frames(c);
-                                    Plane plane = c.createPlane();
-                                    Iterator<Plane> cas = c.getRule().frameIterator(plane);
                                     if(createGif) {
+                                        Plane plane = c.createPlane();
+                                        Iterator<Plane> cas = c.getRule().frameIterator(plane, Executors.newFixedThreadPool(1));
                                         AnimatedGifEncoder age = new AnimatedGifEncoder();
                                         age.start(selfile+".gif");
                                         age.setRepeat(0);
@@ -262,17 +264,31 @@ public class JCAGenerator extends JDialog {
                                     }
                                     else {
                                         //Plane p0 = c.createPlane();
-                                        c.getRule()
-                                            .stream(c.createPlane())
-                                            .limit(numFrames)
-                                            .map(Pipeline.context("p", "i", Pipeline.identifier()))
-                                            .map(Pipeline.toBufferedImage("p", "b"))
-                                            .map(Pipeline.indexed2Rgb("b", "b"))
-                                            .map(Pipeline.scale("b", "b", scale))
-                                            .forEach(Pipeline
-                                                .write("b", "i", selfile)
-                                                .andThen((p)->prog.setValue(p.<Long>get("i").intValue()))
-                                            );
+                                        ExecutorService pool = Executors.newFixedThreadPool(3);
+                                        if(scale==1f) {
+                                            c.getRule()
+                                                .stream(c.createPlane(), pool)
+                                                .limit(numFrames)
+                                                .map(Pipeline.context("p", "i", Pipeline.identifier()))
+                                                .map(Pipeline.toBufferedImage("p", "b"))
+                                                .forEach(Pipeline
+                                                    .write("b", "i", selfile)
+                                                    .andThen((p)->prog.setValue(p.<Long>get("i").intValue()))
+                                                );
+                                        }
+                                        else {
+                                            c.getRule()
+                                                .stream(c.createPlane(), pool)
+                                                .limit(numFrames)
+                                                .map(Pipeline.context("p", "i", Pipeline.identifier()))
+                                                .map(Pipeline.toBufferedImage("p", "b"))
+                                                .map(Pipeline.indexed2Rgb("b", "b"))
+                                                .map(Pipeline.scale("b", "b", scale))
+                                                .forEach(Pipeline
+                                                    .write("b", "i", selfile)
+                                                    .andThen((p)->prog.setValue(p.<Long>get("i").intValue()))
+                                                );
+                                        }
 
                                         /*
                                         for(int i=0;i<numFrames;i++) {

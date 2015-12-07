@@ -3,6 +3,8 @@ package org.excelsi.nausicaa;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 import javax.swing.SwingUtilities;
 import org.excelsi.nausicaa.ca.Plane;
 
@@ -87,10 +89,11 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
     public void runFutures() {
         PlaneDisplay[] ds = _f.getDisplays();
         DisplayAnimator[] da = new DisplayAnimator[ds.length];
+        ExecutorService compute = Executors.newFixedThreadPool(Math.min(4,ds.length));
+        ExecutorService render = Executors.newFixedThreadPool(Math.min(4,ds.length));
         for(int i=0;i<ds.length;i++) {
-            da[i] = new DisplayAnimator(ds[i]);
+            da[i] = new DisplayAnimator(ds[i], compute);
         }
-        ExecutorService pool = Executors.newFixedThreadPool(Math.min(4,ds.length));
         try {
             while(_state==State.animate) {
                 long start = System.currentTimeMillis();
@@ -98,7 +101,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
                     if(_state!=State.animate||isInterrupted()) {
                         break;
                     }
-                    pool.submit(da[i]);
+                    render.submit(da[i]);
                 }
                 long end = System.currentTimeMillis();
                 if(_steps>0&&--_steps==0) {
@@ -113,7 +116,8 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         catch(InterruptedException e) {
         }
         finally {
-            pool.shutdownNow();
+            compute.shutdownNow();
+            render.shutdownNow();
         }
     }
 
@@ -122,9 +126,9 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         private PlaneDisplay _d;
 
 
-        public DisplayAnimator(PlaneDisplay d) {
+        public DisplayAnimator(PlaneDisplay d, ExecutorService pool) {
             //_frames = ((Multirule2D)d.getRule()).frames(d.getCA());
-            _frames = d.getRule().frameIterator(d.getPlane());
+            _frames = d.getRule().frameIterator(d.getPlane(), pool);
             _d = d;
         }
 

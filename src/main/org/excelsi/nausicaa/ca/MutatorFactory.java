@@ -16,6 +16,8 @@ public class MutatorFactory {
             weight(10, new ThickenOne()),
             weight(5, new ThickenAll()),
             weight(10, new Fork()),
+            weight(5, new Segregate()),
+            weight(5, new Tangle()),
             weight(1, new Life())
         );
     private final Weight[] _mutators;

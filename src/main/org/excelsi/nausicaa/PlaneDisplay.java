@@ -9,10 +9,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
+import javax.swing.BoxLayout;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyAdapter;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 import javax.swing.Icon;
@@ -42,6 +44,7 @@ import javax.swing.JComponent;
 
 public class PlaneDisplay extends JComponent {
     private JLabel _label;
+    private JCA _img;
     private JScrollPane _show;
     private boolean _shown = true;
     private Rule _r;
@@ -58,6 +61,7 @@ public class PlaneDisplay extends JComponent {
         _h = h;
         setLayout(new BorderLayout());
         JPanel p = new JPanel(new BorderLayout());
+        //p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
         setForeground(Color.BLACK);
         setBackground(Color.BLACK);
         p.setBackground(Color.BLACK);
@@ -65,7 +69,12 @@ public class PlaneDisplay extends JComponent {
         _label = new JLabel("NOTHING", javax.swing.SwingConstants.CENTER);
         _label.setBackground(Color.BLACK);
         _label.setForeground(Color.BLACK);
-        p.add(_label);
+        _img = new JCA(w, h);
+        //_img.setPreferredSize(new java.awt.Dimension(w,h));
+        _img.setAlignmentX(0.5f);
+        _img.setAlignmentY(0.5f);
+        //p.add(_label);
+        p.add(_img, BorderLayout.CENTER);
         //JScrollPane scr = new JScrollPane(_label);
         JScrollPane scr = new JScrollPane(p);
         scr.setBackground(Color.BLACK);
@@ -124,6 +133,10 @@ public class PlaneDisplay extends JComponent {
         return _label;
     }
 
+    public JComponent getDisplayComponent() {
+        return _img;
+    }
+
     private Icon _oldIcon;
     public void toggleShow() {
         if(_shown) {
@@ -162,6 +175,29 @@ public class PlaneDisplay extends JComponent {
 
     public void setPlane(Plane plane) {
         _p = plane;
+        final Image b;
+        if(_scale==1f) {
+            b = plane.toBufferedImage();
+        }
+        else {
+            b = _p.toImage((int)(_p.getWidth()*_scale), (int) (_p.getHeight()*_scale));
+        }
+        Runnable r = new Runnable() {
+            public void run() {
+                _img.setImage(b);
+                invalidate();
+            }
+        };
+        if(SwingUtilities.isEventDispatchThread()) {
+            r.run();
+        }
+        else {
+            SwingUtilities.invokeLater(r);
+        }
+    }
+
+    public void setPlaneOld(Plane plane) {
+        _p = plane;
         ImageIcon i;
         if(_scale==1f) {
             i = new ImageIcon(_p.toImage());
@@ -177,22 +213,6 @@ public class PlaneDisplay extends JComponent {
                 invalidate();
             }
         };
-        /*
-        final Image img = ca.toImage();
-        Runnable r = new Runnable() {
-            public void run() {
-                ImageIcon ii = (ImageIcon) _label.getIcon();
-                if(ii==null) {
-                    ii = new ImageIcon(img);
-                    _label.setIcon(ii);
-                }
-                else {
-                    ii.setImage(img);
-                    _label.repaint();
-                }
-            }
-        };
-        */
         if(SwingUtilities.isEventDispatchThread()) {
             r.run();
         }

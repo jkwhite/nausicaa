@@ -295,7 +295,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                 }
                 futures.add(_displays[i]);
                 final PlaneDisplay td = _displays[i];
-                _displays[i].getLabel().addMouseListener(new MouseAdapter() {
+                _displays[i].getDisplayComponent().addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
                         tick(td);
                     }
