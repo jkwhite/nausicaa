@@ -19,12 +19,12 @@ public class SafeMutator implements Mutator {
 
     @Override public IndexedRule mutateIndexedRule(IndexedRule r) throws MutationFailedException {
         try {
-            _m.mutateIndexedRule(r);
+            return _m.mutateIndexedRule(r);
         }
         catch(MutationFailedException|IllegalStateException e) {
             System.err.println(e.toString());
+            return r;
         }
-        return r;
     }
 
     public Rule mutate(Rule r) {

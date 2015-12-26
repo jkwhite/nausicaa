@@ -7,14 +7,28 @@ import java.util.*;
 public abstract class AbstractMutator implements Mutator {
     public static final int ALPHA = 10;
     protected Random _om;
+    private final int _alpha;
 
 
     public AbstractMutator() {
-        _om = new Random();
+        this(new Random());
     }
 
     public AbstractMutator(Random om) {
         _om = om;
+        _alpha = findAlpha();
+    }
+
+    protected final int alpha() {
+        return _alpha;
+    }
+
+    protected final int findAlpha() {
+        return _om.nextInt(20)+1;
+    }
+
+    protected final boolean chance() {
+        return _om.nextInt(100)<_alpha;
     }
 
     @Override public IndexedRule mutateIndexedRule(IndexedRule r) throws MutationFailedException {

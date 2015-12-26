@@ -6,17 +6,30 @@ import org.excelsi.nausicaa.ca.Symmetry;
 import org.excelsi.nausicaa.ca.SymmetryForcer;
 import org.excelsi.nausicaa.ca.Colors;
 import org.excelsi.nausicaa.ca.CA;
+import org.excelsi.nausicaa.ca.MutatorFactory;
 import org.excelsi.nausicaa.ca.Plane;
 import org.excelsi.nausicaa.ca.Palette;
 import org.excelsi.nausicaa.ca.Rule;
 import org.excelsi.nausicaa.ca.RuleTransform;
+import org.excelsi.nausicaa.ca.Evolver;
+import org.excelsi.nausicaa.ca.EvolverBuilder;
+import org.excelsi.nausicaa.ca.Fitness;
+import org.excelsi.nausicaa.ca.FitnessCriteria;
+import org.excelsi.nausicaa.ca.Encoder;
+import org.excelsi.nausicaa.ca.RandomMutationStrategy;
+import org.excelsi.nausicaa.ca.RandomInitializer;
+import org.excelsi.nausicaa.ca.WordInitializer;
+import org.excelsi.nausicaa.ca.ImageInitializer;
 
 import java.math.BigInteger;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.util.Random;
 import java.awt.event.ActionEvent;
@@ -175,12 +188,154 @@ public class Actions {
         new JCAGenerator(v, v.getActiveCA(), v.getConfig());
     }
 
+    public void chooseWord(final NViewer v) {
+        final JDialog d = new JDialog(v, "Choose word initializer");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(4,2));
+
+        top.add(new JLabel("Alphabet"));
+        final JTextField alphabet = new JTextField();
+        alphabet.setText(WordInitializer.ALPAHBET);
+        alphabet.setColumns(10);
+        top.add(alphabet);
+
+        top.add(new JLabel("Word"));
+        final JTextField word = new JTextField();
+        word.setText(WordInitializer.WORD);
+        word.setColumns(20);
+        top.add(word);
+
+        top.add(new JLabel("Target"));
+        final JTextField target = new JTextField();
+        target.setText(WordInitializer.TARGET);
+        target.setColumns(20);
+        top.add(target);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                WordInitializer.WORD = word.getText();
+                WordInitializer.ALPAHBET = alphabet.getText();
+                WordInitializer.TARGET = target.getText();
+                v.setInitializer(new WordInitializer(alphabet.getText(), word.getText()));
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
+    public void chooseImage(final NViewer v, Config config) {
+        final JFileChooser f = new JFileChooser(config.getDir());
+        f.setDialogTitle("Initial state image");
+        f.setDialogType(f.OPEN_DIALOG);
+        f.setMultiSelectionEnabled(false);
+        int ret = f.showOpenDialog(v);
+        if(ret==f.APPROVE_OPTION) {
+            File img = f.getSelectedFile();
+            config.setDir(img.getParent());
+            try {
+                BufferedImage initImage = ImageIO.read(img);
+                System.err.println("read image "+img);
+                v.setInitializer(new ImageInitializer(initImage));
+                //SwingUtilities.invokeLater(new Runnable() {
+                    //public void run() {
+                        //generate();
+                    //}
+                //});
+            }
+            catch(IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void evolver(NViewer v, Random random) {
+        final Config config = v.getConfig();
+        final JDialog d = new JDialog(v, "Evolver");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(5,2));
+
+        top.add(new JLabel("Iterations"));
+        final JTextField iterations = new JTextField();
+        iterations.setText("100");
+        iterations.setColumns(6);
+        top.add(iterations);
+
+        top.add(new JLabel("Population"));
+        final JTextField pop = new JTextField();
+        pop.setText("10");
+        pop.setColumns(6);
+        top.add(pop);
+
+        top.add(new JLabel("Birth rate"));
+        final JTextField births = new JTextField();
+        births.setText("0.1");
+        births.setColumns(6);
+        top.add(births);
+
+        top.add(new JLabel("Death rate"));
+        final JTextField deaths = new JTextField();
+        deaths.setText("0.1");
+        deaths.setColumns(6);
+        top.add(deaths);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                final Evolver evolver = new EvolverBuilder()
+                    .withRandom(random)
+                    .withInitializer(new RandomInitializer())
+                    .withEncoder(null)
+                    //.withFitness(FitnessCriteria.repeatGreatest())
+                    .withFitness(FitnessCriteria.findTarget(
+                        WordInitializer.encodeWord(WordInitializer.ALPAHBET, WordInitializer.TARGET)))
+                    .withMutationStrategy(new RandomMutationStrategy(MutatorFactory.defaultMutators()))
+                    .withPopulation(Integer.parseInt(pop.getText()))
+                    .withBirthRate(Float.parseFloat(births.getText()))
+                    .withDeathRate(Float.parseFloat(deaths.getText()))
+                    .build();
+                int it = Integer.parseInt(iterations.getText());
+                final CA evolved = evolver.run(v.getActiveCA(), it);
+                v.setActiveCA(evolved);
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
     public void resizeCA(NViewer v) {
         final Config config = v.getConfig();
         final JDialog d = new JDialog(v, "Size");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(2,2));
+        JPanel top = new JPanel(new GridLayout(3,2));
+
         top.add(new JLabel("Width"));
         final JTextField width = new JTextField();
         width.setText(""+config.getWidth());
@@ -189,6 +344,7 @@ public class Actions {
         wp.add(width);
         wp.add(new JLabel("px"));
         top.add(wp);
+
         JPanel hp = new JPanel();
         top.add(new JLabel("Height"));
         final JTextField height = new JTextField();
@@ -197,6 +353,16 @@ public class Actions {
         hp.add(height);
         hp.add(new JLabel("px"));
         top.add(hp);
+
+        top.add(new JLabel("Depth"));
+        JPanel dp = new JPanel();
+        final JTextField depth = new JTextField();
+        depth.setText(""+config.getDepth());
+        depth.setColumns(6);
+        dp.add(depth);
+        dp.add(new JLabel("px"));
+        top.add(dp);
+
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
         JButton ne = new JButton("Ok");
@@ -206,7 +372,7 @@ public class Actions {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
                 //di.setCASize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
-                config.setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
+                config.setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(depth.getText()));
                 //generate(di);
             }
         });
@@ -259,6 +425,11 @@ public class Actions {
 
     public void zoomOne(NViewer v) {
         v.getConfig().setScale(1f);
+    }
+
+    public void view3d(NViewer v) {
+        JfxWindow.setCA(v.getActiveCA());
+        JfxWindow.launch(JfxWindow.class, new String[0]);
     }
 
     private void showError(NViewer v, String msg, Throwable e) {

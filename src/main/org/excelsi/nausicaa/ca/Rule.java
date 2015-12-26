@@ -10,6 +10,7 @@ import java.util.stream.StreamSupport;
 
 
 public interface Rule extends java.io.Serializable, Humanizable {
+    Archetype archetype();
     Ruleset origin();
     int[][] toPattern();
     int[] colors();

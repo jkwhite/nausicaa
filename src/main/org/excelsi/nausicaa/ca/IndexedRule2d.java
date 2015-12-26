@@ -37,6 +37,10 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
         _meta = null;
     }
 
+    @Override public Archetype archetype() {
+        return _p.archetype();
+    }
+
     @Override public IndexedRule getMetarule() {
         return _meta;
     }
@@ -191,6 +195,9 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
     }
 
     public Iterator<Plane> frameIterator(final Plane c, final ExecutorService pool) {
+        if(c==null) {
+            throw new IllegalArgumentException("null plane");
+        }
         final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c,pool):null;
         final int block = 1000;
         int nworkers = c.getHeight()/block + (c.getHeight()%block>0?1:0);

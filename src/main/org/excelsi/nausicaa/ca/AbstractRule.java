@@ -38,6 +38,10 @@ public abstract class AbstractRule extends WritableImagePlane implements Rule {
         return colors().length;
     }
 
+    @Override public Archetype archetype() {
+        throw new UnsupportedOperationException();
+    }
+
     @Override public void write(DataOutputStream dos) throws IOException {
         throw new UnsupportedOperationException();
     }

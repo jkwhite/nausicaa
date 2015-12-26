@@ -34,7 +34,7 @@ public class Tangle extends AbstractMutator {
                             counts[base[j]]++;
                         }
                     }
-                    if(mixed && _om.nextInt(100)<ALPHA) {
+                    if(mixed && chance()) {
                         int sidx = _om.nextInt(counts.length);
                         while(counts[sidx]==0) {
                             sidx = (sidx+1) % counts.length;

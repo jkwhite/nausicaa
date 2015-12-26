@@ -76,6 +76,10 @@ public class WritableImagePlane implements Plane {
         return _r.getArgb(x, y);
     }
 
+    @Override public void setRGBCell(int x, int y, int rgb) {
+        _w.setArgb(x, y, rgb);
+    }
+
     //public int[] getRow(int[] into, int y) {
         //return _i.getRGB(0, y, into.length, 1, into, 0, 0);
     //}

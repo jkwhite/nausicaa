@@ -9,7 +9,9 @@ import java.io.IOException;
 public enum Initializers {
     random((byte)0),
     single((byte)1),
-    neapolitan((byte)2);
+    neapolitan((byte)2),
+    word((byte)3),
+    image((byte)4);
 
     private final byte _id;
 
@@ -27,6 +29,10 @@ public enum Initializers {
                 return new SingleInitializer();
             case neapolitan:
                 return new NeapolitanInitializer();
+            case word:
+                return new WordInitializer();
+            case image:
+                return new ImageInitializer();
             case random:
             default:
                 return new RandomInitializer();

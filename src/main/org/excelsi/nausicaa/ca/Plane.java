@@ -11,6 +11,7 @@ public interface Plane {
     int getHeight();
     void init();
     void setCell(int x, int y, int v);
+    void setRGBCell(int x, int y, int rgb);
     int getCell(int x, int y);
     //int[] getRow(int[] into, int y);
     int[] getRow(int[] into, int y, int offset);

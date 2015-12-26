@@ -44,7 +44,7 @@ public class Symmetry extends AbstractMutator {
                 Patterns.expandSourceIndex(arch, i, base);
                 Patterns.mirror(base, sym);
                 int midx = Patterns.indexForSource(coefficients, sym);
-                System.err.println(i+" => "+midx+": "+Patterns.formatPattern(base)+" => "+Patterns.formatPattern(sym));
+                //System.err.println(i+" => "+midx+": "+Patterns.formatPattern(base)+" => "+Patterns.formatPattern(sym));
                 target[midx] = target[i];
             }
         }));

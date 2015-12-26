@@ -9,7 +9,7 @@ public class Noise extends AbstractMutator {
         //IndexedPattern p = r.getPattern();
         return r.derive((a, target)->{
             for(int i=0;i<target.length;i++) {
-                if(target[i]>0 && _om.nextInt(100)<ALPHA) {
+                if(target[i]>0 && chance()) {
                     target[i] = (byte) (_om.nextInt(a.colors()));
                 }
             }

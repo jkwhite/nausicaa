@@ -18,6 +18,8 @@ public class MutatorFactory {
             weight(10, new Fork()),
             weight(5, new Segregate()),
             weight(5, new Tangle()),
+            weight(5, new Grow()),
+            weight(5, new Grow(true)),
             weight(1, new Life())
         );
     private final Weight[] _mutators;

@@ -67,6 +67,6 @@ public class IndexedRuleset1d extends AbstractIndexedRuleset {
     }
 
     @Override public IndexedRule custom(IndexedRule source, IndexedPattern.BinaryTransform transform) {
-        return new IndexedRule1d(source.getPattern().transform(archetype(), transform), this);
+        return new IndexedRule1d(source.getPattern().transform(archetype(), transform), this, (IndexedRule1d) source.getMetarule());
     }
 }

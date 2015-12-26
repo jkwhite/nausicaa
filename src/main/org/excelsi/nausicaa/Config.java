@@ -11,6 +11,7 @@ public class Config {
     private List<ConfigListener> _listeners = new ArrayList<>();
     private int _w;
     private int _h;
+    private int _d;
     private long _seed = System.currentTimeMillis(); //19450806L;
     private float _scale = 1f;
     private long _animationDelay = 100;
@@ -19,9 +20,10 @@ public class Config {
     private String _dir = System.getProperty("user.home");
 
 
-    public Config(int w, int h) {
+    public Config(int w, int h, int d) {
         _w = w;
         _h = h;
+        _d = d;
     }
 
     public void addListener(ConfigListener l) {
@@ -38,6 +40,13 @@ public class Config {
         notify("size");
     }
 
+    public void setSize(int w, int h, int d) {
+        _w = w;
+        _h = h;
+        _d = d;
+        notify("size");
+    }
+
     public void setScale(float s) {
         _scale = s;
         notify("scale");
@@ -49,6 +58,10 @@ public class Config {
 
     public int getHeight() {
         return _h;
+    }
+
+    public int getDepth() {
+        return _d;
     }
 
     public float getScale() {

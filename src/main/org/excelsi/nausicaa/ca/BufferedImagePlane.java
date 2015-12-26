@@ -119,6 +119,10 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
         _r.setSample(x, y, 0, v);
     }
 
+    @Override public void setRGBCell(int x, int y, int rgb) {
+        _i.setRGB(x, y, rgb);
+    }
+
     public void setRow(int[] row, int y) {
         _r.setSamples(0, y, getWidth(), 1, 0, row);
     }

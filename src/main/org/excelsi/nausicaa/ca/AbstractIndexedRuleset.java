@@ -23,8 +23,8 @@ public abstract class AbstractIndexedRuleset implements IndexedRuleset {
     @Override public IndexedRule derive(Archetype a, IndexedRule sourceRule) {
         IndexedRuleset rs = derive(a);
         if(a.colors()!=_a.colors()) {
-            return rs.custom(sourceRule, (sa, source, ta, target)->{
-                System.err.println("copying "+sa+" => "+ta);
+            IndexedRule ir = rs.custom(sourceRule, (sa, source, ta, target)->{
+                System.err.println("mismatch: copying "+sa+" => "+ta);
                 //System.arraycopy(source, 0, target, 0, Math.min(source.length, target.length));
                 final byte[] base = new byte[sa.sourceLength()];
                 final int[] coefficients = ta.sourceCoefficients();
@@ -36,10 +36,11 @@ public abstract class AbstractIndexedRuleset implements IndexedRuleset {
                     }
                 }
             });
+            return ir;
         }
         else {
             return rs.custom(sourceRule, (sa, source, ta, target)->{
-                System.err.println("copying "+sa+" => "+ta);
+                System.err.println("match: copying "+sa+" => "+ta);
                 System.arraycopy(source, 0, target, 0, Math.min(source.length, target.length));
             });
             //return (IndexedRule) rs.iterator().next();

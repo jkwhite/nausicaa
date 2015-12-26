@@ -8,6 +8,7 @@ import java.io.IOException;
 public class IndexedRule1d extends AbstractRule implements IndexedRule {
     private final IndexedPattern _p;
     private final IndexedRuleset1d _origin;
+    private final IndexedRule2d _meta;
 
 
     public IndexedRule1d(IndexedPattern p) {
@@ -15,17 +16,26 @@ public class IndexedRule1d extends AbstractRule implements IndexedRule {
     }
 
     public IndexedRule1d(IndexedPattern p, IndexedRuleset1d origin) {
+        this(p, origin, null);
+    }
+
+    public IndexedRule1d(IndexedPattern p, IndexedRuleset1d origin, IndexedRule1d metarule) {
         super(p.archetype().patternLength(), 1);
         _p = p;
         _origin = origin!=null?origin:new IndexedRuleset1d(p.archetype());
+        _meta = null;
+    }
+
+    @Override public Archetype archetype() {
+        return _p.archetype();
     }
 
     @Override public IndexedRule getMetarule() {
-        throw new UnsupportedOperationException();
+        return _meta;
     }
 
     @Override public IndexedRule withMetarule(IndexedRule meta) {
-        throw new UnsupportedOperationException();
+        return new IndexedRule1d(_p, _origin, (IndexedRule1d) meta);
     }
 
     @Override public IndexedRule1d derive(IndexedPattern pattern) {

@@ -39,7 +39,8 @@ public class JCA extends JComponent {
         Graphics2D g = (Graphics2D) gr;
         int x = (getWidth()-_i.getWidth(null))/2;
         //int y = (getHeight()-_i.getHeight(null))/2;
-        int y = (getHeight()-_h)/2;
+        //int y = (getHeight()-_h)/2;
+        int y = 0;
         if(_i!=null) {
             //g.drawImage(_i, null, x, y);
             g.drawImage(_i, x, y, Color.BLACK, null);

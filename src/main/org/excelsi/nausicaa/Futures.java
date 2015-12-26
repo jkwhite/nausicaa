@@ -23,6 +23,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     private long _seed = 8;
     private Config _config;
     private Timeline _timeline;
+    private ViewType _viewType = ViewType.view2d;
     private CA _ca;
 
 
@@ -104,6 +105,18 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
 
     @Override public Plane getActivePlane() {
         return getDisplays()[_show?4:0].getPlane();
+    }
+
+    public void setViewType(ViewType viewType) {
+        if(viewType!=_viewType) {
+            _viewType = viewType;
+            reinit();
+            _timeline.notifyListeners(new TimelineEvent("futures"));
+        }
+    }
+
+    public ViewType getViewType() {
+        return _viewType;
     }
 
     public void toggleEditor() {
@@ -279,17 +292,15 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             _displays = new PlaneDisplay[9];
             int width = getCAWidth()/3-10;
             int height = getCAHeight()/3-10;
-            //PlaneDisplay root = new PlaneDisplay(width, height, getBranch());
-            PlaneDisplay root = new PlaneDisplay(_ca.size(width, height));
+            int depth = _config.getDepth();
+            PlaneDisplay root = createPlaneDisplay(_ca.size(width, height, depth));
             root.setScale(_scale);
             for(int i=0;i<_displays.length;i++) {
                 if(i==4) {
                     _displays[i] = root;
                 }
                 else {
-                    //PlaneDisplay d = new PlaneDisplay(width, height, createMutation(root.getRule()));
-                    //PlaneDisplay d = new PlaneDisplay(_ca.mutate(createMutation(root.getRule())).size(width, height));
-                    PlaneDisplay d = new PlaneDisplay(mutate(_ca).size(width, height));
+                    PlaneDisplay d = createPlaneDisplay(mutate(_ca).size(width, height, depth));
                     d.setScale(_scale);
                     _displays[i] = d;
                 }
@@ -307,9 +318,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             _displays = new PlaneDisplay[1];
             final int width = getCAWidth();
             final int height = getCAHeight();
-            //System.err.println("BRANCH: "+getBranch());
-            //PlaneDisplay d = new PlaneDisplay(width, height, getBranch());
-            PlaneDisplay d = new PlaneDisplay(_ca.size(width, height));
+            PlaneDisplay d = createPlaneDisplay(_ca.size(width, height, _config.getDepth()));
             d.setScale(_scale);
             futures.add(d);
             _displays[0] = d;
@@ -317,21 +326,17 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         revalidate();
     }
 
-    private Rule createMutation(Rule root) {
-        /*
-        while(true) {
-            try {
-                long start = System.currentTimeMillis();
-                Mutator mu = Viewer.createMutator(Rand.om);
-                Rule m = root.mutate(mu);
-                System.err.println(mu.name()+" took "+(System.currentTimeMillis()-start)+" msec");
-                return m;
-            }
-            catch(MutationFailedException e) {
-                System.err.println(e.getMessage());
-            }
+    private PlaneDisplay createPlaneDisplay(final CA ca) {
+        switch(_viewType) {
+            case view3d:
+                return new JfxPlaneDisplay(ca);
+            case view2d:
+            default:
+                return new SwingPlaneDisplay(ca);
         }
-        */
+    }
+
+    private Rule createMutation(Rule root) {
         System.err.println("orig: "+root);
         Rule m = root.origin().random(_random).next();
         System.err.println("mut: "+m);
@@ -351,60 +356,19 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         return _show;
     }
 
-    //public Branch<World> getBranch() {
-        //return _current>=0?_timeline.get(_current):null;
-    //}
-//
-    //public boolean hasPrevious() {
-        //return _current > 0;
-    //}
-//
-    //public boolean hasNext() {
-        //return _current < _timeline.size() - 1;
-    //}
-//
-    //public void setCurrent(int current) {
-        //_current = current;
-    //}
-//
-    //public int getCurrent() {
-        //return _current;
-    //}
-
     public CA getCA() {
-        //return _displays[0].getCA();
         return _ca;
     }
 
-    /*
-    public void addBranch(Branch<World> b) {
-        if(_current>=0&&_current<_timeline.size()-1) {
-            _timeline = _timeline.subList(0, _current+1);
-        }
-        _timeline.add(b);
-        _current = _timeline.size() - 1;
-    }
-    */
-
     public Rule getRule() {
-        //return getBranch().data().getRule();
         return _ca.getRule();
     }
-
-    //public void reroll(final Rule.Initialization init) {
-        //generate(init, true);
-    //}
-//
-    //public void generate(final Rule.Initialization init) {
-        //generate(init, true);
-    //}
 
     public void reroll(final Initializer init) {
         generate(init, true);
     }
 
     public void generate(final Initializer init, final boolean reroll) {
-        //NViewer.getUIActions().notifyFutureChanging(Futures.this);
         _timeline.notifyListeners(new TimelineEvent("tick"));
         java.util.List<Thread> threads = new ArrayList<Thread>();
         _lastInit = init;
@@ -413,44 +377,22 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             int height = getCAHeight()/3-10;
             final CA ca = _ca.size(width,height);
             final Vector<Long> created = new Vector<Long>();
-            //_displays[4].setBranch(getBranch());
-            //created.add(_displays[4].getRuleSeed());
             Thread tdm = new Thread() {
                 public void run() {
                     _displays[4].setCA(ca);
-                    //if(reroll) {
-                        //_displays[4].reroll(init);
-                    //}
-                    //else {
-                        //_displays[4].generate(init);
-                    //}
                 }
             };
             threads.add(tdm);
             tdm.start();
-            //_displays[4].generate(init);
             final int[] order = {2, 5, 8, 7, 6, 3, 0, 1, 4};
             for(int i=0;i<_displays.length;i++) {
                 if(order[i]!=4) {
-                    /*
-                    int tries = 0;
-                    Rule temp = getRule().copy();
-                    do {
-                        _displays[order[i]].setRule(createMutation(temp));
-                        tries++;
-                    } while(tries<100&&created.contains(_displays[order[i]].getRuleSeed()));
-                    */
-                    //created.add(_displays[order[i]].getRuleSeed());
                     final int ix = i;
                     Thread td = new Thread() {
                         public void run() {
                             CA nca = mutate(ca);
                             if(reroll) {
-                                //_displays[order[ix]].reroll(init);
                                 nca = nca.seed();
-                            }
-                            else {
-                                //_displays[order[ix]].generate(init);
                             }
                             _displays[order[ix]].setCA(nca);
                         }
@@ -461,7 +403,6 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             }
         }
         else {
-            //_displays[0].setBranch(getBranch());
             int width = getCAWidth();
             int height = getCAHeight();
             final CA ca = _ca.size(width,height);
@@ -483,6 +424,5 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             }
         }
         _timeline.notifyListeners(new TimelineEvent("tock"));
-        //Viewer.getInstance().notifyFutureChanged(Futures.this);
     }
 }

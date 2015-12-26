@@ -17,6 +17,7 @@ public class NViewer extends JFrame implements UIActions {
     private Actions _a = new Actions();
     private static NViewer _instance;
     private Initializers _init = Initializers.random;
+    private Initializer _initializer;
     private Futures _futures;
     private Config _config;
     private Timeline _timeline;
@@ -66,6 +67,11 @@ public class NViewer extends JFrame implements UIActions {
         _futures.setCA(ca);
     }
 
+    public void setInitializer(Initializer initializer) {
+        _initializer = initializer;
+        setActiveCA(getActiveCA().initializer(_initializer));
+    }
+
     @Override
     public PlaneDisplayProvider getPlaneDisplayProvider() {
         return _futures;
@@ -76,8 +82,8 @@ public class NViewer extends JFrame implements UIActions {
     }
 
     public void init() {
-        final int w = 600, h = 600;
-        _config = new Config(w, h);
+        final int w = 600, h = 600, d = 10;
+        _config = new Config(w, h, d);
         createMenu();
         setSize(_width, _height);
         int dims = 2;
@@ -93,14 +99,13 @@ public class NViewer extends JFrame implements UIActions {
         Rule rule = rs.random(rand).next();
         Palette pal = Palette.random(colors, rand);
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
-        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h);
+        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d);
 
         JPanel main = new JPanel(new BorderLayout());
 
-        //PlaneDisplay d = new PlaneDisplay(w, h);
-        Futures d = new Futures(_config, _timeline, ca, new Random());
-        _futures = d;
-        main.add(d, BorderLayout.CENTER);
+        Futures f = new Futures(_config, _timeline, ca, new Random());
+        _futures = f;
+        main.add(f, BorderLayout.CENTER);
         getContentPane().add(main);
         //d.setCA(ca);
     }
@@ -245,12 +250,13 @@ public class NViewer extends JFrame implements UIActions {
             public void actionPerformed(ActionEvent e) {
                 //_init = Rule.Initialization.random;
                 _init = Initializers.random;
-                setActiveCA(getActiveCA().initializer(_init.create()));
+                _initializer = new RandomInitializer();
+                setActiveCA(getActiveCA().initializer(_initializer));
                 hack[0].setState(true);
                 hack[1].setState(false);
-                //hack[2].setState(false);
-                //hack[3].setState(false);
-                _a.generate(NViewer.this);
+                hack[2].setState(false);
+                hack[3].setState(false);
+                //_a.generate(NViewer.this);
             }
         });
         auto.add(ran);
@@ -258,15 +264,17 @@ public class NViewer extends JFrame implements UIActions {
         ran.setText("Random initial state");
         ran.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, shortcut));
         ran.setState(_init==Initializers.random);
+
         JCheckBoxMenuItem fix = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _init = Initializers.single;
-                setActiveCA(getActiveCA().initializer(_init.create()));
+                _initializer = new SingleInitializer();
+                setActiveCA(getActiveCA().initializer(_initializer));
                 hack[0].setState(false);
                 hack[1].setState(true);
-                //hack[2].setState(false);
-                //hack[3].setState(false);
-                _a.generate(NViewer.this);
+                hack[2].setState(false);
+                hack[3].setState(false);
+                //_a.generate(NViewer.this);
             }
         });
         auto.add(fix);
@@ -274,6 +282,43 @@ public class NViewer extends JFrame implements UIActions {
         fix.setSelected(_init==Initializers.single);
         fix.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcut));
         hack[1] = fix;
+
+        JCheckBoxMenuItem wrd = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _init = Initializers.word;
+                _a.chooseWord(NViewer.this);
+                //setActiveCA(getActiveCA().initializer(_initializer));
+                hack[0].setState(false);
+                hack[1].setState(false);
+                hack[2].setState(true);
+                hack[3].setState(false);
+                //hack[3].setState(false);
+                //_a.generate(NViewer.this);
+            }
+        });
+        auto.add(wrd);
+        wrd.setText("Word initial state ...");
+        wrd.setSelected(_init==Initializers.word);
+        //wrd.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcut));
+        hack[2] = wrd;
+
+        JCheckBoxMenuItem img = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _init = Initializers.image;
+                _a.chooseImage(NViewer.this, _config);
+                //setActiveCA(getActiveCA().initializer(_initializer));
+                hack[0].setState(false);
+                hack[1].setState(false);
+                hack[2].setState(false);
+                hack[3].setState(true);
+                //_a.generate(NViewer.this);
+            }
+        });
+        auto.add(img);
+        img.setText("Image initial state ...");
+        img.setSelected(_init==Initializers.image);
+        //wrd.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcut));
+        hack[3] = img;
         /*
         JCheckBoxMenuItem ara = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -497,6 +542,15 @@ public class NViewer extends JFrame implements UIActions {
         forceSym.setState(_config.getForceSymmetry());
         forceSym.setSelected(_config.getForceSymmetry());
 
+        mutate.addSeparator();
+        JMenuItem evolver = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.evolver(NViewer.this, _random);
+            }
+        });
+        mutate.add(evolver);
+        evolver.setText("Evolver ...");
+
         bar.add(mutate);
     }
 
@@ -522,6 +576,25 @@ public class NViewer extends JFrame implements UIActions {
         full.setText("Hide mutations");
         full.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, shortcut));
 
+        final JMenuItem[] vhack = new JMenuItem[1];
+        final JMenuItem view3d = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                final ViewType vt = _futures!=null ? _futures.getViewType() : ViewType.view2d;
+                vhack[0].setText(vt==ViewType.view2d?"View in 2D":"View in 3D");
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        //_a.generate();
+                        _futures.setViewType(vt==ViewType.view2d?ViewType.view3d:ViewType.view2d);
+                        //_futures.revalidate();
+                    }
+                });
+            }
+        });
+        window.add(view3d);
+        vhack[0] = view3d;
+        view3d.setText("View in 3D");
+        //view3d.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, shortcut));
+
         final JMenuItem peditor = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 //_editor = !_editor;
@@ -533,12 +606,22 @@ public class NViewer extends JFrame implements UIActions {
         //peditor.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcut));
         window.add(peditor);
 
+        final JMenuItem viewh = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.view3d(NViewer.this);
+            }
+        });
+        viewh.setText("View from higher dimension");
+        //peditor.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcut));
+        window.add(viewh);
+
         bar.add(window);
     }
 
     private void togglePaletteEditor() {
         if(_peditor!=null) {
             _paletteEditor.disconnect();
+            _paletteEditor = null;
             _peditor.setVisible(false);
             _peditor = null;
         }
@@ -609,7 +692,7 @@ public class NViewer extends JFrame implements UIActions {
         Rule rule = rs.random(rand).next();
         //System.err.println(p.toDetail());
         //Display2 disp = new Display2(w, h);
-        PlaneDisplay disp = new PlaneDisplay(w, h);
+        PlaneDisplay disp = new SwingPlaneDisplay(w, h);
         JFrame d = new JFrame();
         d.setSize(33+w, 33+h);
         d.getContentPane().add(disp);
@@ -618,7 +701,7 @@ public class NViewer extends JFrame implements UIActions {
         for(long i=0;i<1;i++) {
             //CA ca = new CA(w, h);
             Palette p = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
-            CA ca = new CA(rule, p, Initializers.random.create(), rand, 0, w, h);
+            CA ca = new CA(rule, p, Initializers.random.create(), rand, 0, w, h, 10);
             Plane plane = ca.createPlane();
             /*
             for(int k2=0;k2<h;k2++) {

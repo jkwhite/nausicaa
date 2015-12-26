@@ -32,6 +32,9 @@ public final class IndexedPattern {
     }
 
     public byte next(final int pattern) {
+        if(pattern>=_target.length) {
+            return 0;
+        }
         return _target[pattern];
     }
 
