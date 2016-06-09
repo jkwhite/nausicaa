@@ -6,7 +6,7 @@ public class Tangle extends AbstractMutator {
     public String description() { return "Entangles the color spaces of multiple rules"; }
 
 
-    @Override public IndexedRule mutateIndexedRule(IndexedRule r) throws MutationFailedException {
+    @Override public IndexedRule mutateIndexedRule(IndexedRule r, MutationFactor f) throws MutationFailedException {
         final Archetype a = r.getPattern().archetype();
         if(a.colors()<3) {
             throw new MutationFailedException("need at least 3 colors");
@@ -34,7 +34,7 @@ public class Tangle extends AbstractMutator {
                             counts[base[j]]++;
                         }
                     }
-                    if(mixed && chance()) {
+                    if(mixed && chance(f)) {
                         int sidx = _om.nextInt(counts.length);
                         while(counts[sidx]==0) {
                             sidx = (sidx+1) % counts.length;

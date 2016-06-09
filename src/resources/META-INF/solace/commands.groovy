@@ -1,18 +1,105 @@
-import org.excelsi.ca.*;
+import org.excelsi.nausicaa.ca.*;
+import org.excelsi.solace.JfxRenderer;
+import org.excelsi.solace.JfxRendererRegistry;
+import org.excelsi.solace.Painter;
+import org.excelsi.solace.Predicates;
+
+import java.util.Iterator;
+
+import javafx.application.Platform;
+import javafx.scene.Node;
+import javafx.scene.image.ImageView;
 
 ExpandoMetaClass.enableGlobally()
 
+__random__ = new java.util.Random();
+
 //rules = new Rulespace1D( [ new Ruleset1D( [CA.randomColor(), CA.randomColor()].toArray(new Integer[0]) ) ].toArray(new Ruleset1D[0]) )
 
-ca = { wid, hei, rule ->
-    def c = new CA(wid, hei);
-    rule.init(c, Rule.Initialization.single);
-    rule.generate(c, 1, hei, false, false, null);
-    c.rule = rule;
+rules = { d, s, c, h=null ->
+    Ruleset.create(new Archetype(d,s,c), h)
+}
+
+init_single = { Initializers.single.create() }
+
+init_random = { rnd=__random__, seed=19771026, zero=0 ->
+    new RandomInitializer(rnd, seed, new RandomInitializer.Params(zero))
+}
+
+ca = { dims, rule, pal=null, init=null ->
+    if(pal==null) {
+        p = Palette.random(rule.archetype().colors(), __random__);
+    }
+    else if(pal instanceof Palette) {
+        p = pal
+    }
+    else {
+        p = new Palette(pal.collect { Colors.fromString(it) })
+    }
+    if(init==null) {
+        init = Initializers.random.create()
+    }
+    def c = new CA(rule, p, init, __random__, __random__.nextInt(), dims[0], dims[1], dims.size()>2?dims[2]:1);
+    //rule.init(c, Rule.Initialization.single);
+    //rule.generate(c, 1, hei, false, false, null);
+    //c.rule = rule;
     return c;
 }
 
-org.excelsi.ca.Rule.metaClass.ca = { wid, hei ->
+org.excelsi.nausicaa.ca.Ruleset.metaClass.random = {
+    random(__random__)
+}
+
+org.excelsi.nausicaa.ca.Ruleset.metaClass.rule = { id ->
+    create(id)
+}
+
+org.excelsi.nausicaa.ca.Rule.metaClass.ca = { dims, pal=null, init=null ->
+    ca(dims, delegate, pal, init)
+}
+
+org.excelsi.nausicaa.ca.CA.metaClass.animate = {
+    new Animated(delegate)
+}
+
+$r.register(
+    Predicates.instof(CA),
+    new JfxRenderer() {
+        Node render(Object o, Painter p, JfxRendererRegistry renderers) {
+            return renderers.render(o.createPlane().toJfxImage(), p);
+        }
+    })
+
+$r.register(
+    Predicates.instof(Animated),
+    new JfxRenderer() {
+        Node render(Object o, Painter p, JfxRendererRegistry renderers) {
+            Plane init = o.getCA().createPlane();
+            Node img = renderers.render(init.toJfxImage(), p);
+            Iterator fr = o.getCA().getRule().frameIterator(init, Pools.bgr(), true)
+            Runnable r = new Runnable() {
+                public void run() {
+                    Thread.sleep(250)
+                    Plane nxt = fr.next();
+                    Platform.runLater(new Runnable() {
+                        public void run() {
+                            //img.setImage(nxt.toJfxImage(img.getImage()))
+                            //nxt.toJfxImage(img.getImage())
+                            img.setImage(nxt.toJfxImage(img.getImage()))
+                        }
+                    })
+                    if(img.isVisible()) {
+                        Pools.bgr().submit(this)
+                    }
+                }
+            };
+            Pools.bgr().submit(r)
+            return img;
+        }
+    })
+
+/*
+org.excelsi.nausicaa.ca.Rule.metaClass.ca = { wid, hei ->
     ca(wid, hei, delegate)
 }
 
@@ -38,13 +125,26 @@ mutate = { rule, m=null ->
 
 chaos = new Chaos();
 
-org.excelsi.ca.Rule.metaClass.mog = { m=null ->
+org.excelsi.nausicaa.ca.Rule.metaClass.mog = { m=null ->
     mutate(delegate, m)
 }
 
-org.excelsi.ca.Rule.metaClass.var = { cnt=8 ->
+org.excelsi.nausicaa.ca.Rule.metaClass.var = { cnt=8 ->
     (0..cnt).collect { mutate(delegate) }
 }
+*/
 
 // table(8, (0..255).collect { ca(200, 100, wolfram(it)).label("rule ${it}") }, [padding:10] )
 // chaos.space1d().random().next().var().collect { it.ca(200,100) }.table(3)
+
+pal_grey = { d ->
+    pal = []
+    for(i=0;i<=255;i+=255f / (d-1)) {
+        hex = Integer.toString(i.intValue(), 16); //.substring(2)
+        //pal << Colors.fromString("0x${hex}${hex}${hex}")
+        pal << "0x${hex}${hex}${hex}"
+    }
+    /*new Palette(pal)*/
+    pal
+}
+

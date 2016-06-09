@@ -14,7 +14,7 @@ public class Segregate extends AbstractMutator {
     private boolean _all = false;
 
 
-    @Override public IndexedRule mutateIndexedRule(IndexedRule r) throws MutationFailedException {
+    @Override public IndexedRule mutateIndexedRule(IndexedRule r, MutationFactor f) throws MutationFailedException {
         final Archetype a = r.getPattern().archetype();
         if(a.colors()<3) {
             throw new MutationFailedException("need at least 3 colors");

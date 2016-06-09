@@ -5,7 +5,7 @@ public interface Mutator {
     String name();
     String description();
     Rule mutate(Rule r) throws MutationFailedException;
-    IndexedRule mutateIndexedRule(IndexedRule r) throws MutationFailedException;
+    IndexedRule mutateIndexedRule(IndexedRule r, MutationFactor f) throws MutationFailedException;
     Multirule mutate(Multirule r) throws MutationFailedException;
     void setRandom(java.util.Random r);
 
@@ -43,9 +43,9 @@ public interface Mutator {
                     return r;
                 }
 
-                @Override public IndexedRule mutateIndexedRule(IndexedRule r) throws MutationFailedException {
+                @Override public IndexedRule mutateIndexedRule(IndexedRule r, final MutationFactor f) throws MutationFailedException {
                     for(Mutator m:chain) {
-                        r = m.mutateIndexedRule(r);
+                        r = m.mutateIndexedRule(r, f);
                     }
                     return r;
                 }
@@ -61,6 +61,18 @@ public interface Mutator {
                     for(Mutator m:chain) {
                         m.setRandom(r);
                     }
+                }
+
+                @Override public String toString() {
+                    StringBuilder b = new StringBuilder("[");
+                    for(int i=0;i<chain.length;i++) {
+                        b.append(chain[i].toString());
+                        if(i<chain.length-1) {
+                            b.append(" -> ");
+                        }
+                    }
+                    b.append("]");
+                    return b.toString();
                 }
             };
         }

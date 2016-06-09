@@ -18,8 +18,16 @@ import org.excelsi.nausicaa.ca.FitnessCriteria;
 import org.excelsi.nausicaa.ca.Encoder;
 import org.excelsi.nausicaa.ca.RandomMutationStrategy;
 import org.excelsi.nausicaa.ca.RandomInitializer;
+import org.excelsi.nausicaa.ca.WordEncoder;
+import org.excelsi.nausicaa.ca.ByteInitializer;
 import org.excelsi.nausicaa.ca.WordInitializer;
 import org.excelsi.nausicaa.ca.ImageInitializer;
+import org.excelsi.nausicaa.ca.SingleInitializer;
+import org.excelsi.nausicaa.ca.Initializer;
+import org.excelsi.nausicaa.ca.Training;
+import org.excelsi.nausicaa.ca.RetryingMutationStrategy;
+import org.excelsi.nausicaa.ca.MutationStrategies;
+import org.excelsi.nausicaa.ca.MutationFactor;
 
 import java.math.BigInteger;
 import java.awt.*;
@@ -34,6 +42,7 @@ import javax.swing.*;
 import java.util.Random;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
+import java.util.concurrent.Executors;
 
 
 public class Actions {
@@ -49,7 +58,9 @@ public class Actions {
         if(ret==f.APPROVE_OPTION) {
             try {
                 config.setDir(f.getSelectedFile().getParent());
-                v.setActiveCA(CA.fromFile(f.getSelectedFile().toString()));
+                final CA ca = CA.fromFile(f.getSelectedFile().toString());
+                config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth());
+                v.setActiveCA(ca);
             }
             catch(IOException e) {
                 showError(v, "Failed to load "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);
@@ -109,8 +120,15 @@ public class Actions {
         p.addPair("Text", createRuleText(b64));
         String id = r.id();
         if(id.length()<1000000) {
-            BigInteger rval = new BigInteger(r.id(), r.colorCount());
-            final String frval = rval.toString(10);
+            String frval;
+            try {
+                BigInteger rval = new BigInteger(r.id(), r.colorCount());
+                frval = rval.toString(10);
+            }
+            catch(Exception e) {
+                e.printStackTrace();
+                frval = "Error: "+r.id();
+            }
             p.addPair("Rval ("+frval.length()+" digits)", createRuleText(frval));
         }
         else {
@@ -186,6 +204,83 @@ public class Actions {
 
     public void generateToFile(NViewer v) {
         new JCAGenerator(v, v.getActiveCA(), v.getConfig());
+    }
+
+    public void mutationParams(final NViewer v, Config config) {
+        final JDialog d = new JDialog(v, "Mutation parameters");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(2,2));
+
+        top.add(new JLabel("Alpha"));
+        final JTextField alpha = new JTextField();
+        alpha.setText(config.getVariable("mutator_alpha", "20"));
+        alpha.setColumns(3);
+        top.add(alpha);
+
+        top.add(new JLabel("Max colors"));
+        final JTextField mc = new JTextField();
+        mc.setText(config.getVariable("mutator_maxcolors", "9"));
+        mc.setColumns(3);
+        top.add(mc);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                config.setVariable("mutator_alpha", alpha.getText());
+                config.setVariable("mutator_maxcolors", mc.getText());
+                config.notify("mutator");
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
+    public void chooseRandom(final NViewer v, Config config) {
+        final JDialog d = new JDialog(v, "Random initializer");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(1,2));
+
+        top.add(new JLabel("Zero weight"));
+        final JTextField zeroWeight = new JTextField();
+        zeroWeight.setText(config.getVariable("random_zeroweight", "0"));
+        zeroWeight.setColumns(10);
+        top.add(zeroWeight);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                config.setVariable("random_zeroweight", zeroWeight.getText());
+                v.setInitializer(new RandomInitializer(null, 0, new RandomInitializer.Params(Float.parseFloat(zeroWeight.getText()))));
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
     }
 
     public void chooseWord(final NViewer v) {
@@ -267,31 +362,55 @@ public class Actions {
         final JDialog d = new JDialog(v, "Evolver");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(5,2));
+        JPanel top = new JPanel(new GridLayout(9,2));
+
+        top.add(new JLabel("Epicycles"));
+        final JTextField epicycles = new JTextField();
+        epicycles.setText(config.<String>getVariable("evo_epicycles", "1"));
+        epicycles.setColumns(6);
+        top.add(epicycles);
 
         top.add(new JLabel("Iterations"));
         final JTextField iterations = new JTextField();
-        iterations.setText("100");
+        iterations.setText(config.<String>getVariable("evo_iterations", "100"));
         iterations.setColumns(6);
         top.add(iterations);
 
+        top.add(new JLabel("Subiterations"));
+        final JTextField subiterations = new JTextField();
+        subiterations.setText(config.<String>getVariable("evo_subiterations", "1"));
+        subiterations.setColumns(6);
+        top.add(subiterations);
+
         top.add(new JLabel("Population"));
         final JTextField pop = new JTextField();
-        pop.setText("10");
+        pop.setText(config.<String>getVariable("evo_population", "10"));
         pop.setColumns(6);
         top.add(pop);
 
         top.add(new JLabel("Birth rate"));
         final JTextField births = new JTextField();
-        births.setText("0.1");
+        births.setText(config.<String>getVariable("evo_birthrate", "0.1"));
         births.setColumns(6);
         top.add(births);
 
         top.add(new JLabel("Death rate"));
         final JTextField deaths = new JTextField();
-        deaths.setText("0.1");
+        deaths.setText(config.<String>getVariable("evo_deathrate", "0.1"));
         deaths.setColumns(6);
         top.add(deaths);
+
+        top.add(new JLabel("Color limit"));
+        final JTextField colorlimit = new JTextField();
+        colorlimit.setText(config.<String>getVariable("evo_colorlimit", "9"));
+        colorlimit.setColumns(6);
+        top.add(colorlimit);
+
+        top.add(new JLabel("Training set"));
+        final JTextField training = new JTextField();
+        training.setText(config.<String>getVariable("evo_trainingset", ""));
+        training.setColumns(32);
+        top.add(training);
 
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
@@ -301,21 +420,85 @@ public class Actions {
         ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
-                final Evolver evolver = new EvolverBuilder()
-                    .withRandom(random)
-                    .withInitializer(new RandomInitializer())
-                    .withEncoder(null)
-                    //.withFitness(FitnessCriteria.repeatGreatest())
-                    .withFitness(FitnessCriteria.findTarget(
-                        WordInitializer.encodeWord(WordInitializer.ALPAHBET, WordInitializer.TARGET)))
-                    .withMutationStrategy(new RandomMutationStrategy(MutatorFactory.defaultMutators()))
-                    .withPopulation(Integer.parseInt(pop.getText()))
-                    .withBirthRate(Float.parseFloat(births.getText()))
-                    .withDeathRate(Float.parseFloat(deaths.getText()))
-                    .build();
-                int it = Integer.parseInt(iterations.getText());
-                final CA evolved = evolver.run(v.getActiveCA(), it);
-                v.setActiveCA(evolved);
+                final Encoder enc = new WordEncoder("abc");
+                try {
+                    config.setVariable("evo_epicycles", epicycles.getText());
+                    config.setVariable("evo_iterations", iterations.getText());
+                    config.setVariable("evo_subiterations", subiterations.getText());
+                    config.setVariable("evo_population", pop.getText());
+                    config.setVariable("evo_birthrate", births.getText());
+                    config.setVariable("evo_deathrate", deaths.getText());
+                    config.setVariable("evo_colorlimit", colorlimit.getText());
+                    config.setVariable("evo_trainingset", training.getText());
+                    final Initializer target = new ImageInitializer(new File(training.getText()));
+                    final Plane tplane = v.getActiveCA().size(config.getWidth(), config.getHeight()).initializer(target).createPlane();
+                    final Evolver evolver = new EvolverBuilder()
+                        .withEncoder(null)
+                        //.withTraining(Training.file(training.getText(),
+                            //(line)->{return new ByteInitializer(enc.encode(line));}
+                        //))
+                        .withTraining(Training.of(new SingleInitializer()))
+                        //.withTraining(Training.of(new RandomInitializer(1), new RandomInitializer(2), new RandomInitializer(3), new RandomInitializer(4)))
+                        //.withFitness(FitnessCriteria.repeatGreatest())
+                        //.withFitness(FitnessCriteria.findTarget(
+                            //WordInitializer.encodeWord(WordInitializer.ALPAHBET, WordInitializer.TARGET)))
+                        //.withFitness(FitnessCriteria.reverse(4, 4))
+                        //.withFitness(FitnessCriteria.nothingLostNothingGained())
+                        .withFitness(FitnessCriteria.findTarget(tplane, new double[]{1}))
+                        .withMutationStrategy(new RetryingMutationStrategy(new RandomMutationStrategy(MutatorFactory.defaultMutators()), MutationStrategies.noise(), 4))
+                        .withPopulation(Integer.parseInt(pop.getText()))
+                        .withBirthRate(Float.parseFloat(births.getText()))
+                        .withDeathRate(Float.parseFloat(deaths.getText()))
+                        .build();
+                    final int epi = Integer.parseInt(epicycles.getText());
+                    final int it = Integer.parseInt(iterations.getText());
+                    final int subit = Integer.parseInt(subiterations.getText());
+                    final int colorLimit = Integer.parseInt(colorlimit.getText());
+                    final JDialog gene = new JDialog(v, "Evolving");
+                    final JLabel task = new JLabel("Building automata");
+                    Font font = task.getFont();
+                    task.setFont(font.deriveFont(font.getSize()-2f));
+                    JPanel main = new JPanel(new BorderLayout());
+                    main.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+                    gene.add(main, BorderLayout.CENTER);
+                    final JButton[] hack = new JButton[1];
+
+                    Thread builder = new Thread() {
+                        public void run() {
+                            final CA evolved = evolver.run(v.getActiveCA().size(config.getWidth(), config.getHeight()),
+                                    random,
+                                    epi,
+                                    it,
+                                    subit,
+                                    colorLimit,
+                                    Executors.newFixedThreadPool(4));
+                            SwingUtilities.invokeLater(()->{ v.setActiveCA(evolved); });
+                            SwingUtilities.invokeLater(()->{ gene.dispose(); });
+                        }
+                    };
+                    final JButton cancel = new JButton("Cancel");
+                    cancel.addActionListener(new AbstractAction() {
+                        public void actionPerformed(ActionEvent e) {
+                            task.setText("Canceling");
+                            cancel.setEnabled(false);
+                            evolver.requestCancel();
+                            //builder.interrupt();
+                        }
+                    });
+                    hack[0] = cancel;
+                    JPanel south = new JPanel(new BorderLayout());
+                    south.add(cancel, BorderLayout.EAST);
+                    main.add(south, BorderLayout.SOUTH);
+                    main.add(task, BorderLayout.WEST);
+                    Dimension di = main.getPreferredSize();
+                    gene.setSize(100+di.width, 50+di.height);
+                    Things.centerWindow(gene);
+                    gene.setVisible(true);
+                    builder.start();
+                }
+                catch(Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         bot.add(ne);
@@ -399,20 +582,29 @@ public class Actions {
     }
 
     private Mutator _lastMutator;
-    public void repeatLastMutation(NViewer v, Random rand) {
-        mutate(v, rand, _lastMutator);
+    public void repeatLastMutation(NViewer v, Config config, Random rand) {
+        mutate(v, config, rand, _lastMutator);
     }
 
     public void randomMutation(NViewer v) {
     }
 
-    public void mutate(NViewer v, Random rand, Mutator m) {
+    public void mutate(NViewer v, Config config, Random rand, Mutator m) {
         _lastMutator = m;
         if(v.getConfig().getForceSymmetry()) {
             m = Mutator.chain(m, new Symmetry());
         }
         final CA ca = v.getActiveCA();
-        v.setActiveCA(new RuleTransform(rand, m).transform(ca));
+        v.setActiveCA(new RuleTransform(rand, m, createMutationFactor(config)).transform(ca));
+    }
+
+    public static MutationFactor createMutationFactor(Config config) {
+        int mc = Integer.parseInt(config.getVariable("mutator_maxcolors", "9"));
+        return MutationFactor.defaultFactor()
+            .withAlpha(Integer.parseInt(config.getVariable("mutator_alpha", "20")))
+            .withValidator((a)->{
+                return a.colors()<mc;
+            });
     }
 
     public void zoomIn(NViewer v) {

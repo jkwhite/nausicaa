@@ -4,9 +4,10 @@ package org.excelsi.nausicaa.ca;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 
-public final class IndexedPattern {
+public final class IndexedPattern implements Pattern {
     private final Archetype _a;
     private final long _id;
     private final int _length;
@@ -31,11 +32,14 @@ public final class IndexedPattern {
         return _id;
     }
 
-    public byte next(final int pattern) {
+    @Override public byte next(final int pattern) {
         if(pattern>=_target.length) {
             return 0;
         }
         return _target[pattern];
+    }
+
+    @Override public void tick() {
     }
 
     public byte next(final int pattern, final int offset) {
@@ -56,7 +60,7 @@ public final class IndexedPattern {
         return _length;
     }
 
-    public Archetype archetype() {
+    @Override public Archetype archetype() {
         return _a;
     }
 
@@ -126,6 +130,19 @@ public final class IndexedPattern {
             b.append("\n");
         }
         return b.toString();
+    }
+
+    public String histogram() {
+        int[] counts = new int[_a.colors()];
+        for(int i=0;i<_target.length;i++) {
+            if(_target[i] < counts.length) {
+                counts[_target[i]]++;
+            }
+            else {
+                throw new IllegalStateException(_target[i]+" greater than "+counts.length);
+            }
+        }
+        return Arrays.toString(counts);
     }
 
     @FunctionalInterface

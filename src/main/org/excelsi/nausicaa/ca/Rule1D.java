@@ -6,6 +6,7 @@ import java.util.*;
 import java.math.BigInteger;
 import java.io.*;
 import java.util.zip.*;
+import java.util.concurrent.ExecutorService;
 import org.excelsi.rlyehian.Codec;
 
 
@@ -48,7 +49,8 @@ public class Rule1D extends AbstractRule implements Rule, java.io.Serializable {
                 throw new IllegalArgumentException("length mismatch");
             }
             for(int j=0;j<p.length;j++) {
-                setCell(i++, 0, p[j]);
+                //TODO
+                //setCell(i++, 0, p[j]);
                 seed = Long.rotateLeft(seed, 1);
                 seed ^= p[j];
             }
@@ -125,7 +127,10 @@ public class Rule1D extends AbstractRule implements Rule, java.io.Serializable {
     }
 
     public int[][] toPattern() {
-        int[][] ps = new int[getWidth()/_len][_len];
+        // getCell
+        throw new UnsupportedOperationException();
+        /*
+        int[][] ps = new int[width()/_len][_len];
         int pos = 0;
         for(int i=0;i<ps.length;i++) {
             ps[i] = new int[_len];
@@ -135,6 +140,7 @@ public class Rule1D extends AbstractRule implements Rule, java.io.Serializable {
             }
         }
         return ps;
+        */
     }
 
     public int[] colors() {
@@ -252,7 +258,7 @@ public class Rule1D extends AbstractRule implements Rule, java.io.Serializable {
         }
     }
 
-    public float generate(Plane c, int start, int end, boolean stopOnSame, boolean over, Updater u) {
+    public float generate(Plane c, int start, int end, final ExecutorService pool, boolean stopOnSame, boolean over, Updater u) {
         final int offset = (_len-2)/2;
         if(_next==null||_next.length!=c.getWidth()) {
             _row = new int[c.getWidth()+2*offset];

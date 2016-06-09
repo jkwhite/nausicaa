@@ -2,6 +2,7 @@ package org.excelsi.nausicaa.ca;
 
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 
 public class Multirule1D extends AbstractRule implements Multirule {
@@ -287,7 +288,7 @@ public class Multirule1D extends AbstractRule implements Multirule {
         return 0;
     }
 
-    public float generate(Plane c, int start, int end, boolean stopOnSame, boolean over, Updater u) {
+    public float generate(Plane c, int start, int end, ExecutorService pool, boolean stopOnSame, boolean over, Updater u) {
         float diff = 0f;
         Rule[] rules = new Rule[_rules.length];
         System.arraycopy(_rules, 0, rules, 0, _rules.length);
@@ -302,7 +303,7 @@ public class Multirule1D extends AbstractRule implements Multirule {
             for(Rule r:rules) {
                 //if(r==rules[0]) System.err.println(Thread.currentThread().getId()+" mask for rule "+r.toSeed()+" is "+(r.getMask()==null?"null":"not null"));
                 //if(r==rules[0]) { ((Rule1D)r).setDebug(true); }
-                diff += r.generate(c, i, i+1, stopOnSame, over, null);
+                diff += r.generate(c, i, i+1, pool, stopOnSame, over, null);
                 over = false;
             }
             if(u!=null&&i%u.interval()==0) {

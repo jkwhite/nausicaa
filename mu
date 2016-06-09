@@ -24,7 +24,9 @@ uses:
     - batik-1.7.jar
     - batik-awt-util-1.7.jar
     - imgscalr-lib-4.2.jar
-main: org.excelsi.nausicaa.NViewer
+    - solace-1.0.jar
+main: org.excelsi.gimmal.AppFactory
+#main: org.excelsi.nausicaa.NViewer
 #main: org.excelsi.ca.Viewer
 sysargs: -XX:-OmitStackTraceInFastThrow -Dcom.sun.management.jmxremote -Xmx12g -d64
 # -agentlib:hprof=heap=sites,cpu=samples,depth=8

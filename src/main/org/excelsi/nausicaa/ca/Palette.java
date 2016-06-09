@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.awt.image.IndexColorModel;
+import java.util.List;
 import java.util.Random;
 
 
@@ -12,8 +13,15 @@ public class Palette {
     private final int[] _colors;
 
 
-    public Palette(int... colors) {
+    public Palette(final int... colors) {
         _colors = colors.clone();
+    }
+
+    public Palette(final List<Integer> colors) {
+        _colors = new int[colors.size()];
+        for(int i=0;i<_colors.length;i++) {
+            _colors[i] = colors.get(i);
+        }
     }
 
     public int getColorCount() {

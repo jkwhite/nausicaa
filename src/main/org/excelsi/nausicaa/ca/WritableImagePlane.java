@@ -3,6 +3,9 @@ package org.excelsi.nausicaa.ca;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.Arrays;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
@@ -16,17 +19,24 @@ public class WritableImagePlane implements Plane {
     private final WritableImage _i;
     private final PixelReader _r;
     private final PixelWriter _w;
+    private final Palette _p;
+    private final PixelFormat<ByteBuffer> _pf;
+    private final WritablePixelFormat<IntBuffer> _pfi = WritablePixelFormat.getIntArgbInstance();
+    private final int[] _colors;
     private final int _width;
     private final int _height;
 
 
-    public WritableImagePlane(CA creator, int w, int h) {
+    public WritableImagePlane(CA creator, int w, int h, Palette p) {
         _creator = creator;
         _i = new WritableImage(w, h);
         _r = _i.getPixelReader();
         _w = _i.getPixelWriter();
         _width = w;
         _height = h;
+        _p = p;
+        _colors = p.getColors();
+        _pf = PixelFormat.createByteIndexedInstance(p.getColors());
     }
 
     public CA creator() {
@@ -34,7 +44,7 @@ public class WritableImagePlane implements Plane {
     }
 
     public Plane copy() {
-        return new WritableImagePlane(_creator, _width, _height);
+        return new WritableImagePlane(_creator, _width, _height, _p);
     }
 
     @Override public Plane scale(float scale) {
@@ -56,6 +66,10 @@ public class WritableImagePlane implements Plane {
         return _i;
     }
 
+    @Override public javafx.scene.image.Image toJfxImage(javafx.scene.image.WritableImage img) {
+        return _i;
+    }
+
     public java.awt.Image toImage() {
         throw new UnsupportedOperationException();
     }
@@ -68,16 +82,60 @@ public class WritableImagePlane implements Plane {
         throw new UnsupportedOperationException();
     }
 
+    private byte[] _cellBufW = new byte[1];
     public void setCell(int x, int y, int v) {
-        _w.setArgb(x, y, v);
+        //System.err.println(System.identityHashCode(this)+"setting "+x+", "+y+" to "+v);
+        //_w.setArgb(x, y, v);
+        _cellBufW[0] = (byte) v;
+        _w.setPixels(x, y, 1, 1, _pf, _cellBufW, 0, 0);
+        int c = _r.getArgb(x, y);
+        //System.err.println(System.identityHashCode(this)+"set to "+c);
     }
 
+    private byte[] _cellBufR = new byte[1];
     public int getCell(int x, int y) {
-        return _r.getArgb(x, y);
+        //System.err.println(System.identityHashCode(this)+"getCell "+x+","+y);
+        if(x<0) {
+            x += getWidth();
+        }
+        else if(x>=getWidth()) {
+            x -= getWidth();
+        }
+        if(y<0) {
+            y += getHeight();
+        }
+        else if(y>=getHeight()) {
+            y -= getHeight();
+        }
+        int c = _r.getArgb(x, y);
+        return reverse(c);
+        //_r.getPixels(x, y, 1, 1, _pf, _cellBufR, 0, 0);
+        //return _cellBufR[0];
+    }
+
+    private final int reverse(int argb) {
+        for(int i=0;i<_colors.length;i++) {
+            //System.err.println(System.identityHashCode(this)+"compare "+argb+" vs "+_colors[i]);
+            if(_colors[i]==argb) {
+                return i;
+            }
+        }
+        //throw new IllegalStateException("no such value "+argb+" in "+Arrays.toString(_colors));
+        //return -1;
+        return argb;
+    }
+
+    private final int[] reverse(int[] argb) {
+        //System.err.println(System.identityHashCode(this)+"array: "+Arrays.toString(argb));
+        for(int i=0;i<argb.length;i++) {
+            argb[i] = reverse(argb[i]);
+        }
+        return argb;
     }
 
     @Override public void setRGBCell(int x, int y, int rgb) {
-        _w.setArgb(x, y, rgb);
+        throw new UnsupportedOperationException();
+        //_w.setArgb(x, y, rgb);
     }
 
     //public int[] getRow(int[] into, int y) {
@@ -86,14 +144,31 @@ public class WritableImagePlane implements Plane {
 
     public int[] getRow(int[] into, int y, int offset) {
         //return _i.getRGB(0, y, into.length-2*offset, 1, into, offset, 0);
+        //System.err.println(System.identityHashCode(this)+"getRow "+y);
         _r.getPixels(0, y, into.length-2*offset, 1,
-            WritablePixelFormat.getIntArgbInstance(), into, offset, getWidth());
-        return into;
+            _pfi, into, offset, getWidth());
+        return reverse(into);
     }
 
     public int[] getBlock(int[] into, int x, int y, int w, int h, int offset) {
+        //System.err.println(System.identityHashCode(this)+"getBlock "+x+","+y);
         //return getBlock(into, x, y, d, 0);
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
+        if(false && x>=0&&y>=0&&x+w<_i.getWidth()&&y+h<_i.getHeight()) {
+            //_r.getPixels(x, y, w, h, WritablePixelFormat.getIntArgbInstance(), into, offset, 0);
+            //_r.getPixels(x, y, w, h, _pf, into, offset, 0);
+            _r.getPixels(x, y, w, h, _pfi, into, offset, 0);
+            reverse(into);
+        }
+        else {
+            int n = 0;
+            for(int j=y;j<y+h;j++) {
+                for(int i=x;i<x+w;i++) {
+                    into[n++] = getCell(i,j);
+                }
+            }
+        }
+        return into;
     }
 //
     //public int[] getBlock(int[] into, int x, int y, int d, int offset) {
@@ -104,12 +179,33 @@ public class WritableImagePlane implements Plane {
         //return _i.getRGB(x, y, dx, dy, into, offset, 0);
     //}
 
-    public void setRow(int[] row, int y) {
+    private byte[] _lastRow;
+    public synchronized void setRow(final int[] row, final int y) {
+        if(_lastRow==null||_lastRow.length!=row.length) {
+            _lastRow = new byte[row.length];
+        }
+        for(int i=0;i<row.length;i++) {
+            _lastRow[i] = (byte) row[i];
+        }
         //_i.setRGB(0, y, row.length, 1, row, 0, 0);
-        _w.setPixels(0, y, row.length, 1, PixelFormat.getIntArgbInstance(), row, 0, getWidth());
+        //_w.setPixels(0, y, row.length, 1, PixelFormat.getIntArgbInstance(), row, 0, getWidth());
+        _w.setPixels(0, y, row.length, 1, _pf, _lastRow, 0, getWidth());
     }
 
     @Override public void save(String filename) throws IOException {
         throw new UnsupportedOperationException();
+    }
+
+    @Override public Plane subplane(int x1, int y1, int x2, int y2) {
+        return new WindowedPlane(this, x1, y1, x2, y2);
+    }
+
+    @Override public byte next(final int pattern) {
+        final int y = pattern/getWidth();
+        final int x = pattern%getWidth();
+        return (byte) getCell(x, y);
+    }
+
+    @Override public void tick() {
     }
 }

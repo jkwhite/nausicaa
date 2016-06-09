@@ -9,8 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 
-public class IndexedRule2d extends AbstractRule implements IndexedRule {
-    private final IndexedPattern _p;
+public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
+    //private final IndexedPattern _p;
     private final IndexedRuleset2d _origin;
     private final IndexedRule2d _meta;
 
@@ -20,12 +20,13 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
     }
 
     public IndexedRule2d(IndexedPattern p, IndexedRuleset2d origin) {
-        this(p, origin, null);
+        this(p, origin, null, null);
     }
 
-    public IndexedRule2d(IndexedPattern p, IndexedRuleset2d origin, IndexedRule2d metarule) {
-        super(p.archetype().patternLength(), 1);
-        _p = p;
+    public IndexedRule2d(IndexedPattern p, IndexedRuleset2d origin, IndexedRule2d metarule, IndexedRule hyper) {
+        //super(p.archetype().patternLength(), 1);
+        super(p, hyper);
+        //_p = p;
         _origin = origin!=null?origin:new IndexedRuleset2d(p.archetype());
         //_meta = metarule;
         //if(_meta!=null) {
@@ -37,45 +38,54 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
         _meta = null;
     }
 
-    @Override public Archetype archetype() {
-        return _p.archetype();
-    }
+    //@Override public Archetype archetype() {
+        //return _p.archetype();
+    //}
 
     @Override public IndexedRule getMetarule() {
         return _meta;
     }
 
+    //@Override public IndexedRule getHyperrule() {
+        //throw new UnsupportedOperationException();
+    //}
+
     @Override public IndexedRule withMetarule(IndexedRule meta) {
-        return new IndexedRule2d(_p, _origin, (IndexedRule2d) meta);
+        return new IndexedRule2d(pattern(), _origin, (IndexedRule2d) meta, getHyperrule());
+    }
+
+    @Override public IndexedRule withHyperrule(IndexedRule hyper) {
+        return new IndexedRule2d(pattern(), _origin, _meta, hyper);
+        //throw new UnsupportedOperationException();
     }
 
     @Override public IndexedRule2d derive(IndexedPattern pattern) {
-        return new IndexedRule2d(pattern, _origin, _meta);
+        return new IndexedRule2d(pattern, _origin, _meta, getHyperrule());
     }
 
     @Override public IndexedRule2d derive(IndexedPattern.Transform transform) {
-        return new IndexedRule2d(_p.transform(transform), _origin, _meta!=null?_meta.derive(transform):null);
+        return new IndexedRule2d(pattern().transform(transform), _origin, _meta!=null?_meta.derive(transform):null, getHyperrule());
     }
 
-    @Override public IndexedPattern getPattern() {
-        return _p;
-    }
+    //@Override public IndexedPattern getPattern() {
+        //return _p;
+    //}
 
     @Override public int dimensions() {
         return 2;
     }
 
-    @Override public int length() {
-        return _p.archetype().sourceLength();
-    }
+    //@Override public int length() {
+        //return _p.archetype().sourceLength();
+    //}
 
     @Override public int background() {
         return 0;
     }
 
-    @Override public int colorCount() {
-        return _p.archetype().colors();
-    }
+    //@Override public int colorCount() {
+        //return _p.archetype().colors();
+    //}
 
     @Override public int[][] toPattern() {
         throw new UnsupportedOperationException();
@@ -85,26 +95,26 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
         return _origin;
     }
 
-    @Override public int[] colors() {
-        int[] cols = new int[_p.archetype().colors()];
-        for(int i=0;i<cols.length;i++) {
-            cols[i] = i;
-        }
-        return cols;
-    }
+    //@Override public int[] colors() {
+        //int[] cols = new int[_p.archetype().colors()];
+        //for(int i=0;i<cols.length;i++) {
+            //cols[i] = i;
+        //}
+        //return cols;
+    //}
 
     public class Worker {
         private final int _x1;
         private final int _y1;
         private final int _x2;
         private final int _y2;
-        private final IndexedPattern _wp;
+        private final Pattern _wp;
         private final int _size;
         private final int[] _prev;
         private final byte[] _pattern;
         private final int[] _pow;
 
-        public Worker(IndexedPattern p, int x1, int y1, int x2, int y2) {
+        public Worker(Pattern p, int x1, int y1, int x2, int y2) {
             _x1 = x1;
             _y1 = y1;
             _x2 = x2;
@@ -115,15 +125,25 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
             _prev = new int[(int)Math.pow(2*_size+1, _wp.archetype().dims())];
             _pattern = new byte[_prev.length];
 
-            _pow = new int[_wp.length()];
+            //_pow = new int[_wp.length()];
+            _pow = new int[_wp.archetype().sourceLength()];
             for(int i=0;i<_pow.length;i++) {
                 _pow[_pow.length-1-i] = (int) Math.pow(colors, i);
             }
-            System.err.println(String.format("worker dims: %dx%d+%dx%d", _x1, _y1, _x2, _y2));
+            //System.err.println(String.format("worker dims: %dx%d+%dx%d", _x1, _y1, _x2, _y2));
             //System.err.println(String.format("prev array size: %d, pow array size: %d", _prev.length, _pow.length));
         }
 
+        private void validate(Plane p) {
+            for(int i=0;i<p.getWidth();i++) {
+                for(int j=0;j<p.getHeight();j++) {
+                    p.getCell(i, j);
+                }
+            }
+        }
+
         public void frame(final Plane p1, final Plane p2) {
+            validate(p1);
             int counts = 0;
             //System.err.println(String.format("dims: %d,%d,%d,%d", _y1, _y2, _x1, _x2));
             int mw = p1.getWidth()/2;
@@ -172,7 +192,8 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
                     }
                     //System.err.println(idx+" ");
                     //p2.setCell(j, i, _wp.next(idx));
-                    p2.setCell(j, i, _wp.next(idx, distance(tw, th, mw, mh, i, j)));
+                    //TODO HERE
+                    //p2.setCell(j, i, _wp.next(idx, distance(tw, th, mw, mh, i, j)));
                     //int off = meta.getCell(j, i);
                     //toff += off;
                     //p2.setCell(j, i, _wp.next(idx, off));
@@ -188,25 +209,27 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
         }
 
         private void mutateRule() {
-            if(mutagen()!=null) {
-                _wp.mutate(mutagen());
-            }
+            //if(mutagen()!=null) {
+                //_wp.mutate(mutagen());
+            //}
         }
     }
 
-    public Iterator<Plane> frameIterator(final Plane c, final ExecutorService pool) {
+    public Iterator<Plane> frameIterator(final Plane c, final ExecutorService pool, final boolean doubleBuffer) {
         if(c==null) {
             throw new IllegalArgumentException("null plane");
         }
-        final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c,pool):null;
+        final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c,pool, doubleBuffer):null;
         final int block = 1000;
         int nworkers = c.getHeight()/block + (c.getHeight()%block>0?1:0);
         final Worker[] workers = new Worker[nworkers];
+        final Pattern p = createPattern(pool);
         for(int i=0;i<workers.length;i++) {
-            workers[i] = new Worker(_p, 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block));
+            //workers[i] = new Worker(_p, 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block));
+            workers[i] = new Worker(p, 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block));
         }
         final Future[] futures = new Future[workers.length];
-        System.err.println("frame workers: "+workers.length);
+        //System.err.println("frame workers: "+workers.length);
         return new Iterator<Plane>() {
             Plane p1 = c;
             Plane p2 = c.copy();
@@ -238,7 +261,13 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
                 //w.frame(p1, p2);
                 tmp = p1;
                 p1 = p2;
-                p2 = tmp;
+                if(doubleBuffer) {
+                    p2 = tmp;
+                }
+                else {
+                    p2 = p1.copy();
+                }
+                p.tick();
                 return p2;
             }
 
@@ -251,33 +280,42 @@ public class IndexedRule2d extends AbstractRule implements IndexedRule {
         };
     }
 
-    @Override public float generate(final Plane c, final int start, final int end, final boolean stopOnSame, final boolean overwrite, final Updater u) {
-        Plane p1 = c.copy();
-        Plane p2 = c;
+    @Override public float generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u) {
+        Plane p1 = c;
+        Plane p2 = c.copy();
         Plane tmp;
-        Worker w = new Worker(_p, 0, 0, c.getWidth(), c.getHeight());
+        final Pattern p = createPattern(pool);
+        Worker w = new Worker(p, 0, 0, c.getWidth(), c.getHeight());
         for(int frames=start;frames<end;frames++) {
+            System.err.println("frame "+frames);
             w.frame(p1, p2);
             tmp = p1;
             p1 = p2;
             p2 = tmp;
+            p.tick();
         }
         return 0f;
     }
 
-    @Override public void write(DataOutputStream dos) throws IOException {
-        _p.write(dos);
-    }
+    //@Override public void write(DataOutputStream dos) throws IOException {
+        //_p.write(dos);
+    //}
+
+    //@Override public String humanize() {
+        //return _p.summarize();
+    //}
+
+    //@Override public String id() {
+        //return _p.formatTarget();
+    //}
 
     @Override public String humanize() {
-        return _p.summarize();
-    }
-
-    @Override public String id() {
-        return _p.formatTarget();
+        StringBuilder b = new StringBuilder("2d / ");
+        b.append(super.humanize());
+        return b.toString();
     }
 
     @Override public String toString() {
-        return "IndexedRule1d::{pattern:"+_p+"}";
+        return "IndexedRule2d::{pattern:"+pattern()+"}";
     }
 }

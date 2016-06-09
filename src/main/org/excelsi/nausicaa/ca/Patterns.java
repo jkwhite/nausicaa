@@ -1,6 +1,7 @@
 package org.excelsi.nausicaa.ca;
 
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Random;
@@ -56,9 +57,17 @@ public class Patterns {
     public static IndexedPattern forIndex(Archetype a, long index) {
         //final int plen = 1 + (int) Math.pow(2*a.size()+1, a.dims());
         //final int np = (int) Math.pow(a.colors(), plen-1);
+        String s = Long.toString(index, a.colors());
+        return forIndex(a, s, a.colors());
+    }
+
+    public static IndexedPattern forIndex(Archetype a, String s, int base) {
+        if(a.colors()!=base) {
+            BigInteger i = new BigInteger(s, base);
+            s = i.toString(a.colors());
+        }
         final int plen = a.patternLength();
         final int np = a.totalPatterns();
-        String s = Long.toString(index, a.colors());
         //System.err.println(index+" => "+s);
         byte[] p = new byte[np];
         int i = p.length-1;
@@ -71,7 +80,7 @@ public class Patterns {
         while(i-->0) {
             p[i] = 0;
         }
-        return new IndexedPattern(a, index, plen-1, p);
+        return new IndexedPattern(a, /*index*/ -1, plen-1, p);
     }
 
     // index(10) -> index(b)

@@ -217,7 +217,8 @@ public class JCAGenerator extends JDialog {
                                     //Iterator<CA> cas = ((Multirule2D)_r).frames(c);
                                     if(createGif) {
                                         Plane plane = c.createPlane();
-                                        Iterator<Plane> cas = c.getRule().frameIterator(plane, Executors.newFixedThreadPool(1));
+                                        ExecutorService pool = Executors.newFixedThreadPool(1);
+                                        Iterator<Plane> cas = c.getRule().frameIterator(plane, pool, true);
                                         AnimatedGifEncoder age = new AnimatedGifEncoder();
                                         age.start(selfile+".gif");
                                         age.setRepeat(0);
@@ -261,13 +262,14 @@ public class JCAGenerator extends JDialog {
                                             }
                                         }
                                         age.finish();
+                                        pool.shutdown();
                                     }
                                     else {
                                         //Plane p0 = c.createPlane();
                                         ExecutorService pool = Executors.newFixedThreadPool(3);
                                         if(scale==1f) {
                                             c.getRule()
-                                                .stream(c.createPlane(), pool)
+                                                .stream(c.createPlane(), pool, true)
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))
                                                 .map(Pipeline.toBufferedImage("p", "b"))
@@ -278,7 +280,7 @@ public class JCAGenerator extends JDialog {
                                         }
                                         else {
                                             c.getRule()
-                                                .stream(c.createPlane(), pool)
+                                                .stream(c.createPlane(), pool, true)
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))
                                                 .map(Pipeline.toBufferedImage("p", "b"))

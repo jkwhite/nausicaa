@@ -6,6 +6,8 @@ public interface IndexedRule extends Rule {
     IndexedRule derive(IndexedPattern pattern);
     IndexedRule derive(IndexedPattern.Transform transform);
     IndexedRule getMetarule();
+    IndexedRule getHyperrule();
     IndexedRule withMetarule(IndexedRule meta);
+    IndexedRule withHyperrule(IndexedRule hyper);
     IndexedRuleset origin();
 }

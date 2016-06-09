@@ -31,7 +31,11 @@ public abstract class AbstractMutator implements Mutator {
         return _om.nextInt(100)<_alpha;
     }
 
-    @Override public IndexedRule mutateIndexedRule(IndexedRule r) throws MutationFailedException {
+    protected final boolean chance(MutationFactor f) {
+        return _om.nextInt(100)<f.alpha();
+    }
+
+    @Override public IndexedRule mutateIndexedRule(IndexedRule r, MutationFactor f) throws MutationFailedException {
         throw new UnsupportedOperationException();
     }
 

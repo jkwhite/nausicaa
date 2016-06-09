@@ -9,13 +9,26 @@ import java.util.concurrent.ExecutorService;
 import java.io.*;
 
 
-public abstract class AbstractRule extends WritableImagePlane implements Rule {
+public abstract class AbstractRule /*extends WritableImagePlane*/ implements Rule {
     protected Flags _options = new Flags();
     private Mutagen _mutagen = null; //Genetics.swap();
+    //private Mutagen _mutagen = Genetics.flip();
+    private final int _x;
+    private final int _y;
 
 
     public AbstractRule(int x, int y) {
-        super(null, x, y);
+        //super(null, x, y);
+        _x = x;
+        _y = y;
+    }
+
+    public int width() {
+        return _x;
+    }
+
+    public int height() {
+        return _y;
     }
 
     public Flags getFlags() {
@@ -42,11 +55,18 @@ public abstract class AbstractRule extends WritableImagePlane implements Rule {
         throw new UnsupportedOperationException();
     }
 
+    @Override public IndexedRule getHyperrule() {
+        throw new UnsupportedOperationException();
+    }
+
     @Override public void write(DataOutputStream dos) throws IOException {
         throw new UnsupportedOperationException();
     }
 
     @Override public void tick() {
+    }
+
+    @Override public void copy(Plane p) {
     }
 
     @Override public String humanize() {
@@ -57,7 +77,7 @@ public abstract class AbstractRule extends WritableImagePlane implements Rule {
         return toString();
     }
 
-    @Override public Iterator<Plane> frameIterator(Plane initial, ExecutorService pool) {
+    @Override public Iterator<Plane> frameIterator(Plane initial, ExecutorService pool, boolean doubleBuffer) {
         throw new UnsupportedOperationException();
     }
 

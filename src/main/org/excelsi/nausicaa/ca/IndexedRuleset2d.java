@@ -10,6 +10,10 @@ public class IndexedRuleset2d extends AbstractIndexedRuleset {
         super(a);
     }
 
+    public IndexedRuleset2d(Archetype a, IndexedRuleset hyper) {
+        super(a, hyper);
+    }
+
     @Override
     public Iterator<Rule> iterator() {
         return new Iterator<Rule>() {
@@ -44,7 +48,8 @@ public class IndexedRuleset2d extends AbstractIndexedRuleset {
             public Rule next() {
                 return new IndexedRule2d(Patterns.random(archetype(), r),
                     IndexedRuleset2d.this,
-                    (IndexedRule2d) new ThickenAll().mutateIndexedRule(new IndexedRule2d(Patterns.random(archetype(), r), IndexedRuleset2d.this))
+                    (IndexedRule2d) new ThickenAll().mutateIndexedRule(new IndexedRule2d(Patterns.random(archetype(), r), IndexedRuleset2d.this), MutationFactor.defaultFactor()),
+                    hyperRandom(r)
                 );
             }
 
@@ -70,6 +75,6 @@ public class IndexedRuleset2d extends AbstractIndexedRuleset {
     }
 
     @Override public IndexedRule custom(IndexedRule source, IndexedPattern.BinaryTransform transform) {
-        return new IndexedRule2d(source.getPattern().transform(archetype(), transform), this, (IndexedRule2d) source.getMetarule());
+        return new IndexedRule2d(source.getPattern().transform(archetype(), transform), this, (IndexedRule2d) source.getMetarule(), source.getHyperrule());
     }
 }

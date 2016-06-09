@@ -105,6 +105,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
                 }
                 long end = System.currentTimeMillis();
                 if(_steps>0&&--_steps==0) {
+                    _state = State.die;
                     break;
                 }
                 long sleeps = start+_delay-end;
@@ -128,7 +129,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
 
         public DisplayAnimator(PlaneDisplay d, ExecutorService pool) {
             //_frames = ((Multirule2D)d.getRule()).frames(d.getCA());
-            _frames = d.getRule().frameIterator(d.getPlane(), pool);
+            _frames = d.getRule().frameIterator(d.getPlane(), pool, true);
             _d = d;
         }
 
@@ -137,11 +138,14 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         }
 
         public void step() {
+            System.err.print(".");
             if(!_frames.hasNext()) {
+                System.err.println("done");
                 return;
             }
             final Plane frame = _frames.next(); //.copy();
             if(isInterrupted()) {
+                System.err.println("interrupted done");
                 return;
             }
             final Thread calling = Thread.currentThread();

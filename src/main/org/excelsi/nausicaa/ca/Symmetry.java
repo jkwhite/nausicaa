@@ -22,14 +22,15 @@ public class Symmetry extends AbstractMutator {
         _all = all;
     }
 
-    @Override public IndexedRule mutateIndexedRule(IndexedRule r) throws MutationFailedException {
+    @Override public IndexedRule mutateIndexedRule(IndexedRule r, MutationFactor f) throws MutationFailedException {
+        System.err.println("*********************** running symmetry");
         switch(r.getPattern().archetype().dims()) {
             case 1:
                 return mutateIndexedRule1d(r);
             case 2:
                 return mutateIndexedRule2d(r);
             default:
-                return r;
+                throw new MutationFailedException("unsupported dims: "+r.getPattern().archetype().dims());
         }
     }
 
@@ -85,10 +86,10 @@ public class Symmetry extends AbstractMutator {
         int[] colors = r.colors();
         int bgr = r.background();
         //int[][] sym = new int[arch.length][arch[0].length];
-        Map<Pattern,Pattern> s = new HashMap<Pattern,Pattern>();
+        Map<FullPattern,FullPattern> s = new HashMap<FullPattern,FullPattern>();
         for(int i=0;i<pats.length;i++) {
-            Pattern p = new Pattern(pats[i], r.dimensions());
-            Pattern m = s.get(p.mirror());
+            FullPattern p = new FullPattern(pats[i], r.dimensions());
+            FullPattern m = s.get(p.mirror());
             if(m!=null) {
                 //System.err.println("found: "+p+" => "+m);
                 pats[i][pats[i].length-1] = m.result();
@@ -112,17 +113,17 @@ public class Symmetry extends AbstractMutator {
         int bgr = r.background();
         //int[][] sym = new int[arch.length][arch[0].length];
         long lst = System.currentTimeMillis();
-        Map<Pattern,Pattern> s = new HashMap<Pattern,Pattern>();
+        Map<FullPattern,FullPattern> s = new HashMap<FullPattern,FullPattern>();
         long mirrors = 0;
         for(int i=0;i<pats.length;i++) {
             long st1 = System.currentTimeMillis();
-            Pattern p = new Pattern(pats[i], r.dimensions());
-            Iterator<Pattern> ms = p.mirrors();
-            Pattern found = null;
+            FullPattern p = new FullPattern(pats[i], r.dimensions());
+            Iterator<FullPattern> ms = p.mirrors();
+            FullPattern found = null;
             while(ms.hasNext()) {
                 mirrors++;
-                Pattern mir = ms.next();
-                Pattern m = s.get(mir);
+                FullPattern mir = ms.next();
+                FullPattern m = s.get(mir);
                 if(m!=null) {
                     //System.err.println("found: "+p+" => "+m);
                     found = m;

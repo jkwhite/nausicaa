@@ -2,6 +2,7 @@ package org.excelsi.nausicaa.ca;
 
 
 import java.util.Iterator;
+import java.util.function.Predicate;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -59,7 +60,7 @@ public final class Archetype {
     }
 
     /**
-     * Number of source patterns, not including target.
+     * Number of source patterns. Size of target array.
      */
     public int totalPatterns() {
         return (int) Math.pow(colors(), sourceLength());
@@ -113,6 +114,13 @@ public final class Archetype {
                 };
             }
         };
+    }
+
+    public Archetype validate(Predicate<Archetype> p) {
+        if(!p.test(this)) {
+            throw new LimitExceededException("exceeded VM limit");
+        }
+        return this;
     }
 
     public void write(DataOutputStream dos) throws IOException {

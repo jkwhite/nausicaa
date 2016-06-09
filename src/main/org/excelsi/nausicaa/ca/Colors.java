@@ -2,6 +2,7 @@ package org.excelsi.nausicaa.ca;
 
 
 import java.util.Random;
+import javafx.scene.paint.Color;
 
 
 public class Colors {
@@ -48,6 +49,11 @@ public class Colors {
     public static String toColorString(int c) {
         int[] u = unpack(c);
         return "[R: "+u[2]+" G: "+u[1]+" B: "+u[0]+" A: "+u[3]+"]";
+    }
+
+    public static int fromString(final String c) {
+        final Color col = Color.valueOf(c);
+        return pack((int)(255*col.getRed()), (int)(255*col.getGreen()), (int)(255*col.getBlue()), 255);
     }
 
     public static int randomColor(Random om) {

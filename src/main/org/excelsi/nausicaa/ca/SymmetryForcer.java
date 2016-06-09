@@ -27,8 +27,8 @@ public class SymmetryForcer extends AbstractMutator {
         _m.setRandom(r);
     }
 
-    @Override public IndexedRule mutateIndexedRule(IndexedRule r) throws MutationFailedException {
-        return _s.mutateIndexedRule(_m.mutateIndexedRule(r));
+    @Override public IndexedRule mutateIndexedRule(IndexedRule r, MutationFactor f) throws MutationFailedException {
+        return _s.mutateIndexedRule(_m.mutateIndexedRule(r, f), f);
     }
 
     public Rule mutate(Rule r) throws MutationFailedException {

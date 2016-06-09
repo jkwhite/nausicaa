@@ -10,6 +10,10 @@ public class IndexedRuleset1d extends AbstractIndexedRuleset {
         super(a);
     }
 
+    public IndexedRuleset1d(Archetype a, IndexedRuleset hyper) {
+        super(a, hyper);
+    }
+
     @Override
     public Iterator<Rule> iterator() {
         return new Iterator<Rule>() {
@@ -22,7 +26,7 @@ public class IndexedRuleset1d extends AbstractIndexedRuleset {
 
             @Override
             public Rule next() {
-                return new IndexedRule1d(ps.next(), IndexedRuleset1d.this);
+                return new IndexedRule1d(ps.next(), IndexedRuleset1d.this, null, null);
             }
 
             @Override
@@ -42,7 +46,7 @@ public class IndexedRuleset1d extends AbstractIndexedRuleset {
 
             @Override
             public Rule next() {
-                return new IndexedRule1d(Patterns.random(archetype(), r), IndexedRuleset1d.this);
+                return new IndexedRule1d(Patterns.random(archetype(), r), IndexedRuleset1d.this, null, hyperRandom(r));
             }
 
             @Override
@@ -54,7 +58,11 @@ public class IndexedRuleset1d extends AbstractIndexedRuleset {
 
     @Override
     public Rule create(Object... args) {
-        throw new UnsupportedOperationException();
+        IndexedRule hyper = null;
+        if(args.length==2 && getHyperrules()!=null) {
+            hyper = (IndexedRule) getHyperrules().create(args[1]);
+        }
+        return new IndexedRule1d(Patterns.forIndex(archetype(), args[0].toString(), 10), this, null, hyper);
     }
 
     @Override
@@ -63,10 +71,11 @@ public class IndexedRuleset1d extends AbstractIndexedRuleset {
     }
 
     @Override public IndexedRule custom(IndexedPattern.Transform transform) {
+        Thread.dumpStack();
         return new IndexedRule1d(Patterns.custom(archetype(), transform));
     }
 
     @Override public IndexedRule custom(IndexedRule source, IndexedPattern.BinaryTransform transform) {
-        return new IndexedRule1d(source.getPattern().transform(archetype(), transform), this, (IndexedRule1d) source.getMetarule());
+        return new IndexedRule1d(source.getPattern().transform(archetype(), transform), this, (IndexedRule1d) source.getMetarule(), source.getHyperrule());
     }
 }

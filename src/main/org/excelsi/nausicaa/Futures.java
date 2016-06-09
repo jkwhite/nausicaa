@@ -84,6 +84,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     @Override
     public void configChanged(Config c, String p) {
         switch(p) {
+            case "mutator":
             case "size":
                 reinit();
                 _timeline.notifyListeners(new TimelineEvent("futures"));
@@ -191,8 +192,13 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         });
     }
 
+    private MutationFactor createMutationFactor() {
+        //return MutationFactor.defaultFactor().withAlpha(Integer.parseInt(_config.getVariable("mutator_alpha", "20")));
+        return Actions.createMutationFactor(_config);
+    }
+
     public CA mutate(CA ca) {
-        return new MultiTransform(_random, _config.getForceSymmetry()?new Symmetry(true):null).transform(ca);
+        return new MultiTransform(_random, createMutationFactor(), _config.getForceSymmetry()?new Symmetry(true):null).transform(ca);
         //return ca.mutate(createMutation(ca.getRule()));
         /*
         Transform t;
@@ -290,8 +296,8 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         if(_show) {
             futures.setLayout(new GridLayout(3, 3, 0, 0));
             _displays = new PlaneDisplay[9];
-            int width = getCAWidth()/3-10;
-            int height = getCAHeight()/3-10;
+            int width = getCAWidth() > 60 ? getCAWidth()/3-10 : getCAWidth();
+            int height = getCAHeight() > 60 ? getCAHeight()/3-10 : getCAHeight();
             int depth = _config.getDepth();
             PlaneDisplay root = createPlaneDisplay(_ca.size(width, height, depth));
             root.setScale(_scale);
@@ -373,8 +379,8 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         java.util.List<Thread> threads = new ArrayList<Thread>();
         _lastInit = init;
         if(_show) {
-            int width = getCAWidth()/3-10;
-            int height = getCAHeight()/3-10;
+            int width = getCAWidth() > 60 ? getCAWidth()/3-10 : getCAWidth();
+            int height = getCAHeight() > 60 ? getCAHeight()/3-10 : getCAHeight();
             final CA ca = _ca.size(width,height);
             final Vector<Long> created = new Vector<Long>();
             Thread tdm = new Thread() {

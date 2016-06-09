@@ -17,9 +17,9 @@ public class SafeMutator implements Mutator {
         return _m.description();
     }
 
-    @Override public IndexedRule mutateIndexedRule(IndexedRule r) throws MutationFailedException {
+    @Override public IndexedRule mutateIndexedRule(IndexedRule r, MutationFactor f) throws MutationFailedException {
         try {
-            return _m.mutateIndexedRule(r);
+            return _m.mutateIndexedRule(r, f);
         }
         catch(MutationFailedException|IllegalStateException e) {
             System.err.println(e.toString());

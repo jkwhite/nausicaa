@@ -115,7 +115,7 @@ public class Config {
         return t!=null?t:dvalue;
     }
 
-    private void notify(final String p) {
+    public void notify(final String p) {
         for(ConfigListener l:new ArrayList<>(_listeners)) {
             l.configChanged(this, p);
         }

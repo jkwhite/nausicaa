@@ -70,7 +70,7 @@ public class JfxWindow extends Application {
         stage.setScene(s);
         stage.show();
 
-        final Iterator<Plane> frames = _ca.getRule().frameIterator(p, _pool);
+        final Iterator<Plane> frames = _ca.getRule().frameIterator(p, _pool, true);
         _sched.scheduleAtFixedRate(()->{
                 final Plane next = frames.next();
                 Platform.runLater(()->{_jfxCa.addPlane(next);});

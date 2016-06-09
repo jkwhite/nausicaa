@@ -44,6 +44,8 @@ import javax.swing.JComponent;
 
 public class SwingPlaneDisplay extends PlaneDisplay {
     private JLabel _label;
+    private JLabel _meta;
+    private JLabel _hyper;
     private JCA _img;
     private JScrollPane _show;
     private boolean _shown = true;
@@ -54,9 +56,15 @@ public class SwingPlaneDisplay extends PlaneDisplay {
     private int _w;
     private int _h;
     private float _scale = 1.0f;
+    private final boolean useNew = false;
 
 
-    public SwingPlaneDisplay(int w, int h) {
+    public SwingPlaneDisplay(CA ca) {
+        this(ca.getWidth(), ca.getHeight());
+        setCA(ca);
+    }
+
+    private SwingPlaneDisplay(int w, int h) {
         _w = w;
         _h = h;
         setLayout(new BorderLayout());
@@ -69,12 +77,23 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         _label = new JLabel("NOTHING", javax.swing.SwingConstants.CENTER);
         _label.setBackground(Color.BLACK);
         _label.setForeground(Color.BLACK);
-        _img = new JCA(w, h);
-        //_img.setPreferredSize(new java.awt.Dimension(w,h));
-        _img.setAlignmentX(0.5f);
-        _img.setAlignmentY(0.5f);
-        //p.add(_label);
-        p.add(_img, BorderLayout.CENTER);
+        if(useNew) {
+            _img = new JCA(w, h);
+            //_img.setPreferredSize(new java.awt.Dimension(w,h));
+            _img.setAlignmentX(0.5f);
+            _img.setAlignmentY(0.5f);
+            p.add(_img, BorderLayout.CENTER);
+        }
+        else {
+            p.add(_label);
+        }
+
+        _meta = new JLabel("", javax.swing.SwingConstants.CENTER);
+        _meta.setForeground(Color.WHITE);
+        _hyper = new JLabel("");
+        p.add(_meta, BorderLayout.SOUTH);
+        p.add(_hyper, BorderLayout.EAST);
+
         //JScrollPane scr = new JScrollPane(_label);
         JScrollPane scr = new JScrollPane(p);
         scr.setBackground(Color.BLACK);
@@ -89,19 +108,14 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         //setCA(ca);
     //}
 
-    public SwingPlaneDisplay(CA ca) {
-        this(ca.getWidth(), ca.getHeight());
-        setCA(ca);
-    }
-
-    public SwingPlaneDisplay(Plane p) {
+    private SwingPlaneDisplay(Plane p) {
         this(p.getWidth(), p.getHeight());
         setCA(p.creator());
         //setPlane(p);
         //_p = p;
     }
 
-    public SwingPlaneDisplay(int w, int h, Rule r) {
+    private SwingPlaneDisplay(int w, int h, Rule r) {
         this(w, h);
         _r = r;
     }
@@ -134,7 +148,7 @@ public class SwingPlaneDisplay extends PlaneDisplay {
     }
 
     public JComponent getDisplayComponent() {
-        return _img;
+        return useNew?_img:_label;
     }
 
     private Icon _oldIcon;
@@ -171,9 +185,33 @@ public class SwingPlaneDisplay extends PlaneDisplay {
     public void setCA(CA ca) {
         _c = ca;
         setPlane(_c.createPlane());
+        Info i = new Info(_c);
+        Rule r = ca.getRule();
+        _meta.setText(r.humanize());
+        /*
+        if(r.dimensions()==1) {
+            if(r.getHyperrule()!=null) {
+                final RulePattern rp = new RulePattern(r, r.getHyperrule());
+                Plane p = rp.generate(_c.getHeight(), _c.getPalette());
+                _hyper.setIcon(new ImageIcon(p.toImage((int)(p.getWidth()*_scale), (int) (p.getHeight()*_scale))));
+            }
+            else {
+                _hyper.setIcon(null);
+            }
+        }
+        */
     }
 
     public void setPlane(Plane plane) {
+        if(useNew) {
+            setPlaneNew(plane);
+        }
+        else {
+            setPlaneOld(plane);
+        }
+    }
+
+    public void setPlaneNew(Plane plane) {
         _p = plane;
         final Image b;
         if(_scale==1f) {
@@ -182,7 +220,7 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         else {
             b = _p.toImage((int)(_p.getWidth()*_scale), (int) (_p.getHeight()*_scale));
         }
-        Runnable r = new Runnable() {
+        final Runnable r = new Runnable() {
             public void run() {
                 _img.setImage(b);
                 invalidate();
@@ -206,7 +244,7 @@ public class SwingPlaneDisplay extends PlaneDisplay {
             i = new ImageIcon(_p.toImage((int)(_p.getWidth()*_scale), (int) (_p.getHeight()*_scale)));
         }
         final ImageIcon icon = i;
-        Runnable r = new Runnable() {
+        final Runnable r = new Runnable() {
             public void run() {
                 _label.setIcon(icon);
                 _label.setText("");

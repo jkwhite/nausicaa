@@ -13,10 +13,13 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 import org.excelsi.rlyehian.Codec;
 
 
 public final class CA {
+    private static final ExecutorService POOL = Executors.newSingleThreadExecutor();
     private Rule _r;
     private Palette _p;
     private Initializer _i;
@@ -48,6 +51,7 @@ public final class CA {
 
     public Plane createPlane() {
         return createBufferedImagePlane();
+        //return createWritableImagePlane();
     }
 
     public Plane pooledPlane(Plane p) {
@@ -68,11 +72,11 @@ public final class CA {
         else {
             switch(_r.dimensions()) {
                 case 1:
-                    _r.generate(p, 1, _h, false, true, null);
+                    _r.generate(p, 1, _h, POOL, false, true, null);
                     break;
                 case 2:
                 default:
-                    _r.generate(p, 1, 1, false, true, null);
+                    _r.generate(p, 1, _d, POOL, false, true, null);
                     break;
             }
         }
@@ -80,15 +84,18 @@ public final class CA {
     }
 
     private Plane createWritableImagePlane() {
-        WritableImagePlane p = new WritableImagePlane(this, _w, _h);
+        WritableImagePlane p = new WritableImagePlane(this, _w, _h, _p);
+        populatePlane(p);
+        /*
         _rand.setSeed(_seed);
         _i.init(p, _r, _rand);
         if(_r instanceof Multirule1D) {
             ((Multirule1D)_r).generate2(p, 1, _h, false, true, null);
         }
         else {
-            _r.generate(p, 1, _h, false, true, null);
+            _r.generate(p, 1, _h, POOL, false, true, null);
         }
+        */
         return p;
     }
 
@@ -196,6 +203,7 @@ public final class CA {
         }
         try(DataOutputStream dos=new DataOutputStream(new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(filename))))) {
             write(dos);
+            dos.close();
         }
     }
 
@@ -238,7 +246,7 @@ public final class CA {
     }
 
     @Override public String toString() {
-        return "ca::{w:"+_w+", h:"+_h+"}";
+        return "ca::{w:"+_w+", h:"+_h+", c:"+_r.archetype().colors()+"}";
     }
 
     private Random branchRandom() {

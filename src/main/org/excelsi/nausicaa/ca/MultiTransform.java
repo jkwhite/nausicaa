@@ -6,15 +6,17 @@ import java.util.Random;
 
 public class MultiTransform implements Transform {
     private final Random _rand;
+    private final MutationFactor _factor;
     private final Mutator _extraMutator;
 
 
-    public MultiTransform(Random rand) {
-        this(rand, null);
+    public MultiTransform(Random rand, MutationFactor f) {
+        this(rand, f, null);
     }
 
-    public MultiTransform(Random rand, Mutator extraMutator) {
+    public MultiTransform(Random rand, MutationFactor f, Mutator extraMutator) {
         _rand = rand;
+        _factor = f;
         _extraMutator = extraMutator;
     }
 
@@ -29,6 +31,7 @@ public class MultiTransform implements Transform {
             }
             catch(MutationFailedException e) {
                 System.err.println("transform failed: "+e);
+                e.printStackTrace();
             }
         }
         return c;
@@ -36,13 +39,13 @@ public class MultiTransform implements Transform {
 
     private CA runTransform(CA c) throws MutationFailedException {
         Transform t;
-        switch(_rand.nextInt(4)) {
+        switch(_rand.nextInt(6)) {
             case 1:
                 t = new HueTransform(_rand);
                 break;
             default:
             case 0:
-                t = new RuleTransform(_rand, createMutator(c));
+                t = new RuleTransform(_rand, createMutator(c), _factor);
                 break;
         }
         return t.transform(c);

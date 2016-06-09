@@ -12,7 +12,7 @@ public class RandomMutationStrategy implements MutationStrategy {
         _factory = factory;
     }
 
-    @Override public CA mutate(final CA ca, Random rand) {
-        return new RuleTransform(rand, new SafeMutator(_factory.randomMutator(rand))).transform(ca);
+    @Override public CA mutate(final CA ca, Random rand, MutationFactor f) {
+        return new RuleTransform(rand, _factory.randomMutator(rand), f).transform(ca);
     }
 }

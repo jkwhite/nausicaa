@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.util.Random;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import org.imgscalr.Scalr;
 
@@ -16,6 +17,10 @@ public class ImageInitializer implements Initializer {
 
     public ImageInitializer() {
         _image = null;
+    }
+
+    public ImageInitializer(File url) throws IOException {
+        this(ImageIO.read(url));
     }
 
     public ImageInitializer(BufferedImage image) {

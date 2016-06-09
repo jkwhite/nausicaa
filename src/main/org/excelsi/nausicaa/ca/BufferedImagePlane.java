@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import java.util.Iterator;
 import javax.swing.SwingConstants;
 import javax.swing.ImageIcon;
+import javafx.embed.swing.SwingFXUtils;
 import org.imgscalr.Scalr;
 
 
@@ -50,11 +51,11 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
         _palette = null;
     }
 
-    public CA creator() {
+    @Override public CA creator() {
         return _creator;
     }
 
-    public Plane copy() {
+    @Override public Plane copy() {
         BufferedImagePlane p;
         if(_palette!=null) {
             p = new BufferedImagePlane(_creator, getWidth(), getHeight(), _palette);
@@ -66,14 +67,14 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
         return p;
     }
 
-    public void init() {
+    @Override public void init() {
     }
 
-    public Image toImage() {
+    @Override public Image toImage() {
         return _i;
     }
 
-    public Image toImage(int width, int height) {
+    @Override public Image toImage(int width, int height) {
         return _i.getScaledInstance(width, height, Image.SCALE_SMOOTH);
     }
 
@@ -85,8 +86,12 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
         return _i;
     }
 
-    public javafx.scene.image.Image toJfxImage() {
-        throw new UnsupportedOperationException();
+    @Override public javafx.scene.image.Image toJfxImage() {
+        return SwingFXUtils.toFXImage(_i, null);
+    }
+
+    @Override public javafx.scene.image.Image toJfxImage(javafx.scene.image.WritableImage jfxImage) {
+        return SwingFXUtils.toFXImage(_i, jfxImage);
     }
 
     public float getScale() {
@@ -98,11 +103,11 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
         return this;
     }
 
-    public int getWidth() {
+    @Override public int getWidth() {
         return _i.getWidth();
     }
 
-    public int getHeight() {
+    @Override public int getHeight() {
         return _i.getHeight();
     }
 
@@ -111,7 +116,7 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
         return _r;
     }
 
-    public void setCell(int x, int y, int v) {
+    @Override public void setCell(int x, int y, int v) {
         //_i.getRaster().setSample(x, y, 0, v);
         //if(v>=_palette.getColorCount()) {
             //throw new IllegalArgumentException("color out of range: "+v);
@@ -123,18 +128,18 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
         _i.setRGB(x, y, rgb);
     }
 
-    public void setRow(int[] row, int y) {
+    @Override public void setRow(int[] row, int y) {
         _r.setSamples(0, y, getWidth(), 1, 0, row);
     }
 
-    public int[] getRow(int[] into, int y, int offset) {
+    @Override public int[] getRow(int[] into, int y, int offset) {
         for(int i=0;i<getWidth();i++) {
             into[i+offset] = getCell(i, y);
         }
         return into;
     }
 
-    public int[] getBlock(int[] into, int x, int y, int w, int h, int offset) {
+    @Override public int[] getBlock(int[] into, int x, int y, int w, int h, int offset) {
         //Raster r = _i.getData();
         //System.err.println(String.format("getBlock %d,%d,%d,%d", x, y, w, h));
         Raster r = _r;
@@ -144,15 +149,7 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
             return r.getSamples(x, y, w, h, 0, into);
         }
         else {
-            //System.err.println("m");
             int n = 0;
-            /*
-            for(int i=x;i<x+w;i++) {
-                for(int j=y;j<y+h;j++) {
-                    into[n++] = getCell(i,j);
-                }
-            }
-            */
             for(int j=y;j<y+h;j++) {
                 for(int i=x;i<x+w;i++) {
                     into[n++] = getCell(i,j);
@@ -162,7 +159,7 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
         }
     }
 
-    public int getCell(int x, int y) {
+    @Override public int getCell(int x, int y) {
         //System.err.println(String.format("init %d,%d", x, y));
         if(x<0) {
             x += getWidth();
@@ -185,24 +182,16 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
         Pipeline.write(_i, filename);
     }
 
-    /*
-    public void show() {
-        if(_d!=null) {
-            hide();
-        }
-        Display2 dis = new Display2(this);
-        //_d = dis;
-        _d = new JFrame();
-        _d.setSize(35+(int)(_scale*getWidth()), 35+(int) (_scale*getHeight()));
-        _d.getContentPane().add(dis);
-        _d.setVisible(true);
+    @Override public Plane subplane(final int x1, final int y1, final int x2, final int y2) {
+        return new WindowedPlane(this, x1, y1, x2, y2);
     }
 
-    public void hide() {
-        if(_d!=null) {
-            _d.setVisible(false);
-            _d = null;
-        }
+    @Override public byte next(final int pattern) {
+        final int y = pattern/getWidth();
+        final int x = pattern%getWidth();
+        return (byte) getCell(x, y);
     }
-    */
+
+    @Override public void tick() {
+    }
 }

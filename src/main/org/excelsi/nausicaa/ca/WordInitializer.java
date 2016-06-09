@@ -7,22 +7,24 @@ import java.io.IOException;
 
 
 public class WordInitializer implements Initializer {
+    public static String WORD = "abcdef";
+    public static String ALPAHBET = "abcdef";
+    public static String TARGET = "abcdef";
     private final String _alphabet;
-    public static String WORD = "GATTACA";
-    public static String ALPAHBET = "GATC";
-    public static String TARGET = "GATC";
+    private final String _input;
 
 
     public WordInitializer() {
-        this(ALPAHBET);
+        this(ALPAHBET, WORD);
     }
 
-    public WordInitializer(String alphabet) {
-        _alphabet = alphabet;
-    }
+    //public WordInitializer(String alphabet) {
+        //_alphabet = alphabet;
+    //}
 
     public WordInitializer(String alphabet, String input) {
         _alphabet = alphabet;
+        _input = input;
     }
 
     @Override public void init(Plane plane, Rule rule, Random random) {

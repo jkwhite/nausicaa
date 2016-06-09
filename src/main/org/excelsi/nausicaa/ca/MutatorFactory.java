@@ -8,19 +8,29 @@ public class MutatorFactory {
     private static final MutatorFactory DEFAULT_FACTORY = 
         new MutatorFactory(
             weight(20, new Noise()),
+            weight(10, new ColoredNoise()),
+            weight(5, new Skew("Skew linear", Probability.linear())),
+            weight(5, new Skew("Skew gaussian", Probability.gaussian())),
+            weight(5, new Skew("Skew lowpass", Probability.lowpass())),
+            weight(5, new Skew("Skew highpass", Probability.highpass())),
             weight(5, new Symmetry()),
-            weight(8, new Color()),
-            weight(8, new Collapse()),
+            weight(5, new Color()),
+            weight(3, new Collapse()),
             weight(10, new ThinOne()),
             weight(5, new ThinAll()),
             weight(10, new ThickenOne()),
             weight(5, new ThickenAll()),
-            weight(10, new Fork()),
-            weight(5, new Segregate()),
-            weight(5, new Tangle()),
+            weight(3, new Fork()),
+            weight(3, new Splice()),
+            weight(7, new Segregate()),
+            weight(8, new Tangle()),
             weight(5, new Grow()),
-            weight(5, new Grow(true)),
-            weight(1, new Life())
+            weight(1, new Grow(true)),
+            weight(0, new Life()),
+            weight(0, new Deeper()),
+            weight(0, new Shallower()),
+            weight(0, new Dimensionality(Dimensionality.Direction.up)),
+            weight(0, new Dimensionality(Dimensionality.Direction.down))
         );
     private final Weight[] _mutators;
     private final int _sumWeight;

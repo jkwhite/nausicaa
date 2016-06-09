@@ -22,7 +22,7 @@ public class Life extends AbstractMutator {
     public String name() { return "Life"; }
     public String description() { return "Conway's Life"; }
 
-    @Override public IndexedRule mutateIndexedRule(IndexedRule r) throws MutationFailedException {
+    @Override public IndexedRule mutateIndexedRule(IndexedRule r, MutationFactor f) throws MutationFailedException {
         if(r.getPattern().archetype().dims()!=2) {
             throw new MutationFailedException("life must be 2d");
         }

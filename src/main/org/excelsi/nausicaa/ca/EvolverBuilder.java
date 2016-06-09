@@ -1,6 +1,7 @@
 package org.excelsi.nausicaa.ca;
 
 
+import java.util.List;
 import java.util.Random;
 
 
@@ -8,9 +9,9 @@ public class EvolverBuilder {
     private float _birthRate = 0.1f;
     private float _deathRate = 0.1f;
     private int _population = 10;
-    private Random _random;
-    private Initializer _initializer;
+    private List<Initializer> _training;
     private Encoder _encoder;
+    private Decoder _decoder;
     private Fitness _fitness;
     private MutationStrategy _strategy;
 
@@ -30,18 +31,18 @@ public class EvolverBuilder {
         return this;
     }
 
-    public EvolverBuilder withRandom(Random r) {
-        _random = r;
-        return this;
-    }
-
-    public EvolverBuilder withInitializer(Initializer i) {
-        _initializer = i;
+    public EvolverBuilder withTraining(List<Initializer> training) {
+        _training = training;
         return this;
     }
 
     public EvolverBuilder withEncoder(Encoder e) {
         _encoder = e;
+        return this;
+    }
+
+    public EvolverBuilder withDecoder(Decoder d) {
+        _decoder = d;
         return this;
     }
 
@@ -56,6 +57,6 @@ public class EvolverBuilder {
     }
 
     public Evolver build() {
-        return new Evolver(_random, _initializer, _encoder, _fitness, _strategy, _birthRate, _deathRate, _population);
+        return new Evolver(_training, _encoder, _fitness, _strategy, _birthRate, _deathRate, _population);
     }
 }

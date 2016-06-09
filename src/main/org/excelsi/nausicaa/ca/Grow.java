@@ -22,7 +22,7 @@ public class Grow extends AbstractMutator {
         _full = full;
     }
 
-    @Override public IndexedRule mutateIndexedRule(IndexedRule r) throws MutationFailedException {
+    @Override public IndexedRule mutateIndexedRule(IndexedRule r, MutationFactor f) throws MutationFailedException {
         final Archetype a = r.getPattern().archetype();
         final long max = a.totalPatterns();
         final byte[] base = new byte[a.sourceLength()];
@@ -56,7 +56,7 @@ public class Grow extends AbstractMutator {
                             mx = counts[j];
                         }
                     }
-                    if(target[i]!=(byte) midx && (_full||chance())) {
+                    if(target[i]!=(byte) midx && (_full||chance(f))) {
                         target[i] = (byte) midx;
                     }
                     //if(mixed) {

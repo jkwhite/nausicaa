@@ -42,9 +42,9 @@ public class NViewer extends JFrame implements UIActions {
         _root = v;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                v.setVisible(true);
                 v.init();
                 v.invalidate();
+                v.setVisible(true);
             }
         });
     }
@@ -92,10 +92,14 @@ public class NViewer extends JFrame implements UIActions {
         //final int w = 300, h = 600;
         _timeline = new Timeline();
         org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors);
+        org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
+        org.excelsi.nausicaa.ca.Archetype a2 = new org.excelsi.nausicaa.ca.Archetype(2, size, colors);
         Random rand = new Random();
         _random = rand;
         //Ruleset rs = new IndexedRuleset1d(a);
-        Ruleset rs = new IndexedRuleset2d(a);
+        Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset2d(a2));
+        //Ruleset rs = new IndexedRuleset2d(a);
+        //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset1d(a1));
         Rule rule = rs.random(rand).next();
         Palette pal = Palette.random(colors, rand);
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
@@ -250,8 +254,9 @@ public class NViewer extends JFrame implements UIActions {
             public void actionPerformed(ActionEvent e) {
                 //_init = Rule.Initialization.random;
                 _init = Initializers.random;
-                _initializer = new RandomInitializer();
-                setActiveCA(getActiveCA().initializer(_initializer));
+                _a.chooseRandom(NViewer.this, _config);
+                //_initializer = new RandomInitializer();
+                //setActiveCA(getActiveCA().initializer(_initializer));
                 hack[0].setState(true);
                 hack[1].setState(false);
                 hack[2].setState(false);
@@ -261,7 +266,7 @@ public class NViewer extends JFrame implements UIActions {
         });
         auto.add(ran);
         hack[0] = ran;
-        ran.setText("Random initial state");
+        ran.setText("Random initial state ...");
         ran.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, shortcut));
         ran.setState(_init==Initializers.random);
 
@@ -472,7 +477,7 @@ public class NViewer extends JFrame implements UIActions {
         JMenu mutate = new JMenu("Mutate");
         AbstractAction rep = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.repeatLastMutation(NViewer.this, _random);
+                _a.repeatLastMutation(NViewer.this, _config, _random);
             }
         };
         _repeat = mutate.add(rep);
@@ -496,7 +501,7 @@ public class NViewer extends JFrame implements UIActions {
                     _repeat.setEnabled(true);
                     _repeat.setText("Repeat "+m.name());
                     try {
-                        _a.mutate(NViewer.this, _random, m);
+                        _a.mutate(NViewer.this, _config, _random, m);
                     }
                     catch(MutationFailedException ex) {
                         System.err.println(m.name()+" failed: "+ex.getMessage());
@@ -541,6 +546,14 @@ public class NViewer extends JFrame implements UIActions {
         forceSym.setText("Force symmetry");
         forceSym.setState(_config.getForceSymmetry());
         forceSym.setSelected(_config.getForceSymmetry());
+
+        JMenuItem mparams = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.mutationParams(NViewer.this, _config);
+            }
+        });
+        mutate.add(mparams);
+        mparams.setText("Parameters ...");
 
         mutate.addSeparator();
         JMenuItem evolver = new JMenuItem(new AbstractAction() {
@@ -664,62 +677,6 @@ public class NViewer extends JFrame implements UIActions {
             });
         }
         _pehack.setText(_peditor!=null?"Hide palette editor":"Show palette editor");
-    }
-
-    public static void omain(String[] args) {
-        /*
-        Patterns.allocate(1, 1, 2);
-        Patterns.allocate(2, 1, 2);
-        Patterns.allocate(1, 1, 3);
-        Patterns.allocate(1, 1, 4);
-        Patterns.allocate(2, 1, 4);
-        Patterns.allocate(2, 1, 5);
-        Patterns.allocate(2, 1, 6);
-        Patterns.allocate(2, 1, 8);
-        */
-        //Patterns.iterator(3, 1, 2);
-        //Patterns.iterator(3, 1, 3);
-
-        int dims = 2;
-        int size = 1;
-        int colors = 2;
-        final int w = 400, h = 400;
-        Random rand = new Random(2);
-        org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors);
-        System.err.println("archetype is: "+a);
-        Ruleset rs = new IndexedRuleset1d(a);
-        //Ruleset rs = new IndexedRuleset2d(a);
-        Rule rule = rs.random(rand).next();
-        //System.err.println(p.toDetail());
-        //Display2 disp = new Display2(w, h);
-        PlaneDisplay disp = new SwingPlaneDisplay(w, h);
-        JFrame d = new JFrame();
-        d.setSize(33+w, 33+h);
-        d.getContentPane().add(disp);
-        d.setVisible(true);
-        long m = a.totalRules();
-        for(long i=0;i<1;i++) {
-            //CA ca = new CA(w, h);
-            Palette p = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
-            CA ca = new CA(rule, p, Initializers.random.create(), rand, 0, w, h, 10);
-            Plane plane = ca.createPlane();
-            /*
-            for(int k2=0;k2<h;k2++) {
-                for(int k=0;k<w;k++) {
-                    ca.setCell(k, k2, rand.nextInt(colors));
-                }
-            }
-            */
-            //ca.scale(2f);
-            //Pattern2 p = Patterns.forIndex(a, Math.abs(rand.nextLong()) % m);
-            /*
-           Pattern2 p = Patterns.random(a, rand);
-            System.err.println("pattern is: "+p);
-            runCA(p, ca, size, colors, w, h);
-            */
-            //disp.setCA(ca);
-            disp.setPlane(plane);
-        }
     }
 
     private static void runCA(Pattern2 p, CA2 ca, int size, int colors, int w, int h) {
