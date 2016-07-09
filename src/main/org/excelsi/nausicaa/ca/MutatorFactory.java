@@ -27,6 +27,7 @@ public class MutatorFactory {
             weight(5, new Grow()),
             weight(1, new Grow(true)),
             weight(0, new Life()),
+            weight(0, new Wireworld()),
             weight(0, new Deeper()),
             weight(0, new Shallower()),
             weight(0, new Dimensionality(Dimensionality.Direction.up)),
