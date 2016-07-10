@@ -63,6 +63,17 @@ public class Pipeline {
         };
     }
 
+    public static Consumer<PipelineContext> writeFormat(String s, String i, String filename) {
+        return (p)->{
+            try {
+                write(p.<BufferedImage>get(s), String.format(filename, new Object[]{p.get(i)}));
+            }
+            catch(IOException e) {
+                System.err.println(e.toString());
+            }
+        };
+    }
+
     public static void write(BufferedImage i, String filename) throws IOException {
         File file = new File(filename);
         if(file.getName().endsWith(".gif")) {

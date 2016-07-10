@@ -5,6 +5,8 @@ import org.excelsi.solace.Painter;
 import org.excelsi.solace.Predicates;
 
 import java.util.Iterator;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 import javafx.application.Platform;
 import javafx.scene.Node;
@@ -46,6 +48,10 @@ ca = { dims, rule, pal=null, init=null ->
     return c;
 }
 
+load = { f ->
+    CA.fromFile(f)
+}
+
 org.excelsi.nausicaa.ca.Ruleset.metaClass.random = {
     random(__random__)
 }
@@ -60,6 +66,34 @@ org.excelsi.nausicaa.ca.Rule.metaClass.ca = { dims, pal=null, init=null ->
 
 org.excelsi.nausicaa.ca.CA.metaClass.animate = {
     new Animated(delegate)
+}
+
+org.excelsi.nausicaa.ca.CA.metaClass.generate = { fileTemplate, nFrames, scale ->
+    def pool = Executors.newFixedThreadPool(4);
+    if(scale==1f) {
+        delegate.getRule()
+            .stream(delegate.createPlane(), pool, true)
+            .limit(nFrames)
+            .map(Pipeline.context("p", "i", Pipeline.identifier()))
+            .map(Pipeline.toBufferedImage("p", "b"))
+            .forEach(Pipeline
+                .writeFormat("b", "i", fileTemplate)
+            );
+    }
+    else {
+        delegate.getRule()
+            .stream(delegate.createPlane(), pool, true)
+            .limit(nFrames)
+            .map(Pipeline.context("p", "i", Pipeline.identifier()))
+            .map(Pipeline.toBufferedImage("p", "b"))
+            .map(Pipeline.indexed2Rgb("b", "b"))
+            .map(Pipeline.scale("b", "b", scale))
+            .forEach(Pipeline
+                .writeFormat("b", "i", fileTemplate)
+            );
+    }
+    pool.shutdown()
+    delegate
 }
 
 $r.register(
