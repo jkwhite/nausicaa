@@ -1,6 +1,9 @@
 package org.excelsi.nausicaa.ca;
 
 
+import java.util.Arrays;
+
+
 public final class FitnessCriteria {
     public static Fitness neverending() {
         return (a, ps)->{
@@ -182,6 +185,106 @@ public final class FitnessCriteria {
             }
             return 1d - totaldelta / maxdelta;
         };
+    }
+
+    public static Fitness interesting() {
+        return (a, ps)->{
+            final Plane p1 = ps[ps.length-2];
+            final Plane p2 = ps[ps.length-1];
+            //final Stats s1 = stats(a, p1);
+            final Stats s2 = stats(a, p2);
+            //System.err.println("histo: "+Arrays.toString(s2.histo)+", runs: "+Arrays.toString(s2.maxruns));
+
+            double hs = sdev(s2.histo);
+            //System.err.println("sdev: "+hs);
+            double hval = ideal(10000, hs)/10000d;
+            double runval = ideal(5, sdev(s2.maxruns));
+            double dval = ideal(0.002, diff(p1, p2));
+            return hval + runval + dval;
+        };
+    }
+
+    public static double ideal(double i, double v) {
+        return Math.abs(i-v);
+    }
+
+    public static double sdev(int[] v) {
+        return Math.sqrt(var(v));
+    }
+
+    public static double var(int[] v) {
+        double m = 0;
+        for(int i=0;i<v.length;i++) {
+            m += v[i];
+        }
+        m /= v.length;
+        double var = 0;
+        for(int i=0;i<v.length;i++) {
+            double diff = v[i] - m;
+            diff *= diff;
+            var += diff;
+        }
+        return var;
+    }
+
+    public static int delta(int[] v1, int[] v2) {
+        int d = 0;
+        for(int i=0;i<v1.length;i++) {
+            d += Math.abs(v2[i] - v1[i]);
+        }
+        return d;
+    }
+
+    public static double diff(Plane p1, Plane p2) {
+        final int[] r1 = new int[p1.getWidth()];
+        final int[] r2 = new int[p2.getWidth()];
+        int diff = 0;
+        for(int y=0;y<p1.getHeight();y++) {
+            p1.getRow(r1, y, 0);
+            p2.getRow(r2, y, 0);
+            for(int j=0;j<r1.length;j++) {
+                if(r1[j]!=r2[j]) {
+                    diff++;
+                }
+                //diff += Math.abs(r2[j] - r1[j]);
+            }
+        }
+        return ((double)diff)/(p1.getHeight()*p1.getWidth());
+    }
+
+    public static Stats stats(final Archetype a, final Plane p) {
+        final int[] histo = new int[a.colors()];
+        final int[] maxruns = new int[a.colors()];
+        final int[] row = new int[p.getWidth()];
+        int lastColor = 0;
+        int maxrun = 0;
+        for(int y=0;y<p.getHeight();y++) {
+            p.getRow(row, y, 0);
+            for(int i=0;i<row.length;i++) {
+                histo[row[i]]++;
+                if(row[i]==lastColor) {
+                    maxrun++;
+                }
+                else {
+                    if(maxruns[lastColor]<maxrun) {
+                        maxruns[lastColor] = maxrun;
+                    }
+                    maxrun = 0;
+                    lastColor = row[i];
+                }
+            }
+        }
+        return new Stats(histo, maxruns);
+    }
+
+    public static class Stats {
+        public final int[] histo;
+        public final int[] maxruns;
+
+        public Stats(int[] histo, int[] maxruns) {
+            this.histo = histo;
+            this.maxruns = maxruns;
+        }
     }
 
     private FitnessCriteria() {}

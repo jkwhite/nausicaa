@@ -220,7 +220,7 @@ public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
             throw new IllegalArgumentException("null plane");
         }
         final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c,pool, doubleBuffer):null;
-        final int block = 500;
+        final int block = 800;
         int nworkers = c.getHeight()/block + (c.getHeight()%block>0?1:0);
         final Worker[] workers = new Worker[nworkers];
         final Pattern p = createPattern(pool);
@@ -229,7 +229,7 @@ public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
             workers[i] = new Worker(p, 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block));
         }
         final Future[] futures = new Future[workers.length];
-        System.err.println("frame workers: "+workers.length);
+        //System.err.println("frame workers: "+workers.length);
         return new Iterator<Plane>() {
             Plane p1 = c;
             Plane p2 = c.copy();
@@ -288,6 +288,7 @@ public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
         Worker w = new Worker(p, 0, 0, c.getWidth(), c.getHeight());
         for(int frames=start;frames<end;frames++) {
             System.err.println("frame "+frames);
+            //Thread.dumpStack();
             w.frame(p1, p2);
             tmp = p1;
             p1 = p2;

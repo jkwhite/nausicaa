@@ -82,7 +82,7 @@ public class NViewer extends JFrame implements UIActions {
     }
 
     public void init() {
-        final int w = 600, h = 600, d = 10;
+        final int w = 600, h = 600, d = 1;
         _config = new Config(w, h, d);
         createMenu();
         setSize(_width, _height);
@@ -97,8 +97,8 @@ public class NViewer extends JFrame implements UIActions {
         Random rand = new Random();
         _random = rand;
         //Ruleset rs = new IndexedRuleset1d(a);
-        Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset2d(a2));
-        //Ruleset rs = new IndexedRuleset2d(a);
+        //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset2d(a2));
+        Ruleset rs = new IndexedRuleset2d(a);
         //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset1d(a1));
         Rule rule = rs.random(rand).next();
         Palette pal = Palette.random(colors, rand);

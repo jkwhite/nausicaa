@@ -430,21 +430,22 @@ public class Actions {
                     config.setVariable("evo_deathrate", deaths.getText());
                     config.setVariable("evo_colorlimit", colorlimit.getText());
                     config.setVariable("evo_trainingset", training.getText());
-                    final Initializer target = new ImageInitializer(new File(training.getText()));
-                    final Plane tplane = v.getActiveCA().size(config.getWidth(), config.getHeight()).initializer(target).createPlane();
+                    //final Initializer target = new ImageInitializer(new File(training.getText()));
+                    //final Plane tplane = v.getActiveCA().size(config.getWidth(), config.getHeight()).initializer(target).createPlane();
                     final Evolver evolver = new EvolverBuilder()
                         .withEncoder(null)
                         //.withTraining(Training.file(training.getText(),
                             //(line)->{return new ByteInitializer(enc.encode(line));}
                         //))
-                        .withTraining(Training.of(new SingleInitializer()))
-                        //.withTraining(Training.of(new RandomInitializer(1), new RandomInitializer(2), new RandomInitializer(3), new RandomInitializer(4)))
+                        //.withTraining(Training.of(new SingleInitializer()))
+                        .withTraining(Training.of(new RandomInitializer(1), new RandomInitializer(2), new RandomInitializer(3), new RandomInitializer(4)))
                         //.withFitness(FitnessCriteria.repeatGreatest())
                         //.withFitness(FitnessCriteria.findTarget(
                             //WordInitializer.encodeWord(WordInitializer.ALPAHBET, WordInitializer.TARGET)))
                         //.withFitness(FitnessCriteria.reverse(4, 4))
                         //.withFitness(FitnessCriteria.nothingLostNothingGained())
-                        .withFitness(FitnessCriteria.findTarget(tplane, new double[]{1}))
+                        //.withFitness(FitnessCriteria.findTarget(tplane, new double[]{1}))
+                        .withFitness(FitnessCriteria.interesting())
                         .withMutationStrategy(new RetryingMutationStrategy(new RandomMutationStrategy(MutatorFactory.defaultMutators()), MutationStrategies.noise(), 4))
                         .withPopulation(Integer.parseInt(pop.getText()))
                         .withBirthRate(Float.parseFloat(births.getText()))

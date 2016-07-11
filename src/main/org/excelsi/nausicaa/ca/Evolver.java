@@ -126,6 +126,7 @@ public class Evolver {
 
     private void runIteration(final List<Choice> pop, final Runtime runtime) {
         while(pop.size()<_population) {
+            //System.err.println("creating "+pop.size()+" / "+_population);
             final int children = _population - pop.size();
             final List<Future<Choice>> tasks = new ArrayList<>(children);
             final int repr = (int) Math.max(1f, pop.size()*_birthRate);
@@ -207,7 +208,7 @@ public class Evolver {
 
         @Override public int compareTo(Object o) {
             final double of = ((Choice)o)._fitness;
-            return _fitness>of?-1:_fitness<of?1:0;
+            return _fitness>of?1:_fitness<of?-1:0;
         }
 
         @Override public String toString() {
