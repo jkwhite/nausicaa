@@ -22,11 +22,6 @@ public class Wireworld extends AbstractMutator {
         final Archetype na = r.archetype().asColors(4);
         final byte[] base = new byte[na.sourceLength()];
         final int[] histo = new int[na.colors()];
-        //final int max = (r.getPattern().archetype().colors()-1)*8;
-        //final int ub = (int) Math.sqrt(1+max);
-        //final int lb = (int) Math.cbrt(max);
-        //final int ub = _ub;
-        //final int lb = _lb;
         return r.origin().derive(na).custom((arch, target)->{
             for(int i=0;i<target.length;i++) {
                 Patterns.expandSourceIndex(arch, i, base);

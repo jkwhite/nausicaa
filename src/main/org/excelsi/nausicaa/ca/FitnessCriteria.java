@@ -189,21 +189,40 @@ public final class FitnessCriteria {
 
     public static Fitness interesting() {
         return (a, ps)->{
-            final Plane p1 = ps[ps.length-2];
+            final Plane p1 = ps[ps.length-3];
             final Plane p2 = ps[ps.length-1];
-            //final Stats s1 = stats(a, p1);
-            final Stats s2 = stats(a, p2);
+            final Stats s1 = Stats.forPlane(p1);
+            final Stats s2 = Stats.forPlane(p2);
+            //System.err.println("p1: "+System.identityHashCode(p1)+", p2: "+System.identityHashCode(p2)+", s1: "+s1.humanize()+", s2: "+s2.humanize());
             //System.err.println("histo: "+Arrays.toString(s2.histo)+", runs: "+Arrays.toString(s2.maxruns));
 
-            double hs = sdev(s2.histo);
+            double hs = Stats.sdev(s2.getHisto());
             //System.err.println("sdev: "+hs);
-            double hval = ideal(10000, hs)/10000d;
-            double runval = ideal(5, sdev(s2.maxruns));
-            double dval = ideal(0.002, diff(p1, p2));
+            double hval = Stats.ideal(10000, hs)/10000d;
+            double runval = Stats.ideal(5, Stats.sdev(s2.getMaxruns()));
+            double dval = Stats.ideal(0.002, Stats.diff(p1, p2));
             return hval + runval + dval;
         };
     }
 
+    public static Fitness interesting2() {
+        return (a, ps)->{
+            final Plane p1 = ps[ps.length-3];
+            final Plane p2 = ps[ps.length-2];
+            final Stats s1 = Stats.forPlane(p1);
+            final Stats s2 = Stats.forPlane(p2);
+            final Multistats ms = s2.compareWith(s1);
+            //System.err.println("p1: "+System.identityHashCode(p1)+", p2: "+System.identityHashCode(p2)+", ms: "+ms.humanize());
+            //System.err.println("histo: "+Arrays.toString(s2.histo)+", runs: "+Arrays.toString(s2.maxruns));
+
+            double pm = ms.getPsimmean();
+            double v = 3d * Stats.ideal(0.90, pm);
+            //System.err.println("psim: "+Stats.format(ms.getPsim())+", psimm: "+pm+", v: "+v);
+            return v + Stats.ideal(0.20, s2.getNrsdev());
+        };
+    }
+
+    /*
     public static double ideal(double i, double v) {
         return Math.abs(i-v);
     }
@@ -286,6 +305,7 @@ public final class FitnessCriteria {
             this.maxruns = maxruns;
         }
     }
+    */
 
     private FitnessCriteria() {}
 }

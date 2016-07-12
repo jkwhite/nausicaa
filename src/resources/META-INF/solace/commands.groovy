@@ -68,6 +68,13 @@ org.excelsi.nausicaa.ca.CA.metaClass.animate = {
     new Animated(delegate)
 }
 
+org.excelsi.nausicaa.ca.CA.metaClass.stats = { depth=1 ->
+    def c = delegate.size(delegate.width, delegate.height, depth)
+    def p = c.createPlane()
+    def np = c.rule.frameIterator(p, Pools.bgr(), false).next()
+    def ms = Stats.forPlane(p).compareWith(Stats.forPlane(np))
+}
+
 org.excelsi.nausicaa.ca.CA.metaClass.generate = { fileTemplate, nFrames, scale ->
     def pool = Executors.newFixedThreadPool(4);
     if(scale==1f) {

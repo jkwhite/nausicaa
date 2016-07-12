@@ -28,6 +28,9 @@ import org.excelsi.nausicaa.ca.Training;
 import org.excelsi.nausicaa.ca.RetryingMutationStrategy;
 import org.excelsi.nausicaa.ca.MutationStrategies;
 import org.excelsi.nausicaa.ca.MutationFactor;
+import org.excelsi.nausicaa.ca.Stats;
+import org.excelsi.nausicaa.ca.Multistats;
+import org.excelsi.nausicaa.ca.Pools;
 
 import java.math.BigInteger;
 import java.awt.*;
@@ -110,6 +113,11 @@ public class Actions {
 
     public void info(NViewer v) {
         final CA ca = v.getActiveCA();
+        final Plane plane = v.getPlaneDisplayProvider().getActivePlane();
+        final Plane nextPlane = ca.getRule().frameIterator(plane, Pools.bgr(), false).next();
+        final Stats stats = Stats.forPlane(plane);
+        final Stats nextStats = Stats.forPlane(nextPlane);
+        final Multistats ms = stats.compareWith(nextStats);
 
         Rule r = ca.getRule();
         final JFrame i = new JFrame("Info");
@@ -138,6 +146,7 @@ public class Actions {
             p.addPair("Incantation", createRuleText(ca.toIncantation()));
         }
         p.addPair("Colors", createColorPanel(ca.getPalette()));
+        p.addPair("Stats", createRuleText(ms.humanize(), false));
         /*
         if(r instanceof Multirule) {
             Rule[] chs = ((Multirule)r).rules();
@@ -438,15 +447,15 @@ public class Actions {
                             //(line)->{return new ByteInitializer(enc.encode(line));}
                         //))
                         //.withTraining(Training.of(new SingleInitializer()))
-                        .withTraining(Training.of(new RandomInitializer(1), new RandomInitializer(2), new RandomInitializer(3), new RandomInitializer(4)))
+                        .withTraining(Training.of(new RandomInitializer(1) /*, new RandomInitializer(2), new RandomInitializer(3), new RandomInitializer(4)*/))
                         //.withFitness(FitnessCriteria.repeatGreatest())
                         //.withFitness(FitnessCriteria.findTarget(
                             //WordInitializer.encodeWord(WordInitializer.ALPAHBET, WordInitializer.TARGET)))
                         //.withFitness(FitnessCriteria.reverse(4, 4))
                         //.withFitness(FitnessCriteria.nothingLostNothingGained())
                         //.withFitness(FitnessCriteria.findTarget(tplane, new double[]{1}))
-                        .withFitness(FitnessCriteria.interesting())
-                        .withMutationStrategy(new RetryingMutationStrategy(new RandomMutationStrategy(MutatorFactory.defaultMutators()), MutationStrategies.noise(), 4))
+                        .withFitness(FitnessCriteria.interesting2())
+                        .withMutationStrategy(new RetryingMutationStrategy(new RandomMutationStrategy(MutatorFactory.defaultMutators(), true), MutationStrategies.noise(), 4))
                         .withPopulation(Integer.parseInt(pop.getText()))
                         .withBirthRate(Float.parseFloat(births.getText()))
                         .withDeathRate(Float.parseFloat(deaths.getText()))
@@ -650,13 +659,17 @@ public class Actions {
     }
 
     private static JComponent createRuleText(String str) {
+        return createRuleText(str, true);
+    }
+
+    private static JComponent createRuleText(String str, boolean scroll) {
         JTextArea a = new JTextArea(str, Math.max(1,Math.min(7,str.length()/80)), 80);
         a.setEditable(false);
         a.setLineWrap(true);
         a.setWrapStyleWord(false);
         Font f = a.getFont();
         a.setFont(f.deriveFont(Font.ITALIC, f.getSize()-2));
-        return new JScrollPane(a);
+        return scroll ? new JScrollPane(a) : a;
     }
 
     private static JComponent createColorPanel(Palette palette) {
