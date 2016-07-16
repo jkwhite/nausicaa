@@ -218,7 +218,7 @@ public final class FitnessCriteria {
             double pm = ms.getPsimmean();
             double v = 3d * Stats.ideal(0.90, pm);
             //System.err.println("psim: "+Stats.format(ms.getPsim())+", psimm: "+pm+", v: "+v);
-            return v + Stats.ideal(0.20, s2.getNrsdev());
+            return v + Stats.ideal(0.20, s2.getNrsdev()) + Stats.ideal(0.28, s2.getNrmean());
         };
     }
 

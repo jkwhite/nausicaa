@@ -101,7 +101,7 @@ public class NViewer extends JFrame implements UIActions {
         Ruleset rs = new IndexedRuleset2d(a);
         //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset1d(a1));
         Rule rule = rs.random(rand).next();
-        Palette pal = Palette.random(colors, rand);
+        Palette pal = Palette.random(colors, rand, true);
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
         org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d);
 

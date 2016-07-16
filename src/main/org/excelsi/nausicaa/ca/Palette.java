@@ -125,9 +125,16 @@ public class Palette {
     }
 
     public static Palette random(int numColors, Random rand) {
+        return random(numColors, rand, false);
+    }
+
+    public static Palette random(int numColors, Random rand, boolean zeroBlack) {
         int[] packed = new int[numColors];
         for(int i=0;i<numColors;i++) {
             packed[i] = Colors.randomColor(rand);
+        }
+        if(zeroBlack) {
+            packed[0] = Colors.pack(0, 0, 0);
         }
         return new Palette(packed);
     }

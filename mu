@@ -28,5 +28,6 @@ uses:
 #main: org.excelsi.gimmal.AppFactory
 main: org.excelsi.nausicaa.NViewer
 #main: org.excelsi.ca.Viewer
-sysargs: -XX:-OmitStackTraceInFastThrow -Dcom.sun.management.jmxremote -Xmx12g -d64
+#sysargs: -XX:-OmitStackTraceInFastThrow -Dcom.sun.management.jmxremote -Xmx12g -d64
+sysargs: -XX:-OmitStackTraceInFastThrow -Dcom.sun.management.jmxremote -d64
 # -agentlib:hprof=heap=sites,cpu=samples,depth=8
