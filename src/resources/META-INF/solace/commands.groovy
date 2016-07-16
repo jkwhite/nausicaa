@@ -68,6 +68,26 @@ org.excelsi.nausicaa.ca.CA.metaClass.animate = {
     new Animated(delegate)
 }
 
+org.excelsi.nausicaa.ca.CA.metaClass.evolve = { epicycles, cycles, subcycles, population, idealPm, idealNrsdev, idealNrmean ->
+    def Evolver evolver = new EvolverBuilder()
+        .withEncoder(null)
+        .withTraining(Training.of(new RandomInitializer(1)))
+        .withFitness(FitnessCriteria.interesting3(idealPm, idealNrsdev, idealNrmean))
+        .withMutationStrategy(new RetryingMutationStrategy(new RandomMutationStrategy(MutatorFactory.defaultMutators(), true), MutationStrategies.noise(), 4))
+        .withPopulation(population)
+        .withBirthRate(0.2)
+        .withDeathRate(0.2)
+        .build()
+    def evolved = evolver.run(delegate,
+            __random__,
+            epicycles,
+            cycles,
+            subcycles,
+            9,
+            Pools.core())
+    evolved
+}
+
 org.excelsi.nausicaa.ca.CA.metaClass.stats = { depth=1 ->
     def c = delegate.size(delegate.width, delegate.height, depth)
     def p = c.createPlane()

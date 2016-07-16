@@ -15,8 +15,20 @@ public class Pools {
         }
     });
 
+    private static final ExecutorService _cores = Executors.newFixedThreadPool(4, new ThreadFactory() {
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(r);
+            t.setDaemon(true);
+            return t;
+        }
+    });
+
 
     public static ExecutorService bgr() {
         return _bgr;
+    }
+
+    public static ExecutorService core() {
+        return _cores;
     }
 }

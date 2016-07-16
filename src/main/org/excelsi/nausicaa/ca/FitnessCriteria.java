@@ -222,6 +222,23 @@ public final class FitnessCriteria {
         };
     }
 
+    public static Fitness interesting3(final double idealPm, final double idealNrsdev, final double idealNrmean) {
+        return (a, ps)->{
+            final Plane p1 = ps[ps.length-3];
+            final Plane p2 = ps[ps.length-2];
+            final Stats s1 = Stats.forPlane(p1);
+            final Stats s2 = Stats.forPlane(p2);
+            final Multistats ms = s2.compareWith(s1);
+            //System.err.println("p1: "+System.identityHashCode(p1)+", p2: "+System.identityHashCode(p2)+", ms: "+ms.humanize());
+            //System.err.println("histo: "+Arrays.toString(s2.histo)+", runs: "+Arrays.toString(s2.maxruns));
+
+            double pm = ms.getPsimmean();
+            double v = 3d * Stats.ideal(idealPm, pm);
+            //System.err.println("psim: "+Stats.format(ms.getPsim())+", psimm: "+pm+", v: "+v);
+            return v + Stats.ideal(idealNrsdev, s2.getNrsdev()) + Stats.ideal(idealNrmean, s2.getNrmean());
+        };
+    }
+
     /*
     public static double ideal(double i, double v) {
         return Math.abs(i-v);
