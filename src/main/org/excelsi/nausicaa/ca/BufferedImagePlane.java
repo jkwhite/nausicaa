@@ -79,7 +79,16 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
     }
 
     @Override public Plane scale(float scale) {
-        return new BufferedImagePlane(Scalr.resize(_i, Scalr.Method.ULTRA_QUALITY, (int)(getWidth()*scale), (int)(getWidth()*scale), Scalr.OP_ANTIALIAS /*, Scalr.OP_BRIGHTER*/));
+        return scale(scale, true);
+    }
+
+    @Override public Plane scale(float scale, boolean antialias) {
+        if(antialias) {
+            return new BufferedImagePlane(Scalr.resize(_i, Scalr.Method.ULTRA_QUALITY, (int)(getWidth()*scale), (int)(getWidth()*scale), Scalr.OP_ANTIALIAS /*, Scalr.OP_BRIGHTER*/));
+        }
+        else {
+            return new BufferedImagePlane(Scalr.resize(_i, Scalr.Method.SPEED, (int)(getWidth()*scale), (int)(getWidth()*scale)));
+        }
     }
 
     @Override public BufferedImage toBufferedImage() {

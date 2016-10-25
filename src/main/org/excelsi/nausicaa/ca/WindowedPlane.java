@@ -91,6 +91,10 @@ public class WindowedPlane implements Plane {
         return new WindowedPlane(_p.scale(scale), _x1, _y1, _x2, _y2);
     }
 
+    @Override public Plane scale(float scale, boolean antialias) {
+        return new WindowedPlane(_p.scale(scale, antialias), _x1, _y1, _x2, _y2);
+    }
+
     @Override public void save(String file) throws IOException {
         _p.save(file);
     }

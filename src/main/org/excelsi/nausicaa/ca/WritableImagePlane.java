@@ -51,6 +51,10 @@ public class WritableImagePlane implements Plane {
         throw new UnsupportedOperationException();
     }
 
+    @Override public Plane scale(float scale, boolean antialias) {
+        throw new UnsupportedOperationException();
+    }
+
     public int getWidth() {
         return _width;
     }

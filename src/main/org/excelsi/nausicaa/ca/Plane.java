@@ -25,6 +25,7 @@ public interface Plane /*extends Pattern*/ {
     CA creator();
     Plane copy();
     Plane scale(float scale);
+    Plane scale(float scale, boolean antialias);
     void save(String file) throws IOException;
     Plane subplane(int x1, int y1, int x2, int y2);
     byte next(int pattern);

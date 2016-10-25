@@ -64,6 +64,10 @@ org.excelsi.nausicaa.ca.Rule.metaClass.ca = { dims, pal=null, init=null ->
     ca(dims, delegate, pal, init)
 }
 
+org.excelsi.nausicaa.ca.CA.metaClass.scaled = { scale ->
+    delegate.createPlane().scale(scale, scale<1?true:false).toJfxImage()
+}
+
 org.excelsi.nausicaa.ca.CA.metaClass.animate = {
     new Animated(delegate)
 }
