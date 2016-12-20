@@ -17,6 +17,10 @@ public class SafeMutator implements Mutator {
         return _m.description();
     }
 
+    @Override public void setRandom(java.util.Random r) {
+        _m.setRandom(r);
+    }
+
     @Override public IndexedRule mutateIndexedRule(IndexedRule r, MutationFactor f) throws MutationFailedException {
         try {
             return _m.mutateIndexedRule(r, f);
@@ -26,36 +30,4 @@ public class SafeMutator implements Mutator {
             return r;
         }
     }
-
-    public Rule mutate(Rule r) {
-        if(r instanceof Multirule) {
-            return mutate((Multirule)r);
-        }
-        for(int tries=0;tries<50;tries++) {
-            try {
-                return _m.mutate(r);
-            }
-            catch(MutationFailedException | IllegalStateException e) {
-                System.err.println(e.toString());
-            }
-        }
-        return r;
-    }
-
-    public Multirule mutate(Multirule r) {
-        for(int tries=0;tries<50;tries++) {
-            try {
-                return _m.mutate(r);
-            }
-            catch(MutationFailedException | IllegalStateException e) {
-                System.err.println(e.toString());
-            }
-        }
-        return r;
-    }
-
-    public void setRandom(java.util.Random r) {
-        _m.setRandom(r);
-    }
-
 }

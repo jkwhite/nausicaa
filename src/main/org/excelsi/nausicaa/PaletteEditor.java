@@ -10,7 +10,7 @@ import org.excelsi.nausicaa.ca.Colors;
 import org.excelsi.nausicaa.ca.Rule;
 import org.excelsi.nausicaa.ca.CA;
 import org.excelsi.nausicaa.ca.IndexedRule;
-import org.excelsi.nausicaa.ca.Multirule;
+//import org.excelsi.nausicaa.ca.Multirule;
 import org.excelsi.nausicaa.ca.Palette;
 
 
@@ -75,8 +75,8 @@ public class PaletteEditor extends JComponent implements TimelineListener {
                     c.setColor(_colors[idx]);
                     _ui.doWait(new Runnable() {
                         public void run() {
-                            if(_rule instanceof Multirule) {
                                 /*
+                            if(_rule instanceof Multirule) {
                                 Rule[] orig = ((Multirule)_rule).rules();
                                 final Rule[] ar = new Rule[orig.length];
                                 for(int j=0;j<ar.length;j++) {
@@ -87,9 +87,9 @@ public class PaletteEditor extends JComponent implements TimelineListener {
                                         _f.tick(_rule.origin().create((Object[])ar));
                                     }
                                 });
-                                */
                             }
-                            else if(_rule instanceof IndexedRule) {
+                                */
+                            if(_rule instanceof IndexedRule) {
                                 _ui.setActiveCA(current.palette(new Palette(_colors)));
                             }
                         }

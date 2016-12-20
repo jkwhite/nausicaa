@@ -45,7 +45,10 @@ public class RuleTransform implements Transform {
             return after;
         }
         else {
-            return c.mutate(_m.mutate(root), _rand);
+            //return c.mutate(_m.mutate(root), _rand);
+            //throw new UnsupportedOperationException();
+            System.err.println("do not know how to mutate rule "+root);
+            return c.mutate(root, _rand);
         }
     }
 

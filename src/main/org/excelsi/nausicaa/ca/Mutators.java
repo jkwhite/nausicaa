@@ -85,7 +85,8 @@ public enum Mutators {
             case tangle:
                 return new Tangle();
             case cull:
-                return new Cull();
+                //return new Cull();
+                throw new UnsupportedOperationException();
             case fork:
                 return new Fork();
             case symmetry:
@@ -95,7 +96,8 @@ public enum Mutators {
             case thin:
                 return new ThinAll();
             case hue:
-                return new Hue();
+                //return new Hue();
+                throw new UnsupportedOperationException();
             case noise:
                 return new Noise();
             case color:

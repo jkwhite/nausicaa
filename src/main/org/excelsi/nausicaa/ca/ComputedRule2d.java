@@ -9,43 +9,54 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 
-public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
-    private final IndexedRuleset2d _origin;
-    private final IndexedRule2d _meta;
+public class ComputedRule2d extends AbstractRule {
+    private final Ruleset _origin;
+    private final Pattern _p;
+    private final Rule _meta;
+    //private final IndexedRule2d _meta;
 
 
-    public IndexedRule2d(IndexedPattern p) {
+    public ComputedRule2d(Pattern p) {
         this(p, null);
     }
 
-    public IndexedRule2d(IndexedPattern p, IndexedRuleset2d origin) {
+    public ComputedRule2d(Pattern p, Ruleset origin) {
         this(p, origin, null, null);
     }
 
-    public IndexedRule2d(IndexedPattern p, IndexedRuleset2d origin, IndexedRule2d metarule, IndexedRule hyper) {
-        super(p, hyper);
-        _origin = origin!=null?origin:new IndexedRuleset2d(p.archetype());
+    public ComputedRule2d(Pattern p, Ruleset origin, Rule metarule, Rule hyper) {
+        //super(p, hyper);
+        super(1,1);
+        _p = p;
+        _origin = origin!=null?origin:new ComputedRuleset(p.archetype());
         _meta = null;
     }
 
-    @Override public IndexedRule getMetarule() {
-        return _meta;
+    //@Override public IndexedRule getMetarule() {
+        //return _meta;
+        //throw new UnsupportedOperationException();
+    //}
+//
+    //@Override public IndexedRule withMetarule(IndexedRule meta) {
+        //return new IndexedRule2d(pattern(), _origin, (IndexedRule2d) meta, getHyperrule());
+        //throw new UnsupportedOperationException();
+    //}
+//
+    //@Override public IndexedRule withHyperrule(IndexedRule hyper) {
+        //return new IndexedRule2d(pattern(), _origin, _meta, hyper);
+        //throw new UnsupportedOperationException();
+    //}
+
+    public ComputedRule2d derive(Pattern pattern) {
+        return new ComputedRule2d(pattern, _origin, _meta, getHyperrule());
     }
 
-    @Override public IndexedRule withMetarule(IndexedRule meta) {
-        return new IndexedRule2d(pattern(), _origin, (IndexedRule2d) meta, getHyperrule());
-    }
+    //@Override public ComputedRule2d derive(Pattern.Transform transform) {
+        //return new ComputedRule2d(pattern().transform(transform), _origin, _meta!=null?_meta.derive(transform):null, getHyperrule());
+    //}
 
-    @Override public IndexedRule withHyperrule(IndexedRule hyper) {
-        return new IndexedRule2d(pattern(), _origin, _meta, hyper);
-    }
-
-    @Override public IndexedRule2d derive(IndexedPattern pattern) {
-        return new IndexedRule2d(pattern, _origin, _meta, getHyperrule());
-    }
-
-    @Override public IndexedRule2d derive(IndexedPattern.Transform transform) {
-        return new IndexedRule2d(pattern().transform(transform), _origin, _meta!=null?_meta.derive(transform):null, getHyperrule());
+    @Override public Archetype archetype() {
+        return _p.archetype();
     }
 
     @Override public int dimensions() {
@@ -56,11 +67,23 @@ public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
         return 0;
     }
 
+    @Override public int length() {
+        return _p.archetype().sourceLength();
+    }
+
+    @Override public int[] colors() {
+        int[] cols = new int[_p.archetype().colors()];
+        for(int i=0;i<cols.length;i++) {
+            cols[i] = i;
+        }
+        return cols;
+    }
+
     @Override public int[][] toPattern() {
         throw new UnsupportedOperationException();
     }
 
-    @Override public IndexedRuleset origin() {
+    @Override public Ruleset origin() {
         return _origin;
     }
 
@@ -131,7 +154,6 @@ public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
         final Pattern p = createPattern(pool);
         Worker w = new Worker(p, 0, 0, c.getWidth(), c.getHeight());
         for(int frames=start;frames<end;frames++) {
-            //System.err.println("frame "+frames);
             w.frame(p1, p2);
             tmp = p1;
             p1 = p2;
@@ -148,6 +170,10 @@ public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
     }
 
     @Override public String toString() {
-        return "IndexedRule2d::{pattern:"+pattern()+"}";
+        return "ComputedRule2d::{pattern:"+_p+"}";
+    }
+
+    protected final Pattern createPattern(final ExecutorService pool) {
+        return _p;
     }
 }

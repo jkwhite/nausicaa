@@ -138,4 +138,13 @@ public class Palette {
         }
         return new Palette(packed);
     }
+
+    public static Palette grey(int numColors) {
+        int[] packed = new int[numColors];
+        for(int i=0;i<numColors;i++) {
+            int amt = (int) (255 * ((double) i / (double) numColors));
+            packed[i] = Colors.pack(amt, amt, amt);
+        }
+        return new Palette(packed);
+    }
 }

@@ -83,13 +83,13 @@ public class NViewer extends JFrame implements UIActions {
 
     public void init() {
         final int w = 600, h = 600, d = 1;
+        //final int w = 5, h = 5, d = 1;
         _config = new Config(w, h, d);
         createMenu();
         setSize(_width, _height);
         int dims = 2;
         int size = 1;
-        int colors = 2;
-        //final int w = 300, h = 600;
+        int colors = 20;
         _timeline = new Timeline();
         org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors);
         org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
@@ -98,10 +98,12 @@ public class NViewer extends JFrame implements UIActions {
         _random = rand;
         //Ruleset rs = new IndexedRuleset1d(a);
         //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset2d(a2));
-        Ruleset rs = new IndexedRuleset2d(a);
+        //Ruleset rs = new IndexedRuleset2d(a);
+        Ruleset rs = new ComputedRuleset(a);
         //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset1d(a1));
         Rule rule = rs.random(rand).next();
-        Palette pal = Palette.random(colors, rand, true);
+        //Palette pal = Palette.random(colors, rand, true);
+        Palette pal = Palette.grey(colors);
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
         org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d);
 
@@ -194,9 +196,14 @@ public class NViewer extends JFrame implements UIActions {
                 _a.close(NViewer.this);
             }
         };
-        AbstractAction export = new AbstractAction() {
+        AbstractAction exportImg = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.export(NViewer.this, _config);
+                _a.exportImage(NViewer.this, _config);
+            }
+        };
+        AbstractAction exportRule = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.exportRule(NViewer.this, _config);
             }
         };
         JMenuItem ni = file.add(newCA);
@@ -212,8 +219,10 @@ public class NViewer extends JFrame implements UIActions {
         cl.setText("Close");
         cl.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));
         file.addSeparator();
-        JMenuItem exp = file.add(export);
-        exp.setText("Export ...");
+        JMenuItem expImg = file.add(exportImg);
+        expImg.setText("Export image...");
+        JMenuItem expRule = file.add(exportRule);
+        expRule.setText("Export rule...");
         //exp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));
         bar.add(file);
     }

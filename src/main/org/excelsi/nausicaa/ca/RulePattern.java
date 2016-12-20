@@ -27,7 +27,7 @@ public class RulePattern implements Pattern {
         return _r.archetype();
     }
 
-    @Override public byte next(final int pattern) {
+    @Override public byte next(final int pattern, final byte[] p2) {
         return _cur.next(pattern);
     }
 

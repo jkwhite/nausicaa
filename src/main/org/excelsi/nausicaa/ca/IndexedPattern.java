@@ -4,6 +4,7 @@ package org.excelsi.nausicaa.ca;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Arrays;
 
 
@@ -32,7 +33,7 @@ public final class IndexedPattern implements Pattern {
         return _id;
     }
 
-    @Override public byte next(final int pattern) {
+    @Override public byte next(final int pattern, final byte[] p2) {
         if(pattern>=_target.length) {
             return 0;
         }
@@ -106,6 +107,25 @@ public final class IndexedPattern implements Pattern {
         dos.writeInt(_target.length);
         for(byte b:_target) {
             dos.writeByte(b);
+        }
+    }
+
+    public void write(Writer w) throws IOException {
+        final long max = _a.totalPatterns();
+        final byte[] base = new byte[_a.sourceLength()];
+        final StringBuilder b = new StringBuilder();
+        for(int i=0;i<_a.sourceLength();i++) {
+            w.append("p"+i+"\t");
+        }
+        w.append("t\n");
+        for(int i=0;i<max;i++) {
+            Patterns.expandSourceIndex(_a, i, base);
+            for(int j=0;j<base.length;j++) {
+                b.append('c').append((int)base[j]).append('\t');
+            }
+            b.append('c').append((int)_target[i]).append('\n');
+            w.append(b);
+            b.setLength(0);
         }
     }
 

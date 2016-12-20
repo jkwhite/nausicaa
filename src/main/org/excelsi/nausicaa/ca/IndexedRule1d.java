@@ -92,7 +92,7 @@ public class IndexedRule1d extends AbstractIndexedRule {
                     pattern[k] = (byte) (prev[k]);
                     idx += prev[k] * pow[k];
                 }
-                c.setCell(j, i, p.next(idx));
+                c.setCell(j, i, p.next(idx, pattern));
                 //System.err.print(".");
             }
             //mutateRule(p);

@@ -138,7 +138,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         }
 
         public void step() {
-            System.err.print(".");
+            //System.err.print(".");
             if(!_frames.hasNext()) {
                 System.err.println("done");
                 return;

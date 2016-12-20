@@ -3,6 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
@@ -60,6 +61,10 @@ public abstract class AbstractRule /*extends WritableImagePlane*/ implements Rul
     }
 
     @Override public void write(DataOutputStream dos) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public void write(Writer w) throws IOException {
         throw new UnsupportedOperationException();
     }
 

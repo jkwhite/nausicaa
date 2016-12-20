@@ -39,13 +39,13 @@ public abstract class AbstractMutator implements Mutator {
         throw new UnsupportedOperationException();
     }
 
-    @Override public Rule mutate(Rule r) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override public Multirule mutate(Multirule r) {
-        throw new UnsupportedOperationException();
-    }
+    //@Override public Rule mutate(Rule r) {
+        //throw new UnsupportedOperationException();
+    //}
+//
+    //@Override public Multirule mutate(Multirule r) {
+        //throw new UnsupportedOperationException();
+    //}
 
     public void setRandom(Random om) {
         _om = om;

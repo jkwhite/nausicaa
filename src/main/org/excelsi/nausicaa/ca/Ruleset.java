@@ -8,7 +8,6 @@ import java.util.Random;
 
 public interface Ruleset extends java.io.Serializable {
     Iterator<Rule> iterator();
-    //Rule fromString(String str);
     Iterator<Rule> random(Random r);
     Rule create(Object... args);
     Ruleset derive(int[] colors, int len);

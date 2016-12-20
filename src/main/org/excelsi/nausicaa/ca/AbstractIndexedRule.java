@@ -3,6 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.concurrent.ExecutorService;
 
 
@@ -63,6 +64,10 @@ public abstract class AbstractIndexedRule extends AbstractRule implements Indexe
         _p.write(dos);
     }
 
+    @Override public void write(Writer w) throws IOException {
+        _p.write(w);
+    }
+
     @Override public String humanize() {
         //return _p.summarize();
         StringBuilder b = new StringBuilder(Info.b10Id(this, 50));
@@ -91,6 +96,7 @@ public abstract class AbstractIndexedRule extends AbstractRule implements Indexe
     }
 
     protected final Pattern createPattern(final ExecutorService pool) {
+        //return new ComputedPattern(archetype());
         if(getHyperrule()==null) {
             return pattern().copy();
         }

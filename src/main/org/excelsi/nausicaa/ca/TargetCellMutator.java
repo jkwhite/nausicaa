@@ -15,13 +15,5 @@ public abstract class TargetCellMutator extends AbstractMutator {
         });
     }
 
-    public Rule mutate(Rule r) {
-        throw new UnsupportedOperationException();
-    }
-
-    public Multirule mutate(Multirule r) {
-        throw new UnsupportedOperationException();
-    }
-
     protected abstract byte mutate(Archetype a, MutationFactor f, byte t);
 }

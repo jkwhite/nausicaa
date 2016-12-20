@@ -66,10 +66,10 @@ public final class CA {
     private Plane populatePlane(Plane p) {
         _rand.setSeed(_seed);
         _i.init(p, _r, _rand);
-        if(_r instanceof Multirule1D) {
-            ((Multirule1D)_r).generate2(p, 1, _h, false, true, null);
-        }
-        else {
+        //if(_r instanceof Multirule1D) {
+            //((Multirule1D)_r).generate2(p, 1, _h, false, true, null);
+        //}
+        //else {
             switch(_r.dimensions()) {
                 case 1:
                     _r.generate(p, 1, _h, POOL, false, true, null);
@@ -79,7 +79,7 @@ public final class CA {
                     _r.generate(p, 1, _d, POOL, false, true, null);
                     break;
             }
-        }
+        //}
         return p;
     }
 

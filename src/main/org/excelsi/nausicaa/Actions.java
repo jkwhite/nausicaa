@@ -39,7 +39,10 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.StringWriter;
+import java.io.Writer;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.util.Random;
@@ -92,7 +95,7 @@ public class Actions {
     public void close(NViewer v) {
     }
 
-    public void export(NViewer v, Config config) {
+    public void exportImage(NViewer v, Config config) {
         JFileChooser f = new JFileChooser(config.getDir());
         f.setDialogTitle("Export image");
         f.setDialogType(f.SAVE_DIALOG);
@@ -104,6 +107,24 @@ public class Actions {
             try {
                 config.setDir(f.getSelectedFile().getParent());
                 plane.save(f.getSelectedFile().toString());
+            }
+            catch(IOException e) {
+                showError(v, "Failed to save "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);
+            }
+        }
+    }
+
+    public void exportRule(NViewer v, Config config) {
+        JFileChooser f = new JFileChooser(config.getDir());
+        f.setDialogTitle("Export rule");
+        f.setDialogType(f.SAVE_DIALOG);
+        f.setMultiSelectionEnabled(false);
+        int ret = f.showSaveDialog(v.getRoot());
+        final Rule rule = v.getActiveCA().getRule();
+        if(ret==f.APPROVE_OPTION) {
+            try(Writer w = new BufferedWriter(new FileWriter(f.getSelectedFile().toString()))) {
+                config.setDir(f.getSelectedFile().getParent());
+                rule.write(w);
             }
             catch(IOException e) {
                 showError(v, "Failed to save "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);

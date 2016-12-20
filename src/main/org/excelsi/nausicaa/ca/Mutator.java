@@ -4,9 +4,9 @@ package org.excelsi.nausicaa.ca;
 public interface Mutator {
     String name();
     String description();
-    Rule mutate(Rule r) throws MutationFailedException;
+    //Rule mutate(Rule r) throws MutationFailedException;
     IndexedRule mutateIndexedRule(IndexedRule r, MutationFactor f) throws MutationFailedException;
-    Multirule mutate(Multirule r) throws MutationFailedException;
+    //Multirule mutate(Multirule r) throws MutationFailedException;
     void setRandom(java.util.Random r);
 
     static Mutator chain(final Mutator... chain) {
@@ -36,12 +36,12 @@ public interface Mutator {
                     }
                     return b.toString();
                 }
-                @Override public Rule mutate(Rule r) throws MutationFailedException {
-                    for(Mutator m:chain) {
-                        r = m.mutate(r);
-                    }
-                    return r;
-                }
+                //@Override public Rule mutate(Rule r) throws MutationFailedException {
+                    //for(Mutator m:chain) {
+                        //r = m.mutate(r);
+                    //}
+                    //return r;
+                //}
 
                 @Override public IndexedRule mutateIndexedRule(IndexedRule r, final MutationFactor f) throws MutationFailedException {
                     for(Mutator m:chain) {
@@ -50,12 +50,12 @@ public interface Mutator {
                     return r;
                 }
 
-                @Override public Multirule mutate(Multirule r) throws MutationFailedException {
-                    for(Mutator m:chain) {
-                        r = m.mutate(r);
-                    }
-                    return r;
-                }
+                //@Override public Multirule mutate(Multirule r) throws MutationFailedException {
+                    //for(Mutator m:chain) {
+                        //r = m.mutate(r);
+                    //}
+                    //return r;
+                //}
 
                 @Override public void setRandom(java.util.Random r) {
                     for(Mutator m:chain) {
