@@ -22,7 +22,16 @@ public class Color extends AbstractMutator {
         }
     }
 
-    static public int[] disjoint(int[] set, int[] remove) {
+    @Override public Rule mutate(Rule r) {
+        final Archetype a = r.archetype().asColors(1+r.archetype().colors());
+        return new ComputedRule2d(new ComputedPattern(a, ComputedPattern.random(a, _om)));
+    }
+
+    @Override public boolean supports(Rule r) {
+        return true;
+    }
+
+    static private int[] disjoint(int[] set, int[] remove) {
         Set<Integer> s = new HashSet<Integer>();
         for(int i:set) {
             s.add(i);

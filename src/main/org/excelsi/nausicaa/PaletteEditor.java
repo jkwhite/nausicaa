@@ -89,9 +89,9 @@ public class PaletteEditor extends JComponent implements TimelineListener {
                                 });
                             }
                                 */
-                            if(_rule instanceof IndexedRule) {
+                            //if(_rule instanceof IndexedRule) {
                                 _ui.setActiveCA(current.palette(new Palette(_colors)));
-                            }
+                            //}
                         }
                     }, 1000);
                 }

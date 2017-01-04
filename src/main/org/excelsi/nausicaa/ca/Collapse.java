@@ -17,4 +17,16 @@ public class Collapse extends AbstractMutator {
             return (IndexedRule) r.origin().derive(a.asColors(a.colors()-1)).random(_om).next();
         }
     }
+
+    @Override public Rule mutate(Rule r) {
+        if(r.archetype().colors()<3) {
+            throw new MutationFailedException("only 2 colors");
+        }
+        final Archetype a = r.archetype().asColors(r.archetype().colors()-1);
+        return new ComputedRule2d(new ComputedPattern(a, ComputedPattern.random(a, _om)));
+    }
+
+    @Override public boolean supports(Rule r) {
+        return true;
+    }
 }

@@ -15,11 +15,11 @@ public class RandomMutationStrategy implements MutationStrategy {
     }
 
     @Override public CA mutate(final CA ca, Random rand, MutationFactor f) {
-        return new RuleTransform(rand, createMutator(rand), f).transform(ca);
+        return new RuleTransform(rand, createMutator(rand, ca.getRule()), f).transform(ca);
     }
 
-    private Mutator createMutator(final Random rand) {
-        final Mutator m = _factory.randomMutator(rand);
+    private Mutator createMutator(final Random rand, final Rule rule) {
+        final Mutator m = _factory.randomMutator(rand, rule);
         return _sym ? new SymmetryForcer(m):m;
     }
 }

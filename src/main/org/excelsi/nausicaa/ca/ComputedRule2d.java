@@ -125,6 +125,7 @@ public class ComputedRule2d extends AbstractRule {
                     }
                 }
                 catch(InterruptedException|ExecutionException e) {
+                    e.printStackTrace();
                 }
                 tmp = p1;
                 p1 = p2;
@@ -174,6 +175,6 @@ public class ComputedRule2d extends AbstractRule {
     }
 
     protected final Pattern createPattern(final ExecutorService pool) {
-        return _p;
+        return ((ComputedPattern)_p).copy();
     }
 }

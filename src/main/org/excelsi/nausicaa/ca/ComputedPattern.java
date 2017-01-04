@@ -9,20 +9,37 @@ import java.util.Random;
 
 
 public final class ComputedPattern implements Pattern {
-    public static final RuleLogic IDENTITY = new RARule("id", (p->(byte)(p[(p.length-1)/2])), b->b);
+    public static final RuleLogic IDENTITY = new RARule("id",
+        new Reducer() {
+            @Override public byte reduce(byte[] p) {
+                return (byte)(p[(p.length-1)/2]);
+            }
+            @Override public Reducer copy() { return this; }
+        },
+        new Activator() {
+            @Override public byte activate(byte b) { return b; }
+            @Override public Activator copy() { return this; }
+        });
+
     public static final RuleLogic LIFE = new RARule("life",
-        (p->{
-            int t=PatternOp.sumo(p);
-            int r;
-            if(p[4]==0) {
-                r = t>2&&t<=3?1:0;
+        new Reducer() {
+            @Override public byte reduce(byte[] p) {
+                int t=PatternOp.sumo(p);
+                int r;
+                if(p[4]==0) {
+                    r = t>2&&t<=3?1:0;
+                }
+                else {
+                    r = t>=2&&t<=3?1:0;
+                }
+                return (byte)r;
             }
-            else {
-                r = t>=2&&t<=3?1:0;
-            }
-            return (byte)r;
-        }),
-        b->b);
+            @Override public Reducer copy() { return this; }
+        },
+        new Activator() {
+            @Override public byte activate(byte b) { return b; }
+            @Override public Activator copy() { return this; }
+        });
 
     private final Archetype _a;
     private final RuleLogic _logic;
@@ -30,52 +47,336 @@ public final class ComputedPattern implements Pattern {
 
     public static RuleLogic cyclic(final Archetype a) {
         return new RARule("cyclic",
-            (p->{
-                int t = p[4]+1;
-                if(t>=a.colors()) {
-                    t=0;
+            new Reducer() {
+                @Override public byte reduce(byte[] p) {
+                    int t = p[4]+1;
+                    if(t>=a.colors()) {
+                        t=0;
+                    }
+                    return (byte)t;
                 }
-                return (byte)t;
-            }),
-            b->b);
+                @Override public Reducer copy() { return this; }
+            },
+            new Activator() {
+                @Override public byte activate(byte b) { return b; }
+                @Override public Activator copy() { return this; }
+            });
     }
 
     public static RuleLogic random(final Archetype a, final Random r) {
-        final PatternOp[] ops = new PatternOp[a.sourceLength()];
+        final ArrayOp aop = ArrayOp.histo(a.colors());
+        int len = 1+r.nextInt(a.colors());
+        //len = 3;
+        final PatternOp[] ops = new PatternOp[len];
+        final StringBuilder n = new StringBuilder();
         for(int i=0;i<ops.length;i++) {
             final PatternOp op;
-            switch(r.nextInt(2)) {
+            final char c;
+            switch(r.nextInt(19)) {
                 case 0:
                     op = PatternOp.plus();
+                    c = '+';
                     break;
                 case 1:
                     op = PatternOp.minus();
+                    c = '-';
                     break;
                 case 2:
                     op = PatternOp.multiply();
+                    c = '*';
                     break;
                 case 3:
+                    op = PatternOp.mod();
+                    c = '%';
+                    break;
+                case 4:
+                    op = PatternOp.max();
+                    c = 'M';
+                    break;
+                case 5:
+                    op = PatternOp.min();
+                    c = 'm';
+                    break;
+                case 6:
+                    op = PatternOp.pow();
+                    c = 'p';
+                    break;
+                case 7:
+                    op = PatternOp.minusa();
+                    c = '_';
+                    break;
+                case 8:
+                    op = PatternOp.xor();
+                    c = '^';
+                    break;
+                case 9:
+                    op = PatternOp.and();
+                    c = '&';
+                    break;
+                case 10:
+                    op = PatternOp.or();
+                    c = '|';
+                    break;
+                case 11:
+                    op = PatternOp.rotr();
+                    c = '>';
+                    break;
+                case 12:
+                    op = PatternOp.rotl();
+                    c = '<';
+                    break;
+                case 13:
+                    op = PatternOp.avg();
+                    c = 'a';
+                    break;
+                case 14:
+                    op = PatternOp.first();
+                    c = 'f';
+                    break;
+                case 15:
+                    op = PatternOp.last();
+                    c = 'l';
+                    break;
+                case 16:
+                    op = PatternOp.eq();
+                    c = '=';
+                    break;
+                case 17:
+                    op = PatternOp.neq();
+                    c = '!';
+                    break;
+                case 18:
                 default:
                     op = PatternOp.divide();
+                    c = '/';
                     break;
             }
             ops[i] = op;
+            n.append(c);
         }
-        final PatternOp red = PatternOp.mod();
-        return new RARule("rand",
+        final PatternOp red;
+        switch(r.nextInt(2)) {
+            case 0:
+                red = PatternOp.mod();
+                n.append('%');
+                break;
+            default:
+            case 1:
+                red = PatternOp.mino();
+                n.append('m');
+                break;
+        }
+        return new RARule(n.toString(),
+            new HiddenLayerReducer(a, aop, ops),
+            new BoundedActivator(red, a)
+        );
+        /*
+        return new RARule(n.toString(),
             (p->{
-                int t = p[0];
-                for(int i=1;i<p.length;i++) {
-                    t = ops[i-1].op(t, p[i]);
+                final int[] q = aop.op(p);
+                int t = q[0];
+                int opidx = 0;
+                for(int i=1;i<q.length;i++) {
+                    t = ops[opidx].op(t, q[i]);
+                    if(++opidx==ops.length) {
+                        opidx = 0;
+                    }
                 }
+                if(t<0) t=0;
                 return (byte)t;
             }),
-            b->(byte)red.op(b,a.colors()));
+            b->{
+                int v = red.op(b,a.colors());
+                if(v<0) v=0;
+                if(v>=a.colors()) v=a.colors()-1;
+                return (byte) v;
+            });
+            */
+    }
+
+    private static class HiddenLayerReducer implements Reducer {
+        private final Archetype _a;
+        private final ArrayOp _aop;
+        private final PatternOp[] _ops;
+
+        public HiddenLayerReducer(Archetype a, ArrayOp aop, PatternOp[] ops) {
+            _a = a;
+            _aop = aop;
+            _ops = ops;
+        }
+
+        @Override public byte reduce(byte[] p) {
+            final int[] q = _aop.op(p);
+            int t = q[0];
+            int opidx = 0;
+            for(int i=1;i<q.length;i++) {
+                t = _ops[opidx].op(t, q[i]);
+                if(++opidx==_ops.length) {
+                    opidx = 0;
+                }
+            }
+            if(t<0) t=0;
+            return (byte)t;
+        }
+
+        @Override public HiddenLayerReducer copy() {
+            return new HiddenLayerReducer(
+                _a,
+                ArrayOp.histo(_a.colors()),
+                _ops);
+        }
+    }
+
+    private static class BoundedActivator implements Activator {
+        private final PatternOp _red;
+        private final Archetype _a;
+
+        public BoundedActivator(PatternOp red, Archetype a) {
+            _red = red;
+            _a = a;
+        }
+
+        @Override public byte activate(byte b) {
+            int v = _red.op(b,_a.colors());
+            if(v<0) v=0;
+            if(v>=_a.colors()) v=_a.colors()-1;
+            return (byte) v;
+        }
+
+        @Override public BoundedActivator copy() {
+            return new BoundedActivator(_red, _a);
+        }
+    }
+
+    public static RuleLogic orandom(final Archetype a, final Random r) {
+        int len = 1+r.nextInt(a.sourceLength());
+        len = 5;
+        final PatternOp[] ops = new PatternOp[len];
+        final StringBuilder n = new StringBuilder();
+        for(int i=0;i<ops.length;i++) {
+            final PatternOp op;
+            final char c;
+            switch(r.nextInt(17)) {
+                case 0:
+                    op = PatternOp.plus();
+                    c = '+';
+                    break;
+                case 1:
+                    op = PatternOp.minus();
+                    c = '-';
+                    break;
+                case 2:
+                    op = PatternOp.multiply();
+                    c = '*';
+                    break;
+                case 3:
+                    op = PatternOp.mod();
+                    c = '%';
+                    break;
+                case 4:
+                    op = PatternOp.max();
+                    c = 'M';
+                    break;
+                case 5:
+                    op = PatternOp.min();
+                    c = 'm';
+                    break;
+                case 6:
+                    op = PatternOp.pow();
+                    c = 'p';
+                    break;
+                case 7:
+                    op = PatternOp.minusa();
+                    c = '_';
+                    break;
+                case 8:
+                    op = PatternOp.xor();
+                    c = '^';
+                    break;
+                case 9:
+                    op = PatternOp.and();
+                    c = '&';
+                    break;
+                case 10:
+                    op = PatternOp.or();
+                    c = '|';
+                    break;
+                case 11:
+                    op = PatternOp.rotr();
+                    c = '>';
+                    break;
+                case 12:
+                    op = PatternOp.rotl();
+                    c = '<';
+                    break;
+                case 13:
+                    op = PatternOp.avg();
+                    c = 'a';
+                    break;
+                case 14:
+                    op = PatternOp.first();
+                    c = 'f';
+                    break;
+                case 15:
+                    op = PatternOp.last();
+                    c = 'l';
+                    break;
+                case 16:
+                default:
+                    op = PatternOp.divide();
+                    c = '/';
+                    break;
+            }
+            ops[i] = op;
+            n.append(c);
+        }
+        final PatternOp red;
+        switch(r.nextInt(2)) {
+            case 0:
+                red = PatternOp.mod();
+                n.append('%');
+                break;
+            default:
+            case 1:
+                red = PatternOp.min();
+                n.append('m');
+                break;
+        }
+        //0 1 2
+        //3 4 5
+        //6 7 8
+        final int[] order = {1, 7, 3, 5, 0, 2, 6, 8, 4};
+        return new RARule(n.toString(),
+            new Reducer() {
+                @Override public byte reduce(byte[] p) {
+                    int t = p[order[0]];
+                    int opidx = 0;
+                    for(int i=1;i<p.length;i++) {
+                        t = ops[opidx].op(t, p[order[i]]);
+                        if(++opidx==ops.length) {
+                            opidx = 0;
+                        }
+                    }
+                    if(t<0) t=0;
+                    return (byte)t;
+                }
+                @Override public Reducer copy() { return this; }
+            },
+            new Activator() {
+                @Override public byte activate(byte b) {
+                    return (byte)red.op(b,a.colors());
+                }
+                @Override public Activator copy() { return this; }
+            });       
     }
 
     public ComputedPattern(Archetype a, RuleLogic logic) {
         _a = a;
         _logic = logic;
+    }
+
+    public ComputedPattern copy() {
+        return new ComputedPattern(_a, _logic.copy());
     }
 
     @Override public Archetype archetype() {
@@ -89,9 +390,9 @@ public final class ComputedPattern implements Pattern {
     @Override public void tick() {
     }
 
-    @FunctionalInterface
     public interface RuleLogic {
         byte next(byte[] pattern);
+        RuleLogic copy();
     }
 
     public static class RARule implements RuleLogic {
@@ -115,6 +416,10 @@ public final class ComputedPattern implements Pattern {
             return _a.activate(_r.reduce(pattern));
         }
 
+        @Override public RARule copy() {
+            return new RARule(_n, _r.copy(), _a.copy());
+        }
+
         @Override public String toString() {
             return _n;
         }
@@ -124,11 +429,13 @@ public final class ComputedPattern implements Pattern {
         return _logic.toString();
     }
 
-    @FunctionalInterface public interface Reducer {
+    public interface Reducer {
         byte reduce(byte[] b);
+        Reducer copy();
     }
 
-    @FunctionalInterface public interface Activator {
+    public interface Activator {
         byte activate(byte target);
+        Activator copy();
     }
 }

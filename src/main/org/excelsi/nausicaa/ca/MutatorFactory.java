@@ -59,13 +59,21 @@ public class MutatorFactory {
         return DEFAULT_FACTORY;
     }
 
-    public Mutator randomMutator(final Random rand) {
-        int v = rand.nextInt(_sumWeight);
-        for(Weight w:_mutators) {
-            v -= w.weight();
-            if(v<=0) {
-                return w.mutator();
+    public Mutator randomMutator(final Random rand, final Rule rule) {
+        Mutator m = null;
+        int tries = 0;
+        do {
+            int v = rand.nextInt(_sumWeight);
+            for(Weight w:_mutators) {
+                v -= w.weight();
+                if(v<=0) {
+                    m = w.mutator();
+                    break;
+                }
             }
+        } while(++tries<1000&&(m==null||!m.supports(rule)));
+        if(m!=null) {
+            return m;
         }
         throw new IllegalStateException("impossible weight range for "+_sumWeight);
     }

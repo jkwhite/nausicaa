@@ -199,20 +199,6 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
 
     public CA mutate(CA ca) {
         return new MultiTransform(_random, createMutationFactor(), _config.getForceSymmetry()?new Symmetry(true):null).transform(ca);
-        //return ca.mutate(createMutation(ca.getRule()));
-        /*
-        Transform t;
-        switch(_random.nextInt(2)) {
-            case 1:
-                t = new RuleTransform();
-                break;
-            default:
-            case 0:
-                t = new HueTransform();
-                break;
-        }
-        return t.transform(ca);
-        */
     }
 
     public int getCAWidth() {

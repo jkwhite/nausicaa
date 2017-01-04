@@ -17,8 +17,16 @@ public class SafeMutator implements Mutator {
         return _m.description();
     }
 
+    @Override public boolean supports(Rule r) {
+        return _m.supports(r);
+    }
+
     @Override public void setRandom(java.util.Random r) {
         _m.setRandom(r);
+    }
+
+    @Override public Rule mutate(Rule r) throws MutationFailedException {
+        return _m.mutate(r);
     }
 
     @Override public IndexedRule mutateIndexedRule(IndexedRule r, MutationFactor f) throws MutationFailedException {

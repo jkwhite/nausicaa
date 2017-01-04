@@ -14,4 +14,12 @@ public class Noise extends AbstractMutator {
             }
         });
     }
+
+    @Override public Rule mutate(Rule r) {
+        return new ComputedRule2d(new ComputedPattern(r.archetype(), ComputedPattern.random(r.archetype(), _om)));
+    }
+
+    @Override public boolean supports(Rule r) {
+        return true;
+    }
 }

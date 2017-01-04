@@ -89,7 +89,7 @@ public class NViewer extends JFrame implements UIActions {
         setSize(_width, _height);
         int dims = 2;
         int size = 1;
-        int colors = 20;
+        int colors = 5;
         _timeline = new Timeline();
         org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors);
         org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
@@ -102,8 +102,8 @@ public class NViewer extends JFrame implements UIActions {
         Ruleset rs = new ComputedRuleset(a);
         //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset1d(a1));
         Rule rule = rs.random(rand).next();
-        //Palette pal = Palette.random(colors, rand, true);
-        Palette pal = Palette.grey(colors);
+        Palette pal = Palette.random(colors, rand, true);
+        //Palette pal = Palette.grey(colors);
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
         org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d);
 

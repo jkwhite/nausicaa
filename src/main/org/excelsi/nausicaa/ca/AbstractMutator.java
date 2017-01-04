@@ -35,14 +35,18 @@ public abstract class AbstractMutator implements Mutator {
         return _om.nextInt(100)<f.alpha();
     }
 
+    @Override public boolean supports(Rule r) {
+        return r instanceof IndexedRule;
+    }
+
     @Override public IndexedRule mutateIndexedRule(IndexedRule r, MutationFactor f) throws MutationFailedException {
         throw new UnsupportedOperationException();
     }
 
-    //@Override public Rule mutate(Rule r) {
-        //throw new UnsupportedOperationException();
-    //}
-//
+    @Override public Rule mutate(Rule r) {
+        throw new UnsupportedOperationException(name()+" does not support "+r);
+    }
+
     //@Override public Multirule mutate(Multirule r) {
         //throw new UnsupportedOperationException();
     //}

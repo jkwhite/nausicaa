@@ -52,7 +52,7 @@ public class MultiTransform implements Transform {
     }
 
     protected Mutator createMutator(CA c) {
-        Mutator m = MutatorFactory.defaultMutators().randomMutator(c.getRandom());
+        Mutator m = MutatorFactory.defaultMutators().randomMutator(c.getRandom(), c.getRule());
         return _extraMutator!=null?Mutator.chain(m, _extraMutator):m;
     }
 }
