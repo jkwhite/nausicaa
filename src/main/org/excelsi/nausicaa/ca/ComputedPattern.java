@@ -64,15 +64,28 @@ public final class ComputedPattern implements Pattern {
     }
 
     public static RuleLogic random(final Archetype a, final Random r) {
+        return new MachineElf(new Machine(new Genome("pO-s-c2-c3-i-pO-s8-c3-eq-p4-if")));
+        //return new MachineElf(new Machine(new Genome("pO-s-c2-c3-i-pO-s8-c3-eq-p3-if")));
+        //return new MachineElf(new Machine(new Genome("pO-s-c4-c7-i")));
+    }
+
+    public static RuleLogic serial_random(final Archetype a, final Random r) {
         final ArrayOp aop = ArrayOp.histo(a.colors());
         int len = 1+r.nextInt(a.colors());
-        //len = 3;
+        len = 9;
+        int streak = 0;
         final PatternOp[] ops = new PatternOp[len];
         final StringBuilder n = new StringBuilder();
+        int opi = -1;
         for(int i=0;i<ops.length;i++) {
             final PatternOp op;
             final char c;
-            switch(r.nextInt(19)) {
+            if(streak==0) {
+                streak = 1+r.nextInt(9);
+                opi = r.nextInt(19);
+            }
+            streak--;
+            switch(opi) {
                 case 0:
                     op = PatternOp.plus();
                     c = '+';
@@ -422,6 +435,27 @@ public final class ComputedPattern implements Pattern {
 
         @Override public String toString() {
             return _n;
+        }
+    }
+
+    public static class MachineElf implements RuleLogic {
+        private final Machine _m;
+
+
+        public MachineElf(Machine m) {
+            _m = m;
+        }
+
+        @Override public byte next(byte[] pattern) {
+            return _m.compute(pattern);
+        }
+
+        @Override public RuleLogic copy() {
+            return new MachineElf(_m.copy());
+        }
+
+        @Override public String toString() {
+            return _m.toString();
         }
     }
 

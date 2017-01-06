@@ -83,13 +83,13 @@ public class NViewer extends JFrame implements UIActions {
 
     public void init() {
         final int w = 600, h = 600, d = 1;
-        //final int w = 5, h = 5, d = 1;
+        //final int w = 3, h = 3, d = 1;
         _config = new Config(w, h, d);
         createMenu();
         setSize(_width, _height);
         int dims = 2;
         int size = 1;
-        int colors = 5;
+        int colors = 2;
         _timeline = new Timeline();
         org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors);
         org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
@@ -520,31 +520,11 @@ public class NViewer extends JFrame implements UIActions {
             JMenuItem mutat = mutate.add(mut);
             mutat.setText(m.name());
         }
-        /*
-        if(_dimensions.equals("2")) {
-            mutate.addSeparator();
-            for(final Mutator m:MUTATORS2) {
-                AbstractAction mut = new AbstractAction() {
-                    public void actionPerformed(ActionEvent e) {
-                        try {
-                            _a.mutate(NViewer.this, m);
-                        }
-                        catch(MutationFailedException ex) {
-                            System.err.println(m.name()+" failed: "+ex.getMessage());
-                        }
-                    }
-                };
-                JMenuItem mutat = mutate.add(mut);
-                mutat.setText(m.name());
-            }
-        }
-        */
         mutate.addSeparator();
-        final JCheckBoxMenuItem[] mhack = new JCheckBoxMenuItem[1];
+
+        final JCheckBoxMenuItem[] mhack = new JCheckBoxMenuItem[2];
         JCheckBoxMenuItem forceSym = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //_forceSymmetry = !_forceSymmetry;
-                //MutatorFactory.instance().setForceSymmetry(_forceSymmetry);
                 _config.setForceSymmetry(!_config.getForceSymmetry());
                 mhack[0].setState(!mhack[0].getState());
                 mhack[0].setSelected(!mhack[0].getState());
@@ -555,6 +535,19 @@ public class NViewer extends JFrame implements UIActions {
         forceSym.setText("Force symmetry");
         forceSym.setState(_config.getForceSymmetry());
         forceSym.setSelected(_config.getForceSymmetry());
+
+        JCheckBoxMenuItem incHueVariations = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _config.setHueVariations(!_config.getHueVariations());
+                mhack[1].setState(!mhack[1].getState());
+                mhack[1].setSelected(!mhack[1].getState());
+            }
+        });
+        mutate.add(incHueVariations);
+        mhack[1] = incHueVariations;
+        incHueVariations.setText("Hue variations");
+        incHueVariations.setState(_config.getHueVariations());
+        incHueVariations.setSelected(_config.getHueVariations());
 
         JMenuItem mparams = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {

@@ -16,6 +16,7 @@ public class Config {
     private float _scale = 1f;
     private long _animationDelay = 100;
     private boolean _forceSymmetry = true;
+    private boolean _hueVariations = true;
     private final Map<String,Object> _variables = new HashMap<>();
     private String _dir = System.getProperty("user.home");
 
@@ -95,6 +96,15 @@ public class Config {
 
     public boolean getForceSymmetry() {
         return _forceSymmetry;
+    }
+
+    public void setHueVariations(boolean hueVariations) {
+        _hueVariations = hueVariations;
+        notify("hueVariations");
+    }
+
+    public boolean getHueVariations() {
+        return _hueVariations;
     }
 
     public void setDir(String dir) {

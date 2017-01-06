@@ -8,6 +8,7 @@ public class MultiTransform implements Transform {
     private final Random _rand;
     private final MutationFactor _factor;
     private final Mutator _extraMutator;
+    private boolean _hueVariations;
 
 
     public MultiTransform(Random rand, MutationFactor f) {
@@ -22,6 +23,11 @@ public class MultiTransform implements Transform {
 
     public String name() {
         return "multitransform";
+    }
+
+    public MultiTransform hueVariations(boolean v) {
+        _hueVariations = v;
+        return this;
     }
 
     public CA transform(CA c) {
@@ -39,14 +45,19 @@ public class MultiTransform implements Transform {
 
     private CA runTransform(CA c) throws MutationFailedException {
         Transform t;
-        switch(_rand.nextInt(6)) {
-            case 1:
-                t = new HueTransform(_rand);
-                break;
-            default:
-            case 0:
-                t = new RuleTransform(_rand, createMutator(c), _factor);
-                break;
+        if(_hueVariations) {
+            switch(_rand.nextInt(6)) {
+                case 1:
+                    t = new HueTransform(_rand);
+                    break;
+                default:
+                case 0:
+                    t = new RuleTransform(_rand, createMutator(c), _factor);
+                    break;
+            }
+        }
+        else {
+            t = new RuleTransform(_rand, createMutator(c), _factor);
         }
         return t.transform(c);
     }
