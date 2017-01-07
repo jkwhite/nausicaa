@@ -89,7 +89,7 @@ public class NViewer extends JFrame implements UIActions {
         setSize(_width, _height);
         int dims = 2;
         int size = 1;
-        int colors = 2;
+        int colors = 40;
         _timeline = new Timeline();
         org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors);
         org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);

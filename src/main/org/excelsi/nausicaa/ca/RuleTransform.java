@@ -44,6 +44,10 @@ public class RuleTransform implements Transform {
             //System.err.println(_m.name()+" produced rule "+after.getRule().humanize());
             return after;
         }
+        else if(root instanceof Mutatable) {
+            Rule mut = (Rule)((Mutatable)root).mutate(_rand);
+            return c.mutate(mut, _rand);
+        }
         else {
             //return c.mutate(_m.mutate(root), _rand);
             //throw new UnsupportedOperationException();

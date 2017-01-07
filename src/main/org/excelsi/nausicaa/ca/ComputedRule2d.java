@@ -7,13 +7,14 @@ import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.Random;
 
 
-public class ComputedRule2d extends AbstractRule {
+public class ComputedRule2d extends AbstractRule implements Mutatable {
     private final Ruleset _origin;
     private final Pattern _p;
     private final Rule _meta;
-    //private final IndexedRule2d _meta;
+    //private final ComputedRule2d _meta;
 
 
     public ComputedRule2d(Pattern p) {
@@ -48,7 +49,8 @@ public class ComputedRule2d extends AbstractRule {
     //}
 
     public ComputedRule2d derive(Pattern pattern) {
-        return new ComputedRule2d(pattern, _origin, _meta, getHyperrule());
+        //return new ComputedRule2d(pattern, _origin, _meta, getHyperrule());
+        return new ComputedRule2d(pattern, _origin, _meta, null);
     }
 
     //@Override public ComputedRule2d derive(Pattern.Transform transform) {
@@ -162,6 +164,10 @@ public class ComputedRule2d extends AbstractRule {
             p.tick();
         }
         return 0f;
+    }
+
+    @Override public Mutatable mutate(Random r) {
+        return derive(((ComputedPattern)_p).mutate(r));
     }
 
     @Override public String humanize() {

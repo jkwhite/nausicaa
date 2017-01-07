@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 
-public final class ComputedPattern implements Pattern {
+public final class ComputedPattern implements Pattern, Mutatable {
     public static final RuleLogic IDENTITY = new RARule("id",
         new Reducer() {
             @Override public byte reduce(byte[] p) {
@@ -64,7 +64,9 @@ public final class ComputedPattern implements Pattern {
     }
 
     public static RuleLogic random(final Archetype a, final Random r) {
-        return new MachineElf(new Machine(new Genome("pO-s-c2-c3-i-pO-s8-c3-eq-p4-if")));
+        //return new MachineElf(new Machine(new Genome("pO-s-c2-c3-i-pO-s8-c3-eq-p4-if")));
+        GenomeFactory gf = new GenomeFactory();
+        return new MachineElf(new Machine(a, gf.generate(r)));
         //return new MachineElf(new Machine(new Genome("pO-s-c2-c3-i-pO-s8-c3-eq-p3-if")));
         //return new MachineElf(new Machine(new Genome("pO-s-c4-c7-i")));
     }
@@ -403,9 +405,17 @@ public final class ComputedPattern implements Pattern {
     @Override public void tick() {
     }
 
+    @Override public ComputedPattern mutate(Random r) {
+        GenomeFactory gf = new GenomeFactory();
+        return new ComputedPattern(_a, _logic.mutate(_a, gf, r));
+    }
+
     public interface RuleLogic {
         byte next(byte[] pattern);
         RuleLogic copy();
+        default RuleLogic mutate(Archetype a, GenomeFactory gf, Random r) {
+            return this;
+        }
     }
 
     public static class RARule implements RuleLogic {
@@ -452,6 +462,10 @@ public final class ComputedPattern implements Pattern {
 
         @Override public RuleLogic copy() {
             return new MachineElf(_m.copy());
+        }
+
+        @Override public MachineElf mutate(Archetype a, GenomeFactory gf, Random r) {
+            return new MachineElf(_m.mutate(a, gf, r));
         }
 
         @Override public String toString() {

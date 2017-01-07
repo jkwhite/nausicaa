@@ -1,20 +1,25 @@
 package org.excelsi.nausicaa.ca;
 
 
+import java.util.Random;
+
+
 public class Machine {
+    private final Archetype _a;
     private final Genome _g;
-    private final Op[] _prg;
+    private final Codon[] _prg;
     private final Tape _t;
 
 
-    public Machine(Genome g) {
+    public Machine(Archetype a, Genome g) {
+        _a = a;
         _g = g;
-        _prg = g.ops();
+        _prg = g.codons(a);
         _t = new Tape(128);
     }
 
     public Machine copy() {
-        return new Machine(_g);
+        return new Machine(_a, _g);
     }
 
     public byte compute(final byte[] p) {
@@ -26,9 +31,20 @@ public class Machine {
             //d(_prg[i]+" "+_t);
         }
         int res = _t.pop();
+        res = res % _a.colors();
+        if(res<0) {
+            res = 0;
+        }
+        //if(res>=_a.colors()) {
+            //res = _a.colors()-1;
+        //}
         //d("res: "+res);
         //d("===============");
         return (byte) res;
+    }
+
+    public Machine mutate(Archetype a, GenomeFactory gf, Random r) {
+        return new Machine(_a, _g.mutate(_a, gf, r));
     }
 
     @Override public String toString() {

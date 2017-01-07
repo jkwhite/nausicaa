@@ -18,6 +18,8 @@ public class Ops {
                 return new Sum(p);
             case "p":
                 return new Push(p);
+            case "mo":
+                return new Mod();
             case "pO":
                 return new PushO();
             case "i":
@@ -109,6 +111,15 @@ public class Ops {
             int v2 = t.pop();
             int eq = (v1==v2)?1:0;
             t.push(eq);
+        }
+    }
+
+    static class Mod implements Op {
+        @Override public void op(byte[] p, Tape t) {
+            int v1 = t.pop();
+            int v2 = t.pop();
+            int m = v1%v2;
+            t.push(m);
         }
     }
 
