@@ -1,6 +1,7 @@
 package org.excelsi.nausicaa;
 
 
+import org.excelsi.nausicaa.ca.Archetype;
 import org.excelsi.nausicaa.ca.Mutator;
 import org.excelsi.nausicaa.ca.Symmetry;
 import org.excelsi.nausicaa.ca.SymmetryForcer;
@@ -31,6 +32,9 @@ import org.excelsi.nausicaa.ca.MutationFactor;
 import org.excelsi.nausicaa.ca.Stats;
 import org.excelsi.nausicaa.ca.Multistats;
 import org.excelsi.nausicaa.ca.Pools;
+import org.excelsi.nausicaa.ca.Ruleset;
+import org.excelsi.nausicaa.ca.ComputedRuleset;
+import org.excelsi.nausicaa.ca.Initializers;
 
 import java.math.BigInteger;
 import java.awt.*;
@@ -53,6 +57,57 @@ import java.util.concurrent.Executors;
 
 public class Actions {
     public void newCA(NViewer v) {
+        final JDialog d = new JDialog(v, "New automata");
+        final Config config = v.getConfig();
+        //v.pack();
+        //Things.centerWindow(v);
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(2,2));
+
+        top.add(new JLabel("Dimensions"));
+        final JTextField alpha = new JTextField();
+        alpha.setText(config.getVariable("default_dimensions", "2"));
+        alpha.setColumns(3);
+        top.add(alpha);
+
+        top.add(new JLabel("Colors"));
+        final JTextField mc = new JTextField();
+        mc.setText(config.getVariable("default_colors", "2"));
+        mc.setColumns(3);
+        top.add(mc);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                Integer dims = Integer.parseInt(alpha.getText());
+                Integer colors = Integer.parseInt(mc.getText());
+                int size = 1;
+                config.setVariable("default_dimensions", alpha.getText());
+                config.setVariable("default_colors", mc.getText());
+                Archetype a = new Archetype(dims, size, colors);
+                Random rand = new Random();
+                Ruleset rs = new ComputedRuleset(a);
+                Rule rule = rs.random(rand).next();
+                Palette pal = Palette.random(colors, rand, true);
+                CA ca = new CA(rule, pal, v.getActiveCA().getInitializer(), rand, 0, v.getConfig().getWidth(), v.getConfig().getHeight(), v.getConfig().getDepth());
+                v.setActiveCA(ca);
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
     }
 
     public void load(NViewer v, Config config) {

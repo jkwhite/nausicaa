@@ -50,8 +50,15 @@ public final class CA {
     }
 
     public Plane createPlane() {
-        return createBufferedImagePlane();
-        //return createWritableImagePlane();
+        if(archetype().dims()==3) {
+            BlockPlane p = new BlockPlane(this, getWidth(), getHeight(), getDepth());
+            populatePlane(p);
+            return p;
+        }
+        else {
+            return createBufferedImagePlane();
+            //return createWritableImagePlane();
+        }
     }
 
     public Plane pooledPlane(Plane p) {
@@ -73,6 +80,8 @@ public final class CA {
             switch(_r.dimensions()) {
                 case 1:
                     _r.generate(p, 1, _h, POOL, false, true, null);
+                    break;
+                case 3:
                     break;
                 case 2:
                 default:

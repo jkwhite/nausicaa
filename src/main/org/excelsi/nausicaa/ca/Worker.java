@@ -43,8 +43,23 @@ public class Worker {
         }
     }
 
+    public void frame3d(final BlockPlane p1, final BlockPlane p2) {
+        for(int i=_y1;i<_y2;i++) {
+            for(int j=_x1;j<_x2;j++) {
+                for(int k=0;k<p1.getDepth();k++) {
+                    p1.getBlock(_pattern, j-_size, i-1, k-1, /*dx*/ 3, /*dy*/ 3, 3, 0);
+                    p2.setCell(j, i, k, _wp.next(0, _pattern));
+                }
+            }
+        }
+    }
+
     public void frame(final Plane p1, final Plane p2) {
-        validate(p1);
+        if(p1 instanceof BlockPlane) {
+            frame3d((BlockPlane)p1, (BlockPlane)p2);
+            return;
+        }
+        //validate(p1);
         int counts = 0;
         //System.err.println(String.format("dims: %d,%d,%d,%d", _y1, _y2, _x1, _x2));
         int mw = p1.getWidth()/2;
@@ -68,7 +83,7 @@ public class Worker {
                 p2.setCell(j, i, _wp.next(idx, _pattern));
             }
         }
-        mutateRule();
+        //mutateRule();
         //System.err.println("set "+counts+" cells");
     }
 

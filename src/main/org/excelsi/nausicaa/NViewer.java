@@ -22,8 +22,11 @@ public class NViewer extends JFrame implements UIActions {
     private Config _config;
     private Timeline _timeline;
     private JFrame _peditor;
+    private JFrame _reditor;
     private PaletteEditor _paletteEditor;
+    private RuleEditor _ruleEditor;
     private JMenuItem _pehack;
+    private JMenuItem _rehack;
     private Random _random;
 
 
@@ -82,14 +85,15 @@ public class NViewer extends JFrame implements UIActions {
     }
 
     public void init() {
-        final int w = 600, h = 600, d = 1;
+        //final int w = 600, h = 600, d = 1;
+        final int w = 10, h = 10, d = 10;
         //final int w = 3, h = 3, d = 1;
         _config = new Config(w, h, d);
         createMenu();
         setSize(_width, _height);
-        int dims = 2;
+        int dims = 3;
         int size = 1;
-        int colors = 40;
+        int colors = 20;
         _timeline = new Timeline();
         org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors);
         org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
@@ -396,7 +400,7 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction stp = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.animate(NViewer.this, _timeline, 1);
+                _a.animate(NViewer.this, _timeline, 2);
             }
         };
         JMenuItem stepone = auto.add(stp);
@@ -627,8 +631,17 @@ public class NViewer extends JFrame implements UIActions {
             }
         });
         viewh.setText("View from higher dimension");
-        //peditor.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcut));
         window.add(viewh);
+
+        final JMenuItem formed = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                toggleRuleEditor();
+            }
+        });
+        _rehack = formed;
+        formed.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, shortcut));
+        formed.setText("Show rule editor");
+        window.add(formed);
 
         bar.add(window);
     }
@@ -681,6 +694,55 @@ public class NViewer extends JFrame implements UIActions {
         _pehack.setText(_peditor!=null?"Hide palette editor":"Show palette editor");
     }
 
+    private void toggleRuleEditor() {
+        if(_reditor!=null) {
+            _ruleEditor.disconnect();
+            _ruleEditor = null;
+            _reditor.setVisible(false);
+            _reditor = null;
+        }
+        else {
+            _reditor = new JFrame("Rule Editor");
+            _ruleEditor = new RuleEditor(_reditor, this, _timeline);
+            _reditor.getContentPane().add(_ruleEditor);
+            _reditor.pack();
+            Dimension dim = _reditor.getContentPane().getPreferredSize();
+            _reditor.setSize(16+dim.width, 24+dim.height);
+
+            int shortcut = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+            JMenuBar bar = new JMenuBar();
+            JMenu file = new JMenu("File");
+            AbstractAction close = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    _reditor.setVisible(false);
+                    _reditor = null;
+                }
+            };
+            JMenuItem cl = file.add(close);
+            cl.setText("Close");
+            cl.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));
+            bar.add(file);
+            _reditor.setJMenuBar(bar);
+
+            _reditor.setVisible(true);
+
+            _reditor.addWindowListener(new WindowAdapter() {
+                public void windowClosed(WindowEvent e) {
+                    _rehack.setText("Show rule editor");
+                    _reditor = null;
+                    _ruleEditor.disconnect();
+                }
+
+                public void windowClosing(WindowEvent e) {
+                    _rehack.setText("Show rule editor");
+                    _reditor = null;
+                }
+            });
+        }
+        _rehack.setText(_reditor!=null?"Hide rule editor":"Show rule editor");
+    }
+
+    /*
     private static void runCA(Pattern2 p, CA2 ca, int size, int colors, int w, int h) {
         ca.setCell(w/2, 0, 1);
         int[] row = new int[2+w];
@@ -717,6 +779,7 @@ public class NViewer extends JFrame implements UIActions {
             }
         }
     }
+    */
 
     private static String formatPattern(byte... ps) {
         StringBuilder b = new StringBuilder();

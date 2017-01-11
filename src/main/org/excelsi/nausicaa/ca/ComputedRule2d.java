@@ -62,7 +62,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
     }
 
     @Override public int dimensions() {
-        return 2;
+        return archetype().dims();
     }
 
     @Override public int background() {
@@ -171,9 +171,13 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
     }
 
     @Override public String humanize() {
-        StringBuilder b = new StringBuilder("2d / ");
-        b.append(super.humanize());
+        StringBuilder b = new StringBuilder(archetype().dims()+"d / "+_p);
+        //b.append(super.humanize());
         return b.toString();
+    }
+
+    public String genome() {
+        return _p.toString();
     }
 
     @Override public String toString() {

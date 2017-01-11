@@ -236,21 +236,34 @@ public class SwingPlaneDisplay extends PlaneDisplay {
 
     public void setPlaneOld(Plane plane) {
         _p = plane;
-        ImageIcon i;
-        if(_scale==1f) {
-            i = new ImageIcon(_p.toImage());
+        final Runnable r;
+        if(plane instanceof BlockPlane) {
+            r = new Runnable() {
+                public void run() {
+                    //_label.setIcon(icon);
+                    _label.setForeground(Color.WHITE);
+                    _label.setText("Cannot display BlockPlane");
+                    invalidate();
+                }
+            };
         }
         else {
-            i = new ImageIcon(_p.toImage((int)(_p.getWidth()*_scale), (int) (_p.getHeight()*_scale)));
-        }
-        final ImageIcon icon = i;
-        final Runnable r = new Runnable() {
-            public void run() {
-                _label.setIcon(icon);
-                _label.setText("");
-                invalidate();
+            ImageIcon i;
+            if(_scale==1f) {
+                i = new ImageIcon(_p.toImage());
             }
-        };
+            else {
+                i = new ImageIcon(_p.toImage((int)(_p.getWidth()*_scale), (int) (_p.getHeight()*_scale)));
+            }
+            final ImageIcon icon = i;
+            r = new Runnable() {
+                public void run() {
+                    _label.setIcon(icon);
+                    _label.setText("");
+                    invalidate();
+                }
+            };
+        }
         if(SwingUtilities.isEventDispatchThread()) {
             r.run();
         }

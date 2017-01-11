@@ -41,7 +41,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         //addBranch(b);
         reinit();
         addKeyListener(new KeyAdapter() {
-            public void keyTyped( KeyEvent e ) {
+            public void keyTyped(KeyEvent e) {
                 if(!_show||e.getModifiers()!=0) {
                     return;
                 }

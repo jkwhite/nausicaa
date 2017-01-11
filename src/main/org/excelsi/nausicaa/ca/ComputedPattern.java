@@ -403,6 +403,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
     }
 
     @Override public void tick() {
+        _logic.tick();
     }
 
     @Override public ComputedPattern mutate(Random r) {
@@ -415,6 +416,8 @@ public final class ComputedPattern implements Pattern, Mutatable {
         RuleLogic copy();
         default RuleLogic mutate(Archetype a, GenomeFactory gf, Random r) {
             return this;
+        }
+        default void tick() {
         }
     }
 
@@ -466,6 +469,10 @@ public final class ComputedPattern implements Pattern, Mutatable {
 
         @Override public MachineElf mutate(Archetype a, GenomeFactory gf, Random r) {
             return new MachineElf(_m.mutate(a, gf, r));
+        }
+
+        @Override public void tick() {
+            _m.tick();
         }
 
         @Override public String toString() {

@@ -15,7 +15,7 @@ public class Machine {
         _a = a;
         _g = g;
         _prg = g.codons(a);
-        _t = new Tape(128);
+        _t = new Tape(512);
     }
 
     public Machine copy() {
@@ -45,6 +45,12 @@ public class Machine {
 
     public Machine mutate(Archetype a, GenomeFactory gf, Random r) {
         return new Machine(_a, _g.mutate(_a, gf, r));
+    }
+
+    public void tick() {
+        for(int i=0;i<_prg.length;i++) {
+            _prg[i].tick();
+        }
     }
 
     @Override public String toString() {

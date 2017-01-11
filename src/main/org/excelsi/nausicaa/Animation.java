@@ -129,7 +129,16 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
 
         public DisplayAnimator(PlaneDisplay d, ExecutorService pool) {
             //_frames = ((Multirule2D)d.getRule()).frames(d.getCA());
-            _frames = d.getRule().frameIterator(d.getPlane(), pool, true);
+            Plane p = d.getPlane();
+            while(p==null) {
+                try {
+                    Thread.sleep(10);
+                }
+                catch(InterruptedException e) {
+                }
+                p = d.getPlane();
+            }
+            _frames = d.getRule().frameIterator(p, pool, true);
             _d = d;
         }
 

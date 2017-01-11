@@ -10,4 +10,6 @@ public interface Codon {
     default String generate(Random r) {
         return code();
     }
+    default void tick() {
+    }
 }

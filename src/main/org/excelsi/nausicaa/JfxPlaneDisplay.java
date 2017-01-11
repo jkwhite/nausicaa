@@ -73,6 +73,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     private Group _root;
     private Group _parent;
     private JfxCA _jfxCa;
+    private volatile int _queue;
 
 
     public JfxPlaneDisplay(int w, int h, int d) {
@@ -107,14 +108,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     public JfxPlaneDisplay(Plane p) {
         this(p.getWidth(), p.getHeight(), p.creator().getDepth());
         setCA(p.creator());
-        //setPlane(p);
-        //_p = p;
     }
-
-    //public JfxPlaneDisplay(int w, int h, Rule r) {
-        //this(w, h);
-        //_r = r;
-    //}
 
     private void initScene() {
         _root = new Group();
@@ -133,6 +127,11 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         }
         parent.setTranslateZ(50);
         parent.getTransforms().add(new Rotate(-45, new Point3D(1,0,0)));
+        RotateTransition t = new RotateTransition(Duration.millis(36000), parent);
+        t.setByAngle(360);
+        t.setAxis(new Point3D(1,0,0));
+        t.setCycleCount(t.INDEFINITE);
+        t.play();
         _root.getChildren().add(parent);
         _parent = parent;
         _img.setScene(s);
@@ -151,11 +150,9 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         if(_shown) {
             _oldIcon = _label.getIcon();
             _label.setIcon(null);
-            //remove(_show);
         }
         else {
             _label.setIcon(_oldIcon);
-            //add(_show);
         }
         _shown = ! _shown;
         invalidate();
@@ -204,35 +201,21 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     public void setPlane(final Plane plane) {
         _p = plane;
         _c = plane.creator();
-        //final Image b;
-        //if(_scale==1f) {
-            //b = plane.toBufferedImage();
-        //}
-        //else {
-            //b = _p.toImage((int)(_p.getWidth()*_scale), (int) (_p.getHeight()*_scale));
-        //}
-        Runnable r = new Runnable() {
-            public void run() {
-                //JFX
-                _jfxCa.addPlane(plane);
-                //invalidate();
-            }
-        };
-        Platform.runLater(r);
-        //if(SwingUtilities.isEventDispatchThread()) {
-            //r.run();
-        //}
-        //else {
-            //SwingUtilities.invokeLater(r);
-        //}
+        if(_queue<3) {
+            Runnable r = new Runnable() {
+                public void run() {
+                    _jfxCa.addPlane(plane);
+                    _queue--;
+                }
+            };
+            Platform.runLater(r);
+            _queue++;
+        }
     }
 
     public void setScale(float scale) {
         if(_scale!=scale) {
             _scale = scale;
-            //if(_p!=null) {
-                //setPlane(_p);
-            //}
             setCA(_c);
         }
     }

@@ -45,7 +45,8 @@ public class AbstractComputedRuleset implements Ruleset {
     }
 
     @Override public Rule create(Object... args) {
-        throw new UnsupportedOperationException();
+        return new ComputedRule2d(new ComputedPattern(_a,
+            new ComputedPattern.MachineElf(new Machine(_a, new Genome(args[0].toString())))));
     }
 
     @Override public Ruleset derive(int[] colors, int len) {

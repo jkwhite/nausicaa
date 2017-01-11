@@ -2,6 +2,7 @@ package org.excelsi.nausicaa;
 
 
 import org.excelsi.nausicaa.ca.Plane;
+import org.excelsi.nausicaa.ca.BlockPlane;
 import org.excelsi.nausicaa.ca.CA;
 import org.excelsi.nausicaa.ca.Colors;
 
@@ -26,7 +27,7 @@ import javafx.scene.paint.PhongMaterial;
 
 public class JfxCA extends Group {
     private static final double DEFAULT_SCALE = 4f;
-    private static final int DEFAULT_DEPTH = 10;
+    private static final int DEFAULT_DEPTH = 20;
 
     private final double _scale;
     private final int _depth;
@@ -54,17 +55,47 @@ public class JfxCA extends Group {
     }
 
     public void clear() {
-        getChildren().removeAll();
+        while(!getChildren().isEmpty()) {
+            getChildren().remove(0);
+        }
+        //getChildren().removeAll();
     }
 
     public void addPlane(Plane p) {
-        Layer layer = new Layer(p, _scale);
-        if(getChildren().size()>_depth) {
-            getChildren().remove(0);
-            retranslate();
+        if(p instanceof BlockPlane) {
+            setBlocks((BlockPlane)p);
         }
-        layer.setTranslateZ(-getChildren().size()*_scale);
-        getChildren().add(layer);
+        else {
+            Layer layer = new Layer(p, _scale);
+            if(getChildren().size()>_depth) {
+                getChildren().remove(0);
+                retranslate();
+            }
+            layer.setTranslateZ(-getChildren().size()*_scale);
+            getChildren().add(layer);
+        }
+    }
+
+    private void setBlocks(BlockPlane p) {
+        clear();
+        //System.err.println("setting blocks for "+p);
+        int count = 0;
+        for(int i=0;i<p.getWidth();i++) {
+            for(int j=0;j<p.getHeight();j++) {
+                for(int k=0;k<p.getDepth();k++) {
+                    int v = p.getCell(i,j,k);
+                    if(v!=0) {
+                        Box b = createBox(v);
+                        b.setTranslateX(i*_scale);
+                        b.setTranslateY(j*_scale);
+                        b.setTranslateZ(k*_scale);
+                        getChildren().add(b);
+                        count++;
+                    }
+                }
+            }
+        }
+        //System.err.println("created "+count+" blocks, "+getChildren().size()+" children");
     }
 
     private void retranslate() {
@@ -96,5 +127,12 @@ public class JfxCA extends Group {
                 }
             }
         }
+    }
+
+    private Box createBox(int v) {
+        Box b = new Box(_scale, _scale, _scale);
+        Material m = _materials.get(v);
+        b.setMaterial(m);
+        return b;
     }
 }

@@ -11,9 +11,10 @@ import org.excelsi.nausicaa.ca.Rule;
 import org.excelsi.nausicaa.ca.CA;
 import org.excelsi.nausicaa.ca.IndexedRule;
 import org.excelsi.nausicaa.ca.Palette;
+import org.excelsi.nausicaa.ca.ComputedRule2d;
 
 
-public class PaletteEditor extends JComponent implements TimelineListener {
+public class RuleEditor extends JComponent implements TimelineListener {
     private UIActions _ui;
     private Rule _rule;
     private JFrame _root;
@@ -21,7 +22,7 @@ public class PaletteEditor extends JComponent implements TimelineListener {
     private final Timeline _timeline;
 
 
-    public PaletteEditor(JFrame root, UIActions ui, Timeline timeline) {
+    public RuleEditor(JFrame root, UIActions ui, Timeline timeline) {
         _root = root;
         _ui = ui;
         _timeline = timeline;
@@ -44,6 +45,30 @@ public class PaletteEditor extends JComponent implements TimelineListener {
         final CA current = _ui.getActiveCA();
         _rule = current.getRule();
         JPanel scr = new JPanel(new FlowLayout());
+
+        final JTextField rule = new JTextField(50);
+        if(_rule instanceof ComputedRule2d) {
+            rule.setText(((ComputedRule2d)_rule).genome());
+        }
+        scr.add(rule);
+        rule.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) {
+                if(e.getModifiers()!=0) {
+                    return;
+                }
+                if(e.getKeyChar()=='\n') {
+                    _ui.doWait(new Runnable() {
+                        public void run() {
+                            String g = rule.getText();
+                            _ui.setActiveCA(current.mutate(_rule.origin().create(g), _ui.getActiveCA().getRandom()));
+                            rule.setText(g);
+                            rule.requestFocus();
+                        }
+                    }, 1000);
+                }
+            }
+        });
+        /*
         scr.setLayout(new BoxLayout(scr, BoxLayout.Y_AXIS));
         final int[] colors = current.getPalette().getColors();
         _colors = new int[colors.length];
@@ -69,6 +94,8 @@ public class PaletteEditor extends JComponent implements TimelineListener {
             });
         }
         add(cols, BorderLayout.CENTER);
+        */
+        add(scr, BorderLayout.CENTER);
         validate();
         if(getParent()!=null) {
             Dimension dim = getParent().getPreferredSize();

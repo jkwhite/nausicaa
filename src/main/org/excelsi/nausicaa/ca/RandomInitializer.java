@@ -50,7 +50,16 @@ public class RandomInitializer implements Initializer {
                 for(int y=0;y<plane.getHeight();y++) {
                     for(int x=0;x<plane.getWidth();x++) {
                         plane.setCell(x, y, colors[computeColor(r, colors.length)]);
-                        //plane.setCell(x, y, random.nextInt(colors.length));
+                    }
+                }
+                break;
+            case 3:
+                BlockPlane bp = (BlockPlane) plane;
+                for(int y=0;y<bp.getHeight();y++) {
+                    for(int x=0;x<bp.getWidth();x++) {
+                        for(int z=0;z<bp.getDepth();z++) {
+                            bp.setCell(x, y, z, colors[computeColor(r, colors.length)]);
+                        }
                     }
                 }
                 break;
