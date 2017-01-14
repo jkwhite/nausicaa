@@ -95,7 +95,7 @@ public class Actions {
                 Ruleset rs = new ComputedRuleset(a);
                 Rule rule = rs.random(rand).next();
                 Palette pal = Palette.random(colors, rand, true);
-                CA ca = new CA(rule, pal, v.getActiveCA().getInitializer(), rand, 0, v.getConfig().getWidth(), v.getConfig().getHeight(), v.getConfig().getDepth());
+                CA ca = new CA(rule, pal, v.getActiveCA().getInitializer(), rand, 0, v.getConfig().getWidth(), v.getConfig().getHeight(), v.getConfig().getDepth(), v.getConfig().getPrelude());
                 v.setActiveCA(ca);
             }
         });
@@ -603,7 +603,7 @@ public class Actions {
         final JDialog d = new JDialog(v, "Size");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(3,2));
+        JPanel top = new JPanel(new GridLayout(4,2));
 
         top.add(new JLabel("Width"));
         final JTextField width = new JTextField();
@@ -632,6 +632,15 @@ public class Actions {
         dp.add(new JLabel("px"));
         top.add(dp);
 
+        top.add(new JLabel("Prelude"));
+        JPanel pp = new JPanel();
+        final JTextField prelude = new JTextField();
+        prelude.setText(""+config.getPrelude());
+        prelude.setColumns(6);
+        pp.add(prelude);
+        pp.add(new JLabel("steps"));
+        top.add(pp);
+
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
         JButton ne = new JButton("Ok");
@@ -641,7 +650,7 @@ public class Actions {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
                 //di.setCASize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
-                config.setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(depth.getText()));
+                config.setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(depth.getText()), Integer.parseInt(prelude.getText()));
                 //generate(di);
             }
         });

@@ -6,6 +6,9 @@ import org.excelsi.nausicaa.ca.BlockPlane;
 import org.excelsi.nausicaa.ca.CA;
 import org.excelsi.nausicaa.ca.Colors;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -14,6 +17,7 @@ import javafx.scene.Group;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Sphere;
 import javafx.scene.shape.Box;
+import javafx.scene.shape.DrawMode;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.PerspectiveCamera;
 import javafx.animation.RotateTransition;
@@ -33,6 +37,7 @@ public class JfxCA extends Group {
     private final int _depth;
     private final CA _ca;
     private final Map<Integer,Material> _materials = new HashMap<>();
+    private List<Pool<Box>> _pools;
 
 
     public JfxCA(CA ca) {
@@ -52,11 +57,16 @@ public class JfxCA extends Group {
             Material m = new PhongMaterial(new Color(c[2]/255f, c[1]/255f, c[0]/255f, 1f));
             _materials.put(i, m);
         }
+        _pools = new ArrayList<Pool<Box>>(ca.archetype().colors());
+        for(int i=0;i<ca.archetype().colors();i++) {
+            _pools.add(new Pool<Box>(new BoxFactory(i)));
+        }
     }
 
     public void clear() {
         while(!getChildren().isEmpty()) {
-            getChildren().remove(0);
+            PooledBox b = (PooledBox) getChildren().remove(0);
+            _pools.get(b.poolId()).checkin(b);
         }
         //getChildren().removeAll();
     }
@@ -84,7 +94,7 @@ public class JfxCA extends Group {
             for(int j=0;j<p.getHeight();j++) {
                 for(int k=0;k<p.getDepth();k++) {
                     int v = p.getCell(i,j,k);
-                    if(v!=0) {
+                    if(shouldFill(p,i,j,k,v)) {
                         Box b = createBox(v);
                         b.setTranslateX(i*_scale);
                         b.setTranslateY(j*_scale);
@@ -95,7 +105,17 @@ public class JfxCA extends Group {
                 }
             }
         }
-        //System.err.println("created "+count+" blocks, "+getChildren().size()+" children");
+        System.err.println("created "+count+" blocks, "+getChildren().size()+" children");
+    }
+
+    private static boolean shouldFill(final BlockPlane p, final int i, final int j, final int k, final int v) {
+        if(v!=0&&i>0&&j>0&&k>0&&i<p.getWidth()-1&&j<p.getHeight()-1&&k<p.getDepth()-1) {
+            return p.getCell(i-1,j,k)==0 || p.getCell(i+1,j,k)==0
+                || p.getCell(i,j-1,k)==0 || p.getCell(i,j+1,k)==0
+                || p.getCell(i,j,k-1)==0 || p.getCell(i,j,k+1)==0;
+        }
+        //return true;
+        return v!=0;
     }
 
     private void retranslate() {
@@ -129,10 +149,72 @@ public class JfxCA extends Group {
         }
     }
 
+    class BoxFactory implements PoolFactory<Box> {
+        private final int _c;
+
+        public BoxFactory(int c) {
+            _c = c;
+        }
+
+        @Override public PooledBox create() {
+            PooledBox b = new PooledBox(_c, _scale, _scale, _scale);
+            Material m = _materials.get(_c);
+            b.setMaterial(m);
+            //b.setDrawMode(DrawMode.LINE);
+            return b;
+        }
+    }
+
     private Box createBox(int v) {
+        /*
         Box b = new Box(_scale, _scale, _scale);
         Material m = _materials.get(v);
         b.setMaterial(m);
+        b.setDrawMode(DrawMode.LINE);
         return b;
+        */
+        return _pools.get(v).checkout();
+    }
+
+    static class Pool<E> {
+        private final PoolFactory<E> _pf;
+        private final List<E> _p;
+
+
+        public Pool(PoolFactory pf) {
+            _pf = pf;
+            _p = new LinkedList<>();
+        }
+
+        public void checkin(E e) {
+            _p.add(e);
+        }
+
+        public E checkout() {
+            if(!_p.isEmpty()) {
+                return _p.remove(0);
+            }
+            else {
+                return _pf.create();
+            }
+        }
+    }
+
+    static class PooledBox extends Box {
+        private final int _poolId;
+
+        public PooledBox(int p, double sx, double sy, double sz) {
+            super(sx, sy, sz);
+            _poolId = p;
+        }
+
+        public int poolId() {
+            return _poolId;
+        }
+    }
+
+    @FunctionalInterface
+    interface PoolFactory<E> {
+        E create();
     }
 }

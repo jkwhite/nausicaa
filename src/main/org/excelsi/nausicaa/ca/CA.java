@@ -26,12 +26,13 @@ public final class CA {
     private int _w;
     private int _h;
     private int _d;
+    private int _prelude;
     private Random _rand;
     private long _seed;
     private static final byte VERSION = 1;
 
 
-    public CA(Rule r, Palette p, Initializer i, Random rand, long seed, int w, int h, int d) {
+    public CA(Rule r, Palette p, Initializer i, Random rand, long seed, int w, int h, int d, int prelude) {
         if(i==null) {
             throw new IllegalArgumentException("null initializer");
         }
@@ -43,6 +44,7 @@ public final class CA {
         _w = w;
         _h = h;
         _d = d;
+        _prelude = prelude;
     }
 
     public Archetype archetype() {
@@ -82,6 +84,8 @@ public final class CA {
                     _r.generate(p, 1, _h, POOL, false, true, null);
                     break;
                 case 3:
+                    System.err.println("generating for "+_prelude);
+                    _r.generate(p, 1, _prelude, POOL, false, true, null);
                     break;
                 case 2:
                 default:
@@ -146,15 +150,19 @@ public final class CA {
     }
 
     public CA mutate(Rule r, Random om) {
-        return new CA(r, _p.matchCapacity(r.colorCount(), om), _i, branchRandom(), _seed, _w, _h, _d);
+        return new CA(r, _p.matchCapacity(r.colorCount(), om), _i, branchRandom(), _seed, _w, _h, _d, _prelude);
     }
 
     public CA size(int w, int h) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, _d);
+        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, _d, _prelude);
     }
 
     public CA size(int w, int h, int d) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d);
+        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d, _prelude);
+    }
+
+    public CA size(int w, int h, int d, int prelude) {
+        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d, prelude);
     }
 
     public CA seed() {
@@ -162,15 +170,15 @@ public final class CA {
     }
 
     public CA seed(long seed) {
-        return new CA(_r, _p, _i, branchRandom(), seed, _w, _h, _d);
+        return new CA(_r, _p, _i, branchRandom(), seed, _w, _h, _d, _prelude);
     }
 
     public CA palette(Palette p) {
-        return new CA(_r, p, _i, branchRandom(), _seed, _w, _h, _d);
+        return new CA(_r, p, _i, branchRandom(), _seed, _w, _h, _d, _prelude);
     }
 
     public CA initializer(Initializer i) {
-        return new CA(_r, _p, i, branchRandom(), _seed, _w, _h, _d);
+        return new CA(_r, _p, i, branchRandom(), _seed, _w, _h, _d, _prelude);
     }
 
     public Initializer getInitializer() {
@@ -231,7 +239,7 @@ public final class CA {
             Palette p = Palette.read(dis);
             Initializer i = Initializers.read(dis);
             Rule r = new IndexedRuleReader(dis).read();
-            return new CA(r, p, i, new Random(), seed, w, h, 10);
+            return new CA(r, p, i, new Random(), seed, w, h, 10, 10);
         }
         finally {
             if(in!=null) {

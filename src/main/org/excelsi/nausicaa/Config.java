@@ -12,6 +12,7 @@ public class Config {
     private int _w;
     private int _h;
     private int _d;
+    private int _prelude = 0;
     private long _seed = System.currentTimeMillis(); //19450806L;
     private float _scale = 1f;
     private long _animationDelay = 100;
@@ -48,9 +49,21 @@ public class Config {
         notify("size");
     }
 
+    public void setSize(int w, int h, int d, int prelude) {
+        _w = w;
+        _h = h;
+        _d = d;
+        _prelude = prelude;
+        notify("size");
+    }
+
     public void setScale(float s) {
         _scale = s;
         notify("scale");
+    }
+
+    public void setPrelude(int prelude) {
+        _prelude = prelude;
     }
 
     public int getWidth() {
@@ -67,6 +80,10 @@ public class Config {
 
     public float getScale() {
         return _scale;
+    }
+
+    public int getPrelude() {
+        return _prelude;
     }
 
     public void setSeed(long seed) {

@@ -201,7 +201,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     public void setPlane(final Plane plane) {
         _p = plane;
         _c = plane.creator();
-        if(_queue<3) {
+        if(_queue<2) {
             Runnable r = new Runnable() {
                 public void run() {
                     _jfxCa.addPlane(plane);

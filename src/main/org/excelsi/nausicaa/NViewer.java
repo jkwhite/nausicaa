@@ -86,14 +86,14 @@ public class NViewer extends JFrame implements UIActions {
 
     public void init() {
         //final int w = 600, h = 600, d = 1;
-        final int w = 10, h = 10, d = 10;
+        final int w = 20, h = 20, d = 20, pre = 20;
         //final int w = 3, h = 3, d = 1;
         _config = new Config(w, h, d);
         createMenu();
         setSize(_width, _height);
         int dims = 3;
         int size = 1;
-        int colors = 20;
+        int colors = 2;
         _timeline = new Timeline();
         org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors);
         org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
@@ -109,7 +109,7 @@ public class NViewer extends JFrame implements UIActions {
         Palette pal = Palette.random(colors, rand, true);
         //Palette pal = Palette.grey(colors);
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
-        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d);
+        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre);
 
         JPanel main = new JPanel(new BorderLayout());
 
