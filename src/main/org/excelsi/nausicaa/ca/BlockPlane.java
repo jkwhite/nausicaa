@@ -8,6 +8,8 @@ import javafx.scene.image.WritableImage;
 
 
 public final class BlockPlane implements Plane {
+    public enum Mode { indexed, argb };
+
     private final CA _ca;
     private final int _w;
     private final int _h;
@@ -15,20 +17,36 @@ public final class BlockPlane implements Plane {
     private final int _hstride;
     private final int _dstride;
     private final byte[] _s;
+    private final Palette _p;
+    private final BufferedImage _i;
+    private final WritableRaster _r;
+    private final Mode _m;
 
 
-    public BlockPlane(CA ca, int w, int h, int d) {
-        this(ca, w, h, d, new byte[w*h*d]);
+    public BlockPlane(CA ca, int w, int h, int d, Palette p, Mode m) {
+        this(ca, w, h, d, p, m, new byte[w*h*d]);
     }
 
-    public BlockPlane(CA ca, int w, int h, int d, byte[] s) {
+    public BlockPlane(CA ca, int w, int h, int d, Palette p, Mode m, byte[] s) {
         _ca = ca;
         _w = w;
         _h = h;
         _d = d;
+        _p = p;
         _s = s;
         _hstride = w;
         _dstride = _hstride*_h;
+        _m = m;
+        switch(m) {
+            case argb:
+                _i = new BufferedImage(_w, _h, BufferedImage.TYPE_INT_ARGB);
+                break;
+            default:
+            case indexed:
+                _i = new BufferedImage(_w, _h, BufferedImage.TYPE_BYTE_INDEXED, _p.toColorModel());
+                break;
+        }
+        _r = _i.getRaster();
     }
 
     @Override public int getWidth() {
@@ -51,13 +69,16 @@ public final class BlockPlane implements Plane {
     }
 
     public void setCell(int x, int y, int z, int v) {
-        try {
+        //try {
             _s[x+_hstride*y+_dstride*z] = (byte)v;
-        }
-        catch(ArrayIndexOutOfBoundsException e) {
-            System.err.println("x="+x+", y="+y+", z="+z+", hstride="+_hstride+", dstride="+_dstride);
-            throw new IllegalArgumentException(e);
-        }
+            if(_m==Mode.indexed && z==0) {
+                _r.setSample(x,y,0,v);
+            }
+        //}
+        //catch(ArrayIndexOutOfBoundsException e) {
+            //System.err.println("x="+x+", y="+y+", z="+z+", hstride="+_hstride+", dstride="+_dstride);
+            //throw new IllegalArgumentException(e);
+        //}
     }
 
     @Override public void setRGBCell(int x, int y, int rgb) {
@@ -65,20 +86,20 @@ public final class BlockPlane implements Plane {
     }
 
     @Override public int getCell(int x, int y) {
-        throw new UnsupportedOperationException();
+        return getCell(x, y, 0);
     }
 
     public byte getCell(int x, int y, int z) {
         int nx = normX(x);
         int ny = normY(y);
         int nz = normZ(z);
-        try {
+        //try {
             return _s[nx+_hstride*ny+_dstride*nz];
-        }
-        catch(ArrayIndexOutOfBoundsException e) {
-            System.err.println("x="+x+", y="+y+", z="+z+", nx="+nx+", ny="+ny+", nz="+nz+", hstride="+_hstride+", dstride="+_dstride);
-            throw new IllegalArgumentException(e);
-        }
+        //}
+        //catch(ArrayIndexOutOfBoundsException e) {
+            //System.err.println("x="+x+", y="+y+", z="+z+", nx="+nx+", ny="+ny+", nz="+nz+", hstride="+_hstride+", dstride="+_dstride);
+            //throw new IllegalArgumentException(e);
+        //}
     }
 
     @Override public int[] getRow(int[] into, int y, int offset) {
@@ -108,15 +129,42 @@ public final class BlockPlane implements Plane {
     }
 
     @Override public java.awt.Image toImage() {
-        throw new UnsupportedOperationException();
+        if(_m==Mode.indexed) {
+            return _i;
+        }
+        else {
+            //final BufferedImage p = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_BYTE_INDEXED, _p.toColorModel());
+            //final WritableRaster r = p.getRaster();
+            //System.err.print(".");
+            final int[] rgba = new int[4];
+            final int[] rgb = new int[3];
+            for(int i=0;i<_w;i++) {
+                for(int j=0;j<_h;j++) {
+                    rgb[0]=0;
+                    rgb[1]=0;
+                    rgb[2]=0;
+                    int mx = 0;
+                    for(int k=0;k<_d;k++) {
+                        Colors.unpack(_p.color(getCell(i,j,k)), rgba);
+                        rgb[0] += (_d-k)*rgba[0];
+                        rgb[1] += (_d-k)*rgba[1];
+                        rgb[2] += (_d-k)*rgba[2];
+                        mx += (_d-k);
+                    }
+                    //r.setSample(i, j, 0, getCell(i,j,0));
+                    _i.setRGB(i,j,Colors.pack(rgb[0]/mx, rgb[1]/mx, rgb[2]/mx));
+                }
+            }
+            return _i;
+        }
     }
 
     @Override public java.awt.Image toImage(int width, int height) {
-        throw new UnsupportedOperationException();
+        return toImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
     }
 
     @Override public BufferedImage toBufferedImage() {
-        throw new UnsupportedOperationException();
+        return (BufferedImage) toImage();
     }
 
     @Override public javafx.scene.image.Image toJfxImage() {
@@ -134,7 +182,7 @@ public final class BlockPlane implements Plane {
     @Override public Plane copy() {
         byte[] sc = new byte[_s.length];
         System.arraycopy(_s, 0, sc, 0, _s.length);
-        return new BlockPlane(_ca, _w, _h, _d, sc);
+        return new BlockPlane(_ca, _w, _h, _d, _p, _m, sc);
     }
 
     @Override public Plane scale(float scale) {

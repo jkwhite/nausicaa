@@ -234,10 +234,11 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         }
     }
 
+    private final boolean FAIL3D = false;
     public void setPlaneOld(Plane plane) {
         _p = plane;
         final Runnable r;
-        if(plane instanceof BlockPlane) {
+        if(FAIL3D && plane instanceof BlockPlane) {
             r = new Runnable() {
                 public void run() {
                     //_label.setIcon(icon);

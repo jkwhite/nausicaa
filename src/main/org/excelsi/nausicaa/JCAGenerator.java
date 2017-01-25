@@ -57,7 +57,7 @@ public class JCAGenerator extends JDialog {
         JTextField frame = null;
         JTextField framerate = null;
         JTextField scalingf = null;
-        if(rule.dimensions()==2) {
+        if(rule.dimensions()>1) {
             JPanel an = new JPanel();
             animat = new JCheckBox("Animate");
             animat.setSelected(true);
@@ -223,7 +223,7 @@ public class JCAGenerator extends JDialog {
                                         age.start(selfile+".gif");
                                         age.setRepeat(0);
                                         if(!bb) {
-                                            age.setDelay(70);
+                                            age.setDelay(frameRate);
                                         }
                                         LinkedList<BufferedImage> frames = new LinkedList<BufferedImage>();
                                         for(int i=0;i<numFrames;i++) {
@@ -268,6 +268,7 @@ public class JCAGenerator extends JDialog {
                                         //Plane p0 = c.createPlane();
                                         ExecutorService pool = Executors.newFixedThreadPool(3);
                                         if(scale==1f) {
+                                            System.err.println("skip scaling");
                                             c.getRule()
                                                 .stream(c.createPlane(), pool, true)
                                                 .limit(numFrames)
@@ -279,6 +280,7 @@ public class JCAGenerator extends JDialog {
                                                 );
                                         }
                                         else {
+                                            System.err.println("scaling");
                                             c.getRule()
                                                 .stream(c.createPlane(), pool, true)
                                                 .limit(numFrames)

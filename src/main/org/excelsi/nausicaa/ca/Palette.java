@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 
-public class Palette {
+public final class Palette {
     private final int[] _colors;
 
 
@@ -30,6 +30,10 @@ public class Palette {
 
     public int[] getColors() {
         return _colors;
+    }
+
+    public int color(int idx) {
+        return _colors[idx];
     }
 
     public Palette replace(int index, int newColor) {
