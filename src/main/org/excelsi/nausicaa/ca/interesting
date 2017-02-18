@@ -30,6 +30,7 @@
 ++++++++p3p3sb
 
 life: pO-s-c2-c3-i-pO-s8-c3-eq-p4-if
+3d life: p1-p4-p7-p10-p16-p19-p22-p25-s-c2-c3-i-p1-p4-p7-p10-p16-p19-p22-p25-s8-c3-eq-p13-if
 i1: pO-s-p4-p2-p0-p6-p8-s5-mn
 p4-p6-p8-av-av
 complex city: hi-p4-p4-nz-av
@@ -41,6 +42,12 @@ spiralling: rl-if-i-hi-xo-nz-or-if-av-dv
 6:
 artistic spirals: hi-po-i-rl, hi-po-i-rr
 caverns: rl-x8-mx4-s3-hi-mu-po-rr-xo-mx1-po-av6-mn1-nz-mx-eq-s
+map: rr-if-dv-hi-i-po-av-rl
+pulsing, map, cmod: rr-dv-if-hi-i-po-c5-rl-av-s8-xo
+map: rr-dv-mx-hi-i-c9-rl-av-s8-xo
+map: mx7-su-t-s8-x1-i-rl-hi-dv-ne-eq-xo-an-eq
+travelers: mu-hi-an-or-xo-mu
+blots: mu-hi-ne-xo-av3-rl
 
 60:
 rough ocean: pO-or-or-av-mx1-av-xo-mx2-rl-or-or
@@ -49,6 +56,12 @@ psychedelic river: pO-nz-or-or-mx1-av-xo-mx2-or-rl
 blowaway: pO-nz-or-mx1-av-xo-mx2-rl-or
 evaporate: pO-xo-nz-av-rl-or-av4-rl-xo-s-dv
 finally islands: xo-mx-pO-nz-av4-an-av-s
+
+66:
+66 gods: p4-p2-p0-xo-or-c1-s-c0-pO-s8-c0-if
+goneplaid: nz-mx9-c0-xo-s8-if-p4-pO-s
+poking: hi-av6-nz-po
+stars: hi-dv-p4-mn8-s8-dv-rl-nz-po-mn-or
 
 100:
 ellipsis: mu-pO-mu-av1-dv-nz-av-av-s-su-rr-or-xo-xo-rr
@@ -64,6 +77,7 @@ p13-p22-p10-p16-p12-p14-s-su
 pO-s-c5-c6-i-pO-s26-c3-eq-p4-if
 pO-s-c5-c6-i-pO-s26-c3-eq-if
 hi-eq-su-po-mx6-dv
+eq-s-nz-hi-su
 
 3d, 6:
 periodic caves: hi-i-po-po-rl
@@ -74,3 +88,25 @@ maybe: po-mn1-hi-i-rr-su-dv-rr-xo-av
 particle spray: po-hi-rr-i-rr-su-dv-rr-xo-xo-av-su-nz
 beep boop: rr-dv-nz-xo-av-hi-i-rr-po-su-rr-mn-xo-xo
 ripple: i-an-mx5-rl-av-hi-nz-if-c6-dv
+
+3d, 42:
+blorbs: xo-an-rr-po-c4-rl-hi-nz-rr-av1-dv-i-av-nz-rr-su-s
+plasma: xo-an-rr-po-ne-or-c4-hi-nz-rr-av1-dv-i-av-dv-nz-rr-su-s-av
+4 histogram non-zero divide
+softpower: av-rr-po-ne-or-c4-hi-nz-rr-av1-dv-i-nz-av-su-dv-rr-s-av-rl-su
+temporal: dv-an-mn7-rl-i-if-hi-po-c6-ne-mx5-eq-t-dv-or-nz-dv-rr
+i-mn-su-su-i-mn-dv-hi-su-x5-xo-i-s1-nz-c2-av4-dv-mn8-nz
+an-mx1-s-s8-hi-or-rr-xo
+
+3d, 3:
+starburst: an-mu-an-po-hi-rl-mu-xo-dv-mn1
+
+2d, 7:
+mx8-mn5-hi-or-ne-ne-xo
+hi-av3-su-ex-or
+
+=============================================
+
+3d, 7;
+hi-ko-ra-ku-ho-a7-tsu
+ta5-u-ra-ta3-hi-i-mu-ka

@@ -20,6 +20,7 @@ public final class BlockPlane implements Plane {
     private final Palette _p;
     private final BufferedImage _i;
     private final WritableRaster _r;
+    private final int[][] _unpacked;
     private final Mode _m;
 
 
@@ -33,6 +34,7 @@ public final class BlockPlane implements Plane {
         _h = h;
         _d = d;
         _p = p;
+        _unpacked = p.unpack();
         _s = s;
         _hstride = w;
         _dstride = _hstride*_h;
@@ -138,6 +140,7 @@ public final class BlockPlane implements Plane {
             //System.err.print(".");
             final int[] rgba = new int[4];
             final int[] rgb = new int[3];
+            final int[][] unpacked = _unpacked;
             for(int i=0;i<_w;i++) {
                 for(int j=0;j<_h;j++) {
                     rgb[0]=0;
@@ -145,13 +148,17 @@ public final class BlockPlane implements Plane {
                     rgb[2]=0;
                     int mx = 0;
                     for(int k=0;k<_d;k++) {
-                        Colors.unpack(_p.color(getCell(i,j,k)), rgba);
-                        rgb[0] += (_d-k)*rgba[0];
-                        rgb[1] += (_d-k)*rgba[1];
-                        rgb[2] += (_d-k)*rgba[2];
+                        //Colors.unpack(_p.color(getCell(i,j,k)), rgba);
+                        int idx = getCell(i,j,k);
+                        final int[] u = unpacked[idx];
+                        //rgb[0] += (_d-k)*rgba[0];
+                        //rgb[1] += (_d-k)*rgba[1];
+                        //rgb[2] += (_d-k)*rgba[2];
+                        rgb[0] += (_d-k)*u[0];
+                        rgb[1] += (_d-k)*u[1];
+                        rgb[2] += (_d-k)*u[2];
                         mx += (_d-k);
                     }
-                    //r.setSample(i, j, 0, getCell(i,j,0));
                     _i.setRGB(i,j,Colors.pack(rgb[0]/mx, rgb[1]/mx, rgb[2]/mx));
                 }
             }
@@ -193,8 +200,8 @@ public final class BlockPlane implements Plane {
         throw new UnsupportedOperationException();
     }
 
-    @Override public void save(String file) throws IOException {
-        throw new UnsupportedOperationException();
+    @Override public void save(String filename) throws IOException {
+        Pipeline.write(toBufferedImage(), filename);
     }
 
     @Override public Plane subplane(int x1, int y1, int x2, int y2) {

@@ -5,6 +5,62 @@ import java.util.Random;
 
 
 public class Codons {
+    //public static final String SUM = "s";
+    //public static final String PUSH = "p";
+    //public static final String PUSH_SURROUND = "pO";
+    //public static final String MOD = "mo";
+    //public static final String INTERSECT = "i";
+    //public static final String CONS = "c";
+    //public static final String EQUAL = "eq";
+    //public static final String NOT_EQUAL = "ne";
+    //public static final String IF = "if";
+    //public static final String SUBTRACT = "su";
+    //public static final String MULTIPLY = "mu";
+    //public static final String DIVIDE = "dv";
+    //public static final String POW = "po";
+    //public static final String MIN = "mn";
+    //public static final String MAX = "mx";
+    //public static final String AVG = "av";
+    //public static final String XOR = "xo";
+    //public static final String AND = "an";
+    //public static final String OR = "or";
+    //public static final String ROT_RIGHT = "rl";
+    //public static final String ROT_LEFT = "rl";
+    //public static final String SKIP = "x";
+    //public static final String NON_ZERO = "nz";
+    //public static final String TIME = "t";
+    //public static final String HISTO = "hi";
+    //public static final String DUPLICATE = "du";
+    //public static final String EXCLAMATORY = "ex";
+
+    public static final String SUM = "mi";
+    public static final String PUSH = "o";
+    public static final String PUSH_SURROUND = "kO";
+    public static final String MOD = "mo";
+    public static final String INTERSECT = "u";
+    public static final String CONS = "a";
+    public static final String EQUAL = "ma";
+    public static final String NOT_EQUAL = "ne";
+    public static final String IF = "ra";
+    public static final String SUBTRACT = "su";
+    public static final String MULTIPLY = "mu";
+    public static final String DIVIDE = "ho";
+    public static final String POW = "i";
+    public static final String MIN = "chi";
+    public static final String MAX = "ta";
+    public static final String AVG = "gi";
+    public static final String XOR = "tsu";
+    public static final String AND = "to";
+    public static final String OR = "ka";
+    public static final String ROT_RIGHT = "ku";
+    public static final String ROT_LEFT = "ko";
+    public static final String SKIP = "ro";
+    public static final String NON_ZERO = "zu";
+    public static final String TIME = "te";
+    public static final String HISTO = "hi";
+    public static final String DUPLICATE = "do";
+    public static final String EXCLAMATORY = "ha";
+
     public static Codon codon(final String s, final Archetype a) {
         //System.err.println("op '"+s+"'");
         int i=0;
@@ -17,56 +73,60 @@ public class Codons {
         }
         //System.err.println("arg '"+p+"'");
         switch(code) {
-            case "s":
+            case SUM:
                 return p==-1?new Sum():new Sumn(p);
-            case "p":
+            case PUSH:
                 return new Push(p);
-            case "mo":
+            case MOD:
                 return new Mod();
-            case "pO":
+            case PUSH_SURROUND:
                 return new PushO();
-            case "i":
+            case INTERSECT:
                 return new Intersects();
-            case "c":
+            case CONS:
                 return new Constant(p);
-            case "eq":
+            case EQUAL:
                 return new Equals();
-            case "ne":
+            case NOT_EQUAL:
                 return new NotEquals();
-            case "if":
+            case IF:
                 return new If();
-            case "su":
+            case SUBTRACT:
                 return new Subtract();
-            case "mu":
+            case MULTIPLY:
                 return new Multiply();
-            case "dv":
+            case DIVIDE:
                 return new Divide();
-            case "po":
+            case POW:
                 return new Pow();
-            case "mn":
+            case MIN:
                 return new Min(p);
-            case "mx":
+            case MAX:
                 return new Max(p);
-            case "av":
+            case AVG:
                 return new Avg(p);
-            case "xo":
+            case XOR:
                 return new Xor();
-            case "an":
+            case AND:
                 return new And();
-            case "or":
+            case OR:
                 return new Or();
-            case "rr":
+            case ROT_RIGHT:
                 return new Rotright();
-            case "rl":
+            case ROT_LEFT:
                 return new Rotleft();
-            case "x":
+            case SKIP:
                 return new Skip(p);
-            case "nz":
+            case NON_ZERO:
                 return new Nonzero(p);
-            case "t":
+            case TIME:
                 return new Time();
-            case "hi":
+            case HISTO:
                 return new Histo(a.colors());
+            case DUPLICATE:
+                return new Duplicate();
+            case EXCLAMATORY:
+                return new Exclamatory();
             default:
                 throw new IllegalStateException("unknown opcode '"+code+"'");
         }
@@ -81,7 +141,7 @@ public class Codons {
         }
 
         @Override public String code() {
-            return _c==-1?"nz":("nz"+_c);
+            return _c==-1?NON_ZERO:(NON_ZERO+_c);
         }
 
         @Override public void op(byte[] p, Tape t) {
@@ -102,7 +162,7 @@ public class Codons {
         }
 
         @Override public String code() {
-            return "hi";
+            return HISTO;
         }
 
         @Override public void op(byte[] p, Tape t) {
@@ -122,7 +182,7 @@ public class Codons {
         private final int[] _t = new int[100];
 
         @Override public String code() {
-            return "s";
+            return SUM;
         }
 
         @Override public void op(byte[] p, Tape t) {
@@ -171,7 +231,7 @@ public class Codons {
         }
 
         @Override public String code() {
-            return _c==-1?"x":("x"+_c);
+            return _c==-1?SKIP:(SKIP+_c);
         }
 
         @Override public void op(byte[] p, Tape t) {
@@ -179,7 +239,7 @@ public class Codons {
         }
 
         @Override public String generate(Random r) {
-            return "x"+r.nextInt(9);
+            return SKIP+r.nextInt(9);
         }
     }
 
@@ -191,7 +251,7 @@ public class Codons {
         }
 
         @Override public String code() {
-            return "p"+_p;
+            return PUSH+_p;
         }
 
         @Override public void op(byte[] p, Tape t) {
@@ -199,7 +259,7 @@ public class Codons {
         }
 
         @Override public String generate(Random r) {
-            return "p"+(_p==-1?r.nextInt(9):_p);
+            return PUSH+(_p==-1?r.nextInt(9):_p);
         }
     }
 
@@ -212,7 +272,7 @@ public class Codons {
         }
 
         @Override public String code() {
-            return "c"+_p;
+            return CONS+_p;
         }
 
         @Override public void op(byte[] p, Tape t) {
@@ -220,13 +280,13 @@ public class Codons {
         }
 
         @Override public String generate(Random r) {
-            return "c"+(_p==-1?r.nextInt(9):_p);
+            return CONS+(_p==-1?r.nextInt(9):_p);
         }
     }
 
     public static class PushO implements Codon {
         @Override public String code() {
-            return "pO";
+            return PUSH_SURROUND;
         }
 
         @Override public void op(byte[] p, Tape t) {
@@ -242,7 +302,7 @@ public class Codons {
 
     public static class Intersects implements Codon {
         @Override public String code() {
-            return "i";
+            return INTERSECT;
         }
 
         @Override public void op(byte[] p, Tape t) {
@@ -256,7 +316,7 @@ public class Codons {
 
     public static class Equals implements Codon {
         @Override public String code() {
-            return "eq";
+            return EQUAL;
         }
 
         @Override public void op(byte[] p, Tape t) {
@@ -271,7 +331,7 @@ public class Codons {
         private int _t = 0;
 
         @Override public String code() {
-            return "t";
+            return TIME;
         }
 
         @Override public void op(byte[] p, Tape t) {
@@ -285,7 +345,7 @@ public class Codons {
 
     public static class NotEquals implements Codon {
         @Override public String code() {
-            return "ne";
+            return NOT_EQUAL;
         }
 
         @Override public void op(byte[] p, Tape t) {
@@ -318,43 +378,43 @@ public class Codons {
     }
 
     public static class Subtract extends Binary {
-        public Subtract() { super("su"); }
+        public Subtract() { super(SUBTRACT); }
         @Override int expr(int v1, int v2) {
             return v1-v2;
         }
     }
 
     public static class Multiply extends Binary {
-        public Multiply() { super("mu"); }
+        public Multiply() { super(MULTIPLY); }
         @Override int expr(int v1, int v2) {
             return v1*v2;
         }
     }
 
     public static class Divide extends Binary {
-        public Divide() { super("dv"); }
+        public Divide() { super(DIVIDE); }
         @Override int expr(int v1, int v2) {
             return v2==0?v1:v1/v2;
         }
     }
 
     public static class Mod extends Binary {
-        public Mod() { super("mo"); }
+        public Mod() { super(MOD); }
         @Override int expr(int v1, int v2) {
             return v2==0?v1:v1%v2;
         }
     }
 
     public static class Pow extends Binary {
-        public Pow() { super("po"); }
+        public Pow() { super(POW); }
         @Override int expr(int v1, int v2) {
-            return (int)Math.pow(v1,v2);
+            return Maths.pow(v1,v2);
         }
     }
 
     public static class Sumn extends Aggregate {
-        public Sumn() { super("s", -1); }
-        public Sumn(int c) { super("s", c); }
+        public Sumn() { super(SUM, -1); }
+        public Sumn(int c) { super(SUM, c); }
         @Override int agg(int[] vs, int m) {
             if(m==0) return 0;
             int s = vs[0];
@@ -366,8 +426,8 @@ public class Codons {
     }
 
     public static class Min extends Aggregate {
-        public Min() { super("mn", -1); }
-        public Min(int c) { super("mn", c); }
+        public Min() { super(MIN, -1); }
+        public Min(int c) { super(MIN, c); }
         @Override int agg(int[] vs, int m) {
             if(m==0) return 0;
             int min = vs[0];
@@ -379,8 +439,8 @@ public class Codons {
     }
 
     public static class Max extends Aggregate {
-        public Max() { super("mx", -1); }
-        public Max(int c) { super("mx", c); }
+        public Max() { super(MAX, -1); }
+        public Max(int c) { super(MAX, c); }
         @Override int agg(int[] vs, int m) {
             if(m==0) return 0;
             int max = vs[0];
@@ -392,8 +452,8 @@ public class Codons {
     }
 
     public static class Avg extends Aggregate {
-        public Avg() { super("av", -1); }
-        public Avg(int c) { super("av", c); }
+        public Avg() { super(AVG, -1); }
+        public Avg(int c) { super(AVG, c); }
         @Override int agg(int[] vs, int m) {
             if(m==0) return 0;
             int sum = vs[0];
@@ -405,35 +465,35 @@ public class Codons {
     }
 
     public static class Xor extends Binary {
-        public Xor() { super("xo"); }
+        public Xor() { super(XOR); }
         @Override int expr(int v1, int v2) {
             return v1^v2;
         }
     }
 
     public static class And extends Binary {
-        public And() { super("an"); }
+        public And() { super(AND); }
         @Override int expr(int v1, int v2) {
             return v1&v2;
         }
     }
 
     public static class Or extends Binary {
-        public Or() { super("or"); }
+        public Or() { super(OR); }
         @Override int expr(int v1, int v2) {
             return v1|v2;
         }
     }
 
     public static class Rotright extends Binary {
-        public Rotright() { super("rr"); }
+        public Rotright() { super(ROT_RIGHT); }
         @Override int expr(int v1, int v2) {
             return Integer.rotateRight(v1,v2);
         }
     }
 
     public static class Rotleft extends Binary {
-        public Rotleft() { super("rl"); }
+        public Rotleft() { super(ROT_LEFT); }
         @Override int expr(int v1, int v2) {
             return Integer.rotateLeft(v1,v2);
         }
@@ -441,7 +501,7 @@ public class Codons {
 
     public static class If implements Codon {
         @Override public String code() {
-            return "if";
+            return IF;
         }
 
         @Override public void op(byte[] p, Tape t) {
@@ -450,6 +510,30 @@ public class Codons {
             int tr = t.pop();
             int res = cond!=0?tr:fl;
             t.push(res);
+        }
+    }
+
+    public static class Duplicate implements Codon {
+        @Override public String code() {
+            return DUPLICATE;
+        }
+
+        @Override public void op(byte[] p, Tape t) {
+            int v = t.pop();
+            t.push(v);
+            t.push(v);
+        }
+    }
+
+    public static class Exclamatory implements Codon {
+        @Override public String code() {
+            return POW;
+        }
+
+        @Override public void op(byte[] p, Tape t) {
+            int v = t.pop();
+            int x = Maths.excl(v);
+            t.push(x);
         }
     }
 }

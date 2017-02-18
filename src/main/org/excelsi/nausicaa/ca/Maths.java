@@ -16,5 +16,15 @@ public final class Maths {
         return result;
     }
 
+    public static int excl(int v) {
+        //System.err.print(v+" => ");
+        int res = v;
+        while(v-->1) {
+            res *= v;
+        }
+        //System.err.println(res);
+        return res;
+    }
+
     private Maths() {}
 }

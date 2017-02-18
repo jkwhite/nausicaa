@@ -36,6 +36,14 @@ public final class Palette {
         return _colors[idx];
     }
 
+    public int[][] unpack() {
+        final int[][] u = new int[_colors.length][4];
+        for(int i=0;i<u.length;i++) {
+            Colors.unpack(_colors[i], u[i]);
+        }
+        return u;
+    }
+
     public Palette replace(int index, int newColor) {
         int[] nc = _colors.clone();
         nc[index] = newColor;

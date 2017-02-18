@@ -126,7 +126,9 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
                         futures[i].get();
                     }
                 }
-                catch(InterruptedException|ExecutionException e) {
+                catch(InterruptedException e) {
+                }
+                catch(ExecutionException e) {
                     e.printStackTrace();
                 }
                 tmp = p1;

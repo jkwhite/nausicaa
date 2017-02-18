@@ -36,15 +36,17 @@ public class GenomeFactory {
             weight(1, new If()),
             weight(1, new Time()),
             weight(1, new Nonzero(-1)),
-            //weight(1, new Push(4)),
+            weight(1, new Push(4)),
             //weight(0, new Push(-1)),
             weight(1, new Constant(-1)),
+            weight(1, new Duplicate()),
+            weight(1, new Exclamatory()),
             weight(1, new Mod())
         );
 
 
     public Genome generate(final Random r) {
-        final StringBuilder b = new StringBuilder("hi-");
+        final StringBuilder b = new StringBuilder(Codons.HISTO+"-");
         int len = 3+r.nextInt(12);
         for(int i=0;i<len;i++) {
             final Codon c = G.random(r);
