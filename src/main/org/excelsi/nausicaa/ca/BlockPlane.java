@@ -159,7 +159,7 @@ public final class BlockPlane implements Plane {
                         rgb[2] += (_d-k)*u[2];
                         mx += (_d-k);
                     }
-                    _i.setRGB(i,j,Colors.pack(rgb[0]/mx, rgb[1]/mx, rgb[2]/mx));
+                    _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
                 }
             }
             return _i;

@@ -159,4 +159,57 @@ public final class Palette {
         }
         return new Palette(packed);
     }
+
+    public static Palette shades(int numColors, int[] max) {
+        int[] packed = new int[numColors];
+        for(int i=0;i<numColors;i++) {
+            int red = (int) (max[0] * ((double) i / (double) numColors));
+            int green = (int) (max[1] * ((double) i / (double) numColors));
+            int blue = (int) (max[2] * ((double) i / (double) numColors));
+            packed[i] = Colors.pack(red, green, blue);
+        }
+        return new Palette(packed);
+    }
+
+    private static final int[][] SPECTRUM_RAINBOW = {
+        {148,0,211},
+        {75,0,130},
+        {0,0,255},
+        {0,255,0},
+        {255,255,0},
+        {255,127,0},
+        {255,0,0}
+    };
+
+    public static Palette randomRainbow(Random om, int numColors, boolean black) {
+        final int[][] s = new int[2+om.nextInt(10)][3];
+        for(int i=0;i<s.length;i++) {
+            Colors.unpackRgb(Colors.randomColor(om), s[i]);
+        }
+        return rainbow(numColors, black, s);
+    }
+
+    public static Palette rainbow(int numColors, boolean black) {
+        return rainbow(numColors, black, SPECTRUM_RAINBOW);
+    }
+
+    public static Palette rainbow(int numColors, boolean black, int[][] spectrum) {
+        int[] packed = new int[numColors];
+        int start = black?1:0;
+        for(int i=start;i<numColors;i++) {
+            double p = (double)(i-start) / (double) (numColors-start);
+            double s = p * spectrum.length;
+            int low = (int) Math.floor(s);
+            int high = Math.min(spectrum.length-1, (int) Math.ceil(s));
+            double wgt = s-low;
+
+            System.err.println("low="+low+", high="+high+" wgt="+wgt);
+            int red = (int) (spectrum[low][0]*(1d-wgt) + spectrum[high][0]*(wgt));
+            int green = (int) (spectrum[low][1]*(1d-wgt) + spectrum[high][1]*(wgt));
+            int blue = (int) (spectrum[low][2]*(1d-wgt) + spectrum[high][2]*(wgt));
+            System.err.println("r="+red+", g="+green+", b="+blue);
+            packed[i] = Colors.pack(red, green, blue);
+        }
+        return new Palette(packed);
+    }
 }

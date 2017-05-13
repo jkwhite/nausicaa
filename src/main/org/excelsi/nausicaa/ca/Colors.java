@@ -32,6 +32,13 @@ public class Colors {
         return u;
     }
 
+    public static int[] unpackRgb(int c, int[] u) {
+        u[0] = c & 0xff;
+        u[1] = (c>>8)&0xff;
+        u[2] = (c>>16)&0xff;
+        return u;
+    }
+
     public static int alpha(int c) {
         return c>>24&0xff;
     }

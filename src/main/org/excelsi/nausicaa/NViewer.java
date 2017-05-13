@@ -86,14 +86,14 @@ public class NViewer extends JFrame implements UIActions {
 
     public void init() {
         //final int w = 600, h = 600, d = 1;
-        final int w = 20, h = 20, d = 20, pre = 20;
+        final int w = 400, h = 400, d = 3, pre = 20;
         //final int w = 3, h = 3, d = 1;
         _config = new Config(w, h, d);
         createMenu();
         setSize(_width, _height);
         int dims = 3;
         int size = 1;
-        int colors = 2;
+        int colors = 8;
         _timeline = new Timeline();
         org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors);
         org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
@@ -106,8 +106,9 @@ public class NViewer extends JFrame implements UIActions {
         Ruleset rs = new ComputedRuleset(a);
         //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset1d(a1));
         Rule rule = rs.random(rand).next();
-        Palette pal = Palette.random(colors, rand, true);
+        //Palette pal = Palette.random(colors, rand, true);
         //Palette pal = Palette.grey(colors);
+        Palette pal = Palette.rainbow(colors,true);
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
         org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre);
 
@@ -173,6 +174,7 @@ public class NViewer extends JFrame implements UIActions {
         JMenuBar bar = new JMenuBar();
         createFileMenu(shortcut, bar);
         createAutomataMenu(shortcut, bar);
+        createPaletteMenu(shortcut, bar);
         createMutateMenu(shortcut, bar);
         createWindowMenu(shortcut, bar);
         root().setJMenuBar(bar);
@@ -231,6 +233,78 @@ public class NViewer extends JFrame implements UIActions {
         bar.add(file);
     }
 
+    private void createPaletteMenu(int shortcut, JMenuBar bar) {
+        JMenu pal = new JMenu("Palette");
+
+        AbstractAction greys = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setActiveCA(getActiveCA().palette(Palette.grey(getActiveCA().archetype().colors())));
+            }
+        };
+        JMenuItem grey = pal.add(greys);
+        grey.setText("Grayscale");
+
+        AbstractAction rands = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setActiveCA(getActiveCA().palette(Palette.random(getActiveCA().archetype().colors(), getActiveCA().getRandom())));
+            }
+        };
+        JMenuItem rand = pal.add(rands);
+        rand.setText("Random");
+
+        AbstractAction rains = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setActiveCA(getActiveCA().palette(Palette.rainbow(getActiveCA().archetype().colors(), false)));
+            }
+        };
+        JMenuItem rain = pal.add(rains);
+        rain.setText("Rainbow");
+
+        AbstractAction brains = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setActiveCA(getActiveCA().palette(Palette.rainbow(getActiveCA().archetype().colors(), true)));
+            }
+        };
+        JMenuItem brain = pal.add(brains);
+        brain.setText("Black Rainbow");
+
+        AbstractAction rrains = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setActiveCA(getActiveCA().palette(Palette.randomRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), false)));
+            }
+        };
+        JMenuItem rrain = pal.add(rrains);
+        rrain.setText("Random Spectrum");
+
+        pal.addSeparator();
+
+        AbstractAction reds = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{255,0,0})));
+            }
+        };
+        JMenuItem red = pal.add(reds);
+        red.setText("Red shades");
+
+        AbstractAction blues = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{0,0,255})));
+            }
+        };
+        JMenuItem blue = pal.add(blues);
+        blue.setText("Blue shades");
+
+        AbstractAction greens = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{0,255})));
+            }
+        };
+        JMenuItem green = pal.add(greens);
+        green.setText("Green shades");
+
+        bar.add(pal);
+    }
+
     private void createAutomataMenu(int shortcut, JMenuBar bar) {
         final JCheckBoxMenuItem[] hack = new JCheckBoxMenuItem[4];
         JMenu auto = new JMenu("Automata");
@@ -280,7 +354,7 @@ public class NViewer extends JFrame implements UIActions {
         auto.add(ran);
         hack[0] = ran;
         ran.setText("Random initial state ...");
-        ran.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, shortcut));
+        ran.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, shortcut));
         ran.setState(_init==Initializers.random);
 
         JCheckBoxMenuItem fix = new JCheckBoxMenuItem(new AbstractAction() {

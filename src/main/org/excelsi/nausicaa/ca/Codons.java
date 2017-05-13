@@ -34,8 +34,11 @@ public class Codons {
     //public static final String EXCLAMATORY = "ex";
 
     public static final String SUM = "mi";
+    public static final String SUM_N = "me";
     public static final String PUSH = "o";
-    public static final String PUSH_SURROUND = "kO";
+    public static final String PUSH_N = "no";
+    public static final String PUSH_S = "ya";
+    public static final String PUSH_SURROUND = "ki";
     public static final String MOD = "mo";
     public static final String INTERSECT = "u";
     public static final String CONS = "a";
@@ -49,12 +52,16 @@ public class Codons {
     public static final String MIN = "chi";
     public static final String MAX = "ta";
     public static final String AVG = "gi";
+    public static final String MIN_N = "jo";
+    public static final String MAX_N = "ri";
+    public static final String AVG_N = "e";
     public static final String XOR = "tsu";
     public static final String AND = "to";
     public static final String OR = "ka";
     public static final String ROT_RIGHT = "ku";
     public static final String ROT_LEFT = "ko";
     public static final String SKIP = "ro";
+    public static final String SKIP_N = "ji";
     public static final String NON_ZERO = "zu";
     public static final String TIME = "te";
     public static final String HISTO = "hi";
@@ -75,8 +82,14 @@ public class Codons {
         switch(code) {
             case SUM:
                 return p==-1?new Sum():new Sumn(p);
+            case SUM_N:
+                return new SumnN();
             case PUSH:
                 return new Push(p);
+            case PUSH_N:
+                return new PushN();
+            case PUSH_S:
+                return new PushS();
             case MOD:
                 return new Mod();
             case PUSH_SURROUND:
@@ -105,6 +118,12 @@ public class Codons {
                 return new Max(p);
             case AVG:
                 return new Avg(p);
+            case MIN_N:
+                return new MinN();
+            case MAX_N:
+                return new MaxN();
+            case AVG_N:
+                return new AvgN();
             case XOR:
                 return new Xor();
             case AND:
@@ -117,6 +136,8 @@ public class Codons {
                 return new Rotleft();
             case SKIP:
                 return new Skip(p);
+            case SKIP_N:
+                return new SkipN();
             case NON_ZERO:
                 return new Nonzero(p);
             case TIME:
@@ -133,7 +154,7 @@ public class Codons {
     }
 
     public static class Nonzero implements Codon {
-        private final int[] _t = new int[100];
+        private final int[] _t = new int[256];
         private final int _c;
 
         public Nonzero(int c) {
@@ -179,7 +200,7 @@ public class Codons {
     }
 
     public static class Sum implements Codon {
-        private final int[] _t = new int[100];
+        private final int[] _t = new int[256];
 
         @Override public String code() {
             return SUM;
@@ -198,7 +219,7 @@ public class Codons {
     public abstract static class Aggregate implements Codon {
         private final String _n;
         private final int _c;
-        private final int[] _t = new int[100];
+        private final int[] _t = new int[256];
 
         public Aggregate(String n, int c) {
             _n = n;
@@ -222,6 +243,38 @@ public class Codons {
         abstract int agg(int[] p, int m);
     }
 
+    public abstract static class AggregateN implements Codon {
+        private final String _n;
+        private final int[] _t = new int[1024];
+
+        public AggregateN(String n) {
+            _n = n;
+        }
+
+        @Override public String code() {
+            return _n;
+        }
+
+        @Override public void op(byte[] p, Tape t) {
+            int s = t.pop();
+            if(s>=_t.length) {
+                s = s%_t.length;
+            }
+            else if(s<0) {
+                s = (-s)%_t.length;
+            }
+            int m = t.popAll(_t, s);
+            int a = agg(_t, m);
+            t.push(a);
+        }
+
+        @Override public String generate(Random r) {
+            return _n;
+        }
+
+        abstract int agg(int[] p, int m);
+    }
+
     public static class Skip implements Codon {
         private final int _c;
         private final int[] _t = new int[100];
@@ -239,7 +292,31 @@ public class Codons {
         }
 
         @Override public String generate(Random r) {
-            return SKIP+r.nextInt(9);
+            return SKIP+(1+r.nextInt(9));
+        }
+    }
+
+    public static class SkipN implements Codon {
+        private final int[] _t = new int[256];
+
+        @Override public String code() {
+            return SKIP_N;
+        }
+
+        @Override public void op(byte[] p, Tape t) {
+            int s = t.pop();
+            try {
+                //int m = t.popAll(_t, s);
+                t.skip(s);
+            }
+            catch(Exception e) {
+                System.err.println("FAILED popping "+s+" from "+t);
+                e.printStackTrace();
+            }
+        }
+
+        @Override public String generate(Random r) {
+            return SKIP_N;
         }
     }
 
@@ -263,6 +340,50 @@ public class Codons {
         }
     }
 
+    public static class PushN implements Codon {
+        public PushN() {
+        }
+
+        @Override public String code() {
+            return PUSH_N;
+        }
+
+        @Override public void op(byte[] p, Tape t) {
+            long s = t.pop();
+            long s2 = s;
+            if(s2>=p.length) {
+                s2 = s2%p.length;
+            }
+            else if(s2<0) {
+                s2 = (-s2)%p.length;
+            }
+            if(s2<0) {
+                throw new IllegalArgumentException("how did s get to "+s2+" from "+s+" and "+p.length);
+            }
+            t.push(p[(int)s2]);
+        }
+
+        @Override public String generate(Random r) {
+            return PUSH_N;
+        }
+    }
+
+    public static class PushS implements Codon {
+        public PushS() {
+        }
+
+        @Override public String code() {
+            return PUSH_S;
+        }
+
+        @Override public void op(byte[] p, Tape t) {
+            t.push(p[p.length/2]);
+        }
+
+        @Override public String generate(Random r) {
+            return PUSH_S;
+        }
+    }
 
     public static class Constant implements Codon {
         private final int _p;
@@ -408,13 +529,31 @@ public class Codons {
     public static class Pow extends Binary {
         public Pow() { super(POW); }
         @Override int expr(int v1, int v2) {
-            return Maths.pow(v1,v2);
+            long st = System.currentTimeMillis();
+            int v = Maths.pow(v1,v2);
+            long en = System.currentTimeMillis();
+            if(en-st>2000) {
+                System.err.println("took "+(en-st)+" for pow("+v1+","+v2+")");
+            }
+            return v;
         }
     }
 
     public static class Sumn extends Aggregate {
         public Sumn() { super(SUM, -1); }
         public Sumn(int c) { super(SUM, c); }
+        @Override int agg(int[] vs, int m) {
+            if(m==0) return 0;
+            int s = vs[0];
+            for(int i=1;i<m;i++) {
+                s += vs[i];
+            }
+            return s;
+        }
+    }
+
+    public static class SumnN extends AggregateN {
+        public SumnN() { super(SUM_N); }
         @Override int agg(int[] vs, int m) {
             if(m==0) return 0;
             int s = vs[0];
@@ -438,6 +577,18 @@ public class Codons {
         }
     }
 
+    public static class MinN extends AggregateN {
+        public MinN() { super(MIN_N); }
+        @Override int agg(int[] vs, int m) {
+            if(m==0) return 0;
+            int min = vs[0];
+            for(int i=1;i<m;i++) {
+                if(vs[i]<min) min=vs[i];
+            }
+            return min;
+        }
+    }
+
     public static class Max extends Aggregate {
         public Max() { super(MAX, -1); }
         public Max(int c) { super(MAX, c); }
@@ -451,9 +602,33 @@ public class Codons {
         }
     }
 
+    public static class MaxN extends AggregateN {
+        public MaxN() { super(MAX_N); }
+        @Override int agg(int[] vs, int m) {
+            if(m==0) return 0;
+            int max = vs[0];
+            for(int i=1;i<m;i++) {
+                if(vs[i]>max) max=vs[i];
+            }
+            return max;
+        }
+    }
+
     public static class Avg extends Aggregate {
         public Avg() { super(AVG, -1); }
         public Avg(int c) { super(AVG, c); }
+        @Override int agg(int[] vs, int m) {
+            if(m==0) return 0;
+            int sum = vs[0];
+            for(int i=1;i<m;i++) {
+                sum += vs[i];
+            }
+            return sum/m;
+        }
+    }
+
+    public static class AvgN extends AggregateN {
+        public AvgN() { super(AVG_N); }
         @Override int agg(int[] vs, int m) {
             if(m==0) return 0;
             int sum = vs[0];

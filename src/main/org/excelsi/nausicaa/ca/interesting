@@ -41,6 +41,10 @@ spiralling: rl-if-i-hi-xo-nz-or-if-av-dv
 
 6:
 artistic spirals: hi-po-i-rl, hi-po-i-rr
+hi  hi
+po  i
+i   u
+rl  ko
 caverns: rl-x8-mx4-s3-hi-mu-po-rr-xo-mx1-po-av6-mn1-nz-mx-eq-s
 map: rr-if-dv-hi-i-po-av-rl
 pulsing, map, cmod: rr-dv-if-hi-i-po-c5-rl-av-s8-xo
@@ -110,3 +114,70 @@ hi-av3-su-ex-or
 3d, 7;
 hi-ko-ra-ku-ho-a7-tsu
 ta5-u-ra-ta3-hi-i-mu-ka
+
+3d, 8, d2:
+mu-tsu-hi-ra-su
+su-mu-ra-hi-tsu
+ra-ne-hi-tsu-gi5
+mi-zu-te-ho-ho-a8-ra-hi-ka-ko
+hi-tsu-ko
+hi-ka-ko-do
+
+3d, 8, d4:
+hi-tsu , 5,6
+hi-do-gi7
+
+3d, 8, d3
+o4-ro4-to-chi-ta6-u-ka-zu-hi-mi5-ku-tsu-su-mu-ka
+o4-ro4-to-ta6-chi-ki-ka-zu-hi-mi5-ku-ho-su-mu-ka
+pretty: ya-ya-hi-i-no
+hi-jo-tsu-me-no
+jo-hi-tsu-me-no
+i-hi-te-ro6-do-ri-no-su
+
+3d, 63, 10:
+ta-hi-ma-gi6-mu-do-zu-i-ka-ku-ma-gi5
+
+3d, 99, 3:
+hi-zu-ho-su-su
+gi5-ho-ro6-ne-ki-zu-ji-ko
+
+3d, 8, 1:
+hypno: a1-o13-mi-a0-ki-mi26-ra
+       u-a1-o13-hi-mi-a0-ki-mi26-ra-ku
+maze:  a1-o13-hi-mi-a0-ki-mi26-ra
+       u-mi-a0-ra-ro4-zu-ki-o13-i-ta
+heightmap: u-a0-mi-ra-ro4-zu-ki-o13-i-ta
+ki-gi-a2-mi-a0-ki-mi26-ra
+people they fall apart: ki-gi-a2-a0-ki-mi26
+
+3d, 16, 4
+filaments: u-a0-mi-ra-ro4-zu-ki-o13-i-ta
+
+3d, 64, 4:
+chi-ki-o4-hi-chi9-zu-te-a3-ma-ma-gi-te-mi-mi6-gi
+
+3d, 64, 5:
+ne-ka-ma-te-su-no-no
+ma-no-ta-te-su-no-ka
+ma-no-ta-te-su-no-ka-tsu
+ya-ki-zu-gi-no-su-no
+ki-zu-gi-no-su-no
+ki-gi-no-ta-no
+ki-gi-no-ta
+aureate bloom: ki-me-gi-no-ta
+heatmap: ki-ki-i-me-ne-no-no-gi-ka
+
+3d, 99, 7:
+shimmer: ra-no-ko-ki-ka-ta-ya-mi
+outrun: ka-ta-ra-ki-ya-ko-mi-no
+still life: ra-no-ne-ko-ki-jo-ta-ya-ta
+blob time: mi-ki-no-ra-ta-ko-ya-ka
+painting: mi-ki-no-ra-ta-no-ko-ya-ka
+rising: no-gi-u-ko-ki-ta-ka-mi-no-gi-gi
+probs1: ya-no-gi-ki-ko-ka-mi-no-gi-gi-tsu
+probs2: no-ka-gi-tsu-ki-mi-ko-ya-gi-no-gi
+probs3: ya-no-gi-ki-ko-ka-mi-no-gi-gi-tsu
+probs4: ya-no-gi-ki-ho-ka-mi-no-gi-tsu-tsu
+ya-no-gi-ki-ko-ka-mi-no-gi-gi-tsu
+ki-gi-no

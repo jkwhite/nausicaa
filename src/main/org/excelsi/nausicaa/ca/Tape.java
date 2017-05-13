@@ -48,6 +48,12 @@ public final class Tape {
         return ret;
     }
 
+    public void skip(int c) {
+        for(int i=0;i<c;i++) {
+            pop();
+        }
+    }
+
     public String toString() {
         StringBuilder b = new StringBuilder("tape {pos:"+_i+", tape:[");
         for(int i=0;i<=_i;i++) {

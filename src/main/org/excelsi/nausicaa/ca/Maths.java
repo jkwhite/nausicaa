@@ -3,6 +3,9 @@ package org.excelsi.nausicaa.ca;
 
 public final class Maths {
     public static int pow(final int k, int e) {
+        if(e<0) {
+            throw new IllegalArgumentException("negative e");
+        }
         int result = 1;
         int k2p    = k;
         while (e != 0) {

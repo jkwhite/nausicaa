@@ -94,7 +94,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
             throw new IllegalArgumentException("null plane");
         }
         final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c,pool, doubleBuffer):null;
-        final int block = 800;
+        final int block = 8000;
         int nworkers = c.getHeight()/block + (c.getHeight()%block>0?1:0);
         final Worker[] workers = new Worker[nworkers];
         final Pattern p = createPattern(pool);
