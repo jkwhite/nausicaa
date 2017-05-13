@@ -156,6 +156,8 @@ filaments: u-a0-mi-ra-ro4-zu-ki-o13-i-ta
 
 3d, 64, 4:
 chi-ki-o4-hi-chi9-zu-te-a3-ma-ma-gi-te-mi-mi6-gi
+pretty: i-hi-ka-mu-ya-tsu-zu-mi4
+splotch: i-ka-hi-mu-tsu-ya-zu-mi4-no
 
 3d, 64, 5:
 ne-ka-ma-te-su-no-no
@@ -167,6 +169,12 @@ ki-gi-no-ta-no
 ki-gi-no-ta
 aureate bloom: ki-me-gi-no-ta
 heatmap: ki-ki-i-me-ne-no-no-gi-ka
+
+3d, 77, 3:
+dissipating rainbow: ta-u-ri-ki-zu-e-zu-tsu
+heat death: ma-ta-u-ri-ki-zu-e-zu-ho-tsu
+waves: ma-ta-u-ri-ki-zu-e-zu-ho-tsu-ku
+excitations: ma-ta-u-ri-ki-zu-e-ku-zu-ho
 
 3d, 99, 7:
 shimmer: ra-no-ko-ki-ka-ta-ya-mi
