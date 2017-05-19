@@ -154,6 +154,9 @@ people they fall apart: ki-gi-a2-a0-ki-mi26
 3d, 16, 4
 filaments: u-a0-mi-ra-ro4-zu-ki-o13-i-ta
 
+3d, 37, 3:
+wow: hi-ta-ne-no-ka-jo-ki-ri-ri-do-ro1-gi, zweight 0.8
+
 3d, 64, 4:
 chi-ki-o4-hi-chi9-zu-te-a3-ma-ma-gi-te-mi-mi6-gi
 pretty: i-hi-ka-mu-ya-tsu-zu-mi4
@@ -175,6 +178,21 @@ dissipating rainbow: ta-u-ri-ki-zu-e-zu-tsu
 heat death: ma-ta-u-ri-ki-zu-e-zu-ho-tsu
 waves: ma-ta-u-ri-ki-zu-e-zu-ho-tsu-ku
 excitations: ma-ta-u-ri-ki-zu-e-ku-zu-ho
+pulse: ma-me-u-gi-ki-ya-e-ku-zu-ta-mi-ka-mi-gi
+       ma-me-u-gi-ki-ya-e-ku-a7-mi-ta-ka-mi-gi
+impulse: ma-me-u-gi-ki-ya-e-ku-a4-mi-ta-ka-mi-gi
+         ma-ki-u-gi-ki-ya-e-ku-ta-ka-a2-mi-gi
+         ma-ki-u-gi-ki-ya-e-ku-ne-ka-ta-a1-mi-gi
+impulse2: ma-ki-u-gi-ki-ya-ku-ne-ka-ta-a1-mi-tsu
+boxes: ma-ki-u-ne-ki-ya-ku-i-ka-ta-a1-mi-tsu
+next: ma-ki-u-ne-tsu-ki-ya-ku-i-ka-ro8-ta-a1-mi-tsu
+living: ma-ki-u-ne-tsu-ki-ya-ku-jo-i-ro8-ta-a1-mi-tsu
+wires: ki-ne-a3-ya-ku-a4-ki-ta-a1-mi-tsu
+heightmap, d2: ki-ne-a3-ya-ku-a4-ki-ta-a1-mi-tsu
+breathe: ki-ne-a0-ya-ku-a4-ki-ta-a1-mi-tsu
+flashman: ki-ne-a2-ya-ku-a4-ki-ta-a1-mi-tsu
+reversible: ki-ne-ku-a4-ki-ta-a1-mi-tsu
+
 
 3d, 99, 7:
 shimmer: ra-no-ko-ki-ka-ta-ya-mi
