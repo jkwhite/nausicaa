@@ -189,6 +189,17 @@ public final class Palette {
         return rainbow(numColors, black, s);
     }
 
+    public static Palette randomWrappedRainbow(Random om, int numColors, boolean black) {
+        final int[][] s = new int[3+om.nextInt(10)][3];
+        for(int i=0;i<s.length-1;i++) {
+            Colors.unpackRgb(Colors.randomColor(om), s[i]);
+        }
+        s[s.length-1][0] = s[0][0];
+        s[s.length-1][1] = s[0][1];
+        s[s.length-1][2] = s[0][2];
+        return rainbow(numColors, black, s);
+    }
+
     public static Palette rainbow(int numColors, boolean black) {
         return rainbow(numColors, black, SPECTRUM_RAINBOW);
     }

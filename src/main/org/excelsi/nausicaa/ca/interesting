@@ -134,6 +134,7 @@ pretty: ya-ya-hi-i-no
 hi-jo-tsu-me-no
 jo-hi-tsu-me-no
 i-hi-te-ro6-do-ri-no-su
+drifting: ri-tsu-hi-su-ku-ka-do-do-mu-no-mi9-no
 
 3d, 63, 10:
 ta-hi-ma-gi6-mu-do-zu-i-ka-ku-ma-gi5
@@ -141,6 +142,10 @@ ta-hi-ma-gi6-mu-do-zu-i-ka-ku-ma-gi5
 3d, 99, 3:
 hi-zu-ho-su-su
 gi5-ho-ro6-ne-ki-zu-ji-ko
+
+3d, 37, 3:
+spectrum: hi-ta-ne-no-jo-ka-ne-ki-ri-do-ro1-gi
+!: hi-ta-ne-no-ka-jo-ki-ri-ri-do-ro1-gi, zweight 0.8
 
 3d, 8, 1:
 hypno: a1-o13-mi-a0-ki-mi26-ra
@@ -173,6 +178,10 @@ ki-gi-no-ta
 aureate bloom: ki-me-gi-no-ta
 heatmap: ki-ki-i-me-ne-no-no-gi-ka
 
+3d, 66, 3:
+wraparound: ki-chi-hi-u-zu-hi-i-hi-mi
+            ki-chi-hi-u-hi-hi-a1-i-e-mi
+
 3d, 77, 3:
 dissipating rainbow: ta-u-ri-ki-zu-e-zu-tsu
 heat death: ma-ta-u-ri-ki-zu-e-zu-ho-tsu
@@ -193,6 +202,14 @@ breathe: ki-ne-a0-ya-ku-a4-ki-ta-a1-mi-tsu
 flashman: ki-ne-a2-ya-ku-a4-ki-ta-a1-mi-tsu
 reversible: ki-ne-ku-a4-ki-ta-a1-mi-tsu
 
+machines: ta-u-ho-e-ki-zu-ho-ku-jo
+          no-ta-u-e-to-ki-zu-ho-ku-jo
+satisfying: no-ta-u-e-ki-to-zu-ho-ku-jo
+            no-ta-u-e-to-ki-zu-ho-ku-jo
+war!: no-ku-to-u-ki-zu-ho-ku-jo
+painting: ho-ki-ku-no-to-zu-u-jo-tsu
+melange: ho-ki-ku-no-i-zu-u-tsu-no
+loops: ma-su-hi-a5-to-ri-hi-me-zu-u
 
 3d, 99, 7:
 shimmer: ra-no-ko-ki-ka-ta-ya-mi
