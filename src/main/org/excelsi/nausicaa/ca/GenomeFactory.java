@@ -7,8 +7,8 @@ import static org.excelsi.nausicaa.ca.Codons.*;
 
 
 public class GenomeFactory {
-    private static final WeightedFactory<Codon> G =
-        new WeightedFactory<Codon>(
+    private static final WeightedFactory<Codon> buildFactory(final Archetype a) {
+        return new WeightedFactory<Codon>(
             weight(1, new PushO()),
             weight(1, new Sum()),
             weight(1, new Sumn(1)),
@@ -41,22 +41,27 @@ public class GenomeFactory {
             weight(1, new If()),
             weight(1, new Time()),
             weight(1, new Nonzero(-1)),
-            //weight(1, new Push(4)),
+            weight(1, new Push((a.sourceLength()-1)/2)),
             weight(1, new PushN()),
             weight(1, new PushS()),
+            weight(1, new PushA()),
             weight(1, new Push(-1)),
             weight(1, new Constant(-1)),
             weight(1, new Duplicate()),
             weight(1, new Exclamatory()),
+            weight(1, new Supersymmetry(a.colors()-1)),
+            weight(1, new RotVecN(a.sourceLength())),
             weight(1, new Mod())
         );
+    }
 
 
-    public Genome generate(final Random r) {
+    public Genome generate(final Archetype a, final Random r) {
+        final WeightedFactory<Codon> f = buildFactory(a);
         final StringBuilder b = new StringBuilder(Codons.HISTO+"-");
         int len = 1+r.nextInt(12);
         for(int i=0;i<len;i++) {
-            final Codon c = G.random(r);
+            final Codon c = f.random(r);
             b.append(c.generate(r));
             b.append("-");
         }
@@ -65,6 +70,6 @@ public class GenomeFactory {
     }
 
     public Codon randomCodon(final Archetype a, final Random r) {
-        return Codons.codon(G.random(r).generate(r), a);
+        return Codons.codon(buildFactory(a).random(r).generate(r), a);
     }
 }

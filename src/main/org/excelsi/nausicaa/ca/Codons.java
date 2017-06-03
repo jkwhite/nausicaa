@@ -2,6 +2,7 @@ package org.excelsi.nausicaa.ca;
 
 
 import java.util.Random;
+import java.util.Arrays;
 
 
 public class Codons {
@@ -39,6 +40,7 @@ public class Codons {
     public static final String PUSH_N = "no";
     public static final String PUSH_S = "ya";
     public static final String PUSH_SURROUND = "ki";
+    public static final String PUSH_ALL = "go";
     public static final String MOD = "mo";
     public static final String INTERSECT = "u";
     public static final String CONS = "a";
@@ -67,6 +69,8 @@ public class Codons {
     public static final String HISTO = "hi";
     public static final String DUPLICATE = "do";
     public static final String EXCLAMATORY = "ha";
+    public static final String SUPERSYMMETRY = "hu";
+    public static final String ROT_VEC_N = "ba";
 
     public static Codon codon(final String s, final Archetype a) {
         //System.err.println("op '"+s+"'");
@@ -94,6 +98,8 @@ public class Codons {
                 return new Mod();
             case PUSH_SURROUND:
                 return new PushO();
+            case PUSH_ALL:
+                return new PushA();
             case INTERSECT:
                 return new Intersects();
             case CONS:
@@ -148,6 +154,10 @@ public class Codons {
                 return new Duplicate();
             case EXCLAMATORY:
                 return new Exclamatory();
+            case SUPERSYMMETRY:
+                return new Supersymmetry(a.colors()-1);
+            case ROT_VEC_N:
+                return new RotVecN(a.sourceLength());
             default:
                 throw new IllegalStateException("unknown opcode '"+code+"'");
         }
@@ -401,7 +411,7 @@ public class Codons {
         }
 
         @Override public String generate(Random r) {
-            return CONS+(_p==-1?r.nextInt(9):_p);
+            return CONS+(_p==-1?r.nextInt(27):_p);
         }
     }
 
@@ -416,6 +426,18 @@ public class Codons {
                 t.push(p[i]);
             }
             for(int i=mid+1;i<p.length;i++) {
+                t.push(p[i]);
+            }
+        }
+    }
+
+    public static class PushA implements Codon {
+        @Override public String code() {
+            return PUSH_ALL;
+        }
+
+        @Override public void op(byte[] p, Tape t) {
+            for(int i=0;i<p.length;i++) {
                 t.push(p[i]);
             }
         }
@@ -530,7 +552,7 @@ public class Codons {
         public Pow() { super(POW); }
         @Override int expr(int v1, int v2) {
             long st = System.currentTimeMillis();
-            int v = Maths.pow(v1,v2);
+            int v = Maths.pow(v1,Math.abs(v2));
             long en = System.currentTimeMillis();
             if(en-st>2000) {
                 System.err.println("took "+(en-st)+" for pow("+v1+","+v2+")");
@@ -700,6 +722,24 @@ public class Codons {
         }
     }
 
+    public static class Supersymmetry implements Codon {
+        private final int _max;
+
+        public Supersymmetry(int max) {
+            _max = max;
+        }
+
+        @Override public String code() {
+            return SUPERSYMMETRY;
+        }
+
+        @Override public void op(byte[] p, Tape t) {
+            int v = t.pop();
+            int r = _max-v;
+            t.push(r);
+        }
+    }
+
     public static class Exclamatory implements Codon {
         @Override public String code() {
             return POW;
@@ -711,4 +751,36 @@ public class Codons {
             t.push(x);
         }
     }
+
+    public static class RotVecN implements Codon {
+        private final int[] _v;
+        private final int[] _vt;
+
+        public RotVecN(int max) {
+            _v = new int[max];
+            _vt = new int[max];
+        }
+
+        @Override public String code() {
+            return ROT_VEC_N;
+        }
+
+        @Override public void op(byte[] p, Tape t) {
+            int dist = t.pop();
+            int len = Math.min(t.pop(), _v.length);
+            //int ipeek = t.peek();
+            int m = t.popAll(_v, len);
+            for(int i=0;i<len;i++) {
+                int dest = (i+dist)%len;
+                _vt[dest] = _v[i];
+            }
+            t.pushAll(_vt, len);
+            //int opeek = t.peek();
+            //if(ipeek!=opeek) {
+                //System.err.println("i: p:"+ipeek+", d:"+dist+", l:"+len+", a:"+Arrays.toString(_v));
+                //System.err.println("o: p:"+opeek+", d:"+dist+", l:"+len+", a:"+Arrays.toString(_vt));
+            //}
+        }
+    }
+
 }

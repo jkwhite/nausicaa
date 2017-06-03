@@ -36,6 +36,21 @@ public final class Tape {
         return 0;
     }
 
+    public int peek() {
+        if(_i>=0) {
+            return _t[_i];
+        }
+        return 0;
+    }
+
+    public int pushAll(int[] v, int c) {
+        int m = Math.min(v.length, c);
+        for(int i=0;i<m;i++) {
+            push(v[i]);
+        }
+        return m;
+    }
+
     public int popAll(int[] r, int c) {
         if(c==-1) {
             c = _i+1;

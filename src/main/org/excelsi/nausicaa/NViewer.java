@@ -86,7 +86,7 @@ public class NViewer extends JFrame implements UIActions {
 
     public void init() {
         //final int w = 600, h = 600, d = 1;
-        final int w = 400, h = 400, d = 3, pre = 20;
+        final int w = 300, h = 300, d = 3, pre = 20;
         //final int w = 3, h = 3, d = 1;
         _config = new Config(w, h, d);
         createMenu();
@@ -270,19 +270,39 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction rrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setActiveCA(getActiveCA().palette(Palette.randomRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), false)));
+                getActiveCA().getRandom().nextBoolean();
+                setActiveCA(getActiveCA().palette(Palette.randomRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), false, getActiveCA().archetype().colors()/2)));
             }
         };
         JMenuItem rrain = pal.add(rrains);
-        rrain.setText("Random Spectrum");
+        rrain.setText("Spectrum");
+
+        AbstractAction rdrains = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                getActiveCA().getRandom().nextBoolean();
+                setActiveCA(getActiveCA().palette(Palette.randomRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), false, getActiveCA().archetype().colors())));
+            }
+        };
+        JMenuItem rdrain = pal.add(rdrains);
+        rdrain.setText("Dense Spectrum");
 
         AbstractAction wrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), false)));
+                getActiveCA().getRandom().nextBoolean();
+                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), false, getActiveCA().archetype().colors()/2)));
             }
         };
         JMenuItem wrain = pal.add(wrains);
         wrain.setText("Wrapped Spectrum");
+
+        AbstractAction wdrains = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                getActiveCA().getRandom().nextBoolean();
+                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), false, getActiveCA().archetype().colors())));
+            }
+        };
+        JMenuItem wdrain = pal.add(wdrains);
+        wdrain.setText("Dense Wrapped Spectrum");
 
         pal.addSeparator();
 
@@ -294,6 +314,14 @@ public class NViewer extends JFrame implements UIActions {
         JMenuItem red = pal.add(reds);
         red.setText("Red shades");
 
+        AbstractAction breds = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{255,128,128})));
+            }
+        };
+        JMenuItem bred = pal.add(breds);
+        bred.setText("Bright red shades");
+
         AbstractAction blues = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{0,0,255})));
@@ -302,13 +330,29 @@ public class NViewer extends JFrame implements UIActions {
         JMenuItem blue = pal.add(blues);
         blue.setText("Blue shades");
 
+        AbstractAction bblues = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{128,128,255})));
+            }
+        };
+        JMenuItem bblue = pal.add(bblues);
+        bblue.setText("Bright blue shades");
+
         AbstractAction greens = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{0,255})));
+                setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{0,255,0})));
             }
         };
         JMenuItem green = pal.add(greens);
         green.setText("Green shades");
+
+        AbstractAction bgreens = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{128,255,128})));
+            }
+        };
+        JMenuItem bgreen = pal.add(bgreens);
+        bgreen.setText("Bright green shades");
 
         bar.add(pal);
     }

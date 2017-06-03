@@ -146,6 +146,7 @@ gi5-ho-ro6-ne-ki-zu-ji-ko
 3d, 37, 3:
 spectrum: hi-ta-ne-no-jo-ka-ne-ki-ri-do-ro1-gi
 !: hi-ta-ne-no-ka-jo-ki-ri-ri-do-ro1-gi, zweight 0.8
+whoa: tsu-hi-e-o8-ka-no-zu-mi3
 
 3d, 8, 1:
 hypno: a1-o13-mi-a0-ki-mi26-ra
@@ -161,6 +162,60 @@ filaments: u-a0-mi-ra-ro4-zu-ki-o13-i-ta
 
 3d, 37, 3:
 wow: hi-ta-ne-no-ka-jo-ki-ri-ri-do-ro1-gi, zweight 0.8
+     hi-ta-ya-ka-no-jo-ki-ri-ri-do-ro1-gi-chi
+     hi-ta-ya-to-no-jo-ya-ki-ri-ri-do-ro1-gi-chi
+     ya-a4-ya-jo-ki-ri-ri-do-ro1-gi-chi
+     ya-jo-mi-ki-ri-ri-gi
+     ya-mi-ki-ri-ri-gi
+     mi-ki-ri-ri-gi-gi
+     ki-ri-ri-gi-gi
+     ki-ri-ri-gi
+     ku-ko-mi3-go-ne-o8-me-ri-gi-gi-ta-ku
+emergent: ra-mi-hi-no-mi6-ta
+particles: ra-ne-o13-hu-zu-ko-e-e-ki-ta-mi6-no
+falling triangles: o13-ko-hu-ta-e-ki-ra-no-ne-e-ne-zu-mi6-no
+design: hu-e-no-ta-e-ki-ko-ne-ne-ta-mi6-no-o13-zu
+design2: hu-e-no-ta-e-ki-ko-ne-ne-mi6-ta-no-o13-zu
+design3: hu-e-no-ta-e-ki-ko-ki-ne-mi6-ta-no-o13-zu
+intricate design d7: mi9-gi-e-no-mi2-ko-go-ki-ko-o2-ne-mi6-ri-ta-no-o13-zu
+birdseye: go-zu-ka-ka-ne-no-do-ji-zu
+stripes: go-zu-ka-ka-ne-no-mi1-do-ji-ya-zu-ri
+crystal: go-ho-zu-ka-mi6-ne-no-mi1-do-ji-ya-zu
+         go-do-zu-ka-mi6-ne-mi1-ho-ji-ya-zu
+
+2d, 5:
+go-a9-a1-ba
+ki-o4-a9-a0-ba
+ki-ya-a9-ya-ba
+80s design: ya-ki-a9-ya-ba
+
+3d, 37:
+strange days: ya-e-go-ya-ri-a27-ba-ko
+shapes: go-u-ya-ta-ku-ho-gi-no
+        go-ku-ta
+flashing shapes: ya-ki-a9-to-ba-zu-mu
+overcarven rail: hi-ya-ki-a9-to-no-zu-mu
+                 ya-ki-a9-to-no-zu-mu
+particle spray: ko-ya-ki-to-no-zu-no-me
+partitioned unniverse: ko-ya-ki-i-to-no-zu-me-no
+abandoned station: to-no-me-ko-ki-ya-zu-no
+alien schematic: to-no-me-ki-ko-ya-zu-no
+patchwork: ki-to-ko-mu-me-no-ya-zu
+37 colors is not enough: ya-e-no-a1-mu-i-gi-go-a12-me-o5-ki-o13-to-ya-ya-o7-gi-ku-mi2-do
+
+3d, 99, d3, 0.84:
+overstellar interdrive: do-mu-ki-mi2-e-go-o7-ya-o13-no-to-go-ya-a4-i-ya-o5-a1-me-gi-ku
+                        do-mu-ki-mi2-e-go-o7-ya-o13-no-to-go-ya-a4-i-ya-ki-a1-me-gi-ku
+
+2d, 8:
+nicetown: ya-ki-a9-ya-ba
+shape universe: hi-ki-ya-a9-ba-zu
+cracks: mu-ki-ya-a9-ba-to-zu
+mile after mile: ki-ya-a9-to-ba-zu
+eaten by the void: mu-ki-ya-a9-ba-to-zu-mu
+                   mu-ki-ya-a9-ba-to-ba-zu-mu
+spacewar: ri-mu-ki-a9-ho-do-ba-zu-mu
+stop touching me 0.9: ri-mu-no-ki-a9-ho-do-ba-zu-mu
 
 3d, 64, 4:
 chi-ki-o4-hi-chi9-zu-te-a3-ma-ma-gi-te-mi-mi6-gi
@@ -200,7 +255,7 @@ wires: ki-ne-a3-ya-ku-a4-ki-ta-a1-mi-tsu
 heightmap, d2: ki-ne-a3-ya-ku-a4-ki-ta-a1-mi-tsu
 breathe: ki-ne-a0-ya-ku-a4-ki-ta-a1-mi-tsu
 flashman: ki-ne-a2-ya-ku-a4-ki-ta-a1-mi-tsu
-reversible: ki-ne-ku-a4-ki-ta-a1-mi-tsu
+reversible squaresarecool: ki-ne-ku-a4-ki-ta-a1-mi-tsu
 
 machines: ta-u-ho-e-ki-zu-ho-ku-jo
           no-ta-u-e-to-ki-zu-ho-ku-jo
@@ -224,3 +279,10 @@ probs3: ya-no-gi-ki-ko-ka-mi-no-gi-gi-tsu
 probs4: ya-no-gi-ki-ho-ka-mi-no-gi-tsu-tsu
 ya-no-gi-ki-ko-ka-mi-no-gi-gi-tsu
 ki-gi-no
+
+3d, 99, 3:
+paint: tsu-e-su-o12-zu-no-zu-mi3
+fixed: hi-e-o12-ka-zu-mi3
+nice: zu-ki-ri-e-zu-gi-o13-ta-do
+blob: ma-ki-e-o13-ri-do-gi-chi
+lifestream: ma-ki-to-e-o13-ri-do-gi-chi

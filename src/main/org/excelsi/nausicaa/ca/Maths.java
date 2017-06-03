@@ -19,6 +19,10 @@ public final class Maths {
         return result;
     }
 
+    public static int abs(final int v) {
+        return v<0?-v:v;
+    }
+
     public static int excl(int v) {
         //System.err.print(v+" => ");
         int res = v;
