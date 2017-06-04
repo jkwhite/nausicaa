@@ -73,7 +73,7 @@ public final class Genome {
             }
         };
         final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(a)));
-        int max = 1+r.nextInt(3);
+        int max = 1+r.nextInt(cs.size()/4);
         for(int i=0;i<max;i++) {
             final Mutator m = mutators[r.nextInt(mutators.length)];
             m.mutate(cs);

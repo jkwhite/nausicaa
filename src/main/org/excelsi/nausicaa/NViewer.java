@@ -295,6 +295,15 @@ public class NViewer extends JFrame implements UIActions {
         JMenuItem wrain = pal.add(wrains);
         wrain.setText("Wrapped Spectrum");
 
+        AbstractAction wbrains = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                getActiveCA().getRandom().nextBoolean();
+                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), true, getActiveCA().archetype().colors()/2)));
+            }
+        };
+        JMenuItem wbrain = pal.add(wbrains);
+        wbrain.setText("Wrapped Black Spectrum");
+
         AbstractAction wdrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 getActiveCA().getRandom().nextBoolean();
