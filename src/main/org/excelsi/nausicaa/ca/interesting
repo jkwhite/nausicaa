@@ -206,6 +206,16 @@ patchwork: ki-to-ko-mu-me-no-ya-zu
 3d, 99, d3, 0.84:
 overstellar interdrive: do-mu-ki-mi2-e-go-o7-ya-o13-no-to-go-ya-a4-i-ya-o5-a1-me-gi-ku
                         do-mu-ki-mi2-e-go-o7-ya-o13-no-to-go-ya-a4-i-ya-ki-a1-me-gi-ku
+                        ki-mi2-go-o7-ya-o13-to-no-a23-ya-a4-i-ya-o5-a1-gi-ku
+                        grow: ki-mi2-go-o7-ya-o13-to-no-a23-ya-a20-i-ya-o5-a1-gi-ku
+                            a20 - mults of 4
+                        ripple 0.6: ki-mi2-go-o7-ya-o13-to-no-a23-ya-a48-i-ya-o5-a1-gi-ku
+                            ki-mi2-go-o7-ya-o13-to-no-a23-ya-a48-i-ya-o5-a1-gi-ku
+                        luminiferousaether: ki-mi5-go-o13-ya-o13-to-no-a23-ya-a48-i-ya-o13-a1-gi-ku
+                            a23: residual bounce energy: 25, 33
+                            a1: odd numbers, secondary bounce energy: 3
+                            a48: tertiary bounce, speed?: 40
+                                            0.42, 7
 
 2d, 8:
 nicetown: ya-ki-a9-ya-ba
