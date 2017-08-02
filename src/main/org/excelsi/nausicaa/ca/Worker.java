@@ -47,7 +47,9 @@ public class Worker {
         for(int i=_y1;i<_y2;i++) {
             for(int j=_x1;j<_x2;j++) {
                 for(int k=0;k<p1.getDepth();k++) {
-                    p1.getBlock(_pattern, j-_size, i-1, k-1, /*dx*/ 3, /*dy*/ 3, 3, 0);
+                    final int d = _size*2+1;
+                    //p1.getBlock(_pattern, j-_size, i-1, k-1, /*dx*/ 3, /*dy*/ 3, 3, 0);
+                    p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, d, 0);
                     p2.setCell(j, i, k, _wp.next(0, _pattern));
                 }
             }
@@ -66,11 +68,13 @@ public class Worker {
         int mh = p1.getHeight()/2;
         int tw = p1.getWidth();
         int th = p1.getHeight();
+        final int d = _size*2+1;
         for(int i=_y1;i<_y2;i++) {
             for(int j=_x1;j<_x2;j++) {
                 counts++;
                 //System.err.println(String.format("working: %d,%d", j, i));
-                p1.getBlock(_prev, j-_size, i-1, /*dx*/ 3, /*dy*/ 3, 0);
+                //p1.getBlock(_prev, j-_size, i-1, /*dx*/ 3, /*dy*/ 3, 0);
+                p1.getBlock(_prev, j-_size, i-_size, /*dx*/ d, /*dy*/ d, 0);
                 int idx = 0;
                 for(int k=0;k<_prev.length;k++) {
                     _pattern[k] = (byte) (_prev[k]);

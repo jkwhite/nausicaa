@@ -31,4 +31,16 @@ public class Pools {
     public static ExecutorService core() {
         return _cores;
     }
+
+    public static ExecutorService named(final String name, final int size) {
+        return Executors.newFixedThreadPool(size, new ThreadFactory() {
+            long n = 0;
+            public Thread newThread(Runnable r) {
+                Thread t = new Thread(r);
+                t.setName(name+"-"+n);
+                n++;
+                return t;
+            }
+        });
+    }
 }

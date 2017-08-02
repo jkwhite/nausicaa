@@ -453,6 +453,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
 
     public static class MachineElf implements RuleLogic {
         private final Machine _m;
+        private long _c;
 
 
         public MachineElf(Machine m) {
@@ -460,6 +461,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         }
 
         @Override public byte next(byte[] pattern) {
+            //if(++_c%100==0) System.err.print("-");
             return _m.compute(pattern);
         }
 

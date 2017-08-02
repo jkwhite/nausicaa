@@ -5,8 +5,10 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.swing.SwingUtilities;
 import org.excelsi.nausicaa.ca.Plane;
+import org.excelsi.nausicaa.ca.Pools;
 
 
 public class Animation extends Thread implements TimelineListener, ConfigListener {
@@ -17,9 +19,11 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
     private int _steps;
     private State _state = State.animate;
     private long _delay;
+    private int _version;
 
 
     public Animation(Config config, PlaneDisplayProvider f, Timeline timeline, int steps) {
+        super("Animation");
         _config = config;
         _f = f;
         _timeline = timeline;
@@ -57,10 +61,11 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         interrupt();
         while(isAlive()) {
             try {
+                _state = State.die;
                 Thread.sleep(25);
             }
             catch(InterruptedException e) {
-                break;
+                //break;
             }
         }
         System.err.println("stopped animator");
@@ -87,15 +92,18 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
     }
 
     public void runFutures() {
+        final int version = _version;
         PlaneDisplay[] ds = _f.getDisplays();
         DisplayAnimator[] da = new DisplayAnimator[ds.length];
-        ExecutorService compute = Executors.newFixedThreadPool(Math.min(4,ds.length));
-        ExecutorService render = Executors.newFixedThreadPool(Math.min(4,ds.length));
+        //ExecutorService compute = Executors.newFixedThreadPool(Math.min(4,ds.length));
+        //ExecutorService render = Executors.newFixedThreadPool(Math.min(4,ds.length));
+        ExecutorService compute = Pools.named("compute", Math.min(4,ds.length));
+        ExecutorService render = Pools.named("render", Math.min(4,ds.length));
         for(int i=0;i<ds.length;i++) {
             da[i] = new DisplayAnimator(ds[i], compute);
         }
         try {
-            while(_state==State.animate) {
+top:        while(_state==State.animate) {
                 long start = System.currentTimeMillis();
                 for(int i=0;i<da.length;i++) {
                     if(_state!=State.animate||isInterrupted()) {
@@ -119,6 +127,20 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         finally {
             compute.shutdownNow();
             render.shutdownNow();
+            /*
+            try {
+                compute.awaitTermination(10, TimeUnit.SECONDS);
+            }
+            catch(Exception e) {
+                System.err.println("compute failed to terminate");
+            }
+            try {
+                render.awaitTermination(10, TimeUnit.SECONDS);
+            }
+            catch(Exception e) {
+                System.err.println("render failed to terminate");
+            }
+            */
         }
     }
 

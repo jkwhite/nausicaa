@@ -117,6 +117,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
                 //}
                 final Plane frameP1 = p1;
                 final Plane frameP2 = p2;
+                //System.err.print("z");
                 for(int i=0;i<workers.length;i++) {
                     final int w = i;
                     futures[i] = pool.submit(()->workers[w].frame(frameP1, frameP2));

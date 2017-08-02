@@ -142,6 +142,12 @@ ta-hi-ma-gi6-mu-do-zu-i-ka-ku-ma-gi5
 3d, 99, 3:
 hi-zu-ho-su-su
 gi5-ho-ro6-ne-ki-zu-ji-ko
+shifting clouds: su-ku-to-hi-u-ya-no-mi5
+                 su-ku-u-ya-no-mi5
+slow burn: ki-tsu-ku-ya-tsu-gi-do
+crawling creatures: ki-gi-o13-o13-o13-no-ri-chi
+more more cells: o13-go-mi3-ki-ki-gi-do-o13-ri-do-ro1
+                 go-mi3-ki-ki-gi-do-ri-do-ro1
 
 3d, 37, 3:
 spectrum: hi-ta-ne-no-jo-ka-ne-ki-ri-do-ro1-gi
@@ -207,7 +213,7 @@ patchwork: ki-to-ko-mu-me-no-ya-zu
 overstellar interdrive: do-mu-ki-mi2-e-go-o7-ya-o13-no-to-go-ya-a4-i-ya-o5-a1-me-gi-ku
                         do-mu-ki-mi2-e-go-o7-ya-o13-no-to-go-ya-a4-i-ya-ki-a1-me-gi-ku
                         ki-mi2-go-o7-ya-o13-to-no-a23-ya-a4-i-ya-o5-a1-gi-ku
-                        grow: ki-mi2-go-o7-ya-o13-to-no-a23-ya-a20-i-ya-o5-a1-gi-ku
+                        grow wormhole 0.84: ki-mi2-go-o7-ya-o13-to-no-a23-ya-a20-i-ya-o5-a1-gi-ku
                             a20 - mults of 4
                         ripple 0.6: ki-mi2-go-o7-ya-o13-to-no-a23-ya-a48-i-ya-o5-a1-gi-ku
                             ki-mi2-go-o7-ya-o13-to-no-a23-ya-a48-i-ya-o5-a1-gi-ku
@@ -221,6 +227,80 @@ overstellar interdrive: do-mu-ki-mi2-e-go-o7-ya-o13-no-to-go-ya-a4-i-ya-o5-a1-me
                          cells: 0.2,7: jo-ki-mi5-go-o13-ya-o13-to-no-a33-ya-mi9-a40-i-ya-o13-a3-gi-ku
                          great: 0.2, 7: jo-me-ki-mi5-go-o13-ya-o13-to-no-a33-ya-i-mi10-a40-i-ya-o13-a3-gi-ku
                          more cells, 0.2,3: to-ki-mi5-go-o13-no-u-tsu-ki-ya-i-ro9-a40-i-jo-ki-gi-ku-ho
+scratchy: ku-no-i-hu-ne-hu-me-jo-a3-i-i-tsu-ki-u-zu-ki-ya-a17-mi4-gi-gi-tsu-ta-ka-su-mi-su
+long: ki-gi-i-ra-ta-ho-ne-ko-me-a3-jo-i-i-tsu-ki-u-ki-zu-a17-mi4-gi-gi-ka-ta-su-mi-ko
+endoftime: gi-i-ra-ta-ho-ne-ko-me-a3-jo-ho-i-tsu-ki-ki-zu-a17-mi4-gi-mi9-gi-ka-su-mi-ko
+livinglattice: ra-gi-ra-ta-ne-e-me-a3-ho-jo-tsu-ki-ki-o4-ji-mi4-gi-mi9-gi-su-mi-ku-zu-mi
+    ra-gi-ra-ta-do-e-me-a3-ho-jo-tsu-ki-o4-ki-ji-mi4-gi-mi9-gi-su-mi-ku-mi4-zu-mi-ka
+    ra-gi-ra-mi-o13-e-ho-jo-tsu-ki-o4-ki-ki-ji-mi4-gi-mi9-mi-gi-ku-mi4-zu-ka-mi-ka
+
+
+
+morecells: to-ki-mi5-go-o13-no-u-tsu-ki-ya-i-ro9-a40-i-jo-ki-gi-ku-ho
+
+3d, 111:
+old nemesis: to-zu-ki-be-e-ki-hu-ba-ka-o13-ma-ho-o13-ya-no-ka-e
+             to-zu-ki-be-e-ki-hu-ba-o8-o13-ma-ho-o13-ya-no-ka-e
+oi3: no-e-ta-ka-zu-su-ki-o13-me-tsu-hu-ki-zu-ho-ki-hu-o13-mi5-a11-o13-o13-e-zu
+     no-e-ta-ka-su-ki-o13-me-tsu-hu-ki-zu-ho-ki-hu-o13-mi5-a11-o13-e-zu
+     no-e-ta-su-ki-o13-me-ma-tsu-hu-ki-zu-ho-ki-hu-be-mi5-a11-o13-e-zu
+     e-su-ki-o13-me-ma-hu-ma-ki-zu-ho-ki-hu-be-mi5-a11-o13-e-zu
+dense lava: bu-ho-e-me-su-o13-ka-ma-ra-hu-ho-ma-ki-zu-ho-su-be-i-a11-o13-zu-e-ku-mi
+
+3d, 111, 3, 2:
+lively clouds: psychedelerium: no-ta-no-ta-bo-hu
+    no-ta-no-no-ta-bo-hu
+    no-ta-no-ta-bo-ku-ka
+psychdelic: zu-su-go-ka-ko-i-gi
+    zu-a23-su-go-ka-ko-i-gi
+    su-zu-su-go-ka-ko-i-gi
+    su-zu-go-su-ka-ko-i-gi
+    go-zu-su-bu-ko-i-gi
+    waves: su-zu-go-ka-ko-i-gi
+        ki-zu-su-bu-ko-i-gi
+
+3d, 110, 3, 2:
+  lava: a44-hi-ra-ne-hi-do-e
+  order to chaos:ta-mu-i-no-ko-ta-o62-hu-o1-ya-hi-ya-mi7 b=0.7
+  d1, cells: hi-u-i-chi-go-mi4-gi-ho-mi
+    hi-ka-i-chi-go-mi4-gi-ho-mi
+  infinite zoom: ka-no-ho-a7-hi-no-mu-mi-chi-o62-ki-gi-mi b=0, d=1
+      o0-a7-hi-no-mu-mi-o62-ki-gi
+      o62-a6-hi-no-mu-mi-o62-ki-gi
+      ya-a7-hi-no-mu-mi-ya-ki-gi
+      ya-a-nana-hi-no-mu-mi-ya-ki-gi
+        ka: or
+        no: push_n
+        ho: divide
+        a7: constant 7
+        hi: histo
+        no: push_n
+        mu: multiply
+        mi: sum
+        chi: min
+        o62: self
+        ki: push_surround
+        gi: avg
+        mi: sum
+        (avg(cons((matrix)(sum(top(cons((histogram)(7))))))))
+  flyers: ra-bo-hi-do-mi9-hu-me-mi3-do
+  1: crawling creatures:
+    ku-a3-jo-hi-ya-ji-ho-me-ro8-mi
+  3: hmmm: ho-hi-me-mi-ya-ri-hu
+     each one reach one: hi-me-mi-o2-ri-hu
+  evolving squares: a7-hi-zu-ya-su-do-mi-o62-ki-gi, b=0.4
+
+0-0-0-7
+histo
+pop frequency of max color
+push pattern index of frequency of max color
+multiply with freuency of 2nd max color
+sum everything
+noop: min
+push self
+push surrounding
+average everything
+sum everything
 
 2d, 8:
 nicetown: ya-ki-a9-ya-ba
@@ -301,3 +381,8 @@ fixed: hi-e-o12-ka-zu-mi3
 nice: zu-ki-ri-e-zu-gi-o13-ta-do
 blob: ma-ki-e-o13-ri-do-gi-chi
 lifestream: ma-ki-to-e-o13-ri-do-gi-chi
+
+3d, 8, 3, 2:
+ki-ki-mu-i-ki-bu-me-zu-me-ji-ri
+congeries: hi-ki-ki-ka-zu-su-a15-e
+eating: e-e-zu-ma-ki-o12-zu-ji-me-gi

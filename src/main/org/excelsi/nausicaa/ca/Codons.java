@@ -71,6 +71,9 @@ public class Codons {
     public static final String EXCLAMATORY = "ha";
     public static final String SUPERSYMMETRY = "hu";
     public static final String ROT_VEC_N = "ba";
+    public static final String GT = "be";
+    public static final String LT = "bu";
+    public static final String NEGATE = "bo";
 
     public static Codon codon(final String s, final Archetype a) {
         //System.err.println("op '"+s+"'");
@@ -158,13 +161,19 @@ public class Codons {
                 return new Supersymmetry(a.colors()-1);
             case ROT_VEC_N:
                 return new RotVecN(a.sourceLength());
+            case GT:
+                return new GreaterThan();
+            case LT:
+                return new LessThan();
+            case NEGATE:
+                return new Negate();
             default:
                 throw new IllegalStateException("unknown opcode '"+code+"'");
         }
     }
 
     public static class Nonzero implements Codon {
-        private final int[] _t = new int[256];
+        private final int[] _t = new int[1024];
         private final int _c;
 
         public Nonzero(int c) {
@@ -210,7 +219,7 @@ public class Codons {
     }
 
     public static class Sum implements Codon {
-        private final int[] _t = new int[256];
+        private final int[] _t = new int[1024];
 
         @Override public String code() {
             return SUM;
@@ -229,7 +238,7 @@ public class Codons {
     public abstract static class Aggregate implements Codon {
         private final String _n;
         private final int _c;
-        private final int[] _t = new int[256];
+        private final int[] _t = new int[1024];
 
         public Aggregate(String n, int c) {
             _n = n;
@@ -287,7 +296,7 @@ public class Codons {
 
     public static class Skip implements Codon {
         private final int _c;
-        private final int[] _t = new int[100];
+        private final int[] _t = new int[1024];
 
         public Skip(int c) {
             _c = c;
@@ -307,7 +316,7 @@ public class Codons {
     }
 
     public static class SkipN implements Codon {
-        private final int[] _t = new int[256];
+        private final int[] _t = new int[1024];
 
         @Override public String code() {
             return SKIP_N;
@@ -551,12 +560,12 @@ public class Codons {
     public static class Pow extends Binary {
         public Pow() { super(POW); }
         @Override int expr(int v1, int v2) {
-            long st = System.currentTimeMillis();
-            int v = Maths.pow(v1,Math.abs(v2));
-            long en = System.currentTimeMillis();
-            if(en-st>2000) {
-                System.err.println("took "+(en-st)+" for pow("+v1+","+v2+")");
-            }
+            //long st = System.currentTimeMillis();
+            int v = Maths.pow(v1,Math.max(0,Math.abs(v2)));
+            //long en = System.currentTimeMillis();
+            //if(en-st>2000) {
+                //System.err.println("took "+(en-st)+" for pow("+v1+","+v2+")");
+            //}
             return v;
         }
     }
@@ -668,6 +677,20 @@ public class Codons {
         }
     }
 
+    public static class GreaterThan extends Binary {
+        public GreaterThan() { super(GT); }
+        @Override int expr(int v1, int v2) {
+            return v1>v2?1:0;
+        }
+    }
+
+    public static class LessThan extends Binary {
+        public LessThan() { super(LT); }
+        @Override int expr(int v1, int v2) {
+            return v1<v2?1:0;
+        }
+    }
+
     public static class And extends Binary {
         public And() { super(AND); }
         @Override int expr(int v1, int v2) {
@@ -722,6 +745,17 @@ public class Codons {
         }
     }
 
+    public static class Negate implements Codon {
+        @Override public String code() {
+            return NEGATE;
+        }
+
+        @Override public void op(byte[] p, Tape t) {
+            int v = t.pop();
+            t.push(-v);
+        }
+    }
+
     public static class Supersymmetry implements Codon {
         private final int _max;
 
@@ -767,11 +801,14 @@ public class Codons {
 
         @Override public void op(byte[] p, Tape t) {
             int dist = t.pop();
-            int len = Math.min(t.pop(), _v.length);
+            int len = Math.min(Math.max(0,t.pop()), _v.length);
             //int ipeek = t.peek();
             int m = t.popAll(_v, len);
             for(int i=0;i<len;i++) {
                 int dest = (i+dist)%len;
+                if(dest<0) {
+                    dest = dest + len;
+                }
                 _vt[dest] = _v[i];
             }
             t.pushAll(_vt, len);

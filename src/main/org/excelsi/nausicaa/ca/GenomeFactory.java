@@ -39,7 +39,7 @@ public class GenomeFactory {
             weight(1, new NotEquals()),
             weight(1, new Intersects()),
             weight(1, new If()),
-            weight(1, new Time()),
+            //weight(1, new Time()),
             weight(1, new Nonzero(-1)),
             weight(1, new Push((a.sourceLength()-1)/2)),
             weight(1, new PushN()),
@@ -51,6 +51,9 @@ public class GenomeFactory {
             weight(1, new Exclamatory()),
             weight(1, new Supersymmetry(a.colors()-1)),
             weight(1, new RotVecN(a.sourceLength())),
+            weight(1, new GreaterThan()),
+            weight(1, new LessThan()),
+            weight(1, new Negate()),
             weight(1, new Mod())
         );
     }

@@ -63,7 +63,7 @@ public class Actions {
         //Things.centerWindow(v);
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(2,2));
+        JPanel top = new JPanel(new GridLayout(3,2));
 
         top.add(new JLabel("Dimensions"));
         final JTextField alpha = new JTextField();
@@ -77,6 +77,12 @@ public class Actions {
         mc.setColumns(3);
         top.add(mc);
 
+        top.add(new JLabel("Size"));
+        final JTextField siz = new JTextField();
+        siz.setText(config.getVariable("default_size", "1"));
+        siz.setColumns(3);
+        top.add(siz);
+
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
         JButton ne = new JButton("Ok");
@@ -87,9 +93,10 @@ public class Actions {
                 d.dispose();
                 Integer dims = Integer.parseInt(alpha.getText());
                 Integer colors = Integer.parseInt(mc.getText());
-                int size = 1;
+                Integer size = Integer.parseInt(siz.getText());
                 config.setVariable("default_dimensions", alpha.getText());
                 config.setVariable("default_colors", mc.getText());
+                config.setVariable("default_size", siz.getText());
                 Archetype a = new Archetype(dims, size, colors);
                 Random rand = new Random();
                 Ruleset rs = new ComputedRuleset(a);
