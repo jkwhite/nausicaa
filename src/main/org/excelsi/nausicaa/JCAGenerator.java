@@ -19,7 +19,7 @@ public class JCAGenerator extends JDialog {
         super(root, "Generate automata to disk");
         final Rule rule = ca.getRule();
         final JDialog d = this;
-        final String _lastWidth = config.<String>getVariable("generatorWidth", "1900");
+        final String _lastWidth = config.<String>getVariable("generatorWidth", "1920");
         final String _lastHeight = config.<String>getVariable("generatorHeight", "1080");
         final String _lastFrames = config.<String>getVariable("generatorFrames", "1000");
         JPanel p = new JPanel(new BorderLayout());
