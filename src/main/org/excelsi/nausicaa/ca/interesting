@@ -291,6 +291,26 @@ psychdelic: zu-su-go-ka-ko-i-gi
   evolving squares: a7-hi-zu-ya-su-do-mi-o62-ki-gi, b=0.4
   surprising: hi-zu-su-ho-ya-do-mi-o4-ta-ku-o62-ki-hu-e-gi
   circly: do-o62-ya-ho-hi-e-su-mi-ku-o62-ki-gi-hi-ta
+  explosions: o62-ro6-hi-e-ta-i-o62-ki-gi-hi-ta
+              o62-ro6-hi-e-ta-chi-i-gi-ki-gi-hi-ta
+              hu-o62-ya-bu-e-mi-ki-be-i-gi-hi-ta-mi7
+  everlasting: mi-jo-hi-ta-ho-mi7-hi-e-ki-do-zu-gi, b=0.7
+               mi-jo-hi-o62-ho-mi7-hi-e-ki-do-zu-gi
+               mi-jo-hi-ta-ho-mi7-hi-e-ki-do-mi8-zu-gi
+   binpacking: mi-hi-jo-ta-bu-ho-go-mi7-hi-ji-ki-do-mi8-zu-gi
+   eternal squares: mi-ta-bu-ho-go-mi7-hi-ki-do-zu-gi
+   still life: ka-ki-no-zu-ne-mi3-gi-zu
+   rough: ki-tsu-no-ne-zu-mi3-gi-zu
+          tsu-ki-be-no-hi-zu-su-tsu-gi-zu
+
+3d, 110, 1, 3;
+  blot: ra-ra-hi-zu-su-ku-ho-u
+  interesting: i-hi-ne-ya-bo-zu-tsu-ki-zu-gi-su
+  outline: chi-gi-no-a2-i-be-gi-a20-tsu-hi-ma-ku-zu-tsu-ro2-ri-hu
+
+
+3d, 110, 1, 3;
+  ma-chi-bo-ko-hi-ho-o171-zu-e
 
 0-0-0-7
 histo

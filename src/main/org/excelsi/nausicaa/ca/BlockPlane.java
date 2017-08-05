@@ -217,7 +217,8 @@ public final class BlockPlane implements Plane {
 
     private final int normX(int x) {
         if(x<0) {
-            x = _w-1;
+            x = (_w+x)%_w;
+            if(x<0) throw new IllegalArgumentException("neg x: "+x);
         }
         else if(x>=_w) {
             x = x % _w;
@@ -227,7 +228,7 @@ public final class BlockPlane implements Plane {
 
     private final int normY(int y) {
         if(y<0) {
-            y = _h-1;
+            y = (_h+y)%_h;
         }
         else if(y>=_h) {
             y = y % _h;
@@ -237,7 +238,7 @@ public final class BlockPlane implements Plane {
 
     private final int normZ(int z) {
         if(z<0) {
-            z = _d-1;
+            z = (_d+z)%_d;
         }
         else if(z>=_d) {
             z = z % _d;

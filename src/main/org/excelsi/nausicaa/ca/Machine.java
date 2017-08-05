@@ -15,7 +15,7 @@ public class Machine {
         _a = a;
         _g = g;
         _prg = g.codons(a);
-        _t = new Tape(512);
+        _t = new Tape(2048);
     }
 
     public Machine copy() {
