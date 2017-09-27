@@ -5,7 +5,7 @@ import java.util.Random;
 
 
 public interface Codon {
-    void op(byte[] p, Tape t);
+    void op(int[] p, Tape t);
     String code();
     default String generate(Random r) {
         return code();

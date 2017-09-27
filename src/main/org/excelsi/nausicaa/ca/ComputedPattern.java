@@ -11,19 +11,19 @@ import java.util.Random;
 public final class ComputedPattern implements Pattern, Mutatable {
     public static final RuleLogic IDENTITY = new RARule("id",
         new Reducer() {
-            @Override public byte reduce(byte[] p) {
-                return (byte)(p[(p.length-1)/2]);
+            @Override public int reduce(int[] p) {
+                return (int)(p[(p.length-1)/2]);
             }
             @Override public Reducer copy() { return this; }
         },
         new Activator() {
-            @Override public byte activate(byte b) { return b; }
+            @Override public int activate(int b) { return b; }
             @Override public Activator copy() { return this; }
         });
 
     public static final RuleLogic LIFE = new RARule("life",
         new Reducer() {
-            @Override public byte reduce(byte[] p) {
+            @Override public int reduce(int[] p) {
                 int t=PatternOp.sumo(p);
                 int r;
                 if(p[4]==0) {
@@ -32,12 +32,12 @@ public final class ComputedPattern implements Pattern, Mutatable {
                 else {
                     r = t>=2&&t<=3?1:0;
                 }
-                return (byte)r;
+                return (int)r;
             }
             @Override public Reducer copy() { return this; }
         },
         new Activator() {
-            @Override public byte activate(byte b) { return b; }
+            @Override public int activate(int b) { return b; }
             @Override public Activator copy() { return this; }
         });
 
@@ -48,17 +48,17 @@ public final class ComputedPattern implements Pattern, Mutatable {
     public static RuleLogic cyclic(final Archetype a) {
         return new RARule("cyclic",
             new Reducer() {
-                @Override public byte reduce(byte[] p) {
+                @Override public int reduce(int[] p) {
                     int t = p[4]+1;
                     if(t>=a.colors()) {
                         t=0;
                     }
-                    return (byte)t;
+                    return (int)t;
                 }
                 @Override public Reducer copy() { return this; }
             },
             new Activator() {
-                @Override public byte activate(byte b) { return b; }
+                @Override public int activate(int b) { return b; }
                 @Override public Activator copy() { return this; }
             });
     }
@@ -220,7 +220,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
             _ops = ops;
         }
 
-        @Override public byte reduce(byte[] p) {
+        @Override public int reduce(int[] p) {
             final int[] q = _aop.op(p);
             int t = q[0];
             int opidx = 0;
@@ -231,7 +231,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
                 }
             }
             if(t<0) t=0;
-            return (byte)t;
+            return (int)t;
         }
 
         @Override public HiddenLayerReducer copy() {
@@ -251,11 +251,11 @@ public final class ComputedPattern implements Pattern, Mutatable {
             _a = a;
         }
 
-        @Override public byte activate(byte b) {
+        @Override public int activate(int b) {
             int v = _red.op(b,_a.colors());
             if(v<0) v=0;
             if(v>=_a.colors()) v=_a.colors()-1;
-            return (byte) v;
+            return (int) v;
         }
 
         @Override public BoundedActivator copy() {
@@ -363,7 +363,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         final int[] order = {1, 7, 3, 5, 0, 2, 6, 8, 4};
         return new RARule(n.toString(),
             new Reducer() {
-                @Override public byte reduce(byte[] p) {
+                @Override public int reduce(int[] p) {
                     int t = p[order[0]];
                     int opidx = 0;
                     for(int i=1;i<p.length;i++) {
@@ -373,13 +373,13 @@ public final class ComputedPattern implements Pattern, Mutatable {
                         }
                     }
                     if(t<0) t=0;
-                    return (byte)t;
+                    return (int)t;
                 }
                 @Override public Reducer copy() { return this; }
             },
             new Activator() {
-                @Override public byte activate(byte b) {
-                    return (byte)red.op(b,a.colors());
+                @Override public int activate(int b) {
+                    return (int)red.op(b,a.colors());
                 }
                 @Override public Activator copy() { return this; }
             });       
@@ -399,6 +399,11 @@ public final class ComputedPattern implements Pattern, Mutatable {
     }
 
     @Override public byte next(int pattern, final byte[] p2) {
+        //return _logic.next(p2);
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public int next(int pattern, final int[] p2) {
         return _logic.next(p2);
     }
 
@@ -412,7 +417,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
     }
 
     public interface RuleLogic {
-        byte next(byte[] pattern);
+        int next(int[] pattern);
         RuleLogic copy();
         default RuleLogic mutate(Archetype a, GenomeFactory gf, Random r) {
             return this;
@@ -433,7 +438,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
             _a = a;
         }
 
-        @Override public byte next(byte[] pattern) {
+        @Override public int next(int[] pattern) {
             //System.err.print("pat: "+Patterns.formatPattern(pattern));
             //final byte b1 = _r.reduce(pattern);
             //System.err.print("\tred: "+(int)b1);
@@ -460,7 +465,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
             _m = m;
         }
 
-        @Override public byte next(byte[] pattern) {
+        @Override public int next(int[] pattern) {
             //if(++_c%100==0) System.err.print("-");
             return _m.compute(pattern);
         }
@@ -487,12 +492,12 @@ public final class ComputedPattern implements Pattern, Mutatable {
     }
 
     public interface Reducer {
-        byte reduce(byte[] b);
+        int reduce(int[] b);
         Reducer copy();
     }
 
     public interface Activator {
-        byte activate(byte target);
+        int activate(int target);
         Activator copy();
     }
 }

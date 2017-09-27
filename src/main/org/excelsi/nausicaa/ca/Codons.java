@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 
 public class Codons {
+    private static final int BUF_SIZE = 32768;
     //public static final String SUM = "s";
     //public static final String PUSH = "p";
     //public static final String PUSH_SURROUND = "pO";
@@ -173,7 +174,7 @@ public class Codons {
     }
 
     public static class Nonzero implements Codon {
-        private final int[] _t = new int[1024];
+        private final int[] _t = new int[BUF_SIZE];
         private final int _c;
 
         public Nonzero(int c) {
@@ -184,7 +185,7 @@ public class Codons {
             return _c==-1?NON_ZERO:(NON_ZERO+_c);
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int m = t.popAll(_t, _c);
             for(int i=0;i<m;i++) {
                 if(_t[i]!=0) {
@@ -205,7 +206,7 @@ public class Codons {
             return HISTO;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             for(int i=0;i<_h.length;i++) {
                 _h[i] = 0;
             }
@@ -219,13 +220,13 @@ public class Codons {
     }
 
     public static class Sum implements Codon {
-        private final int[] _t = new int[1024];
+        private final int[] _t = new int[BUF_SIZE];
 
         @Override public String code() {
             return SUM;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int m = t.popAll(_t, -1);
             int s = 0;
             for(int i=0;i<m;i++) {
@@ -238,7 +239,7 @@ public class Codons {
     public abstract static class Aggregate implements Codon {
         private final String _n;
         private final int _c;
-        private final int[] _t = new int[1024];
+        private final int[] _t = new int[BUF_SIZE];
 
         public Aggregate(String n, int c) {
             _n = n;
@@ -249,7 +250,7 @@ public class Codons {
             return _c==-1?_n:(_n+_c);
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int m = t.popAll(_t, _c);
             int a = agg(_t, m);
             t.push(a);
@@ -264,7 +265,7 @@ public class Codons {
 
     public abstract static class AggregateN implements Codon {
         private final String _n;
-        private final int[] _t = new int[1024];
+        private final int[] _t = new int[BUF_SIZE];
 
         public AggregateN(String n) {
             _n = n;
@@ -274,7 +275,7 @@ public class Codons {
             return _n;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int s = t.pop();
             if(s>=_t.length) {
                 s = s%_t.length;
@@ -296,7 +297,7 @@ public class Codons {
 
     public static class Skip implements Codon {
         private final int _c;
-        private final int[] _t = new int[1024];
+        //private final int[] _t = new int[1024];
 
         public Skip(int c) {
             _c = c;
@@ -306,8 +307,9 @@ public class Codons {
             return _c==-1?SKIP:(SKIP+_c);
         }
 
-        @Override public void op(byte[] p, Tape t) {
-            int m = t.popAll(_t, _c);
+        @Override public void op(int[] p, Tape t) {
+            //int m = t.popAll(_t, _c);
+            t.skip(_c);
         }
 
         @Override public String generate(Random r) {
@@ -316,13 +318,13 @@ public class Codons {
     }
 
     public static class SkipN implements Codon {
-        private final int[] _t = new int[1024];
+        //private final int[] _t = new int[1024];
 
         @Override public String code() {
             return SKIP_N;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int s = t.pop();
             try {
                 //int m = t.popAll(_t, s);
@@ -350,7 +352,7 @@ public class Codons {
             return PUSH+_p;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             t.push(p[_p]);
         }
 
@@ -367,7 +369,7 @@ public class Codons {
             return PUSH_N;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             long s = t.pop();
             long s2 = s;
             if(s2>=p.length) {
@@ -395,7 +397,7 @@ public class Codons {
             return PUSH_S;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             t.push(p[p.length/2]);
         }
 
@@ -415,7 +417,7 @@ public class Codons {
             return CONS+_p;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             t.push(_p);
         }
 
@@ -429,7 +431,7 @@ public class Codons {
             return PUSH_SURROUND;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int mid = p.length/2;
             for(int i=0;i<mid;i++) {
                 t.push(p[i]);
@@ -445,7 +447,7 @@ public class Codons {
             return PUSH_ALL;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             for(int i=0;i<p.length;i++) {
                 t.push(p[i]);
             }
@@ -457,7 +459,7 @@ public class Codons {
             return INTERSECT;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int up = t.pop();
             int low = t.pop();
             int mid = t.pop();
@@ -471,7 +473,7 @@ public class Codons {
             return EQUAL;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int v1 = t.pop();
             int v2 = t.pop();
             int eq = (v1==v2)?1:0;
@@ -486,7 +488,7 @@ public class Codons {
             return TIME;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             t.push(_t);
         }
 
@@ -500,7 +502,7 @@ public class Codons {
             return NOT_EQUAL;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int v1 = t.pop();
             int v2 = t.pop();
             int eq = (v1!=v2)?1:0;
@@ -519,7 +521,7 @@ public class Codons {
             return _code;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int v1 = t.pop();
             int v2 = t.pop();
             int m = expr(v1, v2);
@@ -724,7 +726,7 @@ public class Codons {
             return IF;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int cond = t.pop();
             int fl = t.pop();
             int tr = t.pop();
@@ -738,7 +740,7 @@ public class Codons {
             return DUPLICATE;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int v = t.pop();
             t.push(v);
             t.push(v);
@@ -750,7 +752,7 @@ public class Codons {
             return NEGATE;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int v = t.pop();
             t.push(-v);
         }
@@ -767,7 +769,7 @@ public class Codons {
             return SUPERSYMMETRY;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int v = t.pop();
             int r = _max-v;
             t.push(r);
@@ -779,7 +781,7 @@ public class Codons {
             return POW;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int v = t.pop();
             int x = Maths.excl(v);
             t.push(x);
@@ -799,7 +801,7 @@ public class Codons {
             return ROT_VEC_N;
         }
 
-        @Override public void op(byte[] p, Tape t) {
+        @Override public void op(int[] p, Tape t) {
             int dist = t.pop();
             int len = Math.min(Math.max(0,t.pop()), _v.length);
             //int ipeek = t.peek();

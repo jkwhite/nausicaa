@@ -9,7 +9,7 @@ public class Worker {
     private final Pattern _wp;
     private final int _size;
     private final int[] _prev;
-    private final byte[] _pattern;
+    private final int[] _pattern;
     private final int[] _pow;
 
     public Worker(Pattern p, int x1, int y1, int x2, int y2) {
@@ -21,7 +21,7 @@ public class Worker {
         _size = _wp.archetype().size();
         final int colors = _wp.archetype().colors();
         _prev = new int[(int)Math.pow(2*_size+1, _wp.archetype().dims())];
-        _pattern = new byte[_prev.length];
+        _pattern = new int[_prev.length];
 
         //_pow = new int[_wp.length()];
         _pow = new int[_wp.archetype().sourceLength()];
@@ -43,7 +43,7 @@ public class Worker {
         }
     }
 
-    public void frame3d(final BlockPlane p1, final BlockPlane p2) {
+    public void frame3d(final IntBlockPlane p1, final IntBlockPlane p2) {
         for(int i=_y1;i<_y2;i++) {
             for(int j=_x1;j<_x2;j++) {
                 for(int k=0;k<p1.getDepth();k++) {
@@ -57,8 +57,8 @@ public class Worker {
     }
 
     public void frame(final Plane p1, final Plane p2) {
-        if(p1 instanceof BlockPlane) {
-            frame3d((BlockPlane)p1, (BlockPlane)p2);
+        if(p1 instanceof IntBlockPlane) {
+            frame3d((IntBlockPlane)p1, (IntBlockPlane)p2);
             return;
         }
         //validate(p1);
@@ -77,7 +77,7 @@ public class Worker {
                 p1.getBlock(_prev, j-_size, i-_size, /*dx*/ d, /*dy*/ d, 0);
                 int idx = 0;
                 for(int k=0;k<_prev.length;k++) {
-                    _pattern[k] = (byte) (_prev[k]);
+                    _pattern[k] = (int) (_prev[k]);
                     idx += _prev[k] * _pow[k];
                     //System.err.println(String.format("prev[%d]=%d, pow[%d]=%d", k, _prev[k], k, _pow[k]));
                 }
@@ -106,7 +106,7 @@ public class Worker {
                 p1.getBlock(_prev, j-_size, i-1, /*dx*/ 3, /*dy*/ 3, 0);
                 int idx = 0;
                 for(int k=0;k<_prev.length;k++) {
-                    _pattern[k] = (byte) (_prev[k]);
+                    _pattern[k] = (int) (_prev[k]);
                     idx += _prev[k] * _pow[k];
                     //System.err.println(String.format("prev[%d]=%d, pow[%d]=%d", k, _prev[k], k, _pow[k]));
                 }

@@ -22,7 +22,7 @@ public class Machine {
         return new Machine(_a, _g);
     }
 
-    public byte compute(final byte[] p) {
+    public int compute(final int[] p) {
         _t.reset();
         //d("===============");
         //d("init: "+_t);
@@ -40,7 +40,7 @@ public class Machine {
         //}
         //d("res: "+res);
         //d("===============");
-        return (byte) res;
+        return (int) res;
     }
 
     public Machine mutate(Archetype a, GenomeFactory gf, Random r) {

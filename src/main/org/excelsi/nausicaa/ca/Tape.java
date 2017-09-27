@@ -56,6 +56,9 @@ public final class Tape {
             c = _i+1;
         }
         int ret = Math.min(_i+1,c);
+        if(ret>r.length) {
+            ret = r.length;
+        }
         System.arraycopy(_t, _i+1-ret, r, 0, ret);
         //_i = -1;
         _i = Math.max(-1,_i-c);

@@ -85,7 +85,7 @@ public interface PatternOp {
         return (b1,b2)->(b2);
     }
 
-    public static int sum(final byte[] p) {
+    public static int sum(final int[] p) {
         int t=0;
         for(int i=0;i<p.length;i++) {
             t+=p[i];
@@ -93,7 +93,7 @@ public interface PatternOp {
         return t;
     }
 
-    public static int sumo(final byte[] p) {
+    public static int sumo(final int[] p) {
         int t=0;
         for(int i=0;i<p.length;i++) {
             t+=p[i];

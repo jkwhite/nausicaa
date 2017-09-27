@@ -17,8 +17,8 @@ public final class Archetype {
 
 
     public Archetype(int dims, int size, int colors) {
-        if(colors<2||colors>255) {
-            throw new IllegalArgumentException("colors must be between 2 and 255: "+colors);
+        if(colors<2) {
+            throw new IllegalArgumentException("colors must be at least 2: "+colors);
         }
         _dims = dims;
         _size = size;

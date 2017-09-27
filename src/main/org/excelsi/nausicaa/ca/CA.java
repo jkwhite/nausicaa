@@ -53,7 +53,8 @@ public final class CA {
 
     public Plane createPlane() {
         if(archetype().dims()==3) {
-            BlockPlane p = new BlockPlane(this, getWidth(), getHeight(), getDepth(), _p, BlockPlane.Mode.argb);
+            //BlockPlane p = new BlockPlane(this, getWidth(), getHeight(), getDepth(), _p, BlockPlane.Mode.argb);
+            IntBlockPlane p = new IntBlockPlane(this, getWidth(), getHeight(), getDepth(), _p);
             populatePlane(p);
             return p;
         }

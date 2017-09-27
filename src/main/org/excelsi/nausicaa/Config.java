@@ -17,7 +17,7 @@ public class Config {
     private float _scale = 1f;
     private long _animationDelay = 100;
     private boolean _forceSymmetry = true;
-    private boolean _hueVariations = true;
+    private boolean _hueVariations = false;
     private final Map<String,Object> _variables = new HashMap<>();
     private String _dir = System.getProperty("user.home");
 

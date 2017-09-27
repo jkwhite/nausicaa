@@ -47,7 +47,7 @@ public class Words implements Initializer {
         for(long idx=sidx;idx<=eidx;idx++) {
             Rule rule = new IndexedRule1d(Patterns.forIndex(_a, idx));
             //System.err.println(rule.humanize());
-            final CA ca = new CA(rule, pal, this, rand, 0, input.length(), iterations, 1);
+            final CA ca = new CA(rule, pal, this, rand, 0, input.length(), iterations, 1, 0);
             if(plane==null) {
                 plane = ca.createPlane();
             }

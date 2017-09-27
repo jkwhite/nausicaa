@@ -25,7 +25,7 @@ public class SingleInitializer implements Initializer {
                 plane.setCell(plane.getWidth()/2, plane.getHeight()/2, colors[random.nextInt(colors.length)]);
                 break;
             case 3:
-                BlockPlane bp = (BlockPlane) plane;
+                IntBlockPlane bp = (IntBlockPlane) plane;
                 for(int y=0;y<bp.getHeight();y++) {
                     for(int x=0;x<bp.getWidth();x++) {
                         for(int z=0;z<bp.getDepth();z++) {

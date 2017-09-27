@@ -258,6 +258,8 @@ psychdelic: zu-su-go-ka-ko-i-gi
     go-zu-su-bu-ko-i-gi
     waves: su-zu-go-ka-ko-i-gi
         ki-zu-su-bu-ko-i-gi
+    life repeating: gi-ko-hu-a8-ne-a26-ki-o62-to-tsu-ji-mi6-e-mi7
+        gi-ko-hu-ne-a8-be-ki-a26-bo-to-tsu-ji-mi6-e-mi7
 
 3d, 110, 3, 2:
   lava: a44-hi-ra-ne-hi-do-e
@@ -408,3 +410,7 @@ lifestream: ma-ki-to-e-o13-ri-do-gi-chi
 ki-ki-mu-i-ki-bu-me-zu-me-ji-ri
 congeries: hi-ki-ki-ka-zu-su-a15-e
 eating: e-e-zu-ma-ki-o12-zu-ji-me-gi
+
+3d, 20000, 1, 1:
+slippy: do-mu-ki-mi2-go-e-o7-ya-o13-no-to-go-ya-a4-i-ya-o5-a1-me-gi-ku
+ki-ya-a2400-gi-do-no-jo

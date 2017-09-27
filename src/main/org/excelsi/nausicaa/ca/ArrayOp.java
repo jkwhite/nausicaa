@@ -3,7 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 @FunctionalInterface
 public interface ArrayOp {
-    int[] op(byte[] a);
+    int[] op(int[] a);
 
 
     public static ArrayOp histo(int colors) {

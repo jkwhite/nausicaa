@@ -54,7 +54,7 @@ public class RandomInitializer implements Initializer {
                 }
                 break;
             case 3:
-                BlockPlane bp = (BlockPlane) plane;
+                IntBlockPlane bp = (IntBlockPlane) plane;
                 for(int y=0;y<bp.getHeight();y++) {
                     for(int x=0;x<bp.getWidth();x++) {
                         for(int z=0;z<bp.getDepth();z++) {
