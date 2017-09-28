@@ -67,9 +67,14 @@ public class Colors {
         return pack(om.nextInt(256), om.nextInt(256),
                 om.nextInt(256),
                 255);
-                //253 + Rand.om.nextInt(3));
-                //200 + Rand.om.nextInt(53));
-                //randAlpha(om));
+    }
+
+    public static int randomColor(Random om, int min) {
+        return pack(randomShade(om, min), randomShade(om, min), randomShade(om, min), 255);
+    }
+
+    public static int randomShade(Random om, int min) {
+        return om.nextBoolean() ? om.nextInt(min)+(256-min) : om.nextInt(min);
     }
 
     public static int randAlpha() {

@@ -171,6 +171,37 @@ public final class Palette {
         return new Palette(packed);
     }
 
+    public static Palette allShades(int numColors, int[] max) {
+        final int[] r = new int[]{255,127,127};
+        final int[] g = new int[]{127,255,127};
+        final int[] b = new int[]{127,127,255};
+        int[] packed = new int[numColors];
+        int tnc = numColors/3;
+        int idx = 0;
+        for(int i=0;i<numColors/3;i++) {
+            int red = (int) (r[0] * ((double) i / (double) tnc));
+            int green = (int) (r[1] * ((double) i / (double) tnc));
+            int blue = (int) (r[2] * ((double) i / (double) tnc));
+            packed[idx++] = Colors.pack(red, green, blue);
+        }
+        for(int i=0;i<numColors/3;i++) {
+            int red = (int) (g[0] * ((double) i / (double) tnc));
+            int green = (int) (g[1] * ((double) i / (double) tnc));
+            int blue = (int) (g[2] * ((double) i / (double) tnc));
+            packed[idx++] = Colors.pack(red, green, blue);
+        }
+        for(int i=0;i<numColors/3;i++) {
+            int red = (int) (b[0] * ((double) i / (double) tnc));
+            int green = (int) (b[1] * ((double) i / (double) tnc));
+            int blue = (int) (b[2] * ((double) i / (double) tnc));
+            packed[idx++] = Colors.pack(red, green, blue);
+        }
+        while(idx<numColors) {
+            packed[idx++] = Colors.pack(max[0], max[1], max[2]);
+        }
+        return new Palette(packed);
+    }
+
     private static final int[][] SPECTRUM_RAINBOW = {
         {148,0,211},
         {75,0,130},
@@ -185,6 +216,19 @@ public final class Palette {
         final int[][] s = new int[2+om.nextInt(density)][3];
         for(int i=0;i<s.length;i++) {
             Colors.unpackRgb(Colors.randomColor(om), s[i]);
+        }
+        return rainbow(numColors, black, s);
+    }
+
+    public static Palette randomShinyRainbow(Random om, int numColors, boolean black, int density) {
+        final int[][] s = new int[2+om.nextInt(density)][3];
+        for(int i=0;i<s.length;i++) {
+            if(false&&om.nextInt(2+density)<=density/10) {
+                Colors.unpackRgb(Colors.pack(255,255,255), s[i]);
+            }
+            else {
+                Colors.unpackRgb(Colors.randomColor(om, 32), s[i]);
+            }
         }
         return rainbow(numColors, black, s);
     }

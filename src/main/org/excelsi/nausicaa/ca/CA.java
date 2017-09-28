@@ -59,8 +59,15 @@ public final class CA {
             return p;
         }
         else {
-            return createBufferedImagePlane();
-            //return createWritableImagePlane();
+            if(_p.getColorCount()>=127) {
+                IntBlockPlane p = new IntBlockPlane(this, getWidth(), getHeight(), 1, _p);
+                populatePlane(p);
+                return p;
+            }
+            else {
+                return createBufferedImagePlane();
+                //return createWritableImagePlane();
+            }
         }
     }
 

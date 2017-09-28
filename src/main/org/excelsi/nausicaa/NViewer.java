@@ -286,6 +286,15 @@ public class NViewer extends JFrame implements UIActions {
         JMenuItem rdrain = pal.add(rdrains);
         rdrain.setText("Dense Spectrum");
 
+        AbstractAction srdrains = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                getActiveCA().getRandom().nextBoolean();
+                setActiveCA(getActiveCA().palette(Palette.randomShinyRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), false, getActiveCA().archetype().colors())));
+            }
+        };
+        JMenuItem srdrain = pal.add(srdrains);
+        srdrain.setText("Sparkly Spectrum");
+
         AbstractAction wrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 getActiveCA().getRandom().nextBoolean();
@@ -362,6 +371,14 @@ public class NViewer extends JFrame implements UIActions {
         };
         JMenuItem bgreen = pal.add(bgreens);
         bgreen.setText("Bright green shades");
+
+        AbstractAction acbgreens = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setActiveCA(getActiveCA().palette(Palette.allShades(getActiveCA().archetype().colors(), new int[]{255,255,255})));
+            }
+        };
+        JMenuItem acbgreen = pal.add(acbgreens);
+        acbgreen.setText("All Creation");
 
         bar.add(pal);
     }

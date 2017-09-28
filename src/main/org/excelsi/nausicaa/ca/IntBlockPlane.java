@@ -55,7 +55,8 @@ public final class IntBlockPlane implements Plane {
     }
 
     @Override public void setCell(int x, int y, int v) {
-        throw new UnsupportedOperationException();
+        setCell(x, y, 0, v);
+        //throw new UnsupportedOperationException();
     }
 
     public void setCell(int x, int y, int z, int v) {
