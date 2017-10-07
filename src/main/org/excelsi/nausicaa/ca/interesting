@@ -152,7 +152,22 @@ more more cells: o13-go-mi3-ki-ki-gi-do-o13-ri-do-ro1
 3d, 37, 3:
 spectrum: hi-ta-ne-no-jo-ka-ne-ki-ri-do-ro1-gi
 !: hi-ta-ne-no-ka-jo-ki-ri-ri-do-ro1-gi, zweight 0.8
+
 whoa: tsu-hi-e-o8-ka-no-zu-mi3
+=======
+hi: histo
+ta: max
+ne: not-equal
+no: push-n
+ka: or
+jo: min-n
+ki: push-surround
+ri: max-n
+ri: max-n
+do: duplicate
+ro1: skip 1
+gi: avg
+
 
 3d, 8, 1:
 hypno: a1-o13-mi-a0-ki-mi26-ra
