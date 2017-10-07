@@ -372,6 +372,14 @@ public class NViewer extends JFrame implements UIActions {
         JMenuItem bgreen = pal.add(bgreens);
         bgreen.setText("Bright green shades");
 
+        AbstractAction sepia = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                setActiveCA(getActiveCA().palette(Palette.rainbow(getActiveCA().archetype().colors(), false, new int[][]{ {34,27,1}, {84,49,13}, {112,66,20}, {165,139,36}, {196,145,35} })));
+            }
+        };
+        JMenuItem isepia = pal.add(sepia);
+        isepia.setText("Sepia");
+
         AbstractAction acbgreens = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 setActiveCA(getActiveCA().palette(Palette.allShades(getActiveCA().archetype().colors(), new int[]{255,255,255})));
