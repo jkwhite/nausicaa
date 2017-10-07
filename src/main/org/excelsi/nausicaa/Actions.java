@@ -19,6 +19,7 @@ import org.excelsi.nausicaa.ca.FitnessCriteria;
 import org.excelsi.nausicaa.ca.Encoder;
 import org.excelsi.nausicaa.ca.RandomMutationStrategy;
 import org.excelsi.nausicaa.ca.RandomInitializer;
+import org.excelsi.nausicaa.ca.GaussianInitializer;
 import org.excelsi.nausicaa.ca.WordEncoder;
 import org.excelsi.nausicaa.ca.ByteInitializer;
 import org.excelsi.nausicaa.ca.WordInitializer;
@@ -362,6 +363,68 @@ public class Actions {
                 d.dispose();
                 config.setVariable("random_zeroweight", zeroWeight.getText());
                 v.setInitializer(new RandomInitializer(null, 0, new RandomInitializer.Params(Float.parseFloat(zeroWeight.getText()))));
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
+    public void chooseGaussian(final NViewer v, Config config) {
+        final JDialog d = new JDialog(v, "Gaussian initializer");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(/*rows*/4,2));
+
+        top.add(new JLabel("Zero weight"));
+        final JTextField zeroWeight = new JTextField();
+        zeroWeight.setText(config.getVariable("gaussian_zeroweight", "0"));
+        zeroWeight.setColumns(10);
+        top.add(zeroWeight);
+
+        top.add(new JLabel("Max points"));
+        final JTextField maxpoints = new JTextField();
+        maxpoints.setText(config.getVariable("gaussian_maxpoints", "5"));
+        maxpoints.setColumns(10);
+        top.add(maxpoints);
+
+        top.add(new JLabel("Max radius"));
+        final JTextField maxrad = new JTextField();
+        maxrad.setText(config.getVariable("gaussian_maxradius", "0.1"));
+        maxrad.setColumns(10);
+        top.add(maxrad);
+
+        top.add(new JLabel("Density"));
+        final JTextField density = new JTextField();
+        density.setText(config.getVariable("gaussian_density", "0.2"));
+        density.setColumns(10);
+        top.add(density);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                config.setVariable("gaussian_zeroweight", zeroWeight.getText());
+                config.setVariable("gaussian_maxpoints", maxpoints.getText());
+                config.setVariable("gaussian_maxradius", maxrad.getText());
+                config.setVariable("gaussian_density", density.getText());
+                v.setInitializer(new GaussianInitializer(null, 0,
+                    new GaussianInitializer.Params(
+                        Float.parseFloat(zeroWeight.getText()),
+                        Integer.parseInt(maxpoints.getText()),
+                        Float.parseFloat(maxrad.getText()),
+                        Float.parseFloat(density.getText())
+                    )));
             }
         });
         bot.add(ne);

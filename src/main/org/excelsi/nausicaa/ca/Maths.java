@@ -2,6 +2,9 @@ package org.excelsi.nausicaa.ca;
 
 
 public final class Maths {
+    public static final float PI = (float) Math.PI;
+    public static final float PI2 = 2f * (float) Math.PI;
+
     public static int pow(final int k, int e) {
         if(e<0) {
             throw new IllegalArgumentException("negative e: "+e);

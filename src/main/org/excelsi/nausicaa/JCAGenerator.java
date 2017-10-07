@@ -266,7 +266,7 @@ public class JCAGenerator extends JDialog {
                                     }
                                     else {
                                         //Plane p0 = c.createPlane();
-                                        ExecutorService pool = Executors.newFixedThreadPool(3);
+                                        ExecutorService pool = Executors.newFixedThreadPool(4);
                                         if(scale==1f) {
                                             System.err.println("skip scaling");
                                             c.getRule()

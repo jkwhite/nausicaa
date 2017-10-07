@@ -11,7 +11,8 @@ public enum Initializers {
     single((byte)1),
     neapolitan((byte)2),
     word((byte)3),
-    image((byte)4);
+    image((byte)4),
+    gaussian((byte)5);
 
     private final byte _id;
 
@@ -33,6 +34,8 @@ public enum Initializers {
                 return new WordInitializer();
             case image:
                 return new ImageInitializer();
+            case gaussian:
+                return new GaussianInitializer();
             case random:
             default:
                 return new RandomInitializer();
