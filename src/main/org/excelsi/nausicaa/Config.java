@@ -142,6 +142,19 @@ public class Config {
         return t!=null?t:dvalue;
     }
 
+    public int getIntVariable(String name, int dvalue) {
+        Object v = (Object) _variables.get(name);
+        if(v instanceof String) {
+            return Integer.parseInt((String)v);
+        }
+        else if(v instanceof Integer) {
+            return ((Integer)v).intValue();
+        }
+        else {
+            return dvalue;
+        }
+    }
+
     public void notify(final String p) {
         for(ConfigListener l:new ArrayList<>(_listeners)) {
             l.configChanged(this, p);

@@ -94,13 +94,14 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
             throw new IllegalArgumentException("null plane");
         }
         final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c,pool, doubleBuffer):null;
-        final int block = 200;
+        final int block = 300;
         int nworkers = c.getHeight()/block + (c.getHeight()%block>0?1:0);
         final Worker[] workers = new Worker[nworkers];
-        final Pattern p = createPattern(pool);
-        System.err.println("using "+workers.length+" workers");
+        final Pattern[] patterns = new Pattern[nworkers];
+        System.err.println("rule compute using "+workers.length+" workers");
         for(int i=0;i<workers.length;i++) {
-            workers[i] = new Worker(p, 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block));
+            patterns[i] = createPattern(pool);
+            workers[i] = new Worker(patterns[i], 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block));
         }
         final Future[] futures = new Future[workers.length];
         return new Iterator<Plane>() {
@@ -118,20 +119,28 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
                 //}
                 final Plane frameP1 = p1;
                 final Plane frameP2 = p2;
-                //System.err.print("z");
-                for(int i=0;i<workers.length;i++) {
-                    final int w = i;
-                    futures[i] = pool.submit(()->workers[w].frame(frameP1, frameP2));
-                }
+                //frameP2.lock(2);
                 try {
-                    for(int i=0;i<futures.length;i++) {
-                        futures[i].get();
+                    frameP2.lockWrite();
+                    for(int i=0;i<workers.length;i++) {
+                        final int w = i;
+                        futures[i] = pool.submit(()->workers[w].frame(frameP1, frameP2));
+                    }
+                    try {
+                        for(int i=0;i<futures.length;i++) {
+                            futures[i].get();
+                            patterns[i].tick();
+                        }
+                    }
+                    catch(InterruptedException e) {
+                    }
+                    catch(ExecutionException e) {
+                        e.printStackTrace();
                     }
                 }
-                catch(InterruptedException e) {
-                }
-                catch(ExecutionException e) {
-                    e.printStackTrace();
+                finally {
+                    //frameP2.unlock();
+                    frameP2.unlockWrite();
                 }
                 tmp = p1;
                 p1 = p2;
@@ -141,7 +150,6 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
                 else {
                     p2 = p1.copy();
                 }
-                p.tick();
                 return p2;
             }
 

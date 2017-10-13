@@ -97,8 +97,14 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         DisplayAnimator[] da = new DisplayAnimator[ds.length];
         //ExecutorService compute = Executors.newFixedThreadPool(Math.min(4,ds.length));
         //ExecutorService render = Executors.newFixedThreadPool(Math.min(4,ds.length));
-        ExecutorService compute = Pools.named("compute", Math.min(4,ds.length));
-        ExecutorService render = Pools.named("render", Math.min(4,ds.length));
+
+        //ExecutorService compute = Pools.named("compute", Math.min(4,ds.length));
+        //ExecutorService render = Pools.named("render", Math.min(4,ds.length));
+        int ccores = _config.getIntVariable("animation_computeCores", 2);
+        int rcores = Math.min(ds.length, _config.getIntVariable("animation_renderCores", 2));
+        System.err.println("using "+ccores+" compute cores and "+rcores+" render cores");
+        ExecutorService compute = Pools.named("compute", ccores);
+        ExecutorService render = Pools.named("render", rcores);
         for(int i=0;i<ds.length;i++) {
             da[i] = new DisplayAnimator(ds[i], compute);
         }
@@ -175,17 +181,25 @@ top:        while(_state==State.animate) {
                 return;
             }
             final Plane frame = _frames.next(); //.copy();
+            //frame.lock(1);
+            frame.lockRead();
             if(isInterrupted()) {
+                frame.unlockRead();
                 System.err.println("interrupted done");
                 return;
             }
             final Thread calling = Thread.currentThread();
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    if(calling.isInterrupted() || _state!=State.animate) {
-                        return;
+                    try {
+                        if(calling.isInterrupted() || _state!=State.animate) {
+                            return;
+                        }
+                        _d.setPlane(frame);
                     }
-                    _d.setPlane(frame);
+                    finally {
+                        frame.unlockRead();
+                    }
                 }
             });
         }

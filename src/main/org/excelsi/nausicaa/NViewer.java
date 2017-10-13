@@ -608,6 +608,14 @@ public class NViewer extends JFrame implements UIActions {
         animslower.setText("Slow down animation");
         animslower.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, shortcut | InputEvent.SHIFT_DOWN_MASK));
 
+        AbstractAction animcrs = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.coreConfig(NViewer.this, _config);
+            }
+        };
+        JMenuItem animcores = auto.add(animcrs);
+        animcores.setText("Configure animation ...");
+
         auto.addSeparator();
 
         AbstractAction gen = new AbstractAction() {

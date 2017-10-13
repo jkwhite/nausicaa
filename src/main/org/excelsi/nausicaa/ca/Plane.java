@@ -30,4 +30,8 @@ public interface Plane /*extends Pattern*/ {
     Plane subplane(int x1, int y1, int x2, int y2);
     byte next(int pattern);
     void tick();
+    void lockRead();
+    void unlockRead();
+    void lockWrite();
+    void unlockWrite();
 }

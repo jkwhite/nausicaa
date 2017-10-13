@@ -14,7 +14,7 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.PixelFormat;
 
 
-public class WritableImagePlane implements Plane {
+public class WritableImagePlane extends AbstractPlane {
     private final CA _creator;
     private final WritableImage _i;
     private final PixelReader _r;
@@ -25,6 +25,7 @@ public class WritableImagePlane implements Plane {
     private final int[] _colors;
     private final int _width;
     private final int _height;
+    private int _lockOwner = -1;
 
 
     public WritableImagePlane(CA creator, int w, int h, Palette p) {
@@ -212,4 +213,17 @@ public class WritableImagePlane implements Plane {
 
     @Override public void tick() {
     }
+//
+    //@Override public synchronized boolean lock(int id) {
+        //if(_lockOwner==id) {
+            //return true;
+        //}
+        //while(_lockOwner!=-1);
+        //_lockOwner = id;
+        //return true;
+    //}
+//
+    //@Override public void unlock() {
+        //_lockOwner = -1;
+    //}
 }

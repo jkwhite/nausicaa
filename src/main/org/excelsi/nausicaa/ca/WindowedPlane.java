@@ -7,7 +7,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 
-public class WindowedPlane implements Plane {
+public class WindowedPlane extends AbstractPlane {
     private final Plane _p;
     private final int _x1;
     private final int _y1;
@@ -111,4 +111,12 @@ public class WindowedPlane implements Plane {
 
     @Override public void tick() {
     }
+//
+    //@Override public boolean lock(int id) {
+        //return _p.lock(id);
+    //}
+//
+    //@Override public void unlock() {
+        //_p.unlock();
+    //}
 }

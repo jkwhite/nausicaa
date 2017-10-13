@@ -22,6 +22,7 @@ public class JCAGenerator extends JDialog {
         final String _lastWidth = config.<String>getVariable("generatorWidth", "1920");
         final String _lastHeight = config.<String>getVariable("generatorHeight", "1080");
         final String _lastFrames = config.<String>getVariable("generatorFrames", "1000");
+        final String _cores = config.<String>getVariable("generatorCores", "4");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         GridLayout gl = null;
@@ -29,7 +30,7 @@ public class JCAGenerator extends JDialog {
             gl = new GridLayout(2,2);
         }
         else {
-            gl = new GridLayout(11,2);
+            gl = new GridLayout(12,2);
         }
         JPanel top = new JPanel(gl);
         top.add(new JLabel("Width"));
@@ -57,6 +58,7 @@ public class JCAGenerator extends JDialog {
         JTextField frame = null;
         JTextField framerate = null;
         JTextField scalingf = null;
+        JTextField coresf = null;
         if(rule.dimensions()>1) {
             JPanel an = new JPanel();
             animat = new JCheckBox("Animate");
@@ -73,6 +75,10 @@ public class JCAGenerator extends JDialog {
             scalingf = new JTextField();
             scalingf.setText("1.0");
             scalingf.setColumns(4);
+            JPanel coresp = new JPanel();
+            coresf = new JTextField();
+            coresf.setText(_cores);
+            coresf.setColumns(4);
 
             an.add(animat);
             top.add(an);
@@ -89,6 +95,10 @@ public class JCAGenerator extends JDialog {
             top.add(new JLabel("Scaling"));
             scalingp.add(scalingf);
             top.add(scalingp);
+
+            top.add(new JLabel("Cores"));
+            coresp.add(coresf);
+            top.add(coresp);
 
             mp4 = new JCheckBox("Create MP4");
             JPanel p4 = new JPanel();
@@ -128,6 +138,7 @@ public class JCAGenerator extends JDialog {
         final JTextField frames = frame;
         final JTextField frates = framerate;
         final JTextField scaling = scalingf;
+        final JTextField cores = coresf;
         final JCheckBox reverse = revers;
 
         p.add(top, BorderLayout.NORTH);
@@ -153,6 +164,7 @@ public class JCAGenerator extends JDialog {
                     task.setFont(font.deriveFont(font.getSize()-2f));
                     final int w = Integer.parseInt(width.getText());
                     final int h = Integer.parseInt(height.getText());
+                    final int ccores = Integer.parseInt(cores.getText());
                     config.setVariable("generatorWidth", Integer.toString(w));
                     config.setVariable("generatorHeight", Integer.toString(h));
                     //_lastWidth = w;
@@ -266,7 +278,8 @@ public class JCAGenerator extends JDialog {
                                     }
                                     else {
                                         //Plane p0 = c.createPlane();
-                                        ExecutorService pool = Executors.newFixedThreadPool(4);
+                                        System.err.println("using "+ccores+" cores");
+                                        ExecutorService pool = Executors.newFixedThreadPool(ccores);
                                         if(scale==1f) {
                                             System.err.println("skip scaling");
                                             c.getRule()

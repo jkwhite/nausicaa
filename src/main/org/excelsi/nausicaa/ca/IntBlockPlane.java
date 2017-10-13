@@ -7,7 +7,7 @@ import java.io.*;
 import javafx.scene.image.WritableImage;
 
 
-public final class IntBlockPlane implements Plane {
+public final class IntBlockPlane extends AbstractPlane {
     private final CA _ca;
     private final int _w;
     private final int _h;
@@ -19,6 +19,7 @@ public final class IntBlockPlane implements Plane {
     private final BufferedImage _i;
     private final WritableRaster _r;
     private final int[][] _unpacked;
+    //private int _lockOwner = -1;
 
 
     public IntBlockPlane(CA ca, int w, int h, int d, Palette p) {
@@ -203,6 +204,22 @@ public final class IntBlockPlane implements Plane {
 
     @Override public void tick() {
     }
+//
+    //@Override public synchronized boolean lock(int id) {
+        //if(_lockOwner==id) {
+            //return true;
+        //}
+        //int c = 0;
+        //while(_lockOwner!=-1) {
+            //if(++c%10000==0) System.err.println(System.identityHashCode(this)+" o"+_lockOwner+" w"+id);
+        //}
+        //_lockOwner = id;
+        //return true;
+    //}
+//
+    //@Override public void unlock() {
+        //_lockOwner = -1;
+    //}
 
     private final int normX(int x) {
         if(x<0) {

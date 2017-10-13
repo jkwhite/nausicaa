@@ -17,13 +17,14 @@ import javafx.embed.swing.SwingFXUtils;
 import org.imgscalr.Scalr;
 
 
-public class BufferedImagePlane implements Plane, java.io.Serializable {
+public class BufferedImagePlane extends AbstractPlane implements java.io.Serializable {
     private final CA _creator;
     private final Palette _palette;
     private transient BufferedImage _i;
     private transient WritableRaster _r;
     private transient JFrame _d;
     private float _scale = 1f;
+    private int _lockOwner = -1;
 
 
     public BufferedImagePlane(CA creator, int width, int time, Palette p) {
@@ -203,4 +204,17 @@ public class BufferedImagePlane implements Plane, java.io.Serializable {
 
     @Override public void tick() {
     }
+//
+    //@Override public synchronized boolean lock(int id) {
+        //if(_lockOwner==id) {
+            //return true;
+        //}
+        //while(_lockOwner!=-1);
+        //_lockOwner = id;
+        //return true;
+    //}
+//
+    //@Override public void unlock() {
+        //_lockOwner = -1;
+    //}
 }

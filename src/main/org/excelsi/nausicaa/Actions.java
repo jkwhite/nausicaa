@@ -295,6 +295,48 @@ public class Actions {
         v.getConfig().setAnimationDelay(Math.min(10000, Math.max(3, (int)(v.getConfig().getAnimationDelay()*1.5))));
     }
 
+    public void coreConfig(NViewer v, Config config) {
+        final JDialog d = new JDialog(v, "Animation configuration");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(2,2));
+
+        top.add(new JLabel("Compute cores"));
+        final JTextField compute = new JTextField();
+        compute.setText(config.getVariable("animation_computeCores", "2"));
+        compute.setColumns(3);
+        top.add(compute);
+
+        top.add(new JLabel("Render cores"));
+        final JTextField render = new JTextField();
+        render.setText(config.getVariable("animation_renderCores", "2"));
+        render.setColumns(3);
+        top.add(render);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                config.setVariable("animation_computeCores", compute.getText());
+                config.setVariable("animation_renderCores", render.getText());
+                config.notify("animation");
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
     public void generateToFile(NViewer v) {
         new JCAGenerator(v, v.getActiveCA(), v.getConfig());
     }
