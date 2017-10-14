@@ -3,7 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.Writer;
+import java.io.PrintWriter;
 import java.util.concurrent.ExecutorService;
 
 
@@ -64,7 +64,8 @@ public abstract class AbstractIndexedRule extends AbstractRule implements Indexe
         _p.write(dos);
     }
 
-    @Override public void write(Writer w) throws IOException {
+    @Override public void write(PrintWriter w) {
+        w.println("indexed");
         _p.write(w);
     }
 

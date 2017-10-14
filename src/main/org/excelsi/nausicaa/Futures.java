@@ -140,7 +140,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         System.err.println("setting ca "+ca);
         final int width = getCAWidth();
         final int height = getCAHeight();
-        _ca = ca.size(width, height,getCADepth(),getCAPrelude());
+        _ca = ca.size(width, height, getCADepth(), getCAPrelude());
         _lastInit = _ca.getInitializer();
         NViewer.getUIActions().doWait(new Runnable() {
             public void run() {
@@ -294,7 +294,10 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             int height = getCAHeight() > 60 ? getCAHeight()/3-10 : getCAHeight();
             int depth = _config.getDepth();
             int prelude = _config.getPrelude();
-            PlaneDisplay root = createPlaneDisplay(_ca.size(width, height, depth, prelude));
+            //WHAT
+            _ca = _ca.size(width, height, depth, prelude);
+            PlaneDisplay root = createPlaneDisplay(_ca);
+            //PlaneDisplay root = createPlaneDisplay(_ca.size(width, height, depth, prelude));
             root.setScale(_scale);
             for(int i=0;i<_displays.length;i++) {
                 if(i==4) {
@@ -319,7 +322,9 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             _displays = new PlaneDisplay[1];
             final int width = getCAWidth();
             final int height = getCAHeight();
-            PlaneDisplay d = createPlaneDisplay(_ca.size(width, height, _config.getDepth(), _config.getPrelude()));
+            _ca = _ca.size(width, height, _config.getDepth(), _config.getPrelude());
+            PlaneDisplay d = createPlaneDisplay(_ca);
+            //PlaneDisplay d = createPlaneDisplay(_ca.size(width, height, _config.getDepth(), _config.getPrelude()));
             d.setScale(_scale);
             futures.add(d);
             _displays[0] = d;

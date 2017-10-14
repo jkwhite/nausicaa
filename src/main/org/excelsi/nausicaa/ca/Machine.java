@@ -15,7 +15,7 @@ public class Machine {
         _a = a;
         _g = g;
         _prg = g.codons(a);
-        _t = new Tape(2048);
+        _t = new Tape(4096);
     }
 
     public Machine copy() {
@@ -27,7 +27,10 @@ public class Machine {
         //d("===============");
         //d("init: "+_t);
         for(int i=0;i<_prg.length;i++) {
+            long st = System.currentTimeMillis();
             _prg[i].op(p, _t);
+            long en = System.currentTimeMillis();
+            if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
             //d(_prg[i]+" "+_t);
         }
         int res = _t.pop();

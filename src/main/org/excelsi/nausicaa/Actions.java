@@ -127,7 +127,7 @@ public class Actions {
         if(ret==f.APPROVE_OPTION) {
             try {
                 config.setDir(f.getSelectedFile().getParent());
-                final CA ca = CA.fromFile(f.getSelectedFile().toString());
+                final CA ca = CA.fromFile(f.getSelectedFile().toString(), "text");
                 config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth());
                 v.setActiveCA(ca);
             }
@@ -147,7 +147,7 @@ public class Actions {
         if(ret==f.APPROVE_OPTION) {
             try {
                 config.setDir(f.getSelectedFile().getParent());
-                ca.save(f.getSelectedFile().toString());
+                ca.save(f.getSelectedFile().toString(), "text");
             }
             catch(IOException e) {
                 showError(v, "Failed to save "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);
@@ -185,7 +185,7 @@ public class Actions {
         int ret = f.showSaveDialog(v.getRoot());
         final Rule rule = v.getActiveCA().getRule();
         if(ret==f.APPROVE_OPTION) {
-            try(Writer w = new BufferedWriter(new FileWriter(f.getSelectedFile().toString()))) {
+            try(PrintWriter w = new PrintWriter(new BufferedWriter(new FileWriter(f.getSelectedFile().toString())))) {
                 config.setDir(f.getSelectedFile().getParent());
                 rule.write(w);
             }

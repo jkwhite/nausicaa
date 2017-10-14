@@ -106,7 +106,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         ExecutorService compute = Pools.named("compute", ccores);
         ExecutorService render = Pools.named("render", rcores);
         for(int i=0;i<ds.length;i++) {
-            da[i] = new DisplayAnimator(ds[i], compute);
+            da[i] = new DisplayAnimator(ds[i], compute, ds.length==1?ccores:1);
         }
         try {
 top:        while(_state==State.animate) {
@@ -153,9 +153,10 @@ top:        while(_state==State.animate) {
     private class DisplayAnimator implements Runnable {
         private Iterator<Plane> _frames;
         private PlaneDisplay _d;
+        private int _parallel;
 
 
-        public DisplayAnimator(PlaneDisplay d, ExecutorService pool) {
+        public DisplayAnimator(PlaneDisplay d, ExecutorService pool, int parallel) {
             //_frames = ((Multirule2D)d.getRule()).frames(d.getCA());
             Plane p = d.getPlane();
             while(p==null) {
@@ -166,7 +167,8 @@ top:        while(_state==State.animate) {
                 }
                 p = d.getPlane();
             }
-            _frames = d.getRule().frameIterator(p, pool, true);
+            _parallel = parallel;
+            _frames = d.getRule().frameIterator(p, pool, true, _parallel);
             _d = d;
         }
 

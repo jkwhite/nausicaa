@@ -3,6 +3,8 @@ package org.excelsi.nausicaa.ca;
 
 import java.util.Random;
 import java.io.DataOutputStream;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.io.IOException;
 
 
@@ -122,6 +124,28 @@ public class GaussianInitializer implements Initializer {
 
     @Override public void write(DataOutputStream dos) throws IOException {
         dos.writeByte(Initializers.gaussian.getId());
+    }
+
+    @Override public void write(PrintWriter w) {
+        w.println(Initializers.gaussian.name());
+        w.println(_seed);
+        w.println(_params.zeroWeight);
+        w.println(_params.maxPoints);
+        w.println(_params.maxRadius);
+        w.println(_params.density);
+    }
+
+    public static GaussianInitializer read(BufferedReader r, int version) throws IOException {
+        return new GaussianInitializer(
+            null,
+            Long.parseLong(r.readLine()),
+            new Params(
+                Float.parseFloat(r.readLine()),
+                Integer.parseInt(r.readLine()),
+                Float.parseFloat(r.readLine()),
+                Float.parseFloat(r.readLine())
+            )
+        );
     }
 
     public static final class Params {

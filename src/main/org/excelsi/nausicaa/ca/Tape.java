@@ -4,6 +4,8 @@ package org.excelsi.nausicaa.ca;
 public final class Tape {
     private final int[] _t;
     private int _i = -1;
+    private int _s = -1;
+    private boolean _a;
 
 
     public Tape(int len) {
@@ -13,6 +15,55 @@ public final class Tape {
     public void reset() {
         //d("reset");
         _i = -1;
+        _s = -1;
+        _a = false;
+    }
+
+    public void selectAgg(int n) {
+        select(n, true);
+    }
+
+    public void selectIdx(int n) {
+        select(n, false);
+    }
+
+    public void select(int n, boolean a) {
+        if(_i==-1||n==0) {
+            _s = -1;
+        }
+        else if(n==-1) {
+            _s = 0;
+        }
+        else {
+            _s = 1 + _i - n;
+            if(_s<0) {
+                _s = 0;
+            }
+        }
+        _a = a;
+    }
+
+    public void apply(TapeOp op, int[] p) {
+        //System.err.print("s="+_s+", i="+_i);
+        if(_s>=0&&_i>=0) {
+            int v = op.op(_t, _s, _i, p);
+            //System.err.println(", v="+v);
+            if(_a) {
+                _i = _s;
+                _t[_i] = v;
+            }
+            else {
+                if(v>=_s-1&&v<=_i) {
+                    _i = v;
+                }
+                else {
+                    _s = -1;
+                    throw new IllegalArgumentException("v "+v+" not in ("+_s+","+_i+")");
+                }
+            }
+            _s = -1;
+        }
+        //else System.err.println();
     }
 
     public void push(int v) {
@@ -20,9 +71,9 @@ public final class Tape {
             //d("push %d", v);
             _t[++_i] = v;
         }
-        else {
+        //else {
             //d("push end");
-        }
+        //}
     }
 
     public int pop() {
@@ -72,6 +123,11 @@ public final class Tape {
         }
     }
 
+    public void op(final TapeOp op, final int[] p) {
+        int ni = op.op(_t, 0, _i, p);
+        _i = ni;
+    }
+
     public String toString() {
         StringBuilder b = new StringBuilder("tape {pos:"+_i+", tape:[");
         for(int i=0;i<=_i;i++) {
@@ -82,7 +138,11 @@ public final class Tape {
         return b.toString();
     }
 
+    public interface TapeOp {
+        int op(int[] t, int s, int e, int[] p);
+    }
+
     private static void d(String s, Object... args) {
-        //System.err.println(String.format(s, args));
+        System.err.println(String.format(s, args));
     }
 }

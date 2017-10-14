@@ -3,6 +3,8 @@ package org.excelsi.nausicaa.ca;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.PrintWriter;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.awt.image.IndexColorModel;
 import java.util.List;
@@ -108,11 +110,27 @@ public final class Palette {
         }
     }
 
+    public void write(PrintWriter w) {
+        w.println(_colors.length);
+        for(int c:_colors) {
+            w.println(c);
+        }
+    }
+
     public static Palette read(DataInputStream dis) throws IOException {
         int len = dis.readInt();
         int[] colors = new int[len];
         for(int i=0;i<colors.length;i++) {
             colors[i] = dis.readInt();
+        }
+        return new Palette(colors);
+    }
+
+    public static Palette read(BufferedReader r, int version) throws IOException {
+        int len = Integer.parseInt(r.readLine());
+        int[] colors = new int[len];
+        for(int i=0;i<colors.length;i++) {
+            colors[i] = Integer.parseInt(r.readLine());
         }
         return new Palette(colors);
     }

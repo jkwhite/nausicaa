@@ -3,6 +3,8 @@ package org.excelsi.nausicaa.ca;
 
 import java.util.Random;
 import java.io.DataOutputStream;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.io.IOException;
 
 
@@ -41,5 +43,13 @@ public class SingleInitializer implements Initializer {
 
     @Override public void write(DataOutputStream dos) throws IOException {
         dos.writeByte(Initializers.single.getId());
+    }
+
+    @Override public void write(PrintWriter w) {
+        w.println(Initializers.single.name());
+    }
+
+    public static SingleInitializer read(BufferedReader r, int version) throws IOException {
+        return new SingleInitializer();
     }
 }

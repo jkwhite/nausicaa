@@ -86,8 +86,8 @@ public class NViewer extends JFrame implements UIActions {
 
     public void init() {
         //final int w = 600, h = 600, d = 1;
-        final int w = 300, h = 300, d = 3, pre = 20;
-        //final int w = 3, h = 3, d = 1;
+        //final int w = 300, h = 300, d = 3, pre = 20;
+        final int w = 3, h = 3, d = 1, pre=0;
         _config = new Config(w, h, d);
         createMenu();
         setSize(_width, _height);

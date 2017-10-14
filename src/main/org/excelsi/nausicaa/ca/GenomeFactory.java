@@ -38,6 +38,7 @@ public class GenomeFactory {
             weight(1, new Equals()),
             weight(1, new NotEquals()),
             weight(1, new Intersects()),
+            weight(1, new IntersectsSelf()),
             weight(1, new If()),
             //weight(1, new Time()),
             weight(1, new Nonzero(-1)),

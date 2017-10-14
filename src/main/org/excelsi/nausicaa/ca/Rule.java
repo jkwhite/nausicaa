@@ -3,7 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.Writer;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Stream;
@@ -29,12 +29,12 @@ public interface Rule extends java.io.Serializable, Humanizable {
     //void init(CA c, Initialization i);
     //int getSuggestedInterval(CA c);
     void write(DataOutputStream dos) throws IOException;
-    void write(Writer w) throws IOException;
+    void write(PrintWriter w);
     float generate(Plane c, int start, int end, ExecutorService pool, boolean stopOnSame, boolean overwrite, Updater u);
-    Iterator<Plane> frameIterator(Plane initial, ExecutorService pool, boolean doubleBuffer);
+    Iterator<Plane> frameIterator(Plane initial, ExecutorService pool, boolean doubleBuffer, int parallel);
 
-    default Stream<Plane> stream(Plane initial, ExecutorService pool, boolean doubleBuffer) {
-        Iterable<Plane> it = ()->frameIterator(initial, pool, doubleBuffer);
+    default Stream<Plane> stream(Plane initial, ExecutorService pool, boolean doubleBuffer, int parallel) {
+        Iterable<Plane> it = ()->frameIterator(initial, pool, doubleBuffer, parallel);
         return StreamSupport.stream(it.spliterator(), false);
     }
 

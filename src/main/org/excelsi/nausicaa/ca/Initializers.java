@@ -4,6 +4,7 @@ package org.excelsi.nausicaa.ca;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.BufferedReader;
 
 
 public enum Initializers {
@@ -50,5 +51,25 @@ public enum Initializers {
             }
         }
         throw new IllegalStateException("unknown initializer id "+id);
+    }
+
+    public static Initializer read(BufferedReader r, int v) throws IOException {
+        String type = r.readLine();
+        switch(type) {
+            case "single":
+                return SingleInitializer.read(r, v);
+            case "neapolitan":
+                return NeapolitanInitializer.read(r, v);
+            case "word":
+                return WordInitializer.read(r, v);
+            case "image":
+                return ImageInitializer.read(r, v);
+            case "gaussian":
+                return GaussianInitializer.read(r, v);
+            case "random":
+                return RandomInitializer.read(r, v);
+            default:
+                throw new IOException("unknown initializer '"+type+"'");
+        }
     }
 }

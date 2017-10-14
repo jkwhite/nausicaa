@@ -3,7 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.Writer;
+import java.io.PrintWriter;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
@@ -64,7 +64,7 @@ public abstract class AbstractRule /*extends WritableImagePlane*/ implements Rul
         throw new UnsupportedOperationException();
     }
 
-    @Override public void write(Writer w) throws IOException {
+    @Override public void write(PrintWriter w) {
         throw new UnsupportedOperationException();
     }
 
@@ -82,7 +82,7 @@ public abstract class AbstractRule /*extends WritableImagePlane*/ implements Rul
         return toString();
     }
 
-    @Override public Iterator<Plane> frameIterator(Plane initial, ExecutorService pool, boolean doubleBuffer) {
+    @Override public Iterator<Plane> frameIterator(Plane initial, ExecutorService pool, boolean doubleBuffer, int parallel) {
         throw new UnsupportedOperationException();
     }
 

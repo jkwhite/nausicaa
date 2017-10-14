@@ -4,7 +4,7 @@ package org.excelsi.nausicaa.ca;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.Writer;
+import java.io.PrintWriter;
 import java.util.Arrays;
 
 
@@ -110,7 +110,7 @@ public final class IndexedPattern implements Pattern {
         }
     }
 
-    public void write(Writer w) throws IOException {
+    public void write(PrintWriter w) {
         final long max = _a.totalPatterns();
         final byte[] base = new byte[_a.sourceLength()];
         final StringBuilder b = new StringBuilder();

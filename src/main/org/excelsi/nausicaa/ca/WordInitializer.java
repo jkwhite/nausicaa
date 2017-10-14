@@ -3,6 +3,8 @@ package org.excelsi.nausicaa.ca;
 
 import java.util.Random;
 import java.io.DataOutputStream;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.io.IOException;
 
 
@@ -97,5 +99,18 @@ public class WordInitializer implements Initializer {
 
     @Override public void write(DataOutputStream dos) throws IOException {
         dos.writeByte(Initializers.word.getId());
+    }
+
+    @Override public void write(PrintWriter w) {
+        w.println(Initializers.word.name());
+        w.println(_alphabet);
+        w.println(_input);
+    }
+
+    public static WordInitializer read(BufferedReader r, int version) throws IOException {
+        return new WordInitializer(
+            r.readLine(),
+            r.readLine()
+        );
     }
 }

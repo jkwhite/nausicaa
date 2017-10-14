@@ -4,11 +4,18 @@ package org.excelsi.nausicaa.ca;
 import java.io.ByteArrayOutputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.util.Random;
 import java.util.zip.GZIPInputStream;
@@ -222,17 +229,46 @@ public final class CA {
         return c.encode(toBinary());
     }
 
-    public void save(String filename) throws IOException {
-        if(!filename.endsWith(".ca.gz")) {
-            filename = filename+".ca.gz";
+    public void save(String filename, String format) throws IOException {
+        if("binary".equals(format)) {
+            if(!filename.endsWith(".ca.gz")) {
+                filename = filename+".ca.gz";
+            }
+            try(DataOutputStream dos=new DataOutputStream(new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(filename))))) {
+                write(dos);
+            }
         }
-        try(DataOutputStream dos=new DataOutputStream(new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(filename))))) {
-            write(dos);
-            dos.close();
+        else if("text".equals(format)) {
+            OutputStream os = null;
+            if(filename.endsWith(".ca")) {
+                os = new BufferedOutputStream(new FileOutputStream(filename));
+            }
+            else if(filename.endsWith(".ca.gz")) {
+                os = new GZIPOutputStream(new BufferedOutputStream(new FileOutputStream(filename)));
+            }
+            else {
+                filename = filename+".ca";
+                os = new BufferedOutputStream(new FileOutputStream(filename));
+            }
+            try(PrintWriter pw=new PrintWriter(new OutputStreamWriter(os))) {
+                write(pw);
+                if(pw.checkError()) {
+                    throw new IOException("Failed to save "+filename);
+                }
+            }
         }
     }
 
-    public static CA fromFile(String filename) throws IOException {
+    public static CA fromFile(String filename, String format) throws IOException {
+        if("binary".equals(format)) {
+            return fromBinaryFile(filename);
+        }
+        else {
+            return fromTextFile(filename);
+        }
+    }
+
+    private static CA fromBinaryFile(String filename) throws IOException {
         InputStream in = null;
         try {
             in = new BufferedInputStream(new FileInputStream(filename));
@@ -259,6 +295,94 @@ public final class CA {
             }
         }
     }
+    
+    static private class Header {
+        int version;
+        int w;
+        int h;
+        int d;
+        int prelude;
+        long seed;
+    }
+
+    private static CA fromTextFile(String filename) throws IOException {
+        InputStream in = null;
+        try {
+            in = new FileInputStream(filename);
+            if(filename.endsWith(".gz")) {
+                in = new GZIPInputStream(in);
+            }
+            BufferedReader r = new BufferedReader(new InputStreamReader(in));
+            final Header h = readHeader(r);
+            Palette p = null;
+            Initializer i = null;
+            Rule rule = null;
+            String line;
+            while((line=r.readLine())!=null) {
+                switch(line) {
+                    case "palette {":
+                        p = Palette.read(r, h.version);
+                        break;
+                    case "initializer {":
+                        i = Initializers.read(r, h.version);
+                        break;
+                    case "rule {":
+                        rule = new ComputedRuleReader(r, h.version).readRule();
+                        break;
+                    default:
+                        throw new IOException("unknown section '"+line+"'");
+                }
+                line = r.readLine();
+                if(!"}".equals(line)) {
+                    throw new IOException("did not find end of section marker: '"+line+"'");
+                }
+            }
+            if(p==null) {
+                throw new IOException("missing palette");
+            }
+            if(rule==null) {
+                throw new IOException("missing rule");
+            }
+            if(i==null) {
+                throw new IOException("missing initializer");
+            }
+            return new CA(rule, p, i, new Random(), h.seed, h.w, h.h, h.d, h.prelude);
+        }
+        finally {
+            if(in!=null) {
+                try {
+                    in.close();
+                }
+                catch(IOException e) {
+                }
+            }
+        }
+    }
+
+    private static Header readHeader(BufferedReader r) throws IOException {
+        Header h = new Header();
+        String line = r.readLine();
+        if(!"ca {".equals(line)) {
+            throw new IOException("corrupt header; not a CA: '"+line+"'");
+        }
+        h.version = Integer.parseInt(r.readLine());
+        switch(h.version) {
+            case 1:
+                h.w = Integer.parseInt(r.readLine());
+                h.h = Integer.parseInt(r.readLine());
+                h.d = Integer.parseInt(r.readLine());
+                h.prelude = Integer.parseInt(r.readLine());
+                h.seed = Long.parseLong(r.readLine());
+                break;
+            default:
+                throw new IOException("unsupported version "+h.version);
+        }
+        line = r.readLine();
+        if(!"}".equals(line)) {
+            throw new IOException("corrupt trailer; not a CA: "+line);
+        }
+        return h;
+    }
 
     public void write(DataOutputStream dos) throws IOException {
         dos.writeByte(VERSION);
@@ -268,6 +392,26 @@ public final class CA {
         _p.write(dos);
         _i.write(dos);
         _r.write(dos);
+    }
+
+    public void write(PrintWriter w) throws IOException {
+        w.println("ca {");
+        w.println(VERSION);
+        w.println(_w);
+        w.println(_h);
+        w.println(_d);
+        w.println(_prelude);
+        w.println(_seed);
+        w.println("}");
+        w.println("palette {");
+        _p.write(w);
+        w.println("}");
+        w.println("initializer {");
+        _i.write(w);
+        w.println("}");
+        w.println("rule {");
+        new ComputedRuleWriter(w).writeRule(_r);
+        w.println("}");
     }
 
     @Override public String toString() {

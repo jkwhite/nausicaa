@@ -5,15 +5,15 @@ import java.util.Iterator;
 import java.util.function.Predicate;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
-
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.io.IOException;
 
 
 public final class Archetype {
-    private final int _colors;
-    private final int _size;
     private final int _dims;
+    private final int _size;
+    private final int _colors;
 
 
     public Archetype(int dims, int size, int colors) {
@@ -134,6 +134,20 @@ public final class Archetype {
         int size = dis.readInt();
         int dims = dis.readInt();
         return new Archetype(dims, size, cols);
+    }
+
+    public void write(PrintWriter w) {
+        w.println(_dims);
+        w.println(_size);
+        w.println(_colors);
+    }
+
+    public static Archetype read(BufferedReader r) throws IOException {
+        return new Archetype(
+            Integer.parseInt(r.readLine()),
+            Integer.parseInt(r.readLine()),
+            Integer.parseInt(r.readLine())
+        );
     }
 
     @Override public String toString() {

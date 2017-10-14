@@ -230,7 +230,7 @@ public class JCAGenerator extends JDialog {
                                     if(createGif) {
                                         Plane plane = c.createPlane();
                                         ExecutorService pool = Executors.newFixedThreadPool(1);
-                                        Iterator<Plane> cas = c.getRule().frameIterator(plane, pool, true);
+                                        Iterator<Plane> cas = c.getRule().frameIterator(plane, pool, true, 1);
                                         AnimatedGifEncoder age = new AnimatedGifEncoder();
                                         age.start(selfile+".gif");
                                         age.setRepeat(0);
@@ -283,7 +283,7 @@ public class JCAGenerator extends JDialog {
                                         if(scale==1f) {
                                             System.err.println("skip scaling");
                                             c.getRule()
-                                                .stream(c.createPlane(), pool, true)
+                                                .stream(c.createPlane(), pool, true, ccores)
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))
                                                 .map(Pipeline.toBufferedImage("p", "b"))
@@ -295,7 +295,7 @@ public class JCAGenerator extends JDialog {
                                         else {
                                             System.err.println("scaling");
                                             c.getRule()
-                                                .stream(c.createPlane(), pool, true)
+                                                .stream(c.createPlane(), pool, true, ccores)
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))
                                                 .map(Pipeline.toBufferedImage("p", "b"))

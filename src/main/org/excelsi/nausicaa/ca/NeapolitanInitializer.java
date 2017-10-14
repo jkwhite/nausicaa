@@ -3,6 +3,8 @@ package org.excelsi.nausicaa.ca;
 
 import java.util.Random;
 import java.io.DataOutputStream;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.io.IOException;
 
 
@@ -29,5 +31,13 @@ public class NeapolitanInitializer implements Initializer {
 
     @Override public void write(DataOutputStream dos) throws IOException {
         dos.writeByte(Initializers.random.getId());
+    }
+
+    @Override public void write(PrintWriter w) {
+        w.println(Initializers.neapolitan.name());
+    }
+
+    public static NeapolitanInitializer read(BufferedReader r, int version) throws IOException {
+        return new NeapolitanInitializer();
     }
 }

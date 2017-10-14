@@ -64,11 +64,11 @@ public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
         return _origin;
     }
 
-    public Iterator<Plane> frameIterator(final Plane c, final ExecutorService pool, final boolean doubleBuffer) {
+    public Iterator<Plane> frameIterator(final Plane c, final ExecutorService pool, final boolean doubleBuffer, final int parallel) {
         if(c==null) {
             throw new IllegalArgumentException("null plane");
         }
-        final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c,pool, doubleBuffer):null;
+        final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c,pool, doubleBuffer, parallel):null;
         final int block = 800;
         int nworkers = c.getHeight()/block + (c.getHeight()%block>0?1:0);
         final Worker[] workers = new Worker[nworkers];

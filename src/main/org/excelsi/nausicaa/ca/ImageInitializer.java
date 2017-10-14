@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.util.Random;
 import java.io.DataOutputStream;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.io.File;
 import java.io.IOException;
 import org.imgscalr.Scalr;
@@ -13,6 +15,7 @@ import org.imgscalr.Scalr;
 public class ImageInitializer implements Initializer {
     private final BufferedImage _image;
     private BufferedImage _lastImage;
+    private File _url;
 
 
     public ImageInitializer() {
@@ -21,6 +24,7 @@ public class ImageInitializer implements Initializer {
 
     public ImageInitializer(File url) throws IOException {
         this(ImageIO.read(url));
+        _url = url;
     }
 
     public ImageInitializer(BufferedImage image) {
@@ -55,5 +59,14 @@ public class ImageInitializer implements Initializer {
 
     @Override public void write(DataOutputStream dos) throws IOException {
         dos.writeByte(Initializers.image.getId());
+    }
+
+    @Override public void write(PrintWriter w) {
+        w.println(Initializers.image.name());
+        w.println(_url!=null?_url.toString():"-");
+    }
+
+    public static ImageInitializer read(BufferedReader r, int version) throws IOException {
+        return new ImageInitializer(new File(r.readLine()));
     }
 }

@@ -3,6 +3,8 @@ package org.excelsi.nausicaa.ca;
 
 import java.util.Random;
 import java.io.DataOutputStream;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.io.IOException;
 
 
@@ -80,6 +82,20 @@ public class RandomInitializer implements Initializer {
         dos.writeByte(Initializers.random.getId());
     }
 
+    @Override public void write(PrintWriter w) {
+        w.println(Initializers.random.name());
+        w.println(_seed);       
+        _params.write(w);
+    }
+
+    public static RandomInitializer read(BufferedReader r, int version) throws IOException {
+        return new RandomInitializer(
+            null,
+            Long.parseLong(r.readLine()),
+            new Params(Float.parseFloat(r.readLine()))
+        );
+    }
+
     public static final class Params {
         public final float zeroWeight;
 
@@ -90,6 +106,10 @@ public class RandomInitializer implements Initializer {
 
         public Params(float zeroWeight) {
             this.zeroWeight = zeroWeight;
+        }
+
+        public void write(PrintWriter w) {
+            w.println(zeroWeight);
         }
     }
 }

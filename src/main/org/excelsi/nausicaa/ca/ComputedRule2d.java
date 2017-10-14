@@ -3,6 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -89,16 +90,17 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
         return _origin;
     }
 
-    public Iterator<Plane> frameIterator(final Plane c, final ExecutorService pool, final boolean doubleBuffer) {
+    public Iterator<Plane> frameIterator(final Plane c, final ExecutorService pool, final boolean doubleBuffer, final int parallel) {
         if(c==null) {
             throw new IllegalArgumentException("null plane");
         }
-        final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c,pool, doubleBuffer):null;
-        final int block = 300;
+        final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c,pool, doubleBuffer, parallel):null;
+        //final int block = 300;
+        final int block = c.getHeight() / parallel;
         int nworkers = c.getHeight()/block + (c.getHeight()%block>0?1:0);
         final Worker[] workers = new Worker[nworkers];
         final Pattern[] patterns = new Pattern[nworkers];
-        System.err.println("rule compute using "+workers.length+" workers");
+        System.err.println("rule compute using "+workers.length+" workers on blocksize "+block);
         for(int i=0;i<workers.length;i++) {
             patterns[i] = createPattern(pool);
             workers[i] = new Worker(patterns[i], 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block));
@@ -186,6 +188,10 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
         StringBuilder b = new StringBuilder(archetype().dims()+"d / "+_p);
         //b.append(super.humanize());
         return b.toString();
+    }
+
+    @Override public void write(PrintWriter w) {
+        w.println(genome());
     }
 
     public String genome() {

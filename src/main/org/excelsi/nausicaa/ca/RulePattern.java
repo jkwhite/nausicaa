@@ -19,7 +19,7 @@ public class RulePattern implements Pattern {
         _hr = hr;
         Plane p = new BufferedImagePlane(null, r.width(), heightForArchetype(hr.archetype()));
         r.copy(p);
-        _ps = hr.frameIterator(p, _pool, true);
+        _ps = hr.frameIterator(p, _pool, true, 1);
         _cur = p;
     }
 

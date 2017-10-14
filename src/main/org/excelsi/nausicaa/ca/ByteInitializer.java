@@ -3,6 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Random;
 
 
@@ -39,5 +40,9 @@ public class ByteInitializer implements Initializer {
     }
 
     @Override public void write(DataOutputStream dos) throws IOException {
+    }
+
+    @Override public void write(PrintWriter w) {
+        w.println("byte");
     }
 }
