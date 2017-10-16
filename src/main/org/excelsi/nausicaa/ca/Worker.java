@@ -44,12 +44,11 @@ public class Worker {
     }
 
     public void frame3d(final IntBlockPlane p1, final IntBlockPlane p2) {
+        final int d = _size*2+1;
         for(int i=_y1;i<_y2;i++) {
             for(int j=_x1;j<_x2;j++) {
                 for(int k=0;k<p1.getDepth();k++) {
-                    final int d = _size*2+1;
-                    //p1.getBlock(_pattern, j-_size, i-1, k-1, /*dx*/ 3, /*dy*/ 3, 3, 0);
-                    p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, d, 0);
+                    p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
                     p2.setCell(j, i, k, _wp.next(0, _pattern));
                 }
             }

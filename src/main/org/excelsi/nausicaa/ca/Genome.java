@@ -62,18 +62,38 @@ public final class Genome {
             },
             // decimate
             (cs)->{
-                while(cs.size()>1 && r.nextInt(3)==0) {
+                boolean first = true;
+                while(cs.size()>1 && (first || r.nextInt(3)==0)) {
                     int idx = r.nextInt(cs.size());
                     cs.remove(idx);
+                    first = false;
                 }
             },
             // add
             (cs)->{
                 cs.add(gf.randomCodon(a, r));
+            },
+            // adjust
+            (cs)->{
+                boolean any = true;
+                boolean de = false;
+                while(any && !de) {
+                    any = false;
+                    for(int i=0;i<cs.size();i++) {
+                        final Codon c = cs.get(i);
+                        if(c instanceof Unstable) {
+                            any = true;
+                            if(r.nextInt(3)==0) {
+                                cs.set(i, ((Unstable)c).destabilize(r));
+                                de = true;
+                            }
+                        }
+                    }
+                }
             }
         };
         final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(a)));
-        int max = 1+r.nextInt(Math.max(1,cs.size()/4));
+        int max = 1+r.nextInt(Math.max(1,cs.size()/3));
         for(int i=0;i<max;i++) {
             final Mutator m = mutators[r.nextInt(mutators.length)];
             m.mutate(cs);

@@ -116,10 +116,34 @@ public final class IntBlockPlane extends AbstractPlane {
         return into;
     }
 
+    /*
+    public int[] getBlockNew(final int[] into, final int x, final int y, final int z, final int dx, final int dy, final int dz, final int offset) {
+        if(x<0||x+dx>=_w||y<0||y+dy>=_h||z<0||z+dz>=_d) {
+            getBlockOld(into, x, y, z, dx, dy, dz, offset);
+        }
+        else {
+            //System.err.println("x="+x+", y="+y+", z="+z+", dx="+dx+", dy="+dy+", dz="+dz);
+            int idx=offset;
+            for(int k=z;k<z+dz;k++) {
+                for(int j=y;j<y+dy;j++) {
+                    //for(int i=x;i<x+dx;i++) {
+                        //System.err.println(i+", "+j+", "+k+" @ "+idx);
+                        //into[idx++] = getCell(i,j,k);
+                    //}
+                    System.arraycopy(_s, x+_hstride*j+_dstride*k, into, idx, dx);
+                    idx+=dx;
+                }
+            }
+        }
+        return into;
+    }
+    */
+
     @Override public void setRow(int[] row, int y) {
         throw new UnsupportedOperationException();
     }
 
+    private final int[] _rgb = new int[3];
     @Override public java.awt.Image toImage() {
         if(false) {
             return _i;
@@ -128,8 +152,8 @@ public final class IntBlockPlane extends AbstractPlane {
             //final BufferedImage p = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_BYTE_INDEXED, _p.toColorModel());
             //final WritableRaster r = p.getRaster();
             //System.err.print(".");
-            final int[] rgba = new int[4];
-            final int[] rgb = new int[3];
+            //final int[] rgba = new int[4];
+            final int[] rgb = _rgb; //new int[3];
             final int[][] unpacked = _unpacked;
             for(int i=0;i<_w;i++) {
                 for(int j=0;j<_h;j++) {
@@ -137,19 +161,25 @@ public final class IntBlockPlane extends AbstractPlane {
                     rgb[1]=0;
                     rgb[2]=0;
                     int mx = 0;
-                    for(int k=0;k<_d;k++) {
-                        //Colors.unpack(_p.color(getCell(i,j,k)), rgba);
-                        int idx = getCell(i,j,k);
-                        final int[] u = unpacked[idx];
-                        //rgb[0] += (_d-k)*rgba[0];
-                        //rgb[1] += (_d-k)*rgba[1];
-                        //rgb[2] += (_d-k)*rgba[2];
-                        rgb[0] += (_d-k)*u[0];
-                        rgb[1] += (_d-k)*u[1];
-                        rgb[2] += (_d-k)*u[2];
-                        mx += (_d-k);
+                    if(_d==1) {
+                        int idx = getCell(i,j,0);
+                        _i.setRGB(i,j,_p.color(idx));
                     }
-                    _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
+                    else {
+                        for(int k=0;k<_d;k++) {
+                            //Colors.unpack(_p.color(getCell(i,j,k)), rgba);
+                            int idx = getCell(i,j,k);
+                            final int[] u = unpacked[idx];
+                            //rgb[0] += (_d-k)*rgba[0];
+                            //rgb[1] += (_d-k)*rgba[1];
+                            //rgb[2] += (_d-k)*rgba[2];
+                            rgb[0] += (_d-k)*u[0];
+                            rgb[1] += (_d-k)*u[1];
+                            rgb[2] += (_d-k)*u[2];
+                            mx += (_d-k);
+                            _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
+                        }
+                    }
                 }
             }
             return _i;
@@ -224,7 +254,7 @@ public final class IntBlockPlane extends AbstractPlane {
     private final int normX(int x) {
         if(x<0) {
             x = (_w+x)%_w;
-            if(x<0) throw new IllegalArgumentException("neg x: "+x);
+            //if(x<0) throw new IllegalArgumentException("neg x: "+x);
         }
         else if(x>=_w) {
             x = x % _w;

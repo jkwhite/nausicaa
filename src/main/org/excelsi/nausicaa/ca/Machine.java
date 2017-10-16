@@ -8,6 +8,7 @@ public class Machine {
     private final Archetype _a;
     private final Genome _g;
     private final Codon[] _prg;
+    private final int[] _inst;
     private final Tape _t;
 
 
@@ -15,7 +16,8 @@ public class Machine {
         _a = a;
         _g = g;
         _prg = g.codons(a);
-        _t = new Tape(4096);
+        _inst = new int[_prg.length];
+        _t = new Tape(32768);
     }
 
     public Machine copy() {
@@ -31,6 +33,7 @@ public class Machine {
             _prg[i].op(p, _t);
             long en = System.currentTimeMillis();
             if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
+            _inst[i] += en-st;
             //d(_prg[i]+" "+_t);
         }
         int res = _t.pop();
@@ -53,11 +56,19 @@ public class Machine {
     public void tick() {
         for(int i=0;i<_prg.length;i++) {
             _prg[i].tick();
+            //_inst[i] = 0;
         }
     }
 
     @Override public String toString() {
         return _g.toString();
+    }
+
+    public void dump() {
+        for(int i=0;i<_prg.length;i++) {
+            System.err.print(_prg[i].code()+"="+_inst[i]+", ");
+        }
+        System.err.println();
     }
 
     private static void d(String s, Object... args) {

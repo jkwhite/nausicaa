@@ -7,75 +7,52 @@ import java.util.Arrays;
 
 public class Codons {
     private static final int BUF_SIZE = 32768;
-    //public static final String SUM = "s";
-    //public static final String PUSH = "p";
-    //public static final String PUSH_SURROUND = "pO";
-    //public static final String MOD = "mo";
-    //public static final String INTERSECT = "i";
-    //public static final String CONS = "c";
-    //public static final String EQUAL = "eq";
-    //public static final String NOT_EQUAL = "ne";
-    //public static final String IF = "if";
-    //public static final String SUBTRACT = "su";
-    //public static final String MULTIPLY = "mu";
-    //public static final String DIVIDE = "dv";
-    //public static final String POW = "po";
-    //public static final String MIN = "mn";
-    //public static final String MAX = "mx";
-    //public static final String AVG = "av";
-    //public static final String XOR = "xo";
-    //public static final String AND = "an";
-    //public static final String OR = "or";
-    //public static final String ROT_RIGHT = "rl";
-    //public static final String ROT_LEFT = "rl";
-    //public static final String SKIP = "x";
-    //public static final String NON_ZERO = "nz";
-    //public static final String TIME = "t";
-    //public static final String HISTO = "hi";
-    //public static final String DUPLICATE = "du";
-    //public static final String EXCLAMATORY = "ex";
 
-    public static final String SUM = "mi";
-    public static final String SUM_N = "me";
+    public static final String CONS = "a";
+    public static final String POW = "i";
+    public static final String INTERSECT = "u";
+    public static final String AVG_N = "e";
     public static final String PUSH = "o";
+    public static final String OR = "ka";
+    public static final String PUSH_SURROUND = "ki";
+    public static final String ROT_RIGHT = "ku";
+    public static final String GREATER = "ke";
+    public static final String ROT_LEFT = "ko";
+    public static final String EQUAL = "ma";
+    public static final String SUM = "mi";
+    public static final String MULTIPLY = "mu";
+    public static final String SUM_N = "me";
+    public static final String MOD = "mo";
+    public static final String MAX = "ta";
+    public static final String MIN = "chi";
+    public static final String XOR = "tsu";
+    public static final String TIME = "te";
+    public static final String AND = "to";
+    public static final String LESSER = "na";
+    public static final String NOT_EQUAL = "ne";
     public static final String PUSH_N = "no";
     public static final String PUSH_S = "ya";
-    public static final String PUSH_SURROUND = "ki";
-    public static final String PUSH_ALL = "go";
-    public static final String MOD = "mo";
-    public static final String INTERSECT = "u";
     public static final String INTERSECT_S = "yo";
-    public static final String CONS = "a";
-    public static final String EQUAL = "ma";
-    public static final String NOT_EQUAL = "ne";
-    public static final String IF = "ra";
     public static final String SUBTRACT = "su";
-    public static final String MULTIPLY = "mu";
-    public static final String DIVIDE = "ho";
-    public static final String POW = "i";
-    public static final String MIN = "chi";
-    public static final String MAX = "ta";
     public static final String AVG = "gi";
-    public static final String MIN_N = "jo";
-    public static final String MAX_N = "ri";
-    public static final String AVG_N = "e";
-    public static final String XOR = "tsu";
-    public static final String AND = "to";
-    public static final String OR = "ka";
-    public static final String ROT_RIGHT = "ku";
-    public static final String ROT_LEFT = "ko";
-    public static final String SKIP = "ro";
+    public static final String PUSH_ALL_ROT = "ge";
+    public static final String PUSH_ALL = "go";
     public static final String SKIP_N = "ji";
+    public static final String MIN_N = "jo";
+    public static final String IF = "ra";
+    public static final String MAX_N = "ri";
+    public static final String SKIP = "ro";
     public static final String NON_ZERO = "zu";
-    public static final String TIME = "te";
-    public static final String HISTO = "hi";
     public static final String DUPLICATE = "do";
     public static final String EXCLAMATORY = "ha";
+    public static final String HISTO = "hi";
     public static final String SUPERSYMMETRY = "hu";
+    public static final String DIVIDE = "ho";
     public static final String ROT_VEC_N = "ba";
-    public static final String GT = "be";
     public static final String LT = "bu";
+    public static final String GT = "be";
     public static final String NEGATE = "bo";
+
 
     public static Codon codon(final String s, final Archetype a) {
         //System.err.println("op '"+s+"'");
@@ -94,7 +71,7 @@ public class Codons {
             case SUM_N:
                 return new SumnN();
             case PUSH:
-                return new Push(p);
+                return new Push(p, a.sourceLength());
             case PUSH_N:
                 return new PushN();
             case PUSH_S:
@@ -105,6 +82,8 @@ public class Codons {
                 return new PushO();
             case PUSH_ALL:
                 return new PushA();
+            case PUSH_ALL_ROT:
+                return new PushARot();
             case INTERSECT:
                 return new Intersects();
             case INTERSECT_S:
@@ -171,12 +150,16 @@ public class Codons {
                 return new LessThan();
             case NEGATE:
                 return new Negate();
+            case LESSER:
+                return new Lesser();
+            case GREATER:
+                return new Greater();
             default:
                 throw new IllegalStateException("unknown opcode '"+code+"'");
         }
     }
 
-    public static class Nonzero implements Codon, Tape.TapeOp {
+    public static final class Nonzero implements Codon, Tape.TapeOp, Unstable {
         private final int[] _t = new int[BUF_SIZE];
         private final int _c;
 
@@ -189,16 +172,19 @@ public class Codons {
         }
 
         @Override public void op(int[] p, Tape t) {
-            t.selectIdx(_c);
-            t.apply(this, p);
-            /*
-            int m = t.popAll(_t, _c);
-            for(int i=0;i<m;i++) {
-                if(_t[i]!=0) {
-                    t.push(_t[i]);
-                }
+            if(_c==-1) {
+                t.selectIdxAll();
             }
-            */
+            else {
+                t.selectIdx(_c);
+            }
+            t.apply(this, p);
+            //int m = t.popAll(_t, _c);
+            //for(int i=0;i<m;i++) {
+                //if(_t[i]!=0) {
+                    //t.push(_t[i]);
+                //}
+            //}
         }
 
         @Override public int op(int[] t, int st, int en, int[] p) {
@@ -211,15 +197,50 @@ public class Codons {
             }
             return j;
         }
+
+        @Override public Codon destabilize(Random r) {
+            if(_c==-1) {
+                return new Nonzero(1+r.nextInt(9));
+            }
+            else {
+                int nc = _c+(r.nextInt(5)-2);
+                if(nc<=0) {
+                    nc = -1;
+                }
+                return new Nonzero(nc);
+            }
+        }
     }
+
+    /*
+    public static class Nonzero implements Codon {
+        private final int[] _t = new int[BUF_SIZE];
+        private final int _c;
+
+        public Nonzero(int c) {
+            _c = c;
+        }
+
+        @Override public String code() {
+            return _c==-1?NON_ZERO:(NON_ZERO+_c);
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            int m = t.popAll(_t, _c);
+            for(int i=0;i<m;i++) {
+                if(_t[i]!=0) {
+                    t.push(_t[i]);
+                }
+            }
+        }
+    }
+    */
 
     public static class Histo implements Codon {
         private final int[] _h;
-        private final int[] _z;
 
         public Histo(int colors) {
             _h = new int[colors];
-            _z = new int[1024];
         }
 
         @Override public String code() {
@@ -227,40 +248,9 @@ public class Codons {
         }
 
         @Override public void op(int[] p, Tape t) {
-            //System.arraycopy(_z, 0, _h, 0, _h.length);
-            int mx = 0;
-            for(int i=0;i<p.length;i++) {
-                final int v = p[i];
-                _z[mx++] = v;
-                _h[v]++;
+            for(int i=0;i<_h.length;i++) {
+                _h[i] = 0;
             }
-            for(int i=0;i<mx;i++) {
-                final int zi = _z[i];
-                t.push(_h[zi]);
-                _h[zi] = 0;
-                _z[i] = 0;
-            }
-            //for(int i=0;i<_h.length;i++) {
-                //t.push(_h[i]);
-            //}
-        }
-    }
-
-    public static class Histold implements Codon {
-        private final int[] _h;
-        private final int[] _z;
-
-        public Histold(int colors) {
-            _h = new int[colors];
-            _z = new int[colors];
-        }
-
-        @Override public String code() {
-            return HISTO;
-        }
-
-        @Override public void op(int[] p, Tape t) {
-            System.arraycopy(_z, 0, _h, 0, _h.length);
             for(int i=0;i<p.length;i++) {
                 _h[p[i]]++;
             }
@@ -270,7 +260,7 @@ public class Codons {
         }
     }
 
-    public static class Sum implements Codon, Tape.TapeOp {
+    public static final class Sum implements Codon, Tape.TapeOp {
         private final int[] _t = new int[BUF_SIZE];
 
         @Override public String code() {
@@ -280,14 +270,12 @@ public class Codons {
         @Override public void op(int[] p, Tape t) {
             t.selectAgg(-1);
             t.apply(this, p);
-            /*
-            int m = t.popAll(_t, -1);
-            int s = 0;
-            for(int i=0;i<m;i++) {
-                s += _t[i];
-            }
-            t.push(s);
-            */
+            //int m = t.popAll(_t, -1);
+            //int s = 0;
+            //for(int i=0;i<m;i++) {
+                //s += _t[i];
+            //}
+            //t.push(s);
         }
 
         @Override public int op(int[] t, int st, int en, int[] p) {
@@ -299,12 +287,31 @@ public class Codons {
         }
     }
 
-    public abstract static class Aggregate implements Codon, Tape.TapeOp {
+    /*
+    public static class OSum implements Codon {
+        private final int[] _t = new int[BUF_SIZE];
+
+        @Override public String code() {
+            return SUM;
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            int m = t.popAll(_t, -1);
+            int s = 0;
+            for(int i=0;i<m;i++) {
+                s += _t[i];
+            }
+            t.push(s);
+        }
+    }
+    */
+
+    public abstract static class NAggregate implements Codon, Tape.TapeOp {
         private final String _n;
         private final int _c;
         private final int[] _t = new int[BUF_SIZE];
 
-        public Aggregate(String n, int c) {
+        public NAggregate(String n, int c) {
             _n = n;
             _c = c;
         }
@@ -314,12 +321,20 @@ public class Codons {
         }
 
         @Override public void op(int[] p, Tape t) {
-            t.op(this, p);
+            if(_c==-1) {
+                t.selectAggAll();
+            }
+            else {
+                t.selectAgg(_c);
+            }
+            t.apply(this, p);
+            //t.op(this, p);
             //int m = t.popAll(_t, _c);
             //int a = agg(_t, m);
             //t.push(a);
         }
 
+        /*
         @Override public int op(final int[] tape, final int start, final int end, final int[] pat) {
             //System.err.println("start="+start+", end="+end);
             if(end==start||end==-1) {
@@ -350,19 +365,50 @@ public class Codons {
             tape[si] = a;
             return si;
         }
+        */
 
         @Override public String generate(Random r) {
             return _c==-1?_n:(_n+(1+r.nextInt(9)));
         }
 
-        abstract int agg(int[] p, int m, int e);
+        //abstract int agg(int[] p, int m, int e);
     }
 
-    public abstract static class AggregateN implements Codon, Tape.TapeOp {
+    /*
+    public abstract static class Aggregate implements Codon {
+        private final String _n;
+        private final int _c;
+        private final int[] _t = new int[BUF_SIZE];
+
+        public Aggregate(String n, int c) {
+            _n = n;
+            _c = c;
+        }
+
+        @Override public String code() {
+            return _c==-1?_n:(_n+_c);
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            int m = t.popAll(_t, _c);
+            int a = agg(_t, m);
+            t.push(a);
+        }
+
+        @Override public String generate(Random r) {
+            return _c==-1?_n:(_n+(1+r.nextInt(9)));
+        }
+
+        abstract int agg(int[] p, int m);
+    }
+    */
+
+    public abstract static class NAggregateN implements Codon, Tape.TapeOp {
+        //private int dump = 0;
         private final String _n;
         private final int[] _t = new int[BUF_SIZE];
 
-        public AggregateN(String n) {
+        public NAggregateN(String n) {
             _n = n;
         }
 
@@ -371,7 +417,12 @@ public class Codons {
         }
 
         @Override public void op(int[] p, Tape t) {
-            t.op(this, p);
+            int n = t.pop();
+            //++dump;
+            //if(dump<10) System.err.println("agg s="+n);
+            t.selectAgg(n);
+            t.apply(this, p);
+            //t.op(this, p);
             /*
             int s = t.pop();
             if(s>=_t.length) {
@@ -390,7 +441,8 @@ public class Codons {
             return _n;
         }
 
-        @Override public int op(final int[] tape, final int start, final int end, final int[] pat) {
+        /*
+        public int nop(final int[] tape, final int start, final int end, final int[] pat) {
             //System.err.println("start="+start+", end="+end);
             if(end==start||end==-1) {
                 return end;
@@ -420,9 +472,48 @@ public class Codons {
             tape[si] = a;
             return si;
         }
+        */
 
-        abstract int agg(int[] p, int m, int e);
+        //abstract int agg(int[] p, int m, int e);
     }
+
+    /*
+    public abstract static class AggregateN implements Codon {
+        //private int dump = 0;
+        private final String _n;
+        private final int[] _t = new int[BUF_SIZE];
+
+        public AggregateN(String n) {
+            _n = n;
+        }
+
+        @Override public String code() {
+            return _n;
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            int s = t.pop();
+            //++dump;
+            //if(dump<10) System.err.println("agg s="+s);
+            if(s>=_t.length) {
+                s = s%_t.length;
+            }
+            else if(s<0) {
+                s = (-s)%_t.length;
+            }
+            int m = t.popAll(_t, s);
+            int a = agg(_t, m);
+            //if(dump<10) System.err.println("agg m="+m+", a="+a);
+            t.push(a);
+        }
+
+        @Override public String generate(Random r) {
+            return _n;
+        }
+
+        abstract int agg(int[] p, int m);
+    }
+    */
 
     public static class Skip implements Codon {
         private final int _c;
@@ -455,14 +546,14 @@ public class Codons {
 
         @Override public void op(int[] p, Tape t) {
             int s = t.pop();
-            try {
+            //try {
                 //int m = t.popAll(_t, s);
                 t.skip(s);
-            }
-            catch(Exception e) {
-                System.err.println("FAILED popping "+s+" from "+t);
-                e.printStackTrace();
-            }
+            //}
+            //catch(Exception e) {
+                //System.err.println("FAILED popping "+s+" from "+t);
+                //e.printStackTrace();
+            //}
         }
 
         @Override public String generate(Random r) {
@@ -470,6 +561,37 @@ public class Codons {
         }
     }
 
+    public static final class Push implements Codon, Unstable {
+        private final int _p;
+        private final int _m;
+
+        public Push(int p, int m) {
+            _p = p;
+            _m = m;
+        }
+
+        @Override public String code() {
+            return PUSH+_p;
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            t.push(p[_p]);
+        }
+
+        @Override public String generate(Random r) {
+            return PUSH+(_p==-1?r.nextInt(_m):_p);
+        }
+
+        @Override public Codon destabilize(Random r) {
+            int v = Math.max(1,_p/3);
+            int np = _p+((1+r.nextInt(v))*(r.nextBoolean()?1:-1));
+            if(np>_m) {
+                np = _m;
+            }
+            return new Push(np, _m);
+        }
+    }
+    /*
     public static class Push implements Codon {
         private final int _p;
 
@@ -489,6 +611,7 @@ public class Codons {
             return PUSH+(_p==-1?r.nextInt(9):_p);
         }
     }
+    */
 
     public static class PushN implements Codon {
         public PushN() {
@@ -535,7 +658,7 @@ public class Codons {
         }
     }
 
-    public static class Constant implements Codon {
+    public static final class Constant implements Codon, Unstable {
         private final int _p;
 
         public Constant(int p) {
@@ -553,6 +676,15 @@ public class Codons {
         @Override public String generate(Random r) {
             return CONS+(_p==-1?r.nextInt(27):_p);
         }
+
+        @Override public Codon destabilize(Random r) {
+            int v = Math.max(1,_p/3);
+            int np = _p+((1+r.nextInt(v))*(r.nextBoolean()?1:-1));
+            if(np<0) {
+                np = 0;
+            }
+            return new Constant(np);
+        }
     }
 
     public static class PushO implements Codon {
@@ -562,12 +694,14 @@ public class Codons {
 
         @Override public void op(int[] p, Tape t) {
             int mid = p.length/2;
-            for(int i=0;i<mid;i++) {
-                t.push(p[i]);
-            }
-            for(int i=mid+1;i<p.length;i++) {
-                t.push(p[i]);
-            }
+            t.pushAll(p, mid);
+            t.pushAll(p, mid, mid+1);
+            //for(int i=0;i<mid;i++) {
+                //t.push(p[i]);
+            //}
+            //for(int i=mid+1;i<p.length;i++) {
+                //t.push(p[i]);
+            //}
         }
     }
 
@@ -577,9 +711,27 @@ public class Codons {
         }
 
         @Override public void op(int[] p, Tape t) {
-            for(int i=0;i<p.length;i++) {
-                t.push(p[i]);
-            }
+            t.pushAll(p, p.length);
+            //for(int i=0;i<p.length;i++) {
+                //t.push(p[i]);
+            //}
+        }
+    }
+
+    public static class PushARot implements Codon {
+        @Override public String code() {
+            return PUSH_ALL_ROT;
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            int n = t.pop() % p.length;
+            if(n<0) n=-n;
+            t.pushAll(p, p.length-n, n);
+            t.pushAll(p, n);
+            //t.pushAll(p, p.length);
+            //for(int i=0;i<p.length;i++) {
+                //t.push(p[i]);
+            //}
         }
     }
 
@@ -597,7 +749,7 @@ public class Codons {
         }
     }
 
-    public static class IntersectsSelf implements Codon {
+    public static final class IntersectsSelf implements Codon {
         @Override public String code() {
             return INTERSECT;
         }
@@ -653,10 +805,42 @@ public class Codons {
         }
     }
 
-    public abstract static class Binary implements Codon {
+    public abstract static class Binary implements Codon, Tape.TapeOp {
         private final String _code;
 
         public Binary(String code) {
+            _code = code;
+        }
+
+        @Override public String code() {
+            return _code;
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            t.selectAgg(2);
+            t.apply(this, p);
+            //int v1 = t.pop();
+            //int v2 = t.pop();
+            //int m = expr(v1, v2);
+            //t.push(m);
+        }
+
+        @Override public int op(int[] t, int s, int e, int[] p) {
+            //int te = s==e?0:t[e];
+            //int m = expr(t[s], te);
+            int ts = s==e?0:t[s];
+            int m = expr(t[e], ts);
+            return m;
+        }
+
+        abstract int expr(int v1, int v2);
+    }
+
+    /*
+    public abstract static class OBinary implements Codon {
+        private final String _code;
+
+        public OBinary(String code) {
             _code = code;
         }
 
@@ -673,6 +857,7 @@ public class Codons {
 
         abstract int expr(int v1, int v2);
     }
+    */
 
     public static class Subtract extends Binary {
         public Subtract() { super(SUBTRACT); }
@@ -715,32 +900,79 @@ public class Codons {
         }
     }
 
-    public static class Sumn extends Aggregate {
+    public static class Sumn extends NAggregate {
         public Sumn() { super(SUM, -1); }
         public Sumn(int c) { super(SUM, c); }
-        @Override int agg(int[] vs, int m, int e) {
+        @Override public int op(int[] vs, int m, int e, int[] p) {
             int s = vs[m];
             for(int i=m+1;i<=e;i++) {
                 s += vs[i];
             }
             return s;
         }
+        /*
+        @Override int agg(int[] vs, int m) {
+            if(m==0) return 0;
+            int s = vs[0];
+            for(int i=1;i<m;i++) {
+                s += vs[i];
+            }
+            return s;
+        }
+        */
     }
 
-    public static class SumnN extends AggregateN {
+    public static class SumnN extends NAggregateN {
         public SumnN() { super(SUM_N); }
-        @Override int agg(int[] vs, int m, int e) {
+        @Override public int op(int[] vs, int m, int e, int[] p) {
             int s = vs[m];
             for(int i=m+1;i<=e;i++) {
                 s += vs[i];
             }
             return s;
         }
+        //@Override int agg(int[] vs, int m) {
+            //if(m==0) return 0;
+            //int s = vs[0];
+            //for(int i=1;i<m;i++) {
+                //s += vs[i];
+            //}
+            //return s;
+        //}
     }
 
-    public static class Min extends Aggregate {
+    public static class Min extends NAggregate {
         public Min() { super(MIN, -1); }
         public Min(int c) { super(MIN, c); }
+        @Override public int op(int[] vs, int m, int e, int[] p) {
+            int min = vs[m];
+            for(int i=m+1;i<=e;i++) {
+                if(vs[i]<min) min=vs[i];
+            }
+            return min;
+        }
+        //@Override int agg(int[] vs, int m) {
+            //if(m==0) return 0;
+            //int min = vs[0];
+            //for(int i=1;i<m;i++) {
+                //if(vs[i]<min) min=vs[i];
+            //}
+            //return min;
+        //}
+    }
+
+    public static final class MinN extends NAggregateN {
+        public MinN() { super(MIN_N); }
+
+        @Override public int op(int[] vs, int m, int e, int[] p) {
+            int min = vs[m];
+            for(int i=m+1;i<=e;i++) {
+                if(vs[i]<min) min=vs[i];
+            }
+            return min;
+        }
+
+        /*
         @Override int agg(int[] vs, int m, int e) {
             int min = vs[m];
             for(int i=m+1;i<=e;i++) {
@@ -748,22 +980,56 @@ public class Codons {
             }
             return min;
         }
+        */
     }
 
+    /*
     public static class MinN extends AggregateN {
         public MinN() { super(MIN_N); }
-        @Override int agg(int[] vs, int m, int e) {
-            int min = vs[m];
-            for(int i=m+1;i<=e;i++) {
+        @Override int agg(int[] vs, int m) {
+            if(m==0) return 0;
+            int min = vs[0];
+            for(int i=1;i<m;i++) {
                 if(vs[i]<min) min=vs[i];
             }
             return min;
         }
     }
+    */
 
-    public static class Max extends Aggregate {
+    public static class Max extends NAggregate {
         public Max() { super(MAX, -1); }
         public Max(int c) { super(MAX, c); }
+        @Override public int op(int[] vs, int m, int e, int[] p) {
+            int max = vs[m];
+            for(int i=m+1;i<=e;i++) {
+                final int t = vs[i];
+                if(t>max) max=t;
+            }
+            return max;
+        }
+        /*
+        @Override int agg(int[] vs, int m) {
+            if(m==0) return 0;
+            int max = vs[0];
+            for(int i=1;i<m;i++) {
+                if(vs[i]>max) max=vs[i];
+            }
+            return max;
+        }
+        */
+    }
+
+    public static final class MaxN extends NAggregateN {
+        public MaxN() { super(MAX_N); }
+        @Override public int op(int[] vs, int m, int e, int[] p) {
+            int max = vs[m];
+            for(int i=m+1;i<=e;i++) {
+                if(vs[i]>max) max=vs[i];
+            }
+            return max;
+        }
+/*
         @Override int agg(int[] vs, int m, int e) {
             int max = vs[m];
             for(int i=m+1;i<=e;i++) {
@@ -771,41 +1037,113 @@ public class Codons {
             }
             return max;
         }
+    */
     }
 
+    /*
     public static class MaxN extends AggregateN {
         public MaxN() { super(MAX_N); }
-        @Override int agg(int[] vs, int m, int e) {
-            int max = vs[m];
-            for(int i=m+1;i<=e;i++) {
+        @Override int agg(int[] vs, int m) {
+            if(m==0) return 0;
+            int max = vs[0];
+            for(int i=1;i<m;i++) {
                 if(vs[i]>max) max=vs[i];
             }
             return max;
         }
     }
+    */
 
+    public static final class Avg extends NAggregate {
+        public Avg() { super(AVG, -1); }
+        public Avg(int c) { super(AVG, c); }
+        @Override public int op(int[] vs, int m, int e, int[] p) {
+            int sum = vs[m];
+            for(int i=m+1;i<=e;i++) {
+                sum += vs[i];
+            }
+            return sum/(1+e-m);
+        }
+        //@Override int agg(int[] vs, int m, int e) {
+            //int sum = vs[m];
+            //for(int i=m+1;i<=e;i++) {
+                //sum += vs[i];
+            //}
+            //return sum/(1+e-m);
+        //}
+    }
+
+    /*
     public static class Avg extends Aggregate {
         public Avg() { super(AVG, -1); }
         public Avg(int c) { super(AVG, c); }
+        @Override int agg(int[] vs, int m) {
+            if(m==0) return 0;
+            int sum = vs[0];
+            for(int i=1;i<m;i++) {
+                sum += vs[i];
+            }
+            return sum/m;
+        }
+    }
+    */
+
+    private static void dump(int[] vs, int m, int e, int[] p, int sum, int res) {
+        System.err.println("vs.length="+vs.length+", m="+m+", e="+e+", sum="+sum+", res="+res);
+    }
+
+    public static final class AvgN extends NAggregateN {
+        //private int dump = 0;
+//
+        public AvgN() { super(AVG_N); }
+        /*
         @Override int agg(int[] vs, int m, int e) {
             int sum = vs[m];
             for(int i=m+1;i<=e;i++) {
                 sum += vs[i];
             }
             return sum/(1+e-m);
+        }
+        */
+
+        @Override public int op(int[] vs, int m, int e, int[] p) {
+            //if(e-m==0) return 0;
+            int sum = vs[m];
+            for(int i=m+1;i<=e;i++) {
+                sum += vs[i];
+            }
+            int res = sum/(1+e-m);
+            //if(dump++<10) {
+                //dump(vs, m, e, p, sum, res);
+            //}
+            return res;
         }
     }
 
+    /*
     public static class AvgN extends AggregateN {
+        private int dump = 0;
+
         public AvgN() { super(AVG_N); }
-        @Override int agg(int[] vs, int m, int e) {
-            int sum = vs[m];
-            for(int i=m+1;i<=e;i++) {
+        @Override int agg(int[] vs, int m) {
+            if(m==0) {
+                if(dump++<10) {
+                    System.err.println("zero");
+                }
+                return 0;
+            }
+            int sum = vs[0];
+            for(int i=1;i<m;i++) {
                 sum += vs[i];
             }
-            return sum/(1+e-m);
+            int res = sum/m;
+            if(dump++<10) {
+                dump(vs, 0, m, null, sum, res);
+            }
+            return res;
         }
     }
+    */
 
     public static class Xor extends Binary {
         public Xor() { super(XOR); }
@@ -825,6 +1163,20 @@ public class Codons {
         public LessThan() { super(LT); }
         @Override int expr(int v1, int v2) {
             return v1<v2?1:0;
+        }
+    }
+
+    public static final class Greater extends Binary {
+        public Greater() { super(GREATER); }
+        @Override int expr(int v1, int v2) {
+            return v1>=v2?v1:0;
+        }
+    }
+
+    public static final class Lesser extends Binary {
+        public Lesser() { super(LESSER); }
+        @Override int expr(int v1, int v2) {
+            return v1<=v2?v1:0;
         }
     }
 
@@ -876,8 +1228,7 @@ public class Codons {
         }
 
         @Override public void op(int[] p, Tape t) {
-            int v = t.pop();
-            t.push(v);
+            int v = t.peek();
             t.push(v);
         }
     }

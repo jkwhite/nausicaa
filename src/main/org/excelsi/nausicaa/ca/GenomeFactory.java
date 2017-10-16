@@ -42,11 +42,12 @@ public class GenomeFactory {
             weight(1, new If()),
             //weight(1, new Time()),
             weight(1, new Nonzero(-1)),
-            weight(1, new Push((a.sourceLength()-1)/2)),
+            weight(1, new Push((a.sourceLength()-1)/2, a.sourceLength())),
             weight(1, new PushN()),
             weight(1, new PushS()),
             weight(1, new PushA()),
-            weight(1, new Push(-1)),
+            weight(1, new PushARot()),
+            weight(1, new Push(-1, a.sourceLength())),
             weight(1, new Constant(-1)),
             weight(1, new Duplicate()),
             weight(1, new Exclamatory()),
@@ -55,6 +56,8 @@ public class GenomeFactory {
             weight(1, new GreaterThan()),
             weight(1, new LessThan()),
             weight(1, new Negate()),
+            weight(1, new Lesser()),
+            weight(1, new Greater()),
             weight(1, new Mod())
         );
     }

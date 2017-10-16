@@ -466,7 +466,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         }
 
         @Override public int next(int[] pattern) {
-            //if(++_c%100==0) System.err.print("-");
+            if(++_c%1000000==0) _m.dump();
             return _m.compute(pattern);
         }
 

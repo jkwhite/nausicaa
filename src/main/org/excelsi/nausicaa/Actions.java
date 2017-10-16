@@ -198,7 +198,7 @@ public class Actions {
     public void info(NViewer v) {
         final CA ca = v.getActiveCA();
         final Plane plane = v.getPlaneDisplayProvider().getActivePlane();
-        final Plane nextPlane = ca.getRule().frameIterator(plane, Pools.bgr(), false).next();
+        final Plane nextPlane = ca.getRule().frameIterator(plane, Pools.bgr(), false, 1).next();
         final Stats stats = Stats.forPlane(plane);
         final Stats nextStats = Stats.forPlane(nextPlane);
         final Multistats ms = stats.compareWith(nextStats);

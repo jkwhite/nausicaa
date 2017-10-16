@@ -2,6 +2,7 @@ package org.excelsi.nausicaa.ca;
 
 
 public final class Tape {
+    //private int dump = 0;
     private final int[] _t;
     private int _i = -1;
     private int _s = -1;
@@ -20,14 +21,33 @@ public final class Tape {
     }
 
     public void selectAgg(int n) {
-        select(n, true);
+        select(n, true, false);
+    }
+
+    public void selectAggAll() {
+        select(-1, true, true);
     }
 
     public void selectIdx(int n) {
-        select(n, false);
+        select(n, false, false);
     }
 
-    public void select(int n, boolean a) {
+    public void selectIdxAll() {
+        select(-1, false, true);
+    }
+
+    public void select(int n, boolean a, boolean all) {
+        //++dump;
+        if(all) {
+            n = -1;
+        }
+        else if(n>=_t.length) {
+            n = n%_t.length;
+        }
+        else if(n<0) {
+            n = (-n)%_t.length;
+        }
+        //System.err.println("agg 
         if(_i==-1||n==0) {
             _s = -1;
         }
@@ -96,9 +116,15 @@ public final class Tape {
 
     public int pushAll(int[] v, int c) {
         int m = Math.min(v.length, c);
-        for(int i=0;i<m;i++) {
-            push(v[i]);
-        }
+        System.arraycopy(v, 0, _t, _i+1, m);
+        _i+=m;
+        return m;
+    }
+
+    public int pushAll(int[] v, int c, int offset) {
+        int m = Math.min(v.length-offset, c);
+        System.arraycopy(v, offset, _t, _i+1, m);
+        _i+=m;
         return m;
     }
 
@@ -118,9 +144,15 @@ public final class Tape {
     }
 
     public void skip(int c) {
-        for(int i=0;i<c;i++) {
-            pop();
+        if(c>0) {
+            _i -= c;
+            if(_i<-1) {
+                _i = -1;
+            }
         }
+        //for(int i=0;i<c;i++) {
+            //pop();
+        //}
     }
 
     public void op(final TapeOp op, final int[] p) {
