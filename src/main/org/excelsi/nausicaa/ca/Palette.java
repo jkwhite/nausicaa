@@ -238,6 +238,26 @@ public final class Palette {
         return rainbow(numColors, black, s);
     }
 
+    public static Palette randomCutRainbow(Random om, int numColors, int div, boolean black, int density) {
+        Palette p = randomShinyRainbow(om, numColors, black, density);
+        int[] colors = p.getColors();
+        return randomCutRainbow(om, numColors, colors, div, black, density);
+    }
+
+    public static Palette randomCutRainbow(Random om, int numColors, int[] colors, int div, boolean black, int density) {
+        int chance = Math.max(1,numColors/div);
+        for(int i=0;i<colors.length;i++) {
+            if(om.nextInt(numColors)<chance) {
+                int len = 1+om.nextInt(numColors/100);
+                for(int j=0;j<len&&i+j<numColors;j++) {
+                    colors[i+j] = 0;
+                }
+                i+=len;
+            }
+        }
+        return new Palette(colors);
+    }
+
     public static Palette randomShinyRainbow(Random om, int numColors, boolean black, int density) {
         final int[][] s = new int[2+om.nextInt(density)][3];
         for(int i=0;i<s.length;i++) {
@@ -276,11 +296,9 @@ public final class Palette {
             int high = Math.min(spectrum.length-1, (int) Math.ceil(s));
             double wgt = s-low;
 
-            //System.err.println("low="+low+", high="+high+" wgt="+wgt);
             int red = (int) (spectrum[low][0]*(1d-wgt) + spectrum[high][0]*(wgt));
             int green = (int) (spectrum[low][1]*(1d-wgt) + spectrum[high][1]*(wgt));
             int blue = (int) (spectrum[low][2]*(1d-wgt) + spectrum[high][2]*(wgt));
-            //System.err.println("r="+red+", g="+green+", b="+blue);
             packed[i] = Colors.pack(red, green, blue);
         }
         return new Palette(packed);

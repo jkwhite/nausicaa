@@ -116,6 +116,9 @@ public final class Tape {
 
     public int pushAll(int[] v, int c) {
         int m = Math.min(v.length, c);
+        if(_i+1+m>=_t.length) {
+            m = _t.length-(_i+1);
+        }
         System.arraycopy(v, 0, _t, _i+1, m);
         _i+=m;
         return m;

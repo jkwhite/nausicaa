@@ -144,6 +144,7 @@ public final class IntBlockPlane extends AbstractPlane {
     }
 
     private final int[] _rgb = new int[3];
+    private final boolean FIRST = true;
     @Override public java.awt.Image toImage() {
         if(false) {
             return _i;
@@ -177,8 +178,9 @@ public final class IntBlockPlane extends AbstractPlane {
                             rgb[1] += (_d-k)*u[1];
                             rgb[2] += (_d-k)*u[2];
                             mx += (_d-k);
-                            _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
+                            if(FIRST&&(u[0]>0||u[1]>0||u[2]>0)) break;
                         }
+                        _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
                     }
                 }
             }

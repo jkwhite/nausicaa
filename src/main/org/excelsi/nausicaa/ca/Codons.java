@@ -29,6 +29,8 @@ public class Codons {
     public static final String TIME = "te";
     public static final String AND = "to";
     public static final String LESSER = "na";
+    public static final String SQRT = "ni";
+    public static final String CBRT = "nu";
     public static final String NOT_EQUAL = "ne";
     public static final String PUSH_N = "no";
     public static final String PUSH_S = "ya";
@@ -154,6 +156,10 @@ public class Codons {
                 return new Lesser();
             case GREATER:
                 return new Greater();
+            case SQRT:
+                return new Sqrt();
+            case CBRT:
+                return new Cbrt();
             default:
                 throw new IllegalStateException("unknown opcode '"+code+"'");
         }
@@ -169,6 +175,10 @@ public class Codons {
 
         @Override public String code() {
             return _c==-1?NON_ZERO:(NON_ZERO+_c);
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
         }
 
         @Override public void op(int[] p, Tape t) {
@@ -236,15 +246,55 @@ public class Codons {
     }
     */
 
-    public static class Histo implements Codon {
-        private final int[] _h;
+    public static final class Histo implements Codon {
+        private final short[] _h;
+        private final int[] _z;
 
         public Histo(int colors) {
+            _h = new short[colors];
+            _z = new int[1024];
+        }
+
+        @Override public String code() {
+            return HISTO;
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            int mx = 0;
+            for(int i=0;i<p.length;i++) {
+                final int v = p[i];
+                _z[mx++] = v;
+                _h[v]++;
+            }
+            for(int i=0;i<mx;i++) {
+                final int zi = _z[i];
+                final short c = _h[zi];
+                if(c>0) {
+                    t.push(c);
+                    _h[zi] = (short)0;
+                }
+                _z[i] = 0;
+            }
+        }
+    }
+
+    public static class Histold implements Codon {
+        private final int[] _h;
+
+        public Histold(int colors) {
             _h = new int[colors];
         }
 
         @Override public String code() {
             return HISTO;
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
         }
 
         @Override public void op(int[] p, Tape t) {
@@ -265,6 +315,10 @@ public class Codons {
 
         @Override public String code() {
             return SUM;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
         }
 
         @Override public void op(int[] p, Tape t) {
@@ -318,6 +372,10 @@ public class Codons {
 
         @Override public String code() {
             return _c==-1?_n:(_n+_c);
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
         }
 
         @Override public void op(int[] p, Tape t) {
@@ -414,6 +472,10 @@ public class Codons {
 
         @Override public String code() {
             return _n;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
         }
 
         @Override public void op(int[] p, Tape t) {
@@ -527,6 +589,10 @@ public class Codons {
             return _c==-1?SKIP:(SKIP+_c);
         }
 
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
         @Override public void op(int[] p, Tape t) {
             //int m = t.popAll(_t, _c);
             t.skip(_c);
@@ -542,6 +608,10 @@ public class Codons {
 
         @Override public String code() {
             return SKIP_N;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
         }
 
         @Override public void op(int[] p, Tape t) {
@@ -572,6 +642,10 @@ public class Codons {
 
         @Override public String code() {
             return PUSH+_p;
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
         }
 
         @Override public void op(int[] p, Tape t) {
@@ -621,6 +695,10 @@ public class Codons {
             return PUSH_N;
         }
 
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
         @Override public void op(int[] p, Tape t) {
             long s = t.pop();
             long s2 = s;
@@ -649,6 +727,10 @@ public class Codons {
             return PUSH_S;
         }
 
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
         @Override public void op(int[] p, Tape t) {
             t.push(p[p.length/2]);
         }
@@ -667,6 +749,10 @@ public class Codons {
 
         @Override public String code() {
             return CONS+_p;
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
         }
 
         @Override public void op(int[] p, Tape t) {
@@ -692,6 +778,10 @@ public class Codons {
             return PUSH_SURROUND;
         }
 
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
         @Override public void op(int[] p, Tape t) {
             int mid = p.length/2;
             t.pushAll(p, mid);
@@ -710,6 +800,10 @@ public class Codons {
             return PUSH_ALL;
         }
 
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
         @Override public void op(int[] p, Tape t) {
             t.pushAll(p, p.length);
             //for(int i=0;i<p.length;i++) {
@@ -721,6 +815,10 @@ public class Codons {
     public static class PushARot implements Codon {
         @Override public String code() {
             return PUSH_ALL_ROT;
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
         }
 
         @Override public void op(int[] p, Tape t) {
@@ -740,6 +838,10 @@ public class Codons {
             return INTERSECT;
         }
 
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
         @Override public void op(int[] p, Tape t) {
             int up = t.pop();
             int low = t.pop();
@@ -754,6 +856,10 @@ public class Codons {
             return INTERSECT;
         }
 
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
         @Override public void op(int[] p, Tape t) {
             int up = t.pop();
             int low = t.pop();
@@ -766,6 +872,10 @@ public class Codons {
     public static class Equals implements Codon {
         @Override public String code() {
             return EQUAL;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
         }
 
         @Override public void op(int[] p, Tape t) {
@@ -783,6 +893,10 @@ public class Codons {
             return TIME;
         }
 
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
         @Override public void op(int[] p, Tape t) {
             t.push(_t);
         }
@@ -795,6 +909,10 @@ public class Codons {
     public static class NotEquals implements Codon {
         @Override public String code() {
             return NOT_EQUAL;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
         }
 
         @Override public void op(int[] p, Tape t) {
@@ -814,6 +932,10 @@ public class Codons {
 
         @Override public String code() {
             return _code;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
         }
 
         @Override public void op(int[] p, Tape t) {
@@ -890,13 +1012,40 @@ public class Codons {
     public static class Pow extends Binary {
         public Pow() { super(POW); }
         @Override int expr(int v1, int v2) {
-            //long st = System.currentTimeMillis();
             int v = Maths.pow(v1,Math.max(0,Math.abs(v2)));
-            //long en = System.currentTimeMillis();
-            //if(en-st>2000) {
-                //System.err.println("took "+(en-st)+" for pow("+v1+","+v2+")");
-            //}
             return v;
+        }
+    }
+
+    public static class Sqrt implements Codon {
+        @Override public String code() {
+            return SQRT;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            //int v = Maths.pow(v1,Math.max(0,Math.abs(v2)));
+            int v = (int) Math.sqrt(Math.abs(t.pop()));
+            t.push(v);
+        }
+    }
+
+    public static class Cbrt implements Codon {
+        @Override public String code() {
+            return CBRT;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            //int v = Maths.pow(v1,Math.max(0,Math.abs(v2)));
+            int v = (int) Math.cbrt(t.pop());
+            t.push(v);
         }
     }
 
@@ -1213,6 +1362,10 @@ public class Codons {
             return IF;
         }
 
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
         @Override public void op(int[] p, Tape t) {
             int cond = t.pop();
             int fl = t.pop();
@@ -1227,6 +1380,10 @@ public class Codons {
             return DUPLICATE;
         }
 
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
         @Override public void op(int[] p, Tape t) {
             int v = t.peek();
             t.push(v);
@@ -1236,6 +1393,10 @@ public class Codons {
     public static class Negate implements Codon {
         @Override public String code() {
             return NEGATE;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
         }
 
         @Override public void op(int[] p, Tape t) {
@@ -1255,6 +1416,10 @@ public class Codons {
             return SUPERSYMMETRY;
         }
 
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
         @Override public void op(int[] p, Tape t) {
             int v = t.pop();
             int r = _max-v;
@@ -1265,6 +1430,10 @@ public class Codons {
     public static class Exclamatory implements Codon {
         @Override public String code() {
             return POW;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
         }
 
         @Override public void op(int[] p, Tape t) {
@@ -1285,6 +1454,10 @@ public class Codons {
 
         @Override public String code() {
             return ROT_VEC_N;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
         }
 
         @Override public void op(int[] p, Tape t) {

@@ -26,6 +26,8 @@ public class GenomeFactory {
             //weight(1, new Avg(1)),
             weight(1, new AvgN()),
             weight(1, new Pow()),
+            weight(1, new Sqrt()),
+            weight(1, new Cbrt()),
             weight(1, new Xor()),
             weight(1, new And()),
             weight(1, new Or()),
@@ -65,8 +67,8 @@ public class GenomeFactory {
 
     public Genome generate(final Archetype a, final Random r) {
         final WeightedFactory<Codon> f = buildFactory(a);
-        final StringBuilder b = new StringBuilder(Codons.HISTO+"-");
-        int len = 1+r.nextInt(12);
+        final StringBuilder b = new StringBuilder(Codons.PUSH_ALL+"-");
+        int len = 1+r.nextInt(6);
         for(int i=0;i<len;i++) {
             final Codon c = f.random(r);
             b.append(c.generate(r));

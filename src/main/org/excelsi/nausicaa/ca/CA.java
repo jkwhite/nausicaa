@@ -100,7 +100,10 @@ public final class CA {
                     break;
                 case 3:
                     System.err.println("generating for "+_prelude);
+                    final long st = System.currentTimeMillis();
                     _r.generate(p, 1, _prelude, POOL, false, true, null);
+                    final long en = System.currentTimeMillis();
+                    System.err.println("generation took "+(en-st)+" millis");
                     break;
                 case 2:
                 default:

@@ -388,6 +388,9 @@ public final class ComputedPattern implements Pattern, Mutatable {
     public ComputedPattern(Archetype a, RuleLogic logic) {
         _a = a;
         _logic = logic;
+        _lastP = new int[(int)Math.pow(2*_a.size()+1, _a.dims())];
+        int size = (int)Math.pow(2*_a.size()+1, _a.dims());
+        _cache = new PCache(300000, size);
     }
 
     public ComputedPattern copy() {
@@ -403,8 +406,143 @@ public final class ComputedPattern implements Pattern, Mutatable {
         throw new UnsupportedOperationException();
     }
 
+    static final class PCache {
+        public boolean h;
+        public int lk;
+        private final int _psize;
+        private final int _csize;
+        //private final int _bsize;
+        private final int[] _c;
+        //private final int[][] _p;
+        private final int[] _p;
+        private final int[] _hot;
+
+        public PCache(int csize, int psize) {
+            _c = new int[csize];
+            _hot = new int[csize];
+            //_p = new int[csize][];
+            _csize = csize;
+            _psize = psize;
+            //_bsize = _psize + 1;
+            _p = new int[csize*psize];
+            //_p = new int[_bsize*csize];
+            System.err.println("plen: "+_p.length);
+            //for(int i=0;i<_p.length;i++) {
+                //_p[i] = new int[psize];
+            //}
+        }
+
+        public int find(int[] p) {
+            final int i = key(p);
+            lk = i;
+            h = true;
+            int j = 0;
+            //if(i<0) throw new IllegalStateException("negative i: "+i);
+            for(int idx = i*_psize;idx<(i+1)*_psize;idx++) {
+            //int idx;
+            //for(idx = i*_bsize;idx<(i+1)*_bsize-1;idx++) {
+                //if(j<0) throw new IllegalStateException("negative j: "+j+" idx: "+idx+" i: "+i+" psize: "+_psize);
+                //if(idx<0) throw new IllegalStateException("negative idx: "+idx+" j: "+j+" i: "+i+" psize: "+_psize);
+                if(p[j++]!=_p[idx]) {
+                    h = false;
+                    break;
+                }
+            }
+            //h = Arrays.equals(p, _p[i]);
+            return _c[i];
+            //return _p[idx];
+        }
+
+        public void put(int[] p, int r) {
+            //final int i = key(p);
+            final int i = lk;
+            _hot[i]++;
+            System.arraycopy(p, 0, _p, i*_psize, p.length);
+            //System.arraycopy(p, 0, _p, i*_bsize, p.length);
+            _c[i] = r;
+            //_p[i*_bsize+p.length] = r;
+        }
+
+        public void dump() {
+            int w = 0;
+            int b = 0;
+            int max = 0;
+            int min = 99999999;
+            int mb = 0;
+            for(int i=0;i<_csize;i++) {
+                if(_hot[i]>0) {
+                    w+=_hot[i];
+                    b++;
+                    if(max<_hot[i]) {
+                        max = _hot[i];
+                        mb = i;
+                    }
+                    if(min>_hot[i]) min = _hot[i];
+                    //System.err.print(i+": "+_hot[i]);
+                    //System.err.print(" ");
+                }
+                //if(i%10==0) {
+                    //System.err.println();
+                //}
+            }
+            System.err.println("total writes: "+w+" total buckets in use: "+b+" / "+_hot.length+" max: "+max+"("+mb+") min: "+min);
+        }
+
+        private int key(int[] p) {
+            int k = (p[0]<<24^p[1]<<16^p[2]<<8^p[3]^p[4]<<8^p[5]<<16^p[6]<<24);
+            k = k^(p[7]<<24^p[8]); //<<16^p[9]<<8^p[10]^p[11]<<8^p[12]<<16^p[13]<<24);
+            k = k % _p.length;
+            //if(k<0) k=-k;
+            //return k;
+            //int k = p[0];
+            //final int l = p.length;
+            //for(int i=1;i<l;i+=4) {
+                //k = 7*k + p[i];
+            //}
+            //int k = 7*p[0]+31*p[1]+113*p[2]+7*p[3]+31*p[4]+113*p[5]+11*p[6];
+            //k = k * 7*p[7]+31*p[8]+113*p[9]+7*p[10]+31*p[11]+113*p[12]+11*p[13];
+            //k = k * 7*p[14]+31*p[15]+113*p[16]+7*p[17]+31*p[18]+113*p[19]+11*p[20];
+            //k = k * 7*p[21]+31*p[22]+113*p[23]+7*p[24]+31*p[25]+113*p[26]+11*p[27];
+            if(k<0) k=-k;
+            //k = k % _p.length;
+            //k = k % _csize;
+            k = k % _csize;
+            return k;
+        }
+    }
+
+    private PCache _cache;
+    private int[] _lastP;
+    private int _lastN;
+    private long _hits;
+    private long _misses;
     @Override public int next(int pattern, final int[] p2) {
-        return _logic.next(p2);
+        /*
+        if(Arrays.equals(p2, _lastP)) {
+            _hits++;
+            if(_hits%1000000==0) System.err.println("hits: "+_hits);
+            return _lastN;
+        }
+        */
+        //_lastP = p2;
+        //System.arraycopy(p2, 0, _lastP, 0, p2.length);
+        int r = _cache.find(p2);
+        if(_cache.h) {
+            _hits++;
+            if(_hits%1000000==0) {
+                System.err.println("hits: "+_hits+" misses: "+_misses+" ratio: "+(_hits/((float)_hits+_misses)));
+                if(_hits%5000000==0) {
+                    _cache.dump();
+                }
+            }
+            return r;
+        }
+        _misses++;
+        r = _logic.next(p2);
+        //if(_cache.lk!=0) {
+            _cache.put(p2, r);
+        //}
+        return r;
     }
 
     @Override public void tick() {

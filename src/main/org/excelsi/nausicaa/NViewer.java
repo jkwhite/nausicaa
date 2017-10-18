@@ -86,7 +86,7 @@ public class NViewer extends JFrame implements UIActions {
 
     public void init() {
         //final int w = 600, h = 600, d = 1;
-        final int w = 200, h = 200, d = 1, pre = 0;
+        final int w = 300, h = 300, d = 1, pre = 0;
         //final int w = 3, h = 3, d = 1, pre=0;
         _config = new Config(w, h, d);
         createMenu();
@@ -235,6 +235,8 @@ public class NViewer extends JFrame implements UIActions {
 
     private void createPaletteMenu(int shortcut, JMenuBar bar) {
         JMenu pal = new JMenu("Palette");
+        final boolean[] hack = new boolean[1];
+        hack[0] = true;
 
         AbstractAction greys = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -254,24 +256,26 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction rains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setActiveCA(getActiveCA().palette(Palette.rainbow(getActiveCA().archetype().colors(), false)));
+                setActiveCA(getActiveCA().palette(Palette.rainbow(getActiveCA().archetype().colors(), hack[0])));
             }
         };
         JMenuItem rain = pal.add(rains);
         rain.setText("Rainbow");
 
+        /*
         AbstractAction brains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setActiveCA(getActiveCA().palette(Palette.rainbow(getActiveCA().archetype().colors(), true)));
+                setActiveCA(getActiveCA().palette(Palette.rainbow(getActiveCA().archetype().colors(), hack[0])));
             }
         };
         JMenuItem brain = pal.add(brains);
         brain.setText("Black Rainbow");
+        */
 
         AbstractAction rrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), false, getActiveCA().archetype().colors()/2)));
+                setActiveCA(getActiveCA().palette(Palette.randomRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/2)));
             }
         };
         JMenuItem rrain = pal.add(rrains);
@@ -280,7 +284,7 @@ public class NViewer extends JFrame implements UIActions {
         AbstractAction rdrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), false, getActiveCA().archetype().colors())));
+                setActiveCA(getActiveCA().palette(Palette.randomRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors())));
             }
         };
         JMenuItem rdrain = pal.add(rdrains);
@@ -289,34 +293,54 @@ public class NViewer extends JFrame implements UIActions {
         AbstractAction srdrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomShinyRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), false, getActiveCA().archetype().colors())));
+                setActiveCA(getActiveCA().palette(Palette.randomShinyRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/2)));
             }
         };
         JMenuItem srdrain = pal.add(srdrains);
         srdrain.setText("Sparkly Spectrum");
 
+        AbstractAction bsrdrains = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                getActiveCA().getRandom().nextBoolean();
+                setActiveCA(getActiveCA().palette(Palette.randomShinyRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors())));
+            }
+        };
+        JMenuItem bsrdrain = pal.add(bsrdrains);
+        bsrdrain.setText("Dense Sparkly Spectrum");
+
+        AbstractAction ssrdrains = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                getActiveCA().getRandom().nextBoolean();
+                setActiveCA(getActiveCA().palette(Palette.randomShinyRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/4)));
+            }
+        };
+        JMenuItem ssrdrain = pal.add(ssrdrains);
+        ssrdrain.setText("Sparse Sparkly Spectrum");
+
         AbstractAction wrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), false, getActiveCA().archetype().colors()/2)));
+                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/2)));
             }
         };
         JMenuItem wrain = pal.add(wrains);
         wrain.setText("Wrapped Spectrum");
 
+        /*
         AbstractAction wbrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), true, getActiveCA().archetype().colors()/2)));
+                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/2)));
             }
         };
         JMenuItem wbrain = pal.add(wbrains);
         wbrain.setText("Wrapped Black Spectrum");
+        */
 
         AbstractAction wdrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), false, getActiveCA().archetype().colors())));
+                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors())));
             }
         };
         JMenuItem wdrain = pal.add(wdrains);
@@ -374,11 +398,13 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction sepia = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setActiveCA(getActiveCA().palette(Palette.rainbow(getActiveCA().archetype().colors(), false, new int[][]{ {34,27,1}, {84,49,13}, {112,66,20}, {165,139,36}, {196,145,35} })));
+                setActiveCA(getActiveCA().palette(Palette.rainbow(getActiveCA().archetype().colors(), hack[0], new int[][]{ {34,27,1}, {84,49,13}, {112,66,20}, {165,139,36}, {196,145,35} })));
             }
         };
         JMenuItem isepia = pal.add(sepia);
         isepia.setText("Sepia");
+
+        pal.addSeparator();
 
         AbstractAction acbgreens = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -387,6 +413,65 @@ public class NViewer extends JFrame implements UIActions {
         };
         JMenuItem acbgreen = pal.add(acbgreens);
         acbgreen.setText("All Creation");
+
+        AbstractAction cutsp = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                getActiveCA().getRandom().nextBoolean();
+                setActiveCA(getActiveCA().palette(Palette.randomCutRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), 60, hack[0], getActiveCA().archetype().colors()/4)));
+            }
+        };
+        JMenuItem cutsps = pal.add(cutsp);
+        cutsps.setText("Shepherd Moons");
+
+        AbstractAction neongs = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                getActiveCA().getRandom().nextBoolean();
+                setActiveCA(getActiveCA().palette(Palette.randomCutRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), 20, hack[0], getActiveCA().archetype().colors()/4)));
+            }
+        };
+        JMenuItem neong = pal.add(neongs);
+        neong.setText("Neon Garden");
+
+        AbstractAction aesth = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                getActiveCA().getRandom().nextBoolean();
+                setActiveCA(getActiveCA().palette(
+                    new SpectrumBuilder(getActiveCA().archetype().colors())
+                        .cut(true)
+                        .key(0f,0,0,0)
+                        .key(0.1f,0,12,31)
+                        .key(0.01f,45,255,250)
+                        .key(0.1f,0,15,45)
+                        .key(0.01f,45,255,250)
+                        .key(0.1f,70,32,115)
+                        .key(0.01f,45,255,250)
+                        .key(0.1f,70,32,115)
+                        .key(0.01f,45,255,250)
+                        .key(0.1f,5,32,109)
+                        .key(0.01f,45,255,250)
+                        .key(0.1f,201,17,251)
+                        .key(0.01f,45,255,250)
+                        .key(0.1f,99,21,141)
+                        .key(0.01f,45,255,250)
+                        .key(0.1f,255,0,254)
+                        .build()
+                ));
+            }
+        };
+        JMenuItem aesths = pal.add(aesth);
+        aesths.setText("Aesthetic");
+
+        pal.addSeparator();
+
+        final JCheckBoxMenuItem black = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                hack[0] = !hack[0];
+                //setState(hack[0]);
+            }
+        });
+        black.setState(hack[0]);
+        JMenuItem bl = pal.add(black);
+        bl.setText("Black Zero");
 
         bar.add(pal);
     }

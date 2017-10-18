@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import static org.excelsi.nausicaa.ca.WeightedFactory.Weight;
 
 
 public final class Genome {
@@ -25,88 +26,120 @@ public final class Genome {
         return ops.toArray(new Codon[0]);
     }
 
+    public Genome prune(Archetype a) {
+        final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(a)));
+        while(cs.size()>1) {
+            if(!cs.get(0).usesPattern()) {
+                cs.remove(0);
+            }
+            else {
+                break;
+            }
+        }
+        return fromCodons(cs);
+    }
+
     public Genome mutate(final Archetype a, final GenomeFactory gf, final Random r) {
-        final Mutator[] mutators = new Mutator[]{
-            // jumble
-            (cs)->{
-                Collections.shuffle(cs);
-            },
-            // replace
-            (cs)->{
-                int idx = r.nextInt(cs.size());
-                cs.set(idx, gf.randomCodon(a, r));
-            },
-            // swap
-            (cs)->{
-                if(cs.size()>1) {
-                    int idx1 = r.nextInt(cs.size());
-                    boolean d = r.nextBoolean();
-                    int idx2 = d&&idx1<cs.size()-1?idx1+1:idx1>1?idx1-1:r.nextInt(cs.size());
-                    Codon c1 = cs.get(idx1);
-                    Codon c2 = cs.get(idx2);
-                    cs.set(idx1, c2);
-                    cs.set(idx2, c1);
-                }
-            },
-            // insert
-            (cs)->{
-                int idx = r.nextInt(cs.size());
-                cs.add(idx, gf.randomCodon(a, r));
-            },
-            // remove
-            (cs)->{
-                if(cs.size()>1) {
+        final WeightedFactory<Mutator> mf = new WeightedFactory<>(
+            new Weight<>(5,
+                // jumble
+                (cs)->{
+                    Collections.shuffle(cs);
+                }),
+            new Weight<>(20,
+                // replace
+                (cs)->{
                     int idx = r.nextInt(cs.size());
-                    cs.remove(idx);
-                }
-            },
-            // decimate
-            (cs)->{
-                boolean first = true;
-                while(cs.size()>1 && (first || r.nextInt(3)==0)) {
+                    cs.set(idx, gf.randomCodon(a, r));
+                }),
+            new Weight<>(30,
+                // swap
+                (cs)->{
+                    if(cs.size()>1) {
+                        int idx1 = r.nextInt(cs.size());
+                        boolean d = r.nextBoolean();
+                        int idx2 = d&&idx1<cs.size()-1?idx1+1:idx1>1?idx1-1:r.nextInt(cs.size());
+                        Codon c1 = cs.get(idx1);
+                        Codon c2 = cs.get(idx2);
+                        cs.set(idx1, c2);
+                        cs.set(idx2, c1);
+                    }
+                }),
+            new Weight<>(15,
+                // insert
+                (cs)->{
                     int idx = r.nextInt(cs.size());
-                    cs.remove(idx);
-                    first = false;
-                }
-            },
-            // add
-            (cs)->{
-                cs.add(gf.randomCodon(a, r));
-            },
-            // adjust
-            (cs)->{
-                boolean any = true;
-                boolean de = false;
-                while(any && !de) {
-                    any = false;
-                    for(int i=0;i<cs.size();i++) {
-                        final Codon c = cs.get(i);
-                        if(c instanceof Unstable) {
-                            any = true;
-                            if(r.nextInt(3)==0) {
-                                cs.set(i, ((Unstable)c).destabilize(r));
-                                de = true;
+                    cs.add(idx, gf.randomCodon(a, r));
+                }),
+            new Weight<>(20,
+                // remove
+                (cs)->{
+                    if(cs.size()>1) {
+                        int idx = r.nextInt(cs.size());
+                        cs.remove(idx);
+                    }
+                }),
+            new Weight<>(10,
+                // decimate
+                (cs)->{
+                    boolean first = true;
+                    while(cs.size()>1 && (first || r.nextInt(3)==0)) {
+                        int idx = r.nextInt(cs.size());
+                        cs.remove(idx);
+                        first = false;
+                    }
+                }),
+            new Weight<>(15,
+                // add
+                (cs)->{
+                    cs.add(gf.randomCodon(a, r));
+                }),
+            new Weight<>(10,
+                // adjust
+                (cs)->{
+                    boolean any = true;
+                    boolean de = false;
+                    while(any && !de) {
+                        any = false;
+                        for(int i=0;i<cs.size();i++) {
+                            final Codon c = cs.get(i);
+                            if(c instanceof Unstable) {
+                                any = true;
+                                if(r.nextInt(3)==0) {
+                                    cs.set(i, ((Unstable)c).destabilize(r));
+                                    de = true;
+                                }
                             }
                         }
                     }
-                }
+                })
+        );
+        int tries = 0;
+        Genome child;
+        do {
+            child = replicate(a, mf, r);
+            if(tries==999) {
+                System.err.println("failed to mutate "+this);
             }
-        };
+        } while(child.equals(this) && ++tries<1000);
+        System.err.println(this+" => "+child);
+        return child;
+    }
+
+    private Genome replicate(final Archetype a, final WeightedFactory<Mutator> mutators, final Random r) {
         final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(a)));
         int max = 1+r.nextInt(Math.max(1,cs.size()/3));
         for(int i=0;i<max;i++) {
-            final Mutator m = mutators[r.nextInt(mutators.length)];
+            final Mutator m = mutators.random(r);
             m.mutate(cs);
         }
         StringBuilder b = new StringBuilder();
         for(Codon c:cs) {
-            //System.err.println("appending code '"+c.code()+"' for "+c.getClass());
             b.append(c.code());
             b.append("-");
         }
         b.setLength(b.length()-1);
-        System.err.println(this+" => "+b.toString());
-        return new Genome(b.toString());
+        return fromCodons(cs).prune(a);
     }
 
     public String c() {
@@ -115,6 +148,23 @@ public final class Genome {
 
     @Override public String toString() {
         return c();
+    }
+
+    @Override public boolean equals(Object o) {
+        if(o==null||o.getClass()!=Genome.class) {
+            return false;
+        }
+        return ((Genome)o).c().equals(c());
+    }
+
+    private static Genome fromCodons(List<Codon> cs) {
+        StringBuilder b = new StringBuilder();
+        for(Codon c:cs) {
+            b.append(c.code());
+            b.append("-");
+        }
+        b.setLength(b.length()-1);
+        return new Genome(b.toString());
     }
 
     @FunctionalInterface
