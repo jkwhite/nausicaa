@@ -11,7 +11,7 @@ import org.excelsi.nausicaa.ca.Rule;
 import org.excelsi.nausicaa.ca.CA;
 import org.excelsi.nausicaa.ca.IndexedRule;
 import org.excelsi.nausicaa.ca.Palette;
-import org.excelsi.nausicaa.ca.ComputedRule2d;
+import org.excelsi.nausicaa.ca.Genomic;
 
 
 public class RuleEditor extends JComponent implements TimelineListener {
@@ -47,8 +47,8 @@ public class RuleEditor extends JComponent implements TimelineListener {
         JPanel scr = new JPanel(new FlowLayout());
 
         final JTextField rule = new JTextField(50);
-        if(_rule instanceof ComputedRule2d) {
-            rule.setText(((ComputedRule2d)_rule).genome());
+        if(_rule instanceof Genomic) {
+            rule.setText(((Genomic)_rule).genome());
         }
         scr.add(rule);
         rule.addKeyListener(new KeyAdapter() {

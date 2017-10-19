@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 import java.util.Random;
 
 
-public class ComputedRule2d extends AbstractRule implements Mutatable {
+public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
     private final Ruleset _origin;
     private final Pattern _p;
     private final Rule _meta;
@@ -90,13 +90,13 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
         return _origin;
     }
 
-    public Iterator<Plane> frameIterator(final Plane c, final ExecutorService pool, final boolean doubleBuffer, final int parallel) {
+    public Iterator<Plane> frameIterator(final Plane c, final ExecutorService pool, final GOptions opt) {
         if(c==null) {
             throw new IllegalArgumentException("null plane");
         }
-        final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c,pool, doubleBuffer, parallel):null;
+        final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c,pool, opt):null;
         //final int block = 300;
-        final int block = c.getHeight() / parallel;
+        final int block = c.getHeight() / opt.parallel();
         int nworkers = c.getHeight()/block + (c.getHeight()%block>0?1:0);
         final Worker[] workers = new Worker[nworkers];
         final Pattern[] patterns = new Pattern[nworkers];
@@ -141,12 +141,11 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
                     }
                 }
                 finally {
-                    //frameP2.unlock();
                     frameP2.unlockWrite();
                 }
                 tmp = p1;
                 p1 = p2;
-                if(doubleBuffer) {
+                if(opt.doubleBuffer()) {
                     p2 = tmp;
                 }
                 else {
@@ -181,7 +180,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
     }
 
     @Override public Mutatable mutate(Random r) {
-        return derive(((ComputedPattern)_p).mutate(r));
+        return derive((Pattern)((Mutatable)_p).mutate(r));
     }
 
     @Override public String humanize() {
@@ -194,7 +193,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
         w.println(genome());
     }
 
-    public String genome() {
+    @Override public String genome() {
         return _p.toString();
     }
 
@@ -203,6 +202,6 @@ public class ComputedRule2d extends AbstractRule implements Mutatable {
     }
 
     protected final Pattern createPattern(final ExecutorService pool) {
-        return ((ComputedPattern)_p).copy();
+        return _p.copy();
     }
 }

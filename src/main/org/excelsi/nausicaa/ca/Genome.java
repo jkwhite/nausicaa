@@ -65,7 +65,7 @@ public final class Genome {
                         cs.set(idx2, c1);
                     }
                 }),
-            new Weight<>(15,
+            new Weight<>(30,
                 // insert
                 (cs)->{
                     int idx = r.nextInt(cs.size());
@@ -89,7 +89,7 @@ public final class Genome {
                         first = false;
                     }
                 }),
-            new Weight<>(15,
+            new Weight<>(30,
                 // add
                 (cs)->{
                     cs.add(gf.randomCodon(a, r));

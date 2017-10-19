@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.SwingUtilities;
 import org.excelsi.nausicaa.ca.Plane;
 import org.excelsi.nausicaa.ca.Pools;
+import org.excelsi.nausicaa.ca.GOptions;
 
 
 public class Animation extends Thread implements TimelineListener, ConfigListener {
@@ -168,7 +169,7 @@ top:        while(_state==State.animate) {
                 p = d.getPlane();
             }
             _parallel = parallel;
-            _frames = d.getRule().frameIterator(p, pool, true, _parallel);
+            _frames = d.getRule().frameIterator(p, pool, new GOptions(true, _parallel, 1));
             _d = d;
         }
 

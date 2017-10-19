@@ -3,6 +3,7 @@ package org.excelsi.nausicaa;
 
 import org.excelsi.nausicaa.ca.CA;
 import org.excelsi.nausicaa.ca.Plane;
+import org.excelsi.nausicaa.ca.GOptions;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
@@ -70,7 +71,7 @@ public class JfxWindow extends Application {
         stage.setScene(s);
         stage.show();
 
-        final Iterator<Plane> frames = _ca.getRule().frameIterator(p, _pool, true, 1);
+        final Iterator<Plane> frames = _ca.getRule().frameIterator(p, _pool, new GOptions(true, 1, 1));
         _sched.scheduleAtFixedRate(()->{
                 final Plane next = frames.next();
                 Platform.runLater(()->{_jfxCa.addPlane(next);});

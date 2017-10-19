@@ -101,7 +101,7 @@ public class IndexedRule1d extends AbstractIndexedRule {
         return 0f;
     }
 
-    @Override public Iterator<Plane> frameIterator(final Plane initial, final ExecutorService pool, final boolean doubleBuffer, final int parallel) {
+    @Override public Iterator<Plane> frameIterator(final Plane initial, final ExecutorService pool, final GOptions opt) {
         generate(initial, 1, initial.getHeight(), pool, false, false, null);
 
         return new Iterator<Plane>() {

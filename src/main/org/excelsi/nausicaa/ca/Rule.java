@@ -31,10 +31,10 @@ public interface Rule extends java.io.Serializable, Humanizable {
     void write(DataOutputStream dos) throws IOException;
     void write(PrintWriter w);
     float generate(Plane c, int start, int end, ExecutorService pool, boolean stopOnSame, boolean overwrite, Updater u);
-    Iterator<Plane> frameIterator(Plane initial, ExecutorService pool, boolean doubleBuffer, int parallel);
+    Iterator<Plane> frameIterator(Plane initial, ExecutorService pool, GOptions opt);
 
-    default Stream<Plane> stream(Plane initial, ExecutorService pool, boolean doubleBuffer, int parallel) {
-        Iterable<Plane> it = ()->frameIterator(initial, pool, doubleBuffer, parallel);
+    default Stream<Plane> stream(Plane initial, ExecutorService pool, GOptions opt) {
+        Iterable<Plane> it = ()->frameIterator(initial, pool, opt);
         return StreamSupport.stream(it.spliterator(), false);
     }
 

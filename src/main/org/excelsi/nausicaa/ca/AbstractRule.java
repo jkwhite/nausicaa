@@ -82,7 +82,7 @@ public abstract class AbstractRule /*extends WritableImagePlane*/ implements Rul
         return toString();
     }
 
-    @Override public Iterator<Plane> frameIterator(Plane initial, ExecutorService pool, boolean doubleBuffer, int parallel) {
+    @Override public Iterator<Plane> frameIterator(Plane initial, ExecutorService pool, GOptions opt) {
         throw new UnsupportedOperationException();
     }
 
