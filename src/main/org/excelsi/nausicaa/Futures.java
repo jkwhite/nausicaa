@@ -137,7 +137,6 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     }
 
     public void setCA(CA ca) {
-        System.err.println("setting ca "+ca);
         final int width = getCAWidth();
         final int height = getCAHeight();
         _ca = ca.size(width, height, getCADepth(), getCAPrelude());
@@ -194,11 +193,13 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
 
     private MutationFactor createMutationFactor() {
         //return MutationFactor.defaultFactor().withAlpha(Integer.parseInt(_config.getVariable("mutator_alpha", "20")));
-        return Actions.createMutationFactor(_config);
+        MutationFactor mf = Actions.createMutationFactor(_config, _random);
+        return mf;
     }
 
     public CA mutate(CA ca) {
-        return new MultiTransform(_random, createMutationFactor(), _config.getForceSymmetry()?new Symmetry(true):null).hueVariations(_config.getHueVariations()).transform(ca);
+        final CA res = new MultiTransform(_random, createMutationFactor(), _config.getForceSymmetry()?new Symmetry(true):null).hueVariations(_config.getHueVariations()).transform(ca);
+        return res;
     }
 
     public int getCAWidth() {

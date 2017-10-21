@@ -187,7 +187,12 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         setPlane(_c.createPlane());
         Info i = new Info(_c);
         Rule r = ca.getRule();
-        _meta.setText(r.humanize());
+        String text = r.humanize();
+        System.err.println("******** RULE: "+System.identityHashCode(r)+" SET RULE: "+text);
+        if(text.length()>56) {
+            text = "..."+text.substring(text.length()-56,text.length());
+        }
+        _meta.setText(text);
         /*
         if(r.dimensions()==1) {
             if(r.getHyperrule()!=null) {

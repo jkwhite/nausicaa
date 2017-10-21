@@ -25,8 +25,9 @@ public class MutatingRule extends AbstractRule implements Mutatable, Genomic {
         _r = r;
     }
 
-    @Override public Mutatable mutate(Random r) {
-        return new MutatingRule((ComputedRule2d)_rule.mutate(r), _r);
+    //@Override public Mutatable mutate(Random r) {
+    @Override public Mutatable mutate(MutationFactor m) {
+        return new MutatingRule((ComputedRule2d)_rule.mutate(m), _r);
     }
 
     @Override public String humanize() {
@@ -96,7 +97,7 @@ public class MutatingRule extends AbstractRule implements Mutatable, Genomic {
     }
 
     private void internalMutate(final Plane c, final ExecutorService pool, final GOptions opt) {
-        _rule = (ComputedRule2d)_rule.mutate(_r);
+        _rule = (ComputedRule2d)_rule.mutate(new MutationFactor().withRandom(_r));
         init(c, pool, opt);
     }
 

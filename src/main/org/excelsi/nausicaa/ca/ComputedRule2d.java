@@ -179,13 +179,13 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         return 0f;
     }
 
-    @Override public Mutatable mutate(Random r) {
-        return derive((Pattern)((Mutatable)_p).mutate(r));
+    //@Override public Mutatable mutate(Random r) {
+    @Override public Mutatable mutate(MutationFactor m) {
+        return derive((Pattern)((Mutatable)_p).mutate(m));
     }
 
     @Override public String humanize() {
         StringBuilder b = new StringBuilder(archetype().dims()+"d / "+_p);
-        //b.append(super.humanize());
         return b.toString();
     }
 

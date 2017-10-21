@@ -35,8 +35,8 @@ public class SequencePattern implements Pattern, Mutatable {
         return _p[0].archetype();
     }
 
-    @Override public Mutatable mutate(Random r) {
-        return new SequencePattern(_s.mutate(r));
+    @Override public Mutatable mutate(MutationFactor m) {
+        return new SequencePattern(_s.mutate(m));
     }
 
     @Override public void tick() {
@@ -50,7 +50,7 @@ public class SequencePattern implements Pattern, Mutatable {
             float x = (float)t/_thresh;
             float s = _thresh*(1f+(float)Math.tanh(6f*x-3f));
             //System.err.println("samples: "+s);
-            _samples = Math.max(1, (int)s);
+            _samples = Math.max(2, (int)s);
         }
         if(t==0) {
             _p[0] = _s.pattern();
@@ -142,19 +142,44 @@ public class SequencePattern implements Pattern, Mutatable {
             return new Sequence(ns);
         }
 
-        public Sequence mutate(Random r) {
+        //public Sequence mutate(Random r) {
+        public Sequence mutate(MutationFactor m) {
             List<SEntry> ns = new ArrayList<>();
-            for(SEntry s:_s) {
-                ComputedPattern np;
-                if(r.nextBoolean()) {
-                    np = (ComputedPattern)s.p.mutate(r);
-                }
-                else {
-                    np = (ComputedPattern)s.p.copy();
-                }
-                ns.add(new SEntry(s.t, np));
+            switch(m.mode()) {
+                case "normal":
+                    System.err.println("stage mutate: "+m.stage()+" of max "+_s.size());
+                    for(int i=0;i<_s.size();i++) {
+                        final SEntry s = _s.get(i);
+                        ComputedPattern np;
+                        if(i==m.stage()) {
+                            System.err.println("MUTATING "+i);
+                            np = (ComputedPattern)s.p.mutate(m);
+                        }
+                        else {
+                            System.err.println("COPYING "+i);
+                            np = (ComputedPattern)s.p.copy();
+                        }
+                        ns.add(new SEntry(s.t, np));
+                    }
+                    break;
+                case "add":
+                    final Archetype a = _s.get(0).p.archetype();
+                    for(SEntry s:_s) {
+                        ns.add(new SEntry(s.t, (ComputedPattern)s.p.copy()));
+                    }
+                    ns.add(new SEntry(m.random().nextInt(70)+70, new ComputedPattern(a, ComputedPattern.random(a, m.random()))));
+                    break;
+                case "remove":
+                    for(int i=0;i<_s.size();i++) {
+                        if(i!=m.stage()) {
+                            ns.add(new SEntry(m.random().nextInt(70)+70, (ComputedPattern)_s.get(i).p.copy()));
+                        }
+                    }
+                    break;
             }
-            return new Sequence(ns);
+            Sequence news = new Sequence(ns);
+            System.err.println("GOT NEWS: "+news.humanize());
+            return news;
         }
 
         public void clear() {

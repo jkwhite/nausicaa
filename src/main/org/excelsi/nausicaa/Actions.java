@@ -29,6 +29,7 @@ import org.excelsi.nausicaa.ca.Initializer;
 import org.excelsi.nausicaa.ca.Training;
 import org.excelsi.nausicaa.ca.RetryingMutationStrategy;
 import org.excelsi.nausicaa.ca.MutationStrategies;
+import org.excelsi.nausicaa.ca.Mutatable;
 import org.excelsi.nausicaa.ca.MutationFactor;
 import org.excelsi.nausicaa.ca.Stats;
 import org.excelsi.nausicaa.ca.Multistats;
@@ -346,7 +347,7 @@ public class Actions {
         final JDialog d = new JDialog(v, "Mutation parameters");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(2,2));
+        JPanel top = new JPanel(new GridLayout(3,2));
 
         top.add(new JLabel("Alpha"));
         final JTextField alpha = new JTextField();
@@ -360,6 +361,12 @@ public class Actions {
         mc.setColumns(3);
         top.add(mc);
 
+        top.add(new JLabel("Mutation stage"));
+        final JTextField ms = new JTextField();
+        ms.setText(config.getVariable("mutator_stage", "0"));
+        ms.setColumns(3);
+        top.add(ms);
+
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
         JButton ne = new JButton("Ok");
@@ -370,6 +377,7 @@ public class Actions {
                 d.dispose();
                 config.setVariable("mutator_alpha", alpha.getText());
                 config.setVariable("mutator_maxcolors", mc.getText());
+                config.setVariable("mutator_stage", ms.getText());
                 config.notify("mutator");
             }
         });
@@ -794,6 +802,26 @@ public class Actions {
         mutate(v, config, rand, _lastMutator);
     }
 
+    public void addRuleStage(final NViewer v, Config config, Random rand) {
+        final CA ca = v.getActiveCA();
+        final Rule r = ca.getRule();
+        if(r instanceof Mutatable) {
+            v.setActiveCA(ca.mutate((Rule)((Mutatable)r).mutate(createMutationFactor(config, rand).withMode("add")), rand));
+            int nstage = 1+Integer.parseInt(config.getVariable("mutator_stage", "0"));
+            config.setVariable("mutator_stage", ""+nstage);
+        }
+    }
+
+    public void removeRuleStage(final NViewer v, Config config, Random rand) {
+        final CA ca = v.getActiveCA();
+        final Rule r = ca.getRule();
+        if(r instanceof Mutatable) {
+            v.setActiveCA(ca.mutate((Rule)((Mutatable)r).mutate(createMutationFactor(config, rand).withMode("remove")), rand));
+            int stage = Integer.parseInt(config.getVariable("mutator_stage", "0"));
+            config.setVariable("mutator_stage", ""+(stage-1));
+        }
+    }
+
     public void randomMutation(NViewer v) {
     }
 
@@ -803,16 +831,20 @@ public class Actions {
             m = Mutator.chain(m, new Symmetry());
         }
         final CA ca = v.getActiveCA();
-        v.setActiveCA(new RuleTransform(rand, m, createMutationFactor(config)).transform(ca));
+        v.setActiveCA(new RuleTransform(rand, m, createMutationFactor(config, rand)).transform(ca));
     }
 
-    public static MutationFactor createMutationFactor(Config config) {
+    public static MutationFactor createMutationFactor(Config config, Random r) {
         int mc = Integer.parseInt(config.getVariable("mutator_maxcolors", "9"));
-        return MutationFactor.defaultFactor()
+        MutationFactor mf = MutationFactor.defaultFactor()
             .withAlpha(Integer.parseInt(config.getVariable("mutator_alpha", "20")))
+            .withStage(Integer.parseInt(config.getVariable("mutator_stage", "0")))
+            .withRandom(r)
             .withValidator((a)->{
                 return a.colors()<mc;
             });
+        //System.err.println("####### stage: "+mf.stage());
+        return mf;
     }
 
     public void zoomIn(NViewer v) {

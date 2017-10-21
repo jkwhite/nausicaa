@@ -26,8 +26,9 @@ public class SequenceRule extends AbstractRule implements Mutatable, Genomic {
         _rule = _s.rule();
     }
 
-    @Override public Mutatable mutate(Random r) {
-        return new SequenceRule(_s.mutate(r));
+    //@Override public Mutatable mutate(Random r) {
+    @Override public Mutatable mutate(MutationFactor m) {
+        return new SequenceRule(_s.mutate(m));
     }
 
     @Override public String humanize() {
@@ -147,10 +148,10 @@ public class SequenceRule extends AbstractRule implements Mutatable, Genomic {
             return new Sequence(_s);
         }
 
-        public Sequence mutate(Random r) {
+        public Sequence mutate(MutationFactor m) {
             List<SEntry> ns = new ArrayList<>();
             for(SEntry s:_s) {
-                ns.add(new SEntry(r.nextInt(40)+30, (ComputedRule2d)s.r.mutate(r)));
+                ns.add(new SEntry(m.random().nextInt(40)+30, (ComputedRule2d)s.r.mutate(m)));
             }
             return new Sequence(ns);
         }

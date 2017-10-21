@@ -18,7 +18,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         _logic = logic;
         _lastP = new int[(int)Math.pow(2*_a.size()+1, _a.dims())];
         int size = (int)Math.pow(2*_a.size()+1, _a.dims());
-        _cache = new PCache(100000, size);
+        _cache = new PCache(50000, size);
     }
 
     public ComputedPattern copy() {
@@ -175,9 +175,10 @@ public final class ComputedPattern implements Pattern, Mutatable {
         _logic.tick();
     }
 
-    @Override public ComputedPattern mutate(Random r) {
+    //@Override public ComputedPattern mutate(Random r) {
+    @Override public ComputedPattern mutate(MutationFactor m) {
         GenomeFactory gf = new GenomeFactory();
-        return new ComputedPattern(_a, _logic.mutate(_a, gf, r));
+        return new ComputedPattern(_a, _logic.mutate(_a, gf, m.random()));
     }
 
     public interface RuleLogic {

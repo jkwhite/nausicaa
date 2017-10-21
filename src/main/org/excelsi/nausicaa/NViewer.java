@@ -93,7 +93,8 @@ public class NViewer extends JFrame implements UIActions {
         setSize(_width, _height);
         int dims = 3;
         int size = 1;
-        int colors = 1001;
+        //int colors = 1001;
+        int colors = 1111;
         _timeline = new Timeline();
         org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors);
         org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
@@ -764,6 +765,7 @@ public class NViewer extends JFrame implements UIActions {
 
     private void createMutateMenu(int shortcut, JMenuBar bar) {
         JMenu mutate = new JMenu("Mutate");
+        /*
         AbstractAction rep = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _a.repeatLastMutation(NViewer.this, _config, _random);
@@ -801,8 +803,26 @@ public class NViewer extends JFrame implements UIActions {
             mutat.setText(m.name());
         }
         mutate.addSeparator();
+        */
+
+        JMenuItem addseg = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.addRuleStage(NViewer.this, _config, _random);
+            }
+        });
+        mutate.add(addseg);
+        addseg.setText("Add rule stage");
+
+        JMenuItem remseg = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.removeRuleStage(NViewer.this, _config, _random);
+            }
+        });
+        mutate.add(remseg);
+        remseg.setText("Remove active rule stage");
 
         final JCheckBoxMenuItem[] mhack = new JCheckBoxMenuItem[2];
+        /*
         JCheckBoxMenuItem forceSym = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _config.setForceSymmetry(!_config.getForceSymmetry());
@@ -815,6 +835,7 @@ public class NViewer extends JFrame implements UIActions {
         forceSym.setText("Force symmetry");
         forceSym.setState(_config.getForceSymmetry());
         forceSym.setSelected(_config.getForceSymmetry());
+        */
 
         JCheckBoxMenuItem incHueVariations = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {

@@ -44,11 +44,11 @@ public class AbstractComputedRuleset implements Ruleset {
                     new SequencePattern(
                         new SequencePattern.Sequence()
                             .s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
-                            .s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
-                            .s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
-                            .s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
-                            .s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
-                            .s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
+                            //.s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
+                            //.s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
+                            //.s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
+                            //.s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
+                            //.s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
                         )
                     );
             }
