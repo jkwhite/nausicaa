@@ -13,7 +13,8 @@ public enum Initializers {
     neapolitan((byte)2),
     word((byte)3),
     image((byte)4),
-    gaussian((byte)5);
+    gaussian((byte)5),
+    clusteredgaussian((byte)6);
 
     private final byte _id;
 
@@ -37,6 +38,8 @@ public enum Initializers {
                 return new ImageInitializer();
             case gaussian:
                 return new GaussianInitializer();
+            case clusteredgaussian:
+                return new ClusteredGaussianInitializer();
             case random:
             default:
                 return new RandomInitializer();
@@ -66,6 +69,8 @@ public enum Initializers {
                 return ImageInitializer.read(r, v);
             case "gaussian":
                 return GaussianInitializer.read(r, v);
+            case "clusteredgaussian":
+                return ClusteredGaussianInitializer.read(r, v);
             case "random":
                 return RandomInitializer.read(r, v);
             default:

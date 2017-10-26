@@ -20,6 +20,7 @@ import org.excelsi.nausicaa.ca.Encoder;
 import org.excelsi.nausicaa.ca.RandomMutationStrategy;
 import org.excelsi.nausicaa.ca.RandomInitializer;
 import org.excelsi.nausicaa.ca.GaussianInitializer;
+import org.excelsi.nausicaa.ca.ClusteredGaussianInitializer;
 import org.excelsi.nausicaa.ca.WordEncoder;
 import org.excelsi.nausicaa.ca.ByteInitializer;
 import org.excelsi.nausicaa.ca.WordInitializer;
@@ -475,6 +476,76 @@ public class Actions {
                         Integer.parseInt(maxpoints.getText()),
                         Float.parseFloat(maxrad.getText()),
                         Float.parseFloat(density.getText())
+                    )));
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
+    public void chooseClusteredGaussian(final NViewer v, Config config) {
+        final JDialog d = new JDialog(v, "Clustered gaussian initializer");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(/*rows*/5,2));
+
+        top.add(new JLabel("Zero weight"));
+        final JTextField zeroWeight = new JTextField();
+        zeroWeight.setText(config.getVariable("clusteredgaussian_zeroweight", "0"));
+        zeroWeight.setColumns(10);
+        top.add(zeroWeight);
+
+        top.add(new JLabel("Max points"));
+        final JTextField maxpoints = new JTextField();
+        maxpoints.setText(config.getVariable("clusteredgaussian_maxpoints", "5"));
+        maxpoints.setColumns(10);
+        top.add(maxpoints);
+
+        top.add(new JLabel("Max radius"));
+        final JTextField maxrad = new JTextField();
+        maxrad.setText(config.getVariable("clusteredgaussian_maxradius", "0.1"));
+        maxrad.setColumns(10);
+        top.add(maxrad);
+
+        top.add(new JLabel("Density"));
+        final JTextField density = new JTextField();
+        density.setText(config.getVariable("clusteredgaussian_density", "0.2"));
+        density.setColumns(10);
+        top.add(density);
+
+        top.add(new JLabel("Skew"));
+        final JTextField skew = new JTextField();
+        skew.setText(config.getVariable("clusteredgaussian_skew", "0.2"));
+        skew.setColumns(10);
+        top.add(skew);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                config.setVariable("clusteredgaussian_zeroweight", zeroWeight.getText());
+                config.setVariable("clusteredgaussian_maxpoints", maxpoints.getText());
+                config.setVariable("clusteredgaussian_maxradius", maxrad.getText());
+                config.setVariable("clusteredgaussian_density", density.getText());
+                config.setVariable("clusteredgaussian_skew", skew.getText());
+                v.setInitializer(new ClusteredGaussianInitializer(null, 0,
+                    new ClusteredGaussianInitializer.Params(
+                        Float.parseFloat(zeroWeight.getText()),
+                        Integer.parseInt(maxpoints.getText()),
+                        Float.parseFloat(maxrad.getText()),
+                        Float.parseFloat(density.getText()),
+                        Float.parseFloat(skew.getText())
                     )));
             }
         });

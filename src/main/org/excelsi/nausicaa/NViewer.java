@@ -478,7 +478,7 @@ public class NViewer extends JFrame implements UIActions {
     }
 
     private void createAutomataMenu(int shortcut, JMenuBar bar) {
-        final JCheckBoxMenuItem[] hack = new JCheckBoxMenuItem[5];
+        final JCheckBoxMenuItem[] hack = new JCheckBoxMenuItem[6];
         JMenu auto = new JMenu("Automata");
 
         //AbstractAction opentab = new AbstractAction() {
@@ -520,6 +520,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[2].setState(false);
                 hack[3].setState(false);
                 hack[4].setState(false);
+                hack[5].setState(false);
                 //_a.generate(NViewer.this);
             }
         });
@@ -539,6 +540,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[2].setState(false);
                 hack[3].setState(false);
                 hack[4].setState(false);
+                hack[5].setState(false);
                 //_a.generate(NViewer.this);
             }
         });
@@ -558,6 +560,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[2].setState(true);
                 hack[3].setState(false);
                 hack[4].setState(false);
+                hack[5].setState(false);
                 //hack[3].setState(false);
                 //_a.generate(NViewer.this);
             }
@@ -578,6 +581,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[2].setState(false);
                 hack[3].setState(true);
                 hack[4].setState(false);
+                hack[5].setState(false);
                 //_a.generate(NViewer.this);
             }
         });
@@ -628,6 +632,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[2].setState(false);
                 hack[3].setState(false);
                 hack[4].setState(true);
+                hack[5].setState(false);
                 //_a.generate(NViewer.this);
             }
         });
@@ -636,6 +641,27 @@ public class NViewer extends JFrame implements UIActions {
         gau.setText("Gaussian initial state ...");
         gau.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, shortcut));
         gau.setState(_init==Initializers.gaussian);
+
+        JCheckBoxMenuItem cgau = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _init = Initializers.random;
+                _a.chooseClusteredGaussian(NViewer.this, _config);
+                //_initializer = new RandomInitializer();
+                //setActiveCA(getActiveCA().initializer(_initializer));
+                hack[0].setState(false);
+                hack[1].setState(false);
+                hack[2].setState(false);
+                hack[3].setState(false);
+                hack[4].setState(false);
+                hack[5].setState(true);
+                //_a.generate(NViewer.this);
+            }
+        });
+        auto.add(cgau);
+        hack[5] = cgau;
+        cgau.setText("Clustered gaussian initial state ...");
+        cgau.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcut));
+        cgau.setState(_init==Initializers.clusteredgaussian);
 
         auto.addSeparator();
 
