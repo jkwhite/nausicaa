@@ -39,7 +39,10 @@ public class Machine {
         int res = _t.pop();
         res = res % _a.colors();
         if(res<0) {
-            res = 0;
+            //res = 0;
+            //System.err.print(res+" => ");
+            res = _a.colors()+res;
+            //System.err.println(res);
         }
         //if(res>=_a.colors()) {
             //res = _a.colors()-1;

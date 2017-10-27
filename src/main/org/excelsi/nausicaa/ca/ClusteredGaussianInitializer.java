@@ -129,7 +129,7 @@ public class ClusteredGaussianInitializer implements Initializer {
     }
 
     @Override public void write(PrintWriter w) {
-        w.println(Initializers.gaussian.name());
+        w.println(Initializers.clusteredgaussian.name());
         w.println(_seed);
         w.println(_params.zeroWeight);
         w.println(_params.maxPoints);

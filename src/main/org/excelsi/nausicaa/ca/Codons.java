@@ -322,7 +322,8 @@ public class Codons {
         }
 
         @Override public void op(int[] p, Tape t) {
-            t.selectAgg(-1);
+            //t.selectAgg(-1);
+            t.selectAggAll();
             t.apply(this, p);
             //int m = t.popAll(_t, -1);
             //int s = 0;
@@ -784,14 +785,17 @@ public class Codons {
 
         @Override public void op(int[] p, Tape t) {
             int mid = p.length/2;
-            t.pushAll(p, mid);
-            t.pushAll(p, mid, mid+1);
-            //for(int i=0;i<mid;i++) {
-                //t.push(p[i]);
-            //}
-            //for(int i=mid+1;i<p.length;i++) {
-                //t.push(p[i]);
-            //}
+            //t.pushAll(p, mid);
+            //t.pushAll(p, mid, mid+1);
+            int start = p[mid]%p.length;
+            //int c1 = start<mid?start-mid:p.length-start;
+            //t.pushAll(p, c1, start);
+            //int i2 = c1+start<mid?i1+1:mid;
+            int s = 0;
+            for(int i=start;s<p.length;s++) {
+                if(i!=mid) t.push(p[i]);
+                if(++i==p.length) i=0;
+            }
         }
     }
 
@@ -805,10 +809,11 @@ public class Codons {
         }
 
         @Override public void op(int[] p, Tape t) {
-            t.pushAll(p, p.length);
-            //for(int i=0;i<p.length;i++) {
-                //t.push(p[i]);
-            //}
+            //t.pushAll(p, p.length);
+            int n = p[p.length/2]%p.length; //t.pop() % p.length;
+            if(n<0) n=-n;
+            t.pushAll(p, p.length-n, n);
+            t.pushAll(p, n);
         }
     }
 
@@ -826,10 +831,6 @@ public class Codons {
             if(n<0) n=-n;
             t.pushAll(p, p.length-n, n);
             t.pushAll(p, n);
-            //t.pushAll(p, p.length);
-            //for(int i=0;i<p.length;i++) {
-                //t.push(p[i]);
-            //}
         }
     }
 
@@ -950,7 +951,7 @@ public class Codons {
         @Override public int op(int[] t, int s, int e, int[] p) {
             //int te = s==e?0:t[e];
             //int m = expr(t[s], te);
-            int ts = s==e?0:t[s];
+            int ts = s==e?t[s]:t[s];
             int m = expr(t[e], ts);
             return m;
         }
