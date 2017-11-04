@@ -318,6 +318,15 @@ public class NViewer extends JFrame implements UIActions {
         JMenuItem ssrdrain = pal.add(ssrdrains);
         ssrdrain.setText("Sparse Sparkly Spectrum");
 
+        AbstractAction sssrdrains = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                getActiveCA().getRandom().nextBoolean();
+                setActiveCA(getActiveCA().palette(Palette.randomShinyRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/10)));
+            }
+        };
+        JMenuItem sssrdrain = pal.add(sssrdrains);
+        sssrdrain.setText("Super Sparse Sparkly Spectrum");
+
         AbstractAction wrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 getActiveCA().getRandom().nextBoolean();
@@ -478,7 +487,7 @@ public class NViewer extends JFrame implements UIActions {
     }
 
     private void createAutomataMenu(int shortcut, JMenuBar bar) {
-        final JCheckBoxMenuItem[] hack = new JCheckBoxMenuItem[6];
+        final JCheckBoxMenuItem[] hack = new JCheckBoxMenuItem[7];
         JMenu auto = new JMenu("Automata");
 
         //AbstractAction opentab = new AbstractAction() {
@@ -521,6 +530,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[3].setState(false);
                 hack[4].setState(false);
                 hack[5].setState(false);
+                hack[6].setState(false);
                 //_a.generate(NViewer.this);
             }
         });
@@ -541,6 +551,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[3].setState(false);
                 hack[4].setState(false);
                 hack[5].setState(false);
+                hack[6].setState(false);
                 //_a.generate(NViewer.this);
             }
         });
@@ -561,6 +572,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[3].setState(false);
                 hack[4].setState(false);
                 hack[5].setState(false);
+                hack[6].setState(false);
                 //hack[3].setState(false);
                 //_a.generate(NViewer.this);
             }
@@ -582,6 +594,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[3].setState(true);
                 hack[4].setState(false);
                 hack[5].setState(false);
+                hack[6].setState(false);
                 //_a.generate(NViewer.this);
             }
         });
@@ -633,6 +646,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[3].setState(false);
                 hack[4].setState(true);
                 hack[5].setState(false);
+                hack[6].setState(false);
                 //_a.generate(NViewer.this);
             }
         });
@@ -654,14 +668,37 @@ public class NViewer extends JFrame implements UIActions {
                 hack[3].setState(false);
                 hack[4].setState(false);
                 hack[5].setState(true);
+                hack[6].setState(false);
                 //_a.generate(NViewer.this);
             }
         });
         auto.add(cgau);
         hack[5] = cgau;
         cgau.setText("Clustered gaussian initial state ...");
-        cgau.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcut));
+        cgau.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, shortcut));
         cgau.setState(_init==Initializers.clusteredgaussian);
+
+        JCheckBoxMenuItem cai = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _init = Initializers.random;
+                _a.chooseCAInitializer(NViewer.this, _config);
+                //_initializer = new RandomInitializer();
+                //setActiveCA(getActiveCA().initializer(_initializer));
+                hack[0].setState(false);
+                hack[1].setState(false);
+                hack[2].setState(false);
+                hack[3].setState(false);
+                hack[4].setState(false);
+                hack[5].setState(false);
+                hack[6].setState(true);
+                //_a.generate(NViewer.this);
+            }
+        });
+        auto.add(cai);
+        hack[6] = cai;
+        cai.setText("CA initial state ...");
+        cai.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcut));
+        cai.setState(_init==Initializers.ca);
 
         auto.addSeparator();
 

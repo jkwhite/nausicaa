@@ -64,10 +64,10 @@ public final class MutationFactor {
     }
 
     public int stage() {
-        if(_stage==0) {
-            System.err.println("************* ZERO STAGE ***********");
-            Thread.dumpStack();
-        }
+        //if(_stage==0) {
+            //System.err.println("************* ZERO STAGE ***********");
+            //Thread.dumpStack();
+        //}
         return _stage;
     }
 

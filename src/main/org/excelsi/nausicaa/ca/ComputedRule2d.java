@@ -197,6 +197,10 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         return _p.toString();
     }
 
+    @Override public String prettyGenome() {
+        return _p.toString().replace(',','\n');
+    }
+
     @Override public String toString() {
         return "ComputedRule2d::{pattern:"+_p+"}";
     }

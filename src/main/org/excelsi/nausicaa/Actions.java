@@ -20,6 +20,7 @@ import org.excelsi.nausicaa.ca.Encoder;
 import org.excelsi.nausicaa.ca.RandomMutationStrategy;
 import org.excelsi.nausicaa.ca.RandomInitializer;
 import org.excelsi.nausicaa.ca.GaussianInitializer;
+import org.excelsi.nausicaa.ca.CAInitializer;
 import org.excelsi.nausicaa.ca.ClusteredGaussianInitializer;
 import org.excelsi.nausicaa.ca.WordEncoder;
 import org.excelsi.nausicaa.ca.ByteInitializer;
@@ -632,6 +633,50 @@ public class Actions {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void chooseCAInitializer(final NViewer v, Config config) {
+        final JDialog d = new JDialog(v, "CA initializer");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(2,2));
+
+        top.add(new JLabel("File"));
+        final JTextField file = new JTextField();
+        file.setColumns(30);
+        file.setText(config.getVariable("cainitializer_file", ""));
+        top.add(file);
+
+        top.add(new JLabel("Iterations"));
+        final JTextField iter = new JTextField();
+        iter.setColumns(5);
+        iter.setText(config.getVariable("cainitializer_iter", "100"));
+        top.add(iter);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                String url = file.getText();
+                int it = Integer.parseInt(iter.getText());
+                config.setVariable("cainitializer_file", url);
+                config.setVariable("cainitializer_iter", ""+it);
+                v.setInitializer(new CAInitializer(url, it));
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
     }
 
     public void evolver(NViewer v, Random random) {

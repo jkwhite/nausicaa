@@ -199,6 +199,10 @@ public final class CA {
         return new CA(_r, _p, i, branchRandom(), _seed, _w, _h, _d, _prelude);
     }
 
+    public CA prelude(int pre) {
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, pre);
+    }
+
     public Initializer getInitializer() {
         return _i;
     }

@@ -56,15 +56,17 @@ public class AbstractComputedRuleset implements Ruleset {
     }
 
     @Override public Rule create(Object... args) {
-        final String[] gs = args[0].toString().split(",");
+        final String[] gs = args[0].toString().replace('\n',',').split(",");
         SequencePattern.Sequence s = new SequencePattern.Sequence();
-        for(String g:gs) {
+        for(final String gr:gs) {
+            String g = gr.trim();
             int c = 100;
-            if(Character.isDigit(g.charAt(0))) {
+            if(g.indexOf(':')>=0) {
                 String[] cg = g.split(":");
-                c = Integer.parseInt(cg[0]);
+                c = Integer.parseInt(cg[0].trim());
                 g = cg[1];
             }
+            g = g.replace(' ','-');
             System.err.println("time: "+c+", rule: "+g);
             s.s(c, new ComputedPattern(_a,
                 new ComputedPattern.MachineElf(new Machine(_a, new Genome(g)))));
