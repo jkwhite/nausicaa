@@ -7,8 +7,16 @@ import java.io.PrintWriter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.awt.image.IndexColorModel;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Random;
+import java.awt.image.*;
+import javax.imageio.*;
 
 
 public final class Palette {
@@ -24,6 +32,10 @@ public final class Palette {
         for(int i=0;i<_colors.length;i++) {
             _colors[i] = colors.get(i);
         }
+    }
+
+    private Palette(boolean dummy, final int... colors) {
+        _colors = colors;
     }
 
     public int getColorCount() {
@@ -101,6 +113,14 @@ public final class Palette {
             }
             return new Palette(ncolors);
         }
+    }
+
+    public Map<Integer,Integer> buildColormap() {
+        Map<Integer,Integer> m = new HashMap<>(_colors.length);
+        for(int i=0;i<_colors.length;i++) {
+            m.put(_colors[i], i);
+        }
+        return m;
     }
 
     public void write(DataOutputStream dos) throws IOException {
@@ -302,5 +322,57 @@ public final class Palette {
             packed[i] = Colors.pack(red, green, blue);
         }
         return new Palette(packed);
+    }
+
+    public static Palette fromImage(BufferedImage img) {
+        class Key implements Comparable {
+            public final int c;
+            public final int sort;
+
+            public Key(int c, int sort) {
+                this.c = c;
+                this.sort = sort;
+            }
+
+            @Override public int hashCode() {
+                return c;
+            }
+
+            @Override public boolean equals(Object o) {
+                final Key k = (Key)o;
+                return k.c==c;
+            }
+
+            @Override public int compareTo(Object o) {
+                final Key k = (Key)o;
+                return sort-k.sort;
+            }
+        }
+
+        Set<Key> c = new HashSet<>();
+        Raster r = img.getRaster();
+        final int[] unpacked = new int[4];
+        for(int i=0;i<img.getWidth();i++) {
+            for(int j=0;j<img.getHeight();j++) {
+                //final int p = r.getSample(i,j,0);
+                final int p = img.getRGB(i,j);
+                Colors.unpack(p, unpacked);
+                Key k = new Key(p, unpacked[0]+unpacked[1]+unpacked[2]);
+                if(!c.contains(k)) {
+                    c.add(k);
+                }
+            }
+        }
+        System.err.println("found "+c.size()+" colors");
+        final List<Key> sort = new ArrayList<>(c);
+        c.clear();
+        Collections.sort(sort);
+        int[] colors = new int[sort.size()];
+        int i = 0;
+        for(Key k:sort) {
+            colors[i++] = k.c;
+        }
+        System.err.println("*** color zero: "+colors[0]);
+        return new Palette(true, colors);
     }
 }

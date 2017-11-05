@@ -515,6 +515,16 @@ public class NViewer extends JFrame implements UIActions {
         JMenuItem cust = pal.add(custs);
         cust.setText("Custom Spectrum ...");
 
+        AbstractAction imgs = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
+                //getActiveCA().getRandom().nextInt(1000);
+                _a.imageSpectrum(NViewer.this, _config);
+            }
+        };
+        JMenuItem img = pal.add(imgs);
+        img.setText("From image ...");
+
         pal.addSeparator();
 
         final JCheckBoxMenuItem black = new JCheckBoxMenuItem(new AbstractAction() {

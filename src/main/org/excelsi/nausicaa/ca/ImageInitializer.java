@@ -4,6 +4,7 @@ package org.excelsi.nausicaa.ca;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.util.Random;
+import java.util.Map;
 import java.io.DataOutputStream;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -44,14 +45,32 @@ public class ImageInitializer implements Initializer {
         else {
             //final BufferedImage image = _image.getScaledInstance(plane.getWidth(), plane.getHeight(), BufferedImage.SCALE_SMOOTH);
             if(_lastImage==null || _lastImage.getWidth()!=plane.getWidth() || _lastImage.getHeight()!=plane.getHeight()) {
-                _lastImage = Scalr.resize(_image, Scalr.Method.ULTRA_QUALITY, plane.getWidth(), plane.getHeight(), Scalr.OP_ANTIALIAS /*, Scalr.OP_BRIGHTER*/);
+                //_lastImage = Scalr.resize(_image, Scalr.Method.ULTRA_QUALITY, plane.getWidth(), plane.getHeight(), Scalr.OP_ANTIALIAS /*, Scalr.OP_BRIGHTER*/);
+                _lastImage = Scalr.resize(_image, Scalr.Method.SPEED, plane.getWidth(), plane.getHeight() /*, Scalr.OP_ANTIALIAS , Scalr.OP_BRIGHTER*/);
+                //_lastImage = _image;
             }
             final int w = _lastImage.getWidth();
             final int h = _lastImage.getHeight();
-            for(int j=0;j<plane.getHeight();j++) {
-                for(int i=0;i<plane.getWidth();i++) {
-                    int v = _lastImage.getRGB(i % w, j % h);
-                    plane.setRGBCell(i, j, v);
+            if(plane instanceof BufferedImagePlane) {
+                for(int j=0;j<plane.getHeight();j++) {
+                    for(int i=0;i<plane.getWidth();i++) {
+                        int v = _lastImage.getRGB(i % w, j % h);
+                        plane.setRGBCell(i, j, v);
+                    }
+                }
+            }
+            else {
+                Map<Integer,Integer> colormap = p.buildColormap();
+                //IntBlockPlane bp = (IntBlockPlane) plane;
+                for(int j=0;j<plane.getHeight();j++) {
+                    for(int i=0;i<plane.getWidth();i++) {
+                        int v = _lastImage.getRGB(i % w, j % h);
+                        Integer iv = colormap.get(v);
+                        if(iv==null) {
+                            throw new IllegalStateException("colormap missing color "+v);
+                        }
+                        plane.setCell(i, j, iv);
+                    }
                 }
             }
         }

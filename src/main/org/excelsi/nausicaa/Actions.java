@@ -679,6 +679,34 @@ public class Actions {
         d.setVisible(true);
     }
 
+    public void imageSpectrum(final NViewer v, Config config) {
+        final JFileChooser f = new JFileChooser(config.getDir());
+        f.setDialogTitle("Spectrum source image");
+        f.setDialogType(f.OPEN_DIALOG);
+        f.setMultiSelectionEnabled(false);
+        int ret = f.showOpenDialog(v);
+        if(ret==f.APPROVE_OPTION) {
+            File img = f.getSelectedFile();
+            config.setDir(img.getParent());
+            try {
+                BufferedImage bi = ImageIO.read(img);
+                System.err.println("read image "+bi);
+                Palette p = Palette.fromImage(bi);
+                if(v.getActiveCA().archetype().colors()!=p.getColorCount()) {
+                    throw new IllegalArgumentException("archetype colors "+v.getActiveCA().archetype().colors()
+                        +" does not match image colors "+p.getColorCount());
+                }
+                else {
+                    v.setActiveCA(v.getActiveCA().palette(p));
+                }
+                //v.setInitializer(new ImageInitializer(initImage));
+            }
+            catch(IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void customSpectrum(final NViewer v, Config config) {
         final JDialog d = new JDialog(v, "Custom Spectrum");
         JPanel p = new JPanel(new BorderLayout());
