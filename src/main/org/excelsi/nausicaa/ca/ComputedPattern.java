@@ -18,7 +18,13 @@ public final class ComputedPattern implements Pattern, Mutatable {
         _logic = logic;
         _lastP = new int[(int)Math.pow(2*_a.size()+1, _a.dims())];
         int size = (int)Math.pow(2*_a.size()+1, _a.dims());
-        _cache = new PCache(50000, size);
+        // based on 12g heap
+        // 3375
+        // 1=>100000
+        // 7=>29000
+        // -11833
+        int csize = Math.max(5000, -11833*_a.size()+110000);
+        _cache = new PCache(csize, size);
     }
 
     public ComputedPattern copy() {

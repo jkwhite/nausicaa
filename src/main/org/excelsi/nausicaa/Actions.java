@@ -679,6 +679,58 @@ public class Actions {
         d.setVisible(true);
     }
 
+    public void customSpectrum(final NViewer v, Config config) {
+        final JDialog d = new JDialog(v, "Custom Spectrum");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(3,2));
+
+        top.add(new JLabel("Number of colors"));
+        final JTextField cols = new JTextField();
+        cols.setColumns(10);
+        cols.setText(config.getVariable("customspectrum_colors", "10"));
+        top.add(cols);
+
+        top.add(new JLabel("Density"));
+        final JTextField dens = new JTextField();
+        dens.setColumns(10);
+        dens.setText(config.getVariable("customspectrum_density", "0"));
+        top.add(dens);
+
+        top.add(new JLabel("Black zero"));
+        final JCheckBox bz = new JCheckBox();
+        bz.setSelected("true".equals(config.getVariable("customspectrum_blackzero", "true")));
+        top.add(bz);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                String cc = cols.getText();
+                int clrs = Integer.parseInt(cols.getText());
+                int de = Integer.parseInt(dens.getText());
+                boolean blz = bz.isSelected();
+                config.setVariable("customspectrum_colors", cc);
+                config.setVariable("customspectrum_density", ""+de);
+                config.setVariable("customspectrum_blackzero", ""+blz);
+                v.setActiveCA(v.getActiveCA().palette(Palette.randomCutRainbow(v.getRandom(), v.getActiveCA().archetype().colors(), de, blz, clrs)));
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
     public void evolver(NViewer v, Random random) {
         final Config config = v.getConfig();
         final JDialog d = new JDialog(v, "Evolver");

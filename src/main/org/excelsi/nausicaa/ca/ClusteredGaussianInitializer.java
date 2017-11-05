@@ -83,6 +83,7 @@ public class ClusteredGaussianInitializer implements Initializer {
                     ctr[1] = r.nextInt(bp.getHeight());
                     ctr[2] = r.nextInt(bp.getHeight());
                     final int points3 = (int)(rad*rad*rad*_params.density);
+                    System.err.println("computing "+points3+" points");
                     for(int j=0;j<points3;j++) {
                         point(r, ctr, max, rad, pnt);
                         //System.err.println("("+pnt[0]+","+pnt[1]+","+pnt[2]+")");
@@ -95,6 +96,7 @@ public class ClusteredGaussianInitializer implements Initializer {
     }
 
     private void point(Random r, int[] c, int[] max, int rad, int[] pnt) {
+        /*
         final float h = (float)Math.abs(rad*r.nextGaussian());
         final float t1 = r.nextFloat()*2f*Maths.PI2;
         final float t2 = r.nextFloat()*2f*Maths.PI2;
@@ -104,6 +106,28 @@ public class ClusteredGaussianInitializer implements Initializer {
             pnt[1] = wrap(c[1]+(int)(h*Math.sin(t1)), max[1]);
             if(pnt.length>2) {
                 pnt[2] = wrap(c[2]+(int)(h*Math.cos(t3)), max[2]);
+            }
+        }
+        */
+        final float h = rad*r.nextFloat();
+        final float t1 = (float)r.nextGaussian();
+        final float t2 = (float)r.nextGaussian();
+        final float t3 = (float)r.nextGaussian();
+        final float t = (float)Math.sqrt(t1*t1+t2*t2+t3*t3);
+        final float pt1 = h*t1/t;
+        final float pt2 = h*t2/t;
+        final float pt3 = h*t3/t;
+        //System.err.println("point: "+pt1+", "+pt2+", "+pt3);
+
+        //c[0] = max[0]/2;
+        //c[1] = max[1]/2;
+        //c[2] = max[2]/2;
+
+        pnt[0] = wrap(c[0]+(int)(pt1),max[0]);
+        if(pnt.length>1) {
+            pnt[1] = wrap(c[1]+(int)(pt2), max[1]);
+            if(pnt.length>2) {
+                pnt[2] = wrap(c[2]+(int)(pt3), max[2]);
             }
         }
     }
@@ -118,8 +142,16 @@ public class ClusteredGaussianInitializer implements Initializer {
             return 0;
         }
         else {
-            int low = idx * (colors / maxPoints);
-            int high = (1+idx) * (colors / maxPoints)-1;
+            int low, high;
+            switch(colors) {
+                case 2:
+                    low = 1;
+                    high = 2;
+                    break;
+                default:
+                    low = idx * (colors / maxPoints);
+                    high = (1+idx) * (colors / maxPoints)-1;
+            }
             return random.nextInt(high-low)+low;
         }
     }
@@ -161,7 +193,8 @@ public class ClusteredGaussianInitializer implements Initializer {
 
 
         public Params() {
-            this(0f, 5, 0.1f, 0.2f, 0.2f);
+            //this(0f, 5, 0.1f, 0.2f, 0.2f);
+            this(0f, 1, 0.3f, 20f, 0.2f);
         }
 
         public Params(float zeroWeight, int maxPoints, float maxRadius, float density, float skew) {

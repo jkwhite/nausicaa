@@ -29,5 +29,5 @@ uses:
 main: org.excelsi.nausicaa.NViewer
 #main: org.excelsi.ca.Viewer
 #sysargs: -XX:-OmitStackTraceInFastThrow -Dcom.sun.management.jmxremote -Xmx12g -d64
-sysargs: -Xmx8g -XX:-OmitStackTraceInFastThrow -Dcom.sun.management.jmxremote -d64
+sysargs: -Xmx12g -XX:-OmitStackTraceInFastThrow -Dcom.sun.management.jmxremote -d64
 # -agentlib:hprof=heap=sites,cpu=samples,depth=8

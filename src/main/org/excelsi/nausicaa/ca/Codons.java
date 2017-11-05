@@ -252,7 +252,7 @@ public class Codons {
 
         public Histo(int colors) {
             _h = new short[colors];
-            _z = new int[1024];
+            _z = new int[8192];
         }
 
         @Override public String code() {

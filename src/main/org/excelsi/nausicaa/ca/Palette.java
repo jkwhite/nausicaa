@@ -245,7 +245,7 @@ public final class Palette {
     }
 
     public static Palette randomCutRainbow(Random om, int numColors, int[] colors, int div, boolean black, int density) {
-        int chance = Math.max(1,numColors/div);
+        int chance = div==0?0:Math.max(1,numColors/div);
         for(int i=0;i<colors.length;i++) {
             if(om.nextInt(numColors)<chance) {
                 int len = 1+om.nextInt(numColors/100);

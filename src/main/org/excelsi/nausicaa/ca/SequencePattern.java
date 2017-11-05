@@ -9,7 +9,7 @@ import java.util.SplittableRandom;
 
 public class SequencePattern implements Pattern, Mutatable {
     private static final Random R = new Random();
-    private static final int[] OFFSETS = new int[4097];
+    private static final int[] OFFSETS = new int[30059];
     static {
         for(int i=0;i<OFFSETS.length;i++) {
             OFFSETS[i] = R.nextInt(4);

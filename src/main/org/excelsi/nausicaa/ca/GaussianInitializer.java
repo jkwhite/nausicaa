@@ -95,6 +95,7 @@ public class GaussianInitializer implements Initializer {
     }
 
     private void point(Random r, int[] c, int[] max, int rad, int[] pnt) {
+        /*
         final float h = (float)Math.abs(rad*r.nextGaussian());
         final float t1 = r.nextFloat()*2f*Maths.PI2;
         final float t2 = r.nextFloat()*2f*Maths.PI2;
@@ -104,6 +105,23 @@ public class GaussianInitializer implements Initializer {
             pnt[1] = wrap(c[1]+(int)(h*Math.sin(t1)), max[1]);
             if(pnt.length>2) {
                 pnt[2] = wrap(c[2]+(int)(h*Math.cos(t3)), max[2]);
+            }
+        }
+        */
+        final float h = rad*r.nextFloat();
+        final float t1 = (float)r.nextGaussian();
+        final float t2 = (float)r.nextGaussian();
+        final float t3 = (float)r.nextGaussian();
+        final float t = (float)Math.sqrt(t1*t1+t2*t2+t3*t3);
+        final float pt1 = h*t1/t;
+        final float pt2 = h*t2/t;
+        final float pt3 = h*t3/t;
+
+        pnt[0] = wrap(c[0]+(int)(pt1),max[0]);
+        if(pnt.length>1) {
+            pnt[1] = wrap(c[1]+(int)(pt2), max[1]);
+            if(pnt.length>2) {
+                pnt[2] = wrap(c[2]+(int)(pt3), max[2]);
             }
         }
     }

@@ -174,12 +174,18 @@ public final class IntBlockPlane extends AbstractPlane {
                             //rgb[0] += (_d-k)*rgba[0];
                             //rgb[1] += (_d-k)*rgba[1];
                             //rgb[2] += (_d-k)*rgba[2];
-                            rgb[0] += (_d-k)*u[0];
-                            rgb[1] += (_d-k)*u[1];
-                            rgb[2] += (_d-k)*u[2];
+                            //rgb[0] += (_d-k)*u[0];
+                            //rgb[1] += (_d-k)*u[1];
+                            //rgb[2] += (_d-k)*u[2];
+                            float mult = ((_d-k)/(float)_d);
+                            rgb[0] += (int)(mult*u[0]);
+                            rgb[1] += (int)(mult*u[1]);
+                            rgb[2] += (int)(mult*u[2]);
+                            //if(u[0]>0) System.err.println("mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
                             mx += (_d-k);
                             if(FIRST&&(u[0]>0||u[1]>0||u[2]>0)) break;
                         }
+                        mx = 1;
                         _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
                     }
                 }

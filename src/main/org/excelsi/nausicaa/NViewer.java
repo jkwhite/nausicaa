@@ -61,6 +61,10 @@ public class NViewer extends JFrame implements UIActions {
         return _config;
     }
 
+    public Random getRandom() {
+        return _random;
+    }
+
     @Override
     public CA getActiveCA() {
         return _futures.getCA();
@@ -86,15 +90,16 @@ public class NViewer extends JFrame implements UIActions {
 
     public void init() {
         //final int w = 600, h = 600, d = 1;
-        final int w = 300, h = 300, d = 1, pre = 0;
+        final int w = 300, h = 300, d = 5, pre = 0;
         //final int w = 3, h = 3, d = 1, pre=0;
         _config = new Config(w, h, d);
         createMenu();
         setSize(_width, _height);
         int dims = 3;
         int size = 1;
-        //int colors = 1001;
-        int colors = 1111;
+        int colors = 1001;
+        //int colors = 1111;
+        //int colors = 2;
         _timeline = new Timeline();
         org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors);
         org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
@@ -234,13 +239,29 @@ public class NViewer extends JFrame implements UIActions {
         bar.add(file);
     }
 
+    private AbstractAction _lastPaletteAction = null;
     private void createPaletteMenu(int shortcut, JMenuBar bar) {
         JMenu pal = new JMenu("Palette");
         final boolean[] hack = new boolean[1];
+        final NViewer v = this;
         hack[0] = true;
+
+        AbstractAction repeat = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                if(_lastPaletteAction!=null) {
+                    _lastPaletteAction.actionPerformed(e);
+                }
+            }
+        };
+        JMenuItem rep = pal.add(repeat);
+        rep.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, shortcut));
+        rep.setText("Repeat palette");
+
+        pal.addSeparator();
 
         AbstractAction greys = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
                 setActiveCA(getActiveCA().palette(Palette.grey(getActiveCA().archetype().colors())));
             }
         };
@@ -249,7 +270,8 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction rands = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setActiveCA(getActiveCA().palette(Palette.random(getActiveCA().archetype().colors(), getActiveCA().getRandom())));
+                _lastPaletteAction = this;
+                setActiveCA(getActiveCA().palette(Palette.random(getActiveCA().archetype().colors(), v.getRandom())));
             }
         };
         JMenuItem rand = pal.add(rands);
@@ -257,6 +279,7 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction rains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
                 setActiveCA(getActiveCA().palette(Palette.rainbow(getActiveCA().archetype().colors(), hack[0])));
             }
         };
@@ -275,8 +298,8 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction rrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/2)));
+                _lastPaletteAction = this;
+                setActiveCA(getActiveCA().palette(Palette.randomRainbow(v.getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/2)));
             }
         };
         JMenuItem rrain = pal.add(rrains);
@@ -284,8 +307,8 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction rdrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors())));
+                _lastPaletteAction = this;
+                setActiveCA(getActiveCA().palette(Palette.randomRainbow(v.getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors())));
             }
         };
         JMenuItem rdrain = pal.add(rdrains);
@@ -293,8 +316,8 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction srdrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomShinyRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/2)));
+                _lastPaletteAction = this;
+                setActiveCA(getActiveCA().palette(Palette.randomShinyRainbow(v.getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/2)));
             }
         };
         JMenuItem srdrain = pal.add(srdrains);
@@ -302,8 +325,8 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction bsrdrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomShinyRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors())));
+                _lastPaletteAction = this;
+                setActiveCA(getActiveCA().palette(Palette.randomShinyRainbow(v.getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors())));
             }
         };
         JMenuItem bsrdrain = pal.add(bsrdrains);
@@ -311,8 +334,8 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction ssrdrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomShinyRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/4)));
+                _lastPaletteAction = this;
+                setActiveCA(getActiveCA().palette(Palette.randomShinyRainbow(v.getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/4)));
             }
         };
         JMenuItem ssrdrain = pal.add(ssrdrains);
@@ -320,8 +343,8 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction sssrdrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomShinyRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/10)));
+                _lastPaletteAction = this;
+                setActiveCA(getActiveCA().palette(Palette.randomShinyRainbow(v.getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/10)));
             }
         };
         JMenuItem sssrdrain = pal.add(sssrdrains);
@@ -329,8 +352,8 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction wrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/2)));
+                _lastPaletteAction = this;
+                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(v.getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/2)));
             }
         };
         JMenuItem wrain = pal.add(wrains);
@@ -340,7 +363,7 @@ public class NViewer extends JFrame implements UIActions {
         AbstractAction wbrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/2)));
+                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(v.getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors()/2)));
             }
         };
         JMenuItem wbrain = pal.add(wbrains);
@@ -349,8 +372,8 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction wdrains = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors())));
+                _lastPaletteAction = this;
+                setActiveCA(getActiveCA().palette(Palette.randomWrappedRainbow(v.getRandom(), getActiveCA().archetype().colors(), hack[0], getActiveCA().archetype().colors())));
             }
         };
         JMenuItem wdrain = pal.add(wdrains);
@@ -360,6 +383,7 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction reds = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
                 setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{255,0,0})));
             }
         };
@@ -368,6 +392,7 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction breds = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
                 setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{255,128,128})));
             }
         };
@@ -376,6 +401,7 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction blues = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
                 setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{0,0,255})));
             }
         };
@@ -384,6 +410,7 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction bblues = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
                 setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{128,128,255})));
             }
         };
@@ -392,6 +419,7 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction greens = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
                 setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{0,255,0})));
             }
         };
@@ -400,6 +428,7 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction bgreens = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
                 setActiveCA(getActiveCA().palette(Palette.shades(getActiveCA().archetype().colors(), new int[]{128,255,128})));
             }
         };
@@ -408,6 +437,7 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction sepia = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
                 setActiveCA(getActiveCA().palette(Palette.rainbow(getActiveCA().archetype().colors(), hack[0], new int[][]{ {34,27,1}, {84,49,13}, {112,66,20}, {165,139,36}, {196,145,35} })));
             }
         };
@@ -418,6 +448,7 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction acbgreens = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
                 setActiveCA(getActiveCA().palette(Palette.allShades(getActiveCA().archetype().colors(), new int[]{255,255,255})));
             }
         };
@@ -426,8 +457,8 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction cutsp = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomCutRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), 60, hack[0], getActiveCA().archetype().colors()/4)));
+                _lastPaletteAction = this;
+                setActiveCA(getActiveCA().palette(Palette.randomCutRainbow(v.getRandom(), getActiveCA().archetype().colors(), 60, hack[0], getActiveCA().archetype().colors()/4)));
             }
         };
         JMenuItem cutsps = pal.add(cutsp);
@@ -435,8 +466,8 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction neongs = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                getActiveCA().getRandom().nextBoolean();
-                setActiveCA(getActiveCA().palette(Palette.randomCutRainbow(getActiveCA().getRandom(), getActiveCA().archetype().colors(), 20, hack[0], getActiveCA().archetype().colors()/4)));
+                _lastPaletteAction = this;
+                setActiveCA(getActiveCA().palette(Palette.randomCutRainbow(v.getRandom(), getActiveCA().archetype().colors(), 20, hack[0], getActiveCA().archetype().colors()/4)));
             }
         };
         JMenuItem neong = pal.add(neongs);
@@ -444,6 +475,7 @@ public class NViewer extends JFrame implements UIActions {
 
         AbstractAction aesth = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
                 getActiveCA().getRandom().nextBoolean();
                 setActiveCA(getActiveCA().palette(
                     new SpectrumBuilder(getActiveCA().archetype().colors())
@@ -470,6 +502,18 @@ public class NViewer extends JFrame implements UIActions {
         };
         JMenuItem aesths = pal.add(aesth);
         aesths.setText("Aesthetic");
+
+        pal.addSeparator();
+
+        AbstractAction custs = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
+                //getActiveCA().getRandom().nextInt(1000);
+                _a.customSpectrum(NViewer.this, _config);
+            }
+        };
+        JMenuItem cust = pal.add(custs);
+        cust.setText("Custom Spectrum ...");
 
         pal.addSeparator();
 
