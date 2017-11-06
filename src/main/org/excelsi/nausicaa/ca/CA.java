@@ -12,6 +12,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,6 +23,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import javax.imageio.ImageIO;
+import java.awt.image.*;
 import org.excelsi.rlyehian.Codec;
 
 
@@ -158,6 +161,10 @@ public final class CA {
         return _d;
     }
 
+    public int getPrelude() {
+        return _prelude;
+    }
+
     public void resize(int w, int h) {
         _w = w;
         _h = h;
@@ -264,6 +271,24 @@ public final class CA {
                 }
             }
         }
+    }
+
+    public static CA fromImage(String filename) throws IOException {
+        BufferedImage i = ImageIO.read(new File(filename));
+        Palette p = Palette.fromImage(i);
+        int w = i.getWidth();
+        int h = i.getHeight();
+        int d = 1;
+        int colors = p.getColorCount();
+        int size = 1;
+        int dims = 3;
+        Archetype a = new Archetype(dims, size, colors);
+        Ruleset rs = new ComputedRuleset(a);
+        Random rand = new Random();
+        Rule rule = rs.random(rand).next();
+        ImageInitializer init = new ImageInitializer(i);
+        CA ca = new CA(rule, p, init, rand, 0, w, h, d, 0);
+        return ca;
     }
 
     public static CA fromFile(String filename, String format) throws IOException {

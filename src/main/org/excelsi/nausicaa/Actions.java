@@ -122,6 +122,26 @@ public class Actions {
         d.setVisible(true);
     }
 
+    public void newCAImage(NViewer v, Config config) {
+        JFileChooser f = new JFileChooser(config.getDir());
+        f.setDialogTitle("New CA from image");
+        f.setDialogType(f.OPEN_DIALOG);
+        f.setMultiSelectionEnabled(false);
+        int ret = f.showOpenDialog(v.getRoot());
+        if(ret==f.APPROVE_OPTION) {
+            try {
+                config.setDir(f.getSelectedFile().getParent());
+                final CA ca = CA.fromImage(f.getSelectedFile().toString());
+                config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth(), ca.getPrelude());
+                //config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth());
+                v.setActiveCA(ca);
+            }
+            catch(IOException e) {
+                showError(v, "Failed to load "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);
+            }
+        }
+    }
+
     public void load(NViewer v, Config config) {
         JFileChooser f = new JFileChooser(config.getDir());
         f.setDialogTitle("Open automata");
@@ -611,28 +631,108 @@ public class Actions {
     }
 
     public void chooseImage(final NViewer v, Config config) {
-        final JFileChooser f = new JFileChooser(config.getDir());
-        f.setDialogTitle("Initial state image");
-        f.setDialogType(f.OPEN_DIALOG);
-        f.setMultiSelectionEnabled(false);
-        int ret = f.showOpenDialog(v);
-        if(ret==f.APPROVE_OPTION) {
-            File img = f.getSelectedFile();
-            config.setDir(img.getParent());
-            try {
-                BufferedImage initImage = ImageIO.read(img);
-                System.err.println("read image "+img);
-                v.setInitializer(new ImageInitializer(initImage));
-                //SwingUtilities.invokeLater(new Runnable() {
-                    //public void run() {
-                        //generate();
-                    //}
-                //});
+        final String[] filehack = new String[1];
+        final String[] methack = new String[1];
+
+        final JDialog d = new JDialog(v, "Choose image initializer");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(3,2));
+
+        AbstractAction choosefile = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                final JFileChooser f = new JFileChooser(config.getDir());
+                f.setDialogTitle("Initial state image");
+                f.setDialogType(f.OPEN_DIALOG);
+                f.setMultiSelectionEnabled(false);
+                int ret = f.showOpenDialog(v);
+                if(ret==f.APPROVE_OPTION) {
+                    File img = f.getSelectedFile();
+                    config.setDir(img.getParent());
+                    filehack[0] = img.toString();
+                    //BufferedImage initImage = ImageIO.read(img);
+                    System.err.println("read image "+img);
+                    //v.setInitializer(new ImageInitializer(initImage));
+                }
             }
-            catch(IOException e) {
-                e.printStackTrace();
+        };
+
+        top.add(new JLabel("Image"));
+        final JButton file = new JButton(choosefile);
+        file.setText("Choose file");
+        top.add(file);
+
+        top.add(new JLabel("Method"));
+        ButtonGroup met = new ButtonGroup();
+
+        AbstractAction center = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                methack[0] = "center";
             }
-        }
+        };
+        JRadioButton rcenter = new JRadioButton(center);
+        rcenter.setText("Center");
+        met.add(rcenter);
+        AbstractAction tile = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                methack[0] = "tile";
+            }
+        };
+        JRadioButton rtile = new JRadioButton(center);
+        rtile.setText("Tile");
+        met.add(rtile);
+        AbstractAction none = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                methack[0] = "none";
+            }
+        };
+        JRadioButton rnone = new JRadioButton(none);
+        rnone.setText("None");
+        met.add(rnone);
+        JPanel methods = new JPanel();
+        methods.add(rcenter);
+        methods.add(rtile);
+        methods.add(rnone);
+        top.add(methods);
+
+        final boolean[] scalehack = new boolean[1];
+        top.add(new JLabel("Scale"));
+        JCheckBox scl = new JCheckBox(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                scalehack[0] = !scalehack[0];
+            }
+        });
+        top.add(scl);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                try {
+                    BufferedImage initImage = ImageIO.read(new File(filehack[0]));
+                    boolean cent = "center".equals(methack[0]);
+                    boolean til = "tile".equals(methack[0]);
+                    boolean sc = scl.isSelected();
+                    v.setInitializer(new ImageInitializer(initImage, new ImageInitializer.Params(cent, til, sc)));
+                }
+                catch(IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
     }
 
     public void chooseCAInitializer(final NViewer v, Config config) {

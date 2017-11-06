@@ -193,6 +193,11 @@ public class NViewer extends JFrame implements UIActions {
                 _a.newCA(NViewer.this);
             }
         };
+        AbstractAction newCAImage = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.newCAImage(NViewer.this, _config);
+            }
+        };
         AbstractAction open = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _a.load(NViewer.this, _config);
@@ -221,6 +226,9 @@ public class NViewer extends JFrame implements UIActions {
         JMenuItem ni = file.add(newCA);
         ni.setText("New ...");
         ni.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, shortcut));
+        JMenuItem niimg = file.add(newCAImage);
+        niimg.setText("New from image...");
+        //ni.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, shortcut));
         JMenuItem oi = file.add(open);
         oi.setText("Open ...");
         oi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, shortcut));
