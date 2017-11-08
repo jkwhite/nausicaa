@@ -11,6 +11,7 @@ public final class MutationFactor {
     private Predicate<Archetype> _validator;
     private String _mode = "normal";
     private int _stage;
+    private float _transition;
 
 
     public MutationFactor() {
@@ -69,6 +70,15 @@ public final class MutationFactor {
             //Thread.dumpStack();
         //}
         return _stage;
+    }
+
+    public float transition() {
+        return _transition;
+    }
+
+    public MutationFactor withTransition(float t) {
+        _transition = t;
+        return this;
     }
 
     public String toString() {

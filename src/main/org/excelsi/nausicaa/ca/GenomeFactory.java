@@ -9,7 +9,7 @@ import static org.excelsi.nausicaa.ca.Codons.*;
 public class GenomeFactory {
     private static final WeightedFactory<Codon> buildFactory(final Archetype a) {
         return new WeightedFactory<Codon>(
-            weight(1, new PushO()),
+            weight(2, new PushO()),
             weight(1, new Sum()),
             weight(1, new Sumn(1)),
             weight(1, new SumnN()),
@@ -35,7 +35,7 @@ public class GenomeFactory {
             weight(1, new Rotright()),
             weight(1, new Skip(-1)),
             weight(1, new SkipN()),
-            weight(1, new Histo(1)),
+            weight(2, new Histo(1)),
             //weight(1, new Sumn(-1)),
             weight(1, new Equals()),
             weight(1, new NotEquals()),
@@ -44,13 +44,13 @@ public class GenomeFactory {
             weight(1, new If()),
             //weight(1, new Time()),
             weight(1, new Nonzero(-1)),
-            weight(1, new Push((a.sourceLength()-1)/2, a.sourceLength())),
-            weight(1, new PushN()),
-            weight(1, new PushS()),
-            weight(1, new PushA()),
-            weight(1, new PushARot()),
-            weight(1, new Push(-1, a.sourceLength())),
-            weight(1, new Constant(-1)),
+            weight(2, new Push((a.sourceLength()-1)/2, a.sourceLength())),
+            weight(2, new PushN()),
+            weight(2, new PushS()),
+            weight(2, new PushA()),
+            weight(2, new PushARot()),
+            weight(2, new Push(-1, a.sourceLength())),
+            weight(2, new Constant(-1)),
             weight(1, new Duplicate()),
             weight(1, new Exclamatory()),
             weight(1, new Supersymmetry(a.colors()-1)),
@@ -60,6 +60,9 @@ public class GenomeFactory {
             weight(1, new Negate()),
             weight(1, new Lesser()),
             weight(1, new Greater()),
+            weight(1, new Codons.Fork(-1, 10, a.colors()-1)),
+            weight(1, new Stop()),
+            weight(1, new Pos()),
             weight(1, new Mod())
         );
     }

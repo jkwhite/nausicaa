@@ -18,6 +18,7 @@ public class SequencePattern implements Pattern, Mutatable {
 
     private final Sequence _s;
     private Pattern[] _p = new Pattern[2];
+    private float _trans;
     private int _samples = 1;
     private int _idx;
     private int _offsetIdx;
@@ -25,10 +26,17 @@ public class SequencePattern implements Pattern, Mutatable {
 
 
     public SequencePattern(Sequence s) {
+        this(s, 0.5f);
+    }
+
+    public SequencePattern(Sequence s, float trans) {
         _s = s;
         _p[0] = _s.pattern();
         _p[1] = _s.next();
-        _thresh = _s.peek()/2;
+        _trans = trans;
+        _thresh = (int)(trans*_s.peek());
+        //System.err.println("** created with threshold "+_thresh+" from "+trans);
+        //Thread.dumpStack();
     }
 
     @Override public Archetype archetype() {
@@ -36,7 +44,7 @@ public class SequencePattern implements Pattern, Mutatable {
     }
 
     @Override public Mutatable mutate(MutationFactor m) {
-        return new SequencePattern(_s.mutate(m));
+        return new SequencePattern(_s.mutate(m), m.transition());
     }
 
     @Override public void tick() {
@@ -55,7 +63,7 @@ public class SequencePattern implements Pattern, Mutatable {
         if(t==0) {
             _p[0] = _s.pattern();
             _p[1] = _s.next();
-            _thresh = _s.peek()/2;
+            _thresh = (int)(_trans*_s.peek());
             _samples = 1;
             _idx = 0;
             //_idx = OFFSETS[t%OFFSETS.length];
@@ -64,7 +72,7 @@ public class SequencePattern implements Pattern, Mutatable {
     }
 
     @Override public Pattern copy() {
-        return new SequencePattern(_s.copy());
+        return new SequencePattern(_s.copy(), _trans);
     }
 
     @Override public byte next(int pattern, byte[] p2) {
@@ -152,7 +160,7 @@ public class SequencePattern implements Pattern, Mutatable {
                     for(int i=0;i<_s.size();i++) {
                         final SEntry s = _s.get(i);
                         ComputedPattern np;
-                        if(i==m.stage()) {
+                        if(m.stage()==-1 || i==m.stage()) {
                             System.err.println("MUTATING "+i);
                             np = (ComputedPattern)s.p.mutate(m);
                         }

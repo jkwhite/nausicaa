@@ -26,29 +26,20 @@ public class Machine {
 
     public int compute(final int[] p) {
         _t.reset();
-        //d("===============");
-        //d("init: "+_t);
         for(int i=0;i<_prg.length;i++) {
             long st = System.currentTimeMillis();
             _prg[i].op(p, _t);
             long en = System.currentTimeMillis();
             if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
             _inst[i] += en-st;
-            //d(_prg[i]+" "+_t);
+            if(_t.stopped()) break;
         }
         int res = _t.pop();
+        //if(res<0) res=-res;
         res = res % _a.colors();
         if(res<0) {
-            //res = 0;
-            //System.err.print(res+" => ");
             res = _a.colors()+res;
-            //System.err.println(res);
         }
-        //if(res>=_a.colors()) {
-            //res = _a.colors()-1;
-        //}
-        //d("res: "+res);
-        //d("===============");
         return (int) res;
     }
 

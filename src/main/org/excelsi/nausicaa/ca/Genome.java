@@ -28,6 +28,7 @@ public final class Genome {
 
     public Genome prune(Archetype a) {
         final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(a)));
+        System.err.println("prune init codons: "+cs);
         while(cs.size()>1) {
             if(!cs.get(0).usesPattern()) {
                 cs.remove(0);
@@ -36,6 +37,7 @@ public final class Genome {
                 break;
             }
         }
+        System.err.println("prune final codons: "+cs);
         return fromCodons(cs);
     }
 
@@ -72,6 +74,12 @@ public final class Genome {
                     cs.add(idx, gf.randomCodon(a, r));
                 }),
             new Weight<>(20,
+                // duplicate
+                (cs)->{
+                    int idx = r.nextInt(cs.size());
+                    cs.add(idx, cs.get(idx).copy());
+                }),
+            new Weight<>(20,
                 // remove
                 (cs)->{
                     if(cs.size()>1) {
@@ -89,12 +97,22 @@ public final class Genome {
                         first = false;
                     }
                 }),
+            new Weight<>(10,
+                // repeat
+                (cs)->{
+                    int st = r.nextInt(cs.size());
+                    int en = st+r.nextInt(cs.size()-st);
+                    int o = en;
+                    for(int i=st;i<en;i++) {
+                        cs.add(o++, cs.get(i).copy());
+                    }
+                }),
             new Weight<>(40,
                 // add
                 (cs)->{
                     cs.add(gf.randomCodon(a, r));
                 }),
-            new Weight<>(10,
+            new Weight<>(30,
                 // adjust
                 (cs)->{
                     boolean any = true;

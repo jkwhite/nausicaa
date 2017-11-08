@@ -369,7 +369,7 @@ public class Actions {
         final JDialog d = new JDialog(v, "Mutation parameters");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(3,2));
+        JPanel top = new JPanel(new GridLayout(4,2));
 
         top.add(new JLabel("Alpha"));
         final JTextField alpha = new JTextField();
@@ -389,6 +389,12 @@ public class Actions {
         ms.setColumns(3);
         top.add(ms);
 
+        top.add(new JLabel("Transition factor"));
+        final JTextField tf = new JTextField();
+        tf.setText(config.getVariable("mutator_transition", "0.5"));
+        tf.setColumns(3);
+        top.add(tf);
+
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
         JButton ne = new JButton("Ok");
@@ -400,6 +406,7 @@ public class Actions {
                 config.setVariable("mutator_alpha", alpha.getText());
                 config.setVariable("mutator_maxcolors", mc.getText());
                 config.setVariable("mutator_stage", ms.getText());
+                config.setVariable("mutator_transition", tf.getText());
                 config.notify("mutator");
             }
         });
@@ -713,11 +720,12 @@ public class Actions {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
                 try {
-                    BufferedImage initImage = ImageIO.read(new File(filehack[0]));
+                    //BufferedImage initImage = ImageIO.read(new File(filehack[0]));
                     boolean cent = "center".equals(methack[0]);
                     boolean til = "tile".equals(methack[0]);
                     boolean sc = scl.isSelected();
-                    v.setInitializer(new ImageInitializer(initImage, new ImageInitializer.Params(cent, til, sc)));
+                    //v.setInitializer(new ImageInitializer(initImage, new ImageInitializer.Params(cent, til, sc)));
+                    v.setInitializer(new ImageInitializer(new File(filehack[0]), new ImageInitializer.Params(cent, til, sc)));
                 }
                 catch(IOException ex) {
                     ex.printStackTrace();
@@ -1132,10 +1140,12 @@ public class Actions {
 
     public static MutationFactor createMutationFactor(Config config, Random r) {
         int mc = Integer.parseInt(config.getVariable("mutator_maxcolors", "9"));
+        final String stage = config.getVariable("mutator_stage", "0");
         MutationFactor mf = MutationFactor.defaultFactor()
             .withAlpha(Integer.parseInt(config.getVariable("mutator_alpha", "20")))
-            .withStage(Integer.parseInt(config.getVariable("mutator_stage", "0")))
+            .withStage("*".equals(stage)?-1:Integer.parseInt(stage))
             .withRandom(r)
+            .withTransition(Float.parseFloat(config.getVariable("mutator_transition", "0.5")))
             .withValidator((a)->{
                 return a.colors()<mc;
             });

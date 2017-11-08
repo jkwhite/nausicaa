@@ -71,7 +71,15 @@ public class AbstractComputedRuleset implements Ruleset {
             s.s(c, new ComputedPattern(_a,
                 new ComputedPattern.MachineElf(new Machine(_a, new Genome(g)))));
         }
-        return new ComputedRule2d(new SequencePattern(s));
+
+        SequencePattern sp;
+        if(args.length>1 && args[1] instanceof MutationFactor) {
+            sp = new SequencePattern(s, ((MutationFactor)args[1]).transition());
+        }
+        else {
+            sp = new SequencePattern(s);
+        }
+        return new ComputedRule2d(sp);
     }
 
     @Override public Ruleset derive(int[] colors, int len) {

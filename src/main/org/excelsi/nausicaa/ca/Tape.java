@@ -7,6 +7,7 @@ public final class Tape {
     private int _i = -1;
     private int _s = -1;
     private boolean _a;
+    private boolean _stop;
 
 
     public Tape(int len) {
@@ -114,6 +115,10 @@ public final class Tape {
         return 0;
     }
 
+    public int pos() {
+        return _i;
+    }
+
     public int pushAll(int[] v, int c) {
         int m = Math.min(v.length, c);
         if(_i+1+m>=_t.length) {
@@ -156,6 +161,14 @@ public final class Tape {
         //for(int i=0;i<c;i++) {
             //pop();
         //}
+    }
+
+    public void stop() {
+        _stop = true;
+    }
+
+    public boolean stopped() {
+        return _stop;
     }
 
     public void op(final TapeOp op, final int[] p) {

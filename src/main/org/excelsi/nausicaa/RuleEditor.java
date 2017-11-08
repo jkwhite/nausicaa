@@ -12,6 +12,7 @@ import org.excelsi.nausicaa.ca.CA;
 import org.excelsi.nausicaa.ca.IndexedRule;
 import org.excelsi.nausicaa.ca.Palette;
 import org.excelsi.nausicaa.ca.Genomic;
+import org.excelsi.nausicaa.ca.MutationFactor;
 
 
 public class RuleEditor extends JComponent implements TimelineListener {
@@ -20,12 +21,14 @@ public class RuleEditor extends JComponent implements TimelineListener {
     private JFrame _root;
     private int[] _colors;
     private final Timeline _timeline;
+    private final MutationFactor _f;
 
 
-    public RuleEditor(JFrame root, UIActions ui, Timeline timeline) {
+    public RuleEditor(JFrame root, UIActions ui, Timeline timeline, MutationFactor f) {
         _root = root;
         _ui = ui;
         _timeline = timeline;
+        _f = f;
         timeline.addTimelineListener(this);
         futureChanged();
     }
@@ -61,7 +64,8 @@ public class RuleEditor extends JComponent implements TimelineListener {
                     _ui.doWait(new Runnable() {
                         public void run() {
                             String g = rule.getText();
-                            _ui.setActiveCA(current.mutate(_rule.origin().create(g), _ui.getActiveCA().getRandom()));
+                            System.err.println("*** FACTOR: "+_f.transition());
+                            _ui.setActiveCA(current.mutate(_rule.origin().create(g, _f), _ui.getActiveCA().getRandom()));
                             rule.setText(g);
                             rule.requestFocus();
                         }

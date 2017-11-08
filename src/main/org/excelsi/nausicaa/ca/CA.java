@@ -286,7 +286,7 @@ public final class CA {
         Ruleset rs = new ComputedRuleset(a);
         Random rand = new Random();
         Rule rule = rs.random(rand).next();
-        ImageInitializer init = new ImageInitializer(i);
+        ImageInitializer init = new ImageInitializer(new File(filename));
         CA ca = new CA(rule, p, init, rand, 0, w, h, d, 0);
         return ca;
     }

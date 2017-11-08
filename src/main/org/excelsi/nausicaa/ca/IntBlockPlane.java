@@ -164,12 +164,16 @@ public final class IntBlockPlane extends AbstractPlane {
                     int mx = 0;
                     if(_d==1) {
                         int idx = getCell(i,j,0);
+                        //if(idx<0) idx=-idx;
+                        //if(idx>_p.getColorCount()) idx = idx % _p.getColorCount();
                         _i.setRGB(i,j,_p.color(idx));
                     }
                     else {
                         for(int k=0;k<_d;k++) {
                             //Colors.unpack(_p.color(getCell(i,j,k)), rgba);
                             int idx = getCell(i,j,k);
+                            //if(idx<0) idx=-idx;
+                            //if(idx>_p.getColorCount()) idx = idx % _p.getColorCount();
                             final int[] u = unpacked[idx];
                             //rgb[0] += (_d-k)*rgba[0];
                             //rgb[1] += (_d-k)*rgba[1];
