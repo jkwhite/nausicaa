@@ -4,6 +4,8 @@ package org.excelsi.nausicaa.ca;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.util.Random;
+import java.util.Map;
+import java.util.HashMap;
 import java.io.DataOutputStream;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -15,20 +17,42 @@ import org.imgscalr.Scalr;
 public class CAInitializer implements Initializer {
     private String _url;
     private int _iterations = 10;
+    private CA _ca;
     private Plane _cached;
+    private final Map<CKey,Plane> _cache = new HashMap<>();
 
 
     public CAInitializer() {
     }
 
-    public CAInitializer(String url, int iterations) {
+    public CAInitializer(String url, int iterations) throws IOException {
         _url = url;
         _iterations = iterations;
+        _ca = CA.fromFile(_url, "text")
+            .prelude(_iterations);
     }
 
     @Override public void init(Plane plane, Rule rule, Random random) {
-        Plane res = null;
+        final CKey key = new CKey(plane.getWidth(), plane.getHeight(), plane.getDepth());
+        Plane p = _cache.get(key);
+        if(p==null) {
+            switch(rule.archetype().dims()) {
+                case 1:
+                case 2:
+                    _ca = _ca.size(plane.getWidth(), plane.getHeight());
+                    break;
+                case 3:
+                    IntBlockPlane bp = (IntBlockPlane) plane;
+                    _ca = _ca.size(plane.getWidth(), plane.getHeight(), bp.getDepth());
+                    break;
+                default:
+                    throw new IllegalArgumentException("unsupported dimensionality "+rule.archetype().dims());
+            }
+            p = _ca.createPlane();
+            _cache.put(key, p);
+        }
         /*
+        Plane res = null;
         if(_cached!=null) {
             switch(rule.archetype().dims()) {
                 case 1:
@@ -54,6 +78,7 @@ public class CAInitializer implements Initializer {
             }
         }
         */
+        /*
         if(res==null) {
             CA ca = null;
             try {
@@ -78,6 +103,7 @@ public class CAInitializer implements Initializer {
             }
         }
         final Plane p = res;
+        */
         switch(rule.archetype().dims()) {
             case 1:
             case 2:
@@ -101,7 +127,6 @@ public class CAInitializer implements Initializer {
             default:
                 throw new IllegalArgumentException("unsupported dimensionality "+rule.archetype().dims());
         }
-        _cached = p;
     }
 
     @Override public void write(DataOutputStream dos) throws IOException {
@@ -121,13 +146,24 @@ public class CAInitializer implements Initializer {
         );
     }
 
-    /*
     private static class CKey {
-        public Plane pl
-        public int w;
-        public int h;
-        public int d;
-        public int r;
+        public final int w;
+        public final int h;
+        public final int d;
+
+        public CKey(int w, int h, int d) {
+            this.w = w;
+            this.h = h;
+            this.d = d;
+        }
+
+        public int hashCode() {
+            return 7*w + 31*h + 47*d;
+        }
+
+        public boolean equals(Object o) {
+            CKey k = (CKey)o;
+            return k.w==w&&k.h==h&&k.d==d;
+        }
     }
-    */
 }

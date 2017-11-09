@@ -10,6 +10,7 @@ import javafx.scene.image.WritableImage;
 public interface Plane /*extends Pattern*/ {
     int getWidth();
     int getHeight();
+    int getDepth();
     void init();
     void setCell(int x, int y, int v);
     void setRGBCell(int x, int y, int rgb);

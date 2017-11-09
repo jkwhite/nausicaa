@@ -64,6 +64,10 @@ public class WritableImagePlane extends AbstractPlane {
         return _height;
     }
 
+    @Override public int getDepth() {
+        return 1;
+    }
+
     public void init() {
     }
 

@@ -745,14 +745,30 @@ public class Actions {
 
     public void chooseCAInitializer(final NViewer v, Config config) {
         final JDialog d = new JDialog(v, "CA initializer");
+        final String[] filehack = new String[1];
+        filehack[0] = config.getVariable("cainitializer_file", "");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JPanel top = new JPanel(new GridLayout(2,2));
 
-        top.add(new JLabel("File"));
-        final JTextField file = new JTextField();
-        file.setColumns(30);
-        file.setText(config.getVariable("cainitializer_file", ""));
+        AbstractAction choosefile = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                final JFileChooser f = new JFileChooser(config.getDir());
+                f.setDialogTitle("Automata");
+                f.setDialogType(f.OPEN_DIALOG);
+                f.setMultiSelectionEnabled(false);
+                int ret = f.showOpenDialog(v);
+                if(ret==f.APPROVE_OPTION) {
+                    File ca = f.getSelectedFile();
+                    config.setDir(ca.getParent());
+                    filehack[0] = ca.toString();
+                }
+            }
+        };
+
+        top.add(new JLabel("Automata"));
+        final JButton file = new JButton(choosefile);
+        file.setText("Choose file");
         top.add(file);
 
         top.add(new JLabel("Iterations"));
@@ -769,11 +785,16 @@ public class Actions {
         ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
-                String url = file.getText();
+                String url = filehack[0];
                 int it = Integer.parseInt(iter.getText());
                 config.setVariable("cainitializer_file", url);
                 config.setVariable("cainitializer_iter", ""+it);
-                v.setInitializer(new CAInitializer(url, it));
+                try {
+                    v.setInitializer(new CAInitializer(url, it));
+                }
+                catch(IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         bot.add(ne);

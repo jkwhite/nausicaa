@@ -70,7 +70,7 @@ public final class CA {
         }
         else {
             if(_p.getColorCount()>=127) {
-                IntBlockPlane p = new IntBlockPlane(this, getWidth(), getHeight(), 1, _p);
+                IntBlockPlane p = new IntBlockPlane2d(this, getWidth(), getHeight(), 1, _p);
                 populatePlane(p);
                 return p;
             }
@@ -89,6 +89,7 @@ public final class CA {
         BufferedImagePlane p = new BufferedImagePlane(this, _w, _h, _p);
         return populatePlane(p);
     }
+
 
     private Plane populatePlane(Plane p) {
         _rand.setSeed(_seed);

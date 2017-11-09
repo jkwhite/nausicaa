@@ -31,6 +31,10 @@ public class WindowedPlane extends AbstractPlane {
         return _y2 - _y1;
     }
 
+    @Override public int getDepth() {
+        return _p.getDepth();
+    }
+
     @Override public void init() {
         _p.init();
     }

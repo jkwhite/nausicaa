@@ -121,6 +121,10 @@ public class BufferedImagePlane extends AbstractPlane implements java.io.Seriali
         return _i.getHeight();
     }
 
+    @Override public int getDepth() {
+        return 1;
+    }
+
     public Raster getRaster() {
         //return _i.getRaster();
         return _r;

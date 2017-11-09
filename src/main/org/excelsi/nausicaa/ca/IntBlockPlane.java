@@ -7,7 +7,7 @@ import java.io.*;
 import javafx.scene.image.WritableImage;
 
 
-public final class IntBlockPlane extends AbstractPlane {
+public class IntBlockPlane extends AbstractPlane {
     private final CA _ca;
     private final int _w;
     private final int _h;
@@ -50,6 +50,10 @@ public final class IntBlockPlane extends AbstractPlane {
 
     public int getDepth() {
         return _d;
+    }
+
+    public Palette getPalette() {
+        return _p;
     }
 
     @Override public void init() {
@@ -262,6 +266,10 @@ public final class IntBlockPlane extends AbstractPlane {
     //@Override public void unlock() {
         //_lockOwner = -1;
     //}
+
+    protected int[] getBuffer() {
+        return _s;
+    }
 
     private final int normX(int x) {
         if(x<0) {
