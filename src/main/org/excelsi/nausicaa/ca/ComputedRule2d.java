@@ -110,6 +110,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
             Plane p1 = c;
             Plane p2 = c.copy();
             Plane tmp;
+            long count;
 
             @Override public Plane next() {
                 //if(metarator!=null) {
@@ -151,6 +152,9 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                 else {
                     p2 = p1.copy();
                 }
+                if(++count%500==0) {
+                    System.err.println("frame "+count);
+                }
                 return p2;
             }
 
@@ -179,7 +183,6 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         return 0f;
     }
 
-    //@Override public Mutatable mutate(Random r) {
     @Override public Mutatable mutate(MutationFactor m) {
         return derive((Pattern)((Mutatable)_p).mutate(m));
     }

@@ -90,7 +90,11 @@ public class IntBlockPlane extends AbstractPlane {
         int ny = normY(y);
         int nz = normZ(z);
         //try {
-            return _s[nx+_hstride*ny+_dstride*nz];
+            final int idx = nx+_hstride*ny+_dstride*nz;
+            //if(idx==12) {
+                //System.err.println("("+x+","+y+","+z+") => ("+nx+","+ny+","+nz+") => "+idx);
+            //}
+            return _s[idx];
         //}
         //catch(ArrayIndexOutOfBoundsException e) {
             //System.err.println("x="+x+", y="+y+", z="+z+", nx="+nx+", ny="+ny+", nz="+nz+", hstride="+_hstride+", dstride="+_dstride);
@@ -113,7 +117,13 @@ public class IntBlockPlane extends AbstractPlane {
             for(int j=y;j<y+dy;j++) {
                 for(int k=z;k<z+dz;k++) {
                     //System.err.println(i+", "+j+", "+k+" @ "+idx);
-                    into[idx++] = getCell(i,j,k);
+                    final int v = getCell(i,j,k);
+                    //if(x==4&&y==2&&z==0) {
+                        //if(v!=0) {
+                            //System.err.println("got value "+v+" for ("+x+","+y+","+z+")");
+                        //}
+                    //}
+                    into[idx++] = v;
                 }
             }
         }
@@ -272,6 +282,8 @@ public class IntBlockPlane extends AbstractPlane {
     }
 
     private final int normX(int x) {
+        return norm(x, _w);
+        /*
         if(x<0) {
             x = (_w+x)%_w;
             //if(x<0) throw new IllegalArgumentException("neg x: "+x);
@@ -280,9 +292,12 @@ public class IntBlockPlane extends AbstractPlane {
             x = x % _w;
         }
         return x;
+        */
     }
 
     private final int normY(int y) {
+        return norm(y, _h);
+        /*
         if(y<0) {
             y = (_h+y)%_h;
         }
@@ -290,9 +305,12 @@ public class IntBlockPlane extends AbstractPlane {
             y = y % _h;
         }
         return y;
+        */
     }
 
     private final int normZ(int z) {
+        return norm(z, _d);
+        /*
         if(z<0) {
             z = (_d+z)%_d;
         }
@@ -300,5 +318,20 @@ public class IntBlockPlane extends AbstractPlane {
             z = z % _d;
         }
         return z;
+        */
+    }
+
+    private static final int norm(int v, final int m) {
+        if(v<0) {
+            //System.err.print("v="+v+", m="+m);
+            v = (m+v)%m;
+            //System.err.println(", nv="+v);
+        }
+        else if(v>=m) {
+            //System.err.print("v="+v+", m="+m);
+            v = v % m;
+            //System.err.println(", nv="+v);
+        }
+        return v;
     }
 }

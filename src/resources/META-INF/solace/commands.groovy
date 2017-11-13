@@ -41,7 +41,7 @@ ca = { dims, rule, pal=null, init=null ->
     if(init==null) {
         init = Initializers.random.create()
     }
-    def c = new CA(rule, p, init, __random__, __random__.nextInt(), dims[0], dims[1], dims.size()>2?dims[2]:1);
+    def c = new CA(rule, p, init, __random__, __random__.nextInt(), dims[0], dims[1], dims.size()>2?dims[2]:1, 0);
     //rule.init(c, Rule.Initialization.single);
     //rule.generate(c, 1, hei, false, false, null);
     //c.rule = rule;

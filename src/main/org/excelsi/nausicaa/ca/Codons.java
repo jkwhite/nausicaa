@@ -255,6 +255,7 @@ public class Codons {
         @Override public boolean reversible() { return false; }
 
         @Override public void op(int[] p, Tape t) {
+            clear();
             int mx = 0;
             for(int i=0;i<p.length;i++) {
                 final int v = p[i];
@@ -268,6 +269,15 @@ public class Codons {
                     t.push(c);
                     _h[zi] = (short)0;
                 }
+                _z[i] = 0;
+            }
+        }
+
+        private void clear() {
+            for(int i=0;i<_h.length;i++) {
+                _h[i] = (short)0;
+            }
+            for(int i=0;i<_z.length;i++) {
                 _z[i] = 0;
             }
         }
@@ -587,6 +597,8 @@ public class Codons {
 
         @Override public boolean reversible() { return true; }
 
+        @Override public boolean symmetric() { return false; }
+
         @Override public void op(int[] p, Tape t) {
             t.push(p[_p]);
         }
@@ -622,6 +634,8 @@ public class Codons {
         }
 
         @Override public boolean reversible() { return true; }
+
+        @Override public boolean symmetric() { return false; }
 
         @Override public void op(int[] p, Tape t) {
             long s = t.pop();
@@ -724,6 +738,8 @@ public class Codons {
 
         @Override public boolean reversible() { return true; }
 
+        @Override public boolean symmetric() { return false; }
+
         @Override public void op(int[] p, Tape t) {
             int mid = p.length/2;
             //t.pushAll(p, mid);
@@ -753,6 +769,8 @@ public class Codons {
             return true;
         }
 
+        @Override public boolean symmetric() { return false; }
+
         @Override public void op(int[] p, Tape t) {
             //t.pushAll(p, p.length);
             int n = p[p.length/2]%p.length; //t.pop() % p.length;
@@ -774,6 +792,8 @@ public class Codons {
         @Override public boolean usesPattern() {
             return true;
         }
+
+        @Override public boolean symmetric() { return false; }
 
         @Override public void op(int[] p, Tape t) {
             int n = t.pop() % p.length;

@@ -27,11 +27,11 @@ public class Machine {
     public int compute(final int[] p) {
         _t.reset();
         for(int i=0;i<_prg.length;i++) {
-            long st = System.currentTimeMillis();
+            //long st = System.currentTimeMillis();
             _prg[i].op(p, _t);
-            long en = System.currentTimeMillis();
-            if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
-            _inst[i] += en-st;
+            //long en = System.currentTimeMillis();
+            //if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
+            //_inst[i] += en-st;
             if(_t.stopped()) break;
         }
         int res = _t.pop();
@@ -43,8 +43,8 @@ public class Machine {
         return (int) res;
     }
 
-    public Machine mutate(Archetype a, GenomeFactory gf, Random r) {
-        return new Machine(_a, _g.mutate(_a, gf, r));
+    public Machine mutate(Archetype a, GenomeFactory gf, MutationFactor m) {
+        return new Machine(_a, _g.mutate(_a, gf, m));
     }
 
     public void tick() {

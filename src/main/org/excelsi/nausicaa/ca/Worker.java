@@ -49,10 +49,29 @@ public class Worker {
             for(int j=_x1;j<_x2;j++) {
                 for(int k=0;k<p1.getDepth();k++) {
                     p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
-                    p2.setCell(j, i, k, _wp.next(0, _pattern));
+                    //if(i==2&&j==4&&k==0) {
+                        //for(int w=0;w<_pattern.length;w++) {
+                            //if(_pattern[w]!=0) {
+                                //System.err.println("got nz pattern at "+w);
+                            //}
+                        //}
+                    //}
+                    int v = _wp.next(0, _pattern);
+                    //dump(j,i,k,_pattern,v);
+                    p2.setCell(j, i, k, v);
                 }
             }
         }
+        //System.err.println("-----");
+    }
+
+    private static void dump(int x, int y, int z, int[] p, int v) {
+        StringBuilder b = new StringBuilder("("+x+","+y+","+z+") => ");
+        for(int i=0;i<p.length;i++) {
+            b.append(p[i]).append(" ");
+        }
+        b.append("=> ").append(v);
+        System.err.println(b);
     }
 
     public void frame(final Plane p1, final Plane p2) {

@@ -369,7 +369,7 @@ public class Actions {
         final JDialog d = new JDialog(v, "Mutation parameters");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(4,2));
+        JPanel top = new JPanel(new GridLayout(5,2));
 
         top.add(new JLabel("Alpha"));
         final JTextField alpha = new JTextField();
@@ -395,6 +395,11 @@ public class Actions {
         tf.setColumns(3);
         top.add(tf);
 
+        top.add(new JLabel("Attempt symmetry"));
+        final JCheckBox as = new JCheckBox();
+        as.setSelected("true".equals(config.getVariable("mutator_symmetry", "false")));
+        top.add(as);
+
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
         JButton ne = new JButton("Ok");
@@ -407,6 +412,7 @@ public class Actions {
                 config.setVariable("mutator_maxcolors", mc.getText());
                 config.setVariable("mutator_stage", ms.getText());
                 config.setVariable("mutator_transition", tf.getText());
+                config.setVariable("mutator_symmetry", ""+as.isSelected());
                 config.notify("mutator");
             }
         });
@@ -1167,6 +1173,7 @@ public class Actions {
             .withStage("*".equals(stage)?-1:Integer.parseInt(stage))
             .withRandom(r)
             .withTransition(Float.parseFloat(config.getVariable("mutator_transition", "0.5")))
+            .withSymmetry("true".equals(config.getVariable("mutator_symmetry", "false")))
             .withValidator((a)->{
                 return a.colors()<mc;
             });

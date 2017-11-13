@@ -12,6 +12,7 @@ public final class MutationFactor {
     private String _mode = "normal";
     private int _stage;
     private float _transition;
+    private boolean _symmetry;
 
 
     public MutationFactor() {
@@ -79,6 +80,15 @@ public final class MutationFactor {
     public MutationFactor withTransition(float t) {
         _transition = t;
         return this;
+    }
+
+    public MutationFactor withSymmetry(boolean s) {
+        _symmetry = s;
+        return this;
+    }
+
+    public boolean symmetry() {
+        return _symmetry;
     }
 
     public String toString() {

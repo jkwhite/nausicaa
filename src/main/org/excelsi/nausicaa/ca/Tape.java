@@ -19,6 +19,7 @@ public final class Tape {
         _i = -1;
         _s = -1;
         _a = false;
+        _stop = false;
     }
 
     public void selectAgg(int n) {

@@ -60,7 +60,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
             //_bsize = _psize + 1;
             _p = new int[csize*psize];
             //_p = new int[_bsize*csize];
-            System.err.println("plen: "+_p.length);
+            //System.err.println("plen: "+_p.length);
             //for(int i=0;i<_p.length;i++) {
                 //_p[i] = new int[psize];
             //}
@@ -150,27 +150,20 @@ public final class ComputedPattern implements Pattern, Mutatable {
     private long _misses;
     @Override public int next(int pattern, final int[] p2) {
         /*
-        if(Arrays.equals(p2, _lastP)) {
-            _hits++;
-            if(_hits%1000000==0) System.err.println("hits: "+_hits);
-            return _lastN;
-        }
-        */
-        //_lastP = p2;
-        //System.arraycopy(p2, 0, _lastP, 0, p2.length);
         int r = _cache.find(p2);
         if(_cache.h) {
             _hits++;
-            if(_hits%1000000==0) {
-                System.err.println("hits: "+_hits+" misses: "+_misses+" ratio: "+(_hits/((float)_hits+_misses)));
-                if(_hits%5000000==0) {
-                    _cache.dump();
-                }
-            }
+            //if(_hits%1000000==0) {
+                //System.err.println("hits: "+_hits+" misses: "+_misses+" ratio: "+(_hits/((float)_hits+_misses)));
+                //if(_hits%5000000==0) {
+                    //_cache.dump();
+                //}
+            //}
             return r;
         }
         _misses++;
-        r = _logic.next(p2);
+        */
+        int r = _logic.next(p2);
         //if(_cache.lk!=0) {
             _cache.put(p2, r);
         //}
@@ -181,16 +174,15 @@ public final class ComputedPattern implements Pattern, Mutatable {
         _logic.tick();
     }
 
-    //@Override public ComputedPattern mutate(Random r) {
     @Override public ComputedPattern mutate(MutationFactor m) {
         GenomeFactory gf = new GenomeFactory();
-        return new ComputedPattern(_a, _logic.mutate(_a, gf, m.random()));
+        return new ComputedPattern(_a, _logic.mutate(_a, gf, m));
     }
 
     public interface RuleLogic {
         int next(int[] pattern);
         RuleLogic copy();
-        default RuleLogic mutate(Archetype a, GenomeFactory gf, Random r) {
+        default RuleLogic mutate(Archetype a, GenomeFactory gf, MutationFactor mf) {
             return this;
         }
         default void tick() {
@@ -237,7 +229,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         }
 
         @Override public int next(int[] pattern) {
-            if(++_c%1000000==0) _m.dump();
+            //if(++_c%1000000==0) _m.dump();
             return _m.compute(pattern);
         }
 
@@ -245,8 +237,8 @@ public final class ComputedPattern implements Pattern, Mutatable {
             return new MachineElf(_m.copy());
         }
 
-        @Override public MachineElf mutate(Archetype a, GenomeFactory gf, Random r) {
-            return new MachineElf(_m.mutate(a, gf, r));
+        @Override public MachineElf mutate(Archetype a, GenomeFactory gf, MutationFactor m) {
+            return new MachineElf(_m.mutate(a, gf, m));
         }
 
         @Override public void tick() {

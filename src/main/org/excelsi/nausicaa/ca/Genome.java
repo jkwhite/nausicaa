@@ -41,7 +41,8 @@ public final class Genome {
         return fromCodons(cs);
     }
 
-    public Genome mutate(final Archetype a, final GenomeFactory gf, final Random r) {
+    public Genome mutate(final Archetype a, final GenomeFactory gf, final MutationFactor m) {
+        final Random r = m.random();
         final WeightedFactory<Mutator> mf = new WeightedFactory<>(
             new Weight<>(5,
                 // jumble
@@ -97,7 +98,7 @@ public final class Genome {
                         first = false;
                     }
                 }),
-            new Weight<>(10,
+            new Weight<>(5,
                 // repeat
                 (cs)->{
                     int st = r.nextInt(cs.size());
@@ -106,6 +107,32 @@ public final class Genome {
                     for(int i=st;i<en;i++) {
                         cs.add(o++, cs.get(i).copy());
                     }
+                }),
+            new Weight<>(10,
+                // symmetry
+                (cs)->{
+                    symmetry(a, cs);
+                    /*
+                    System.err.println("before sym: "+cs);
+                    for(int i=0;i<cs.size()&&cs.size()>1;i++) {
+                        Codon c = cs.get(i);
+                        if(!c.symmetric()) {
+                            cs.remove(i);
+                            i--;
+                        }
+                    }
+                    boolean pat = false;
+                    for(Codon c:cs) {
+                        if(c.usesPattern()) {
+                            pat = true;
+                            break;
+                        }
+                    }
+                    if(!pat) {
+                        cs.add(0, new Codons.Histo(a.colors()));
+                    }
+                    System.err.println("after sym: "+cs);
+                    */
                 }),
             new Weight<>(40,
                 // add
@@ -135,7 +162,7 @@ public final class Genome {
         int tries = 0;
         Genome child;
         do {
-            child = replicate(a, mf, r);
+            child = replicate(a, mf, m);
             if(tries==999) {
                 System.err.println("failed to mutate "+this);
             }
@@ -144,12 +171,15 @@ public final class Genome {
         return child;
     }
 
-    private Genome replicate(final Archetype a, final WeightedFactory<Mutator> mutators, final Random r) {
+    private Genome replicate(final Archetype a, final WeightedFactory<Mutator> mutators, final MutationFactor mf) {
         final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(a)));
-        int max = 1+r.nextInt(Math.max(1,cs.size()/3));
+        int max = 1+mf.random().nextInt(Math.max(1,cs.size()/3));
         for(int i=0;i<max;i++) {
-            final Mutator m = mutators.random(r);
+            final Mutator m = mutators.random(mf.random());
             m.mutate(cs);
+        }
+        if(mf.symmetry()) {
+            symmetry(a, cs);
         }
         StringBuilder b = new StringBuilder();
         for(Codon c:cs) {
@@ -188,5 +218,27 @@ public final class Genome {
     @FunctionalInterface
     interface Mutator {
         void mutate(LinkedList<Codon> cs);
+    }
+
+    private static void symmetry(final Archetype a, final List<Codon> cs) {
+        System.err.println("before sym: "+cs);
+        for(int i=0;i<cs.size()&&cs.size()>1;i++) {
+            Codon c = cs.get(i);
+            if(!c.symmetric()) {
+                cs.remove(i);
+                i--;
+            }
+        }
+        boolean pat = false;
+        for(Codon c:cs) {
+            if(c.usesPattern()) {
+                pat = true;
+                break;
+            }
+        }
+        if(!pat) {
+            cs.add(0, new Codons.Histo(a.colors()));
+        }
+        System.err.println("after sym: "+cs);
     }
 }
