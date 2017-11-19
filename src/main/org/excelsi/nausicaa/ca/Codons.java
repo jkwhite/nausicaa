@@ -261,7 +261,7 @@ public class Codons {
         @Override public boolean reversible() { return false; }
 
         @Override public void op(int[] p, Tape t) {
-            clear();
+            //clear();
             int mx = 0;
             for(int i=0;i<p.length;i++) {
                 final int v = p[i];
@@ -318,7 +318,9 @@ public class Codons {
                 _h[p[i]]++;
             }
             for(int i=0;i<_h.length;i++) {
-                t.push(_h[i]);
+                if(_h[i]>0) {
+                    t.push(_h[i]);
+                }
             }
         }
     }

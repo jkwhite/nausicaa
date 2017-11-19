@@ -45,7 +45,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         public int lk;
         private final int _psize;
         private final int _csize;
-        //private final int _bsize;
+        private final int _bsize;
         private final int[] _c;
         //private final int[][] _p;
         private final int[] _p;
@@ -57,9 +57,9 @@ public final class ComputedPattern implements Pattern, Mutatable {
             //_p = new int[csize][];
             _csize = csize;
             _psize = psize;
-            //_bsize = _psize + 1;
-            _p = new int[csize*psize];
-            //_p = new int[_bsize*csize];
+            _bsize = _psize + 1;
+            //_p = new int[csize*psize];
+            _p = new int[_bsize*csize];
             //System.err.println("plen: "+_p.length);
             //for(int i=0;i<_p.length;i++) {
                 //_p[i] = new int[psize];
@@ -67,12 +67,18 @@ public final class ComputedPattern implements Pattern, Mutatable {
         }
 
         public int find(int[] p) {
-            final int i = key(p);
+            int i = key(p);
             lk = i;
+            i=0;
             h = true;
             int j = 0;
             //if(i<0) throw new IllegalStateException("negative i: "+i);
-            for(int idx = i*_psize;idx<(i+1)*_psize;idx++) {
+            int idx = i*_psize;
+            if(_p[idx++]==0) {
+                h = false;
+                return 0;
+            }
+            for(;idx<(i+1)*_psize;idx++) {
                 //if(j<0) throw new IllegalStateException("negative j: "+j+" idx: "+idx+" i: "+i+" psize: "+_psize);
                 //if(idx<0) throw new IllegalStateException("negative idx: "+idx+" j: "+j+" i: "+i+" psize: "+_psize);
                 if(p[j++]!=_p[idx]) {
@@ -81,16 +87,19 @@ public final class ComputedPattern implements Pattern, Mutatable {
                 }
             }
             //h = Arrays.equals(p, _p[i]);
+            //if(Arrays.equals(ZEROS, p)) System.err.println("** PCACHE FIND: "+fmt(p)+"h: "+h+" r: "+_c[i]);
             return _c[i];
             //return _p[idx];
         }
 
         public void put(int[] p, int r) {
+            //if(Arrays.equals(ZEROS, p)) System.err.println("*** PCACHE PUT: "+fmt(p)+" => "+r);
             //final int i = key(p);
             final int i = lk;
             _hot[i]++;
-            System.arraycopy(p, 0, _p, i*_psize, p.length);
-            //System.arraycopy(p, 0, _p, i*_bsize, p.length);
+            //System.arraycopy(p, 0, _p, i*_psize, p.length);
+            _p[i*_bsize] = 1;
+            System.arraycopy(p, 0, _p, 1+i*_bsize, p.length);
             _c[i] = r;
             //_p[i*_bsize+p.length] = r;
         }
@@ -148,8 +157,8 @@ public final class ComputedPattern implements Pattern, Mutatable {
     private int _lastN;
     private long _hits;
     private long _misses;
+    //private static final int[] ZEROS = new int[9];
     @Override public int next(int pattern, final int[] p2) {
-        /*
         int r = _cache.find(p2);
         if(_cache.h) {
             _hits++;
@@ -159,16 +168,52 @@ public final class ComputedPattern implements Pattern, Mutatable {
                     //_cache.dump();
                 //}
             //}
+            //dumpres(p2, r);
             return r;
         }
         _misses++;
-        */
-        int r = _logic.next(p2);
+        r = _logic.next(p2);
         //if(_cache.lk!=0) {
             _cache.put(p2, r);
         //}
+        //dumpres(p2, r);
         return r;
     }
+
+    private static String fmt(int[] p) {
+        StringBuilder b = new StringBuilder();
+        for(int i:p) {
+            b.append(i).append(" ");
+        }
+        String key = b.toString();
+        return key;
+    }
+
+    /*
+    private java.util.Map<String,Integer> _dumpmap = new java.util.HashMap<>();
+    private void dumpres(int[] p, int r) {
+        StringBuilder b = new StringBuilder();
+        for(int i:p) {
+            b.append(i).append(" ");
+        }
+        String key = b.toString();
+        Integer res = _dumpmap.get(key);
+        if(res!=null) {
+            if(r!=res.intValue()) {
+                System.err.println("!!!!!!!!! BUG!!!!!!!!!! "+key+"=> res: "+res+" r: "+r);
+                Thread.dumpStack();
+            }
+        }
+        else {
+            _dumpmap.put(key, r);
+            if(Arrays.equals(ZEROS, p)) {
+                System.err.println("PUTTING "+key+" => "+r);
+            }
+        }
+        //b.append("=> ").append(r);
+        //System.err.println(b.toString());
+    }
+    */
 
     @Override public void tick() {
         _logic.tick();
