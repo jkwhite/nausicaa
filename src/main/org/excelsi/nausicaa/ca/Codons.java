@@ -39,6 +39,8 @@ public class Codons {
     public static final String STOP = "sa";
     public static final String POS = "shi";
     public static final String SUBTRACT = "su";
+    public static final String NOT = "se";
+    public static final String NOT_INTERSECT = "so";
     public static final String AVG = "gi";
     public static final String PUSH_ALL_ROT = "ge";
     public static final String PUSH_ALL = "go";
@@ -91,6 +93,8 @@ public class Codons {
                 return new PushARot();
             case INTERSECT:
                 return new Intersects();
+            case NOT_INTERSECT:
+                return new NotIntersects();
             case INTERSECT_S:
                 return new IntersectsSelf();
             case CONS:
@@ -169,6 +173,8 @@ public class Codons {
                 return new Stop();
             case POS:
                 return new Pos();
+            case NOT:
+                return new Not();
             default:
                 throw new IllegalStateException("unknown opcode '"+code+"'");
         }
@@ -825,6 +831,28 @@ public class Codons {
         }
     }
 
+    public static class NotIntersects implements Codon {
+        @Override public Codon copy() {
+            return new NotIntersects();
+        }
+
+        @Override public String code() {
+            return NOT_INTERSECT;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            int up = t.pop();
+            int low = t.pop();
+            int mid = t.pop();
+            int in = (mid < low || mid > up)?1:0;
+            t.push(in);
+        }
+    }
+
     public static final class IntersectsSelf implements Codon {
         @Override public Codon copy() {
             return new IntersectsSelf();
@@ -1284,6 +1312,23 @@ public class Codons {
         @Override public void op(int[] p, Tape t) {
             int v = t.pop();
             t.push(-v);
+        }
+    }
+
+    public static class Not implements Codon {
+        @Override public Codon copy() { return new Not(); }
+
+        @Override public String code() {
+            return NOT;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            int v = t.pop();
+            t.push(v==0?1:0);
         }
     }
 

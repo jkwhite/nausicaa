@@ -278,6 +278,24 @@ public final class Palette {
         return new Palette(colors);
     }
 
+    public Palette cut(int div, Random om) {
+        int[] colors = new int[_colors.length];
+        int chance = div==0?0:Math.max(1,_colors.length/div);
+        for(int i=0;i<colors.length;i++) {
+            if(om.nextInt(colors.length)<chance) {
+                int len = 1+om.nextInt(colors.length/100);
+                for(int j=0;j<len&&i+j<colors.length;j++) {
+                    colors[i+j] = 0;
+                }
+                i+=len;
+            }
+            else {
+                colors[i] = _colors[i];
+            }
+        }
+        return new Palette(true, colors);
+    }
+
     public static Palette randomShinyRainbow(Random om, int numColors, boolean black, int density) {
         final int[][] s = new int[2+om.nextInt(density)][3];
         for(int i=0;i<s.length;i++) {

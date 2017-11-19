@@ -96,6 +96,7 @@ public class GenomeFactory {
             weight(1, new Equals()),
             weight(1, new NotEquals()),
             weight(1, new Intersects()),
+            weight(1, new NotIntersects()),
             weight(1, new IntersectsSelf()),
             weight(1, new If()),
             weight(1, new Nonzero(-1)),
@@ -118,6 +119,7 @@ public class GenomeFactory {
             weight(1, new Codons.Fork(-1, 10, a.colors()-1)),
             weight(1, new Stop()),
             weight(1, new Pos()),
+            weight(1, new Not()),
             weight(1, new Mod())
         );
     }

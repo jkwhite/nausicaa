@@ -361,6 +361,48 @@ public class Actions {
         d.setVisible(true);
     }
 
+    public void paletteOptions(NViewer v, Config config) {
+        final JDialog d = new JDialog(v, "Palette options");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(2,2));
+
+        top.add(new JLabel("Black Zero"));
+        final JCheckBox bz = new JCheckBox();
+        bz.setSelected("true".equals(config.getVariable("palette_blackzero", "true")));
+        top.add(bz);
+
+        top.add(new JLabel("Density"));
+        final JTextField dense = new JTextField();
+        dense.setText(config.getVariable("palette_cut", "0"));
+        dense.setColumns(3);
+        top.add(dense);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                config.setVariable("palette_blackzero", ""+bz.isSelected());
+                config.setVariable("palette_cut", dense.getText());
+                config.notify("palette");
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
+
     public void generateToFile(NViewer v) {
         new JCAGenerator(v, v.getActiveCA(), v.getConfig());
     }

@@ -199,7 +199,7 @@ public class IntBlockPlane extends AbstractPlane {
                             rgb[0] += (int)(mult*u[0]);
                             rgb[1] += (int)(mult*u[1]);
                             rgb[2] += (int)(mult*u[2]);
-                            //if(u[0]>0) System.err.println("mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
+                            //if(u[0]>0) System.err.println("k: "+k+", u: "+u[0]+","+u[1]+","+u[2]+", mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
                             mx += (_d-k);
                             if(FIRST&&(u[0]>0||u[1]>0||u[2]>0)) break;
                         }
