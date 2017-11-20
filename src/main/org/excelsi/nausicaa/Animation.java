@@ -187,7 +187,9 @@ top:        while(_state==State.animate) {
             //frame.lock(1);
             frame.lockRead();
             if(isInterrupted()) {
-                frame.unlockRead();
+                if(!_d.delegateUnlock()) {
+                    frame.unlockRead();
+                }
                 System.err.println("interrupted done");
                 return;
             }
@@ -201,7 +203,9 @@ top:        while(_state==State.animate) {
                         _d.setPlane(frame);
                     }
                     finally {
-                        frame.unlockRead();
+                        if(!_d.delegateUnlock()) {
+                            frame.unlockRead();
+                        }
                     }
                 }
             });

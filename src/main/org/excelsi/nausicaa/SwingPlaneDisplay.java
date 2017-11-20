@@ -143,6 +143,10 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         //_r = r;
     //}
 
+    public boolean delegateUnlock() {
+        return false;
+    }
+
     public JLabel getLabel() {
         return _label;
     }

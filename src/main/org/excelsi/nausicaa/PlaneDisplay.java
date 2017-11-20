@@ -22,4 +22,5 @@ public abstract class PlaneDisplay extends JComponent {
     abstract public void reroll(Initializer i);
     abstract public void generate(Initializer i);
     abstract public void toggleShow();
+    abstract public boolean delegateUnlock();
 }
