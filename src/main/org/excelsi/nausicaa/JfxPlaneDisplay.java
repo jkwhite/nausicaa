@@ -113,6 +113,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         setCA(p.creator());
     }
 
+    /*
     static private class CameraAnimator extends AnimationTimer {
         private final Runnable _r;
         private long _lastExecution;
@@ -129,6 +130,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
             }
         }
     }
+    */
 
     private void initScene() {
         final double INC = 5d;
@@ -138,45 +140,36 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         final PerspectiveCamera cam = new PerspectiveCamera(true);
         cam.setFarClip(1000);
         s.setCamera(cam);
-        Group camGroup = new Group();
-        camGroup.getChildren().add(cam);
-        _root.getChildren().add(camGroup);
-        //cam.setTranslateY(-400);
-        /*
-        final TranslateTransition moveX = new TranslateTransition(Duration.INDEFINITE, cam);
-        moveX.setByX(100f);
-        //moveX.setCycleCount(moveX.INDEFINITE);
-        moveX.setCycleCount(0);
-        final AnimationTimer timer = new AnimationTimer() {
+        Xform cameraXform = new Xform();
+        Xform cameraXform2 = new Xform();
+        Xform cameraXform3 = new Xform();
+        _root.getChildren().add(cameraXform);
+        cameraXform.getChildren().add(cameraXform2);
+        cameraXform2.getChildren().add(cameraXform3);
+        cameraXform3.getChildren().add(cam);
 
-            private final long delay = 10_000L; // This must be in 
-                                                    // nanoseconds
-                                                    // since "now" is in
-                                                    // nanoseconds
-            private long lastExecution;
-
-            @Override
-            public void handle(long now) {
-                //System.err.println("HMMMM: "+(lastExecution+delay)+" "+now);
-                //if (now - (lastExecution + delay) <= 0L) {
-                if(true||lastExecution==0||lastExecution+delay>=now) {
-                    //System.err.println("MOVING");
-                    cam.setTranslateX(cam.getTranslateX()+INC);
-                    lastExecution = now;
-                }
-            }
-
-        };
-        */
+        Group camGroup = cameraXform2;
         final CameraAnimator forwardX = new CameraAnimator(()->camGroup.setTranslateX(camGroup.getTranslateX()+INC));
         final CameraAnimator forwardY = new CameraAnimator(()->camGroup.setTranslateY(camGroup.getTranslateY()+INC));
         final CameraAnimator forwardZ = new CameraAnimator(()->camGroup.setTranslateZ(camGroup.getTranslateZ()+INC));
         final CameraAnimator backwardX = new CameraAnimator(()->camGroup.setTranslateX(camGroup.getTranslateX()-INC));
         final CameraAnimator backwardY = new CameraAnimator(()->camGroup.setTranslateY(camGroup.getTranslateY()-INC));
         final CameraAnimator backwardZ = new CameraAnimator(()->camGroup.setTranslateZ(camGroup.getTranslateZ()-INC));
-        final Rotate rotateX = new Rotate(0, new Point3D(0,0,1));
-        final Rotate rotateY = new Rotate(0, new Point3D(0,1,0));
-        final Rotate rotateZ = new Rotate(0, new Point3D(1,0,0));
+        //final Rotate rotateX = new Rotate(0, new Point3D(0,0,1));
+        //final Rotate rotateY = new Rotate(0, new Point3D(0,1,0));
+        //final Rotate rotateZ = new Rotate(0, new Point3D(1,0,0));
+
+        Xform rotateX = cameraXform;
+        Xform rotateY = cameraXform;
+        Xform rotateZ = cameraXform3;
+        final int ROT = 3;
+        final CameraAnimator rotRight = new CameraAnimator(()->rotateY.setRy(rotateY.getRy()+ROT));
+        final CameraAnimator rotLeft = new CameraAnimator(()->rotateY.setRy(rotateY.getRy()-ROT));
+        final CameraAnimator rotUp = new CameraAnimator(()->rotateX.setRx(rotateX.getRx()+ROT));
+        final CameraAnimator rotDown = new CameraAnimator(()->rotateX.setRx(rotateX.getRx()-ROT));
+        final CameraAnimator rotFront = new CameraAnimator(()->rotateZ.setRz(rotateZ.getRz()+ROT));
+        final CameraAnimator rotBack = new CameraAnimator(()->rotateZ.setRz(rotateZ.getRz()-ROT));
+        /*
         cam.getTransforms().add(rotateX);
         cam.getTransforms().add(rotateY);
         cam.getTransforms().add(rotateZ);
@@ -187,6 +180,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         final CameraAnimator rotDown = new CameraAnimator(()->rotateY.setAngle(rotateY.getAngle()-ROT));
         final CameraAnimator rotFront = new CameraAnimator(()->rotateZ.setAngle(rotateZ.getAngle()+ROT));
         final CameraAnimator rotBack = new CameraAnimator(()->rotateZ.setAngle(rotateZ.getAngle()-ROT));
+        */
 
         s.setOnKeyPressed(new EventHandler<javafx.scene.input.KeyEvent>() {
             public void handle(javafx.scene.input.KeyEvent e) {

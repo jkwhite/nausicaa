@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 import javafx.scene.shape.DrawMode;
+import javafx.scene.CacheHint;
 import javafx.scene.Scene;
 import javafx.scene.Group;
 import javafx.scene.shape.Rectangle;
@@ -300,6 +301,8 @@ public class JfxCA extends Group {
             PooledBox b = new PooledBox(_c, _scale, _scale, _scale);
             Material m = _materials.get(_c);
             b.setMaterial(m);
+            //b.setCache(true);
+            //b.setCacheHint(CacheHint.SCALE_AND_ROTATE);
             //b.setDrawMode(DrawMode.LINE);
             return b;
         }
@@ -346,7 +349,6 @@ public class JfxCA extends Group {
         public PooledBox(int p, double sx, double sy, double sz) {
             super(sx, sy, sz);
             _poolId = p;
-            //setDrawMode(DrawMode.LINE);
         }
 
         public int poolId() {

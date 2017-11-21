@@ -25,8 +25,10 @@ uses:
     - batik-awt-util-1.7.jar
     - imgscalr-lib-4.2.jar
     - solace-1.0.jar
+    - Fxyz-lib-1.0.jar
 #main: org.excelsi.gimmal.AppFactory
-main: org.excelsi.nausicaa.NViewer
+#main: org.excelsi.nausicaa.NViewer
+main: org.excelsi.nausicaa.JfxUniverse
 #main: org.excelsi.ca.Viewer
 #sysargs: -XX:-OmitStackTraceInFastThrow -Dcom.sun.management.jmxremote -Xmx12g -d64
 sysargs: -Xmx12g -XX:-OmitStackTraceInFastThrow -Dcom.sun.management.jmxremote -d64

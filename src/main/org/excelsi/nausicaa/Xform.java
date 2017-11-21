@@ -91,6 +91,9 @@ public class Xform extends Group {
     public void setRx(double x) { rx.setAngle(x); }
     public void setRy(double y) { ry.setAngle(y); }
     public void setRz(double z) { rz.setAngle(z); }
+    public double getRx() { return rx.getAngle(); }
+    public double getRy() { return ry.getAngle(); }
+    public double getRz() { return rz.getAngle(); }
 
     public void setScale(double scaleFactor) {
         s.setX(scaleFactor);
