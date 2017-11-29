@@ -167,7 +167,12 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         };
     }
 
-    @Override public float generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u) {
+    @Override public float generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, final GOptions opt) {
+        final Iterator<Plane> ps = frameIterator(c, pool, opt);
+        for(int i=start;i<end;i++) {
+            Plane p = ps.next();
+        }
+        /*
         Plane p1 = c;
         Plane p2 = c.copy();
         Plane tmp;
@@ -180,6 +185,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
             p2 = tmp;
             p.tick();
         }
+        */
         return 0f;
     }
 

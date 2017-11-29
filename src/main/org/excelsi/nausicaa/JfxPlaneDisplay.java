@@ -17,6 +17,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import javax.swing.Icon;
 import javax.swing.JTextArea;
 import javax.swing.JDialog;
@@ -57,6 +58,10 @@ import javafx.geometry.Point3D;
 import javafx.event.EventHandler;
 import javafx.animation.*;
 
+import org.fxyz.cameras.CameraTransformer;
+import org.fxyz.cameras.AdvancedCamera;
+import org.fxyz.cameras.controllers.FPSController;
+
 
 public class JfxPlaneDisplay extends PlaneDisplay {
     private static final boolean HANDLE_UNLOCK = false;
@@ -72,7 +77,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     private int _w;
     private int _h;
     private int _d;
-    private float _scale = 1.0f;
+    private float _scale = 1.5f;
     private Group _root;
     private Group _parent;
     private JfxCA _jfxCa;
@@ -113,33 +118,15 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         setCA(p.creator());
     }
 
-    /*
-    static private class CameraAnimator extends AnimationTimer {
-        private final Runnable _r;
-        private long _lastExecution;
-
-
-        public CameraAnimator(Runnable r) {
-            _r = r;
-        }
-
-        @Override public void handle(long now) {
-            if(_lastExecution==0||_lastExecution+100<now) {
-                _r.run();
-                _lastExecution = now;
-            }
-        }
-    }
-    */
-
     private void initScene() {
         final double INC = 5d;
         _root = new Group();
-        Scene s = new Scene(_root, 400, 400, true, SceneAntialiasing.BALANCED);
+        Scene s = new Scene(_root, 800, 800, true, SceneAntialiasing.BALANCED);
         s.setFill(javafx.scene.paint.Color.BLACK);
         final PerspectiveCamera cam = new PerspectiveCamera(true);
-        cam.setFarClip(1000);
+        cam.setFarClip(3000);
         s.setCamera(cam);
+        /*
         Xform cameraXform = new Xform();
         Xform cameraXform2 = new Xform();
         Xform cameraXform3 = new Xform();
@@ -149,42 +136,38 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         cameraXform3.getChildren().add(cam);
 
         Group camGroup = cameraXform2;
+        */
+        Group move = new Group();
+        CameraTransformer t = new CameraTransformer();
+        t.getChildren().add(cam);
+        move.getChildren().add(t);
+        _root.getChildren().add(move);
+
+        Group camGroup = move;
         final CameraAnimator forwardX = new CameraAnimator(()->camGroup.setTranslateX(camGroup.getTranslateX()+INC));
         final CameraAnimator forwardY = new CameraAnimator(()->camGroup.setTranslateY(camGroup.getTranslateY()+INC));
         final CameraAnimator forwardZ = new CameraAnimator(()->camGroup.setTranslateZ(camGroup.getTranslateZ()+INC));
         final CameraAnimator backwardX = new CameraAnimator(()->camGroup.setTranslateX(camGroup.getTranslateX()-INC));
         final CameraAnimator backwardY = new CameraAnimator(()->camGroup.setTranslateY(camGroup.getTranslateY()-INC));
         final CameraAnimator backwardZ = new CameraAnimator(()->camGroup.setTranslateZ(camGroup.getTranslateZ()-INC));
-        //final Rotate rotateX = new Rotate(0, new Point3D(0,0,1));
-        //final Rotate rotateY = new Rotate(0, new Point3D(0,1,0));
-        //final Rotate rotateZ = new Rotate(0, new Point3D(1,0,0));
 
-        Xform rotateX = cameraXform;
-        Xform rotateY = cameraXform;
-        Xform rotateZ = cameraXform3;
-        final int ROT = 3;
+        //Xform rotateX = cameraXform;
+        //Xform rotateY = cameraXform;
+        //Xform rotateZ = cameraXform3;
+        //final int ROT = 3;
+        CameraTransformer rotateX = t;
+        CameraTransformer rotateY = t;
+        CameraTransformer rotateZ = t;
+        final double ROT = 1.5d;
         final CameraAnimator rotRight = new CameraAnimator(()->rotateY.setRy(rotateY.getRy()+ROT));
         final CameraAnimator rotLeft = new CameraAnimator(()->rotateY.setRy(rotateY.getRy()-ROT));
         final CameraAnimator rotUp = new CameraAnimator(()->rotateX.setRx(rotateX.getRx()+ROT));
         final CameraAnimator rotDown = new CameraAnimator(()->rotateX.setRx(rotateX.getRx()-ROT));
         final CameraAnimator rotFront = new CameraAnimator(()->rotateZ.setRz(rotateZ.getRz()+ROT));
         final CameraAnimator rotBack = new CameraAnimator(()->rotateZ.setRz(rotateZ.getRz()-ROT));
-        /*
-        cam.getTransforms().add(rotateX);
-        cam.getTransforms().add(rotateY);
-        cam.getTransforms().add(rotateZ);
-        final int ROT = 3;
-        final CameraAnimator rotRight = new CameraAnimator(()->rotateX.setAngle(rotateX.getAngle()+ROT));
-        final CameraAnimator rotLeft = new CameraAnimator(()->rotateX.setAngle(rotateX.getAngle()-ROT));
-        final CameraAnimator rotUp = new CameraAnimator(()->rotateY.setAngle(rotateY.getAngle()+ROT));
-        final CameraAnimator rotDown = new CameraAnimator(()->rotateY.setAngle(rotateY.getAngle()-ROT));
-        final CameraAnimator rotFront = new CameraAnimator(()->rotateZ.setAngle(rotateZ.getAngle()+ROT));
-        final CameraAnimator rotBack = new CameraAnimator(()->rotateZ.setAngle(rotateZ.getAngle()-ROT));
-        */
 
         s.setOnKeyPressed(new EventHandler<javafx.scene.input.KeyEvent>() {
             public void handle(javafx.scene.input.KeyEvent e) {
-                //System.err.println("HERE HERE: "+e.getCode());
                 switch(e.getCode()) {
                     case D:
                         forwardX.start();
@@ -227,7 +210,6 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         });
         s.setOnKeyReleased(new EventHandler<javafx.scene.input.KeyEvent>() {
             public void handle(javafx.scene.input.KeyEvent e) {
-                //System.err.println("HERE: "+e.getCode());
                 switch(e.getCode()) {
                     case D:
                         forwardX.stop();
@@ -270,25 +252,6 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         });
 
         Group parent = new Group();
-        /*
-        if(_w<60) {
-            parent.setTranslateX(200);
-            parent.setTranslateY(100);
-        }
-        else {
-            parent.setTranslateX(400);
-            parent.setTranslateY(200);
-        }
-        parent.setTranslateZ(50);
-        parent.getTransforms().add(new Rotate(-45, new Point3D(1,0,0)));
-        parent.getTransforms().add(new Rotate(-45, new Point3D(0,0,1)));
-        */
-
-        //RotateTransition t = new RotateTransition(Duration.millis(36000), parent);
-        //t.setByAngle(360);
-        //t.setAxis(new Point3D(1,0,0));
-        //t.setCycleCount(t.INDEFINITE);
-        //t.play();
         _root.getChildren().add(parent);
         _parent = parent;
         _img.setScene(s);
@@ -336,6 +299,10 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     }
 
     public void setCA(CA ca) {
+        setCA(ca, Pools.prelude(), new GOptions(true, 1, 0));
+    }
+
+    public void setCA(CA ca, ExecutorService pool, GOptions opt) {
         if(ca==null) {
             throw new IllegalArgumentException("null ca");
         }
@@ -345,7 +312,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
             if(_jfxCa!=null) {
                 _parent.getChildren().remove(_jfxCa);
             }
-            _jfxCa = new JfxCA(ca, _scale*4, _d);
+            _jfxCa = new JfxCA(ca, _scale*4, _d, JfxCA.Render.mesh);
             _parent.getChildren().add(_jfxCa);
             //RotateTransition t = new RotateTransition(Duration.millis(72000), _jfxCa);
             //t.setByAngle(360);
@@ -355,7 +322,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
             setPlane(_c.createPlane());
         }
         else {
-            Platform.runLater(()->{setCA(ca);});
+            Platform.runLater(()->{setCA(ca, pool, opt);});
         }
     }
 

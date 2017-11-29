@@ -50,6 +50,12 @@ public final class Palette {
         return _colors[idx];
     }
 
+    public boolean isBlack(int idx) {
+        //System.err.print("col "+_colors[idx]+" ");
+        //return _colors[idx]==0;
+        return Colors.isBlack(_colors[idx]);
+    }
+
     public int[][] unpack() {
         final int[][] u = new int[_colors.length][4];
         for(int i=0;i<u.length;i++) {

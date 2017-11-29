@@ -4,6 +4,7 @@ package org.excelsi.nausicaa;
 import org.excelsi.nausicaa.ca.*;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import javafx.embed.swing.JFXPanel;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -21,6 +22,8 @@ import javafx.geometry.Point3D;
 import javafx.event.EventHandler;
 import javafx.animation.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.effect.Light;
+import javafx.scene.effect.Lighting;
 
 import org.fxyz.cameras.CameraTransformer;
 import org.fxyz.cameras.AdvancedCamera;
@@ -71,14 +74,21 @@ public class JfxWorld {
             if(_jfxCa!=null) {
                 _parent.getChildren().remove(_jfxCa);
             }
-            _jfxCa = new JfxCA(ca, _scale*4, _d);
+            _jfxCa = new JfxCA(ca, _scale*8, _d, JfxCA.Render.best);
             _parent.getChildren().add(_jfxCa);
             //RotateTransition t = new RotateTransition(Duration.millis(72000), _jfxCa);
             //t.setByAngle(360);
             //t.setCycleCount(t.INDEFINITE);
             //t.play();
-            Platform.runLater(()->{_jfxCa.clear();});
-            setPlane(_c.createPlane());
+
+            // ????? Platform.runLater(()->{_jfxCa.clear();});
+            ExecutorService comp = Pools.named("compute", 4);
+            try {
+                setPlane(_c.createPlane(comp, new GOptions(true, 4, 0)));
+            }
+            finally {
+                comp.shutdown();
+            }
         }
         else {
             Platform.runLater(()->{setCA(ca);});
@@ -112,6 +122,18 @@ public class JfxWorld {
         }
     }
 
+    public void setRender(JfxCA.Render render) {
+        _jfxCa.setRender(render);
+    }
+
+    public void scaleUp() {
+        _jfxCa.setScale(_jfxCa.getScale()*1.2);
+    }
+
+    public void scaleDown() {
+        _jfxCa.setScale(_jfxCa.getScale()*0.8);
+    }
+
     public void initScene() {
         final double INC = 5d;
         Scene s;
@@ -130,7 +152,7 @@ public class JfxWorld {
         }
         s.setFill(javafx.scene.paint.Color.BLACK);
         final PerspectiveCamera cam = new PerspectiveCamera(true);
-        cam.setFarClip(2000);
+        cam.setFarClip(10000);
         s.setCamera(cam);
 
         Group move = new Group();
@@ -138,17 +160,7 @@ public class JfxWorld {
         t.getChildren().add(cam);
         move.getChildren().add(t);
         _root.getChildren().add(move);
-        /*
-        Xform cameraXform = new Xform();
-        Xform cameraXform2 = new Xform();
-        Xform cameraXform3 = new Xform();
-        _root.getChildren().add(cameraXform);
-        cameraXform.getChildren().add(cameraXform2);
-        cameraXform2.getChildren().add(cameraXform3);
-        cameraXform3.getChildren().add(cam);
-        */
 
-        //Group camGroup = cameraXform2;
         Group camGroup = move;
         final CameraAnimator forwardX = new CameraAnimator(()->camGroup.setTranslateX(camGroup.getTranslateX()+INC));
         final CameraAnimator forwardY = new CameraAnimator(()->camGroup.setTranslateY(camGroup.getTranslateY()+INC));
@@ -157,9 +169,6 @@ public class JfxWorld {
         final CameraAnimator backwardY = new CameraAnimator(()->camGroup.setTranslateY(camGroup.getTranslateY()-INC));
         final CameraAnimator backwardZ = new CameraAnimator(()->camGroup.setTranslateZ(camGroup.getTranslateZ()-INC));
 
-        //Xform rotateX = cameraXform;
-        //Xform rotateY = cameraXform;
-        //Xform rotateZ = cameraXform3;
         CameraTransformer rotateX = t;
         CameraTransformer rotateY = t;
         CameraTransformer rotateZ = t;
@@ -170,19 +179,6 @@ public class JfxWorld {
         final CameraAnimator rotDown = new CameraAnimator(()->rotateX.setRx(rotateX.getRx()-ROT));
         final CameraAnimator rotFront = new CameraAnimator(()->rotateZ.setRz(rotateZ.getRz()+ROT));
         final CameraAnimator rotBack = new CameraAnimator(()->rotateZ.setRz(rotateZ.getRz()-ROT));
-        /*
-        FPSController controller = new FPSController(); 
-        controller.setScene(s); 
-        controller.setSpeed(0.000000001d);
-        controller.setMouseLookEnabled(false); 
-         
-        AdvancedCamera camera = new AdvancedCamera(); 
-        camera.setController(controller); 
-         
-        _root.getChildren().add(camera); 
-         
-        s.setCamera(camera); 
-        */
 
         s.setOnKeyPressed(new EventHandler<javafx.scene.input.KeyEvent>() {
             public void handle(javafx.scene.input.KeyEvent e) {
@@ -271,6 +267,14 @@ public class JfxWorld {
 
         Group parent = new Group();
         _root.getChildren().add(parent);
+
+        //Light.Point l = new Light.Point();
+        //Light.Distant l = new Light.Distant();
+        //Lighting li = new Lighting();
+        //li.setLight(l);
+        //li.setSurfaceScale(50.0);
+        //parent.setEffect(li);
+
         _parent = parent;
         _scene = s;
     }

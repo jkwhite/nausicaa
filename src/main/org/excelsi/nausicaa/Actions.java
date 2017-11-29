@@ -2,6 +2,7 @@ package org.excelsi.nausicaa;
 
 
 import org.excelsi.nausicaa.ca.Archetype;
+import org.excelsi.nausicaa.ca.Blobs;
 import org.excelsi.nausicaa.ca.Mutator;
 import org.excelsi.nausicaa.ca.Symmetry;
 import org.excelsi.nausicaa.ca.SymmetryForcer;
@@ -219,10 +220,18 @@ public class Actions {
         }
     }
 
+    public void debug(NViewer v) {
+        final Plane p = v.getPlaneDisplayProvider().getActivePlane();
+        final java.util.List<Blobs.Blob> blobs = new Blobs().blobs(p, Blobs.Mode.finite);
+        for(Blobs.Blob b:blobs) {
+            System.err.println(b.toString());
+        }
+    }
+
     public void info(NViewer v) {
         final CA ca = v.getActiveCA();
         final Plane plane = v.getPlaneDisplayProvider().getActivePlane();
-        final Plane nextPlane = ca.getRule().frameIterator(plane, Pools.bgr(), new GOptions(false, 1, 1)).next();
+        final Plane nextPlane = ca.getRule().frameIterator(plane, Pools.adhoc(), new GOptions(false, 1, 1)).next();
         final Stats stats = Stats.forPlane(plane);
         final Stats nextStats = Stats.forPlane(nextPlane);
         final Multistats ms = stats.compareWith(nextStats);

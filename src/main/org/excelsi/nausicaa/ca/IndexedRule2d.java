@@ -124,7 +124,7 @@ public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
         };
     }
 
-    @Override public float generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u) {
+    @Override public float generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, final GOptions opt) {
         Plane p1 = c;
         Plane p2 = c.copy();
         Plane tmp;

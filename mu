@@ -25,6 +25,7 @@ uses:
     - batik-awt-util-1.7.jar
     - imgscalr-lib-4.2.jar
     - solace-1.0.jar
+    - Fxyz-Core-1.0.jar
     - Fxyz-lib-1.0.jar
 #main: org.excelsi.gimmal.AppFactory
 #main: org.excelsi.nausicaa.NViewer

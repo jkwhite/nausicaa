@@ -4,6 +4,7 @@ package org.excelsi.nausicaa;
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.awt.event.KeyAdapter;
 import java.awt.event.*;
 
@@ -379,6 +380,9 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         _timeline.notifyListeners(new TimelineEvent("tick"));
         java.util.List<Thread> threads = new ArrayList<Thread>();
         _lastInit = init;
+        //final ExecutorService pool = Pools.named("compute", 3);
+        final ExecutorService pool = Pools.prelude();
+        final GOptions opt = new GOptions(true, _show?1:Pools.preludeSize(), 0);
         if(_show) {
             int width = getCAWidth() > 60 ? getCAWidth()/3-10 : getCAWidth();
             int height = getCAHeight() > 60 ? getCAHeight()/3-10 : getCAHeight();
@@ -386,7 +390,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             final Vector<Long> created = new Vector<Long>();
             Thread tdm = new Thread() {
                 public void run() {
-                    _displays[4].setCA(ca);
+                    _displays[4].setCA(ca, pool, opt);
                 }
             };
             threads.add(tdm);
@@ -401,7 +405,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                             if(reroll) {
                                 nca = nca.seed();
                             }
-                            _displays[order[ix]].setCA(nca);
+                            _displays[order[ix]].setCA(nca, pool, opt);
                         }
                     };
                     threads.add(td);
@@ -414,7 +418,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             int height = getCAHeight();
             final CA ca = _ca.size(width,height,getCADepth(),getCAPrelude());
             _ca = ca;
-            _displays[0].setCA(_ca);
+            _displays[0].setCA(_ca, pool, opt);
             if(reroll) {
                 _displays[0].reroll(init);
             }

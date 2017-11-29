@@ -38,7 +38,7 @@ public class RulePattern implements Pattern {
     public Plane generate(final int height, final Palette palette) {
         Plane p = new BufferedImagePlane(null, _r.width(), height, palette);
         _r.copy(p);
-        _hr.generate(p, 1, height, _pool, false, false, null);
+        _hr.generate(p, 1, height, _pool, false, false, null, new GOptions(false, 1, 0));
         return p;
     }
 

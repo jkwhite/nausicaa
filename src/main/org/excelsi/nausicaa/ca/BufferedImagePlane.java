@@ -130,6 +130,10 @@ public class BufferedImagePlane extends AbstractPlane implements java.io.Seriali
         return _r;
     }
 
+    @Override public void setCell(int x, int y, int z, int v) {
+        setCell(x, y, v);
+    }
+
     @Override public void setCell(int x, int y, int v) {
         //_i.getRaster().setSample(x, y, 0, v);
         //if(v>=_palette.getColorCount()) {
@@ -153,6 +157,14 @@ public class BufferedImagePlane extends AbstractPlane implements java.io.Seriali
         return into;
     }
 
+    @Override public int[] getCardinal(int[] into, int x, int y, int z, int offset) {
+        into[0] = getCell(x-1,y,0);
+        into[1] = getCell(x+1,y,0);
+        into[2] = getCell(x,y-1,0);
+        into[3] = getCell(x,y+1,0);
+        return into;
+    }
+
     @Override public int[] getBlock(int[] into, int x, int y, int w, int h, int offset) {
         //Raster r = _i.getData();
         //System.err.println(String.format("getBlock %d,%d,%d,%d", x, y, w, h));
@@ -171,6 +183,10 @@ public class BufferedImagePlane extends AbstractPlane implements java.io.Seriali
             }
             return into;
         }
+    }
+
+    @Override public int getCell(int x, int y, int z) {
+        return getCell(x, y);
     }
 
     @Override public int getCell(int x, int y) {

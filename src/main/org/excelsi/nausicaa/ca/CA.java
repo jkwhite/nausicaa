@@ -62,36 +62,40 @@ public final class CA {
     }
 
     public Plane createPlane() {
+        return createPlane(POOL, new GOptions(true, 1, 0));
+    }
+
+    public Plane createPlane(ExecutorService pool, GOptions opt) {
         if(archetype().dims()==3) {
             //BlockPlane p = new BlockPlane(this, getWidth(), getHeight(), getDepth(), _p, BlockPlane.Mode.argb);
             IntBlockPlane p = new IntBlockPlane(this, getWidth(), getHeight(), getDepth(), _p);
-            populatePlane(p);
+            populatePlane(p, pool, opt);
             return p;
         }
         else {
             if(_p.getColorCount()>=127) {
                 IntBlockPlane p = new IntBlockPlane2d(this, getWidth(), getHeight(), 1, _p);
-                populatePlane(p);
+                populatePlane(p, pool, opt);
                 return p;
             }
             else {
-                return createBufferedImagePlane();
-                //return createWritableImagePlane();
+                return createBufferedImagePlane(pool, opt);
+                //return createWritableImagePlane(pool, opt);
             }
         }
     }
 
-    public Plane pooledPlane(Plane p) {
-        return populatePlane(p);
+    public Plane pooledPlane(Plane p, ExecutorService pool, GOptions opt) {
+        return populatePlane(p, pool, opt);
     }
 
-    private Plane createBufferedImagePlane() {
+    private Plane createBufferedImagePlane(ExecutorService pool, GOptions opt) {
         BufferedImagePlane p = new BufferedImagePlane(this, _w, _h, _p);
-        return populatePlane(p);
+        return populatePlane(p, pool, opt);
     }
 
 
-    private Plane populatePlane(Plane p) {
+    private Plane populatePlane(Plane p, ExecutorService pool, GOptions opt) {
         _rand.setSeed(_seed);
         _i.init(p, _r, _rand);
         //if(_r instanceof Multirule1D) {
@@ -100,27 +104,27 @@ public final class CA {
         //else {
             switch(_r.dimensions()) {
                 case 1:
-                    _r.generate(p, 1, _h, POOL, false, true, null);
+                    _r.generate(p, 1, _h, pool, false, true, null, opt);
                     break;
                 case 3:
                     System.err.println("generating for "+_prelude);
                     final long st = System.currentTimeMillis();
-                    _r.generate(p, 1, _prelude, POOL, false, true, null);
+                    _r.generate(p, 1, _prelude, pool, false, true, null, opt);
                     final long en = System.currentTimeMillis();
                     System.err.println("generation took "+(en-st)+" millis");
                     break;
                 case 2:
                 default:
-                    _r.generate(p, 1, _d, POOL, false, true, null);
+                    _r.generate(p, 1, _d, pool, false, true, null, opt);
                     break;
             }
         //}
         return p;
     }
 
-    private Plane createWritableImagePlane() {
+    private Plane createWritableImagePlane(ExecutorService pool, GOptions opt) {
         WritableImagePlane p = new WritableImagePlane(this, _w, _h, _p);
-        populatePlane(p);
+        populatePlane(p, pool, opt);
         /*
         _rand.setSeed(_seed);
         _i.init(p, _r, _rand);

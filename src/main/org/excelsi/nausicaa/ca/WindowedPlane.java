@@ -39,6 +39,10 @@ public class WindowedPlane extends AbstractPlane {
         _p.init();
     }
 
+    @Override public void setCell(int x, int y, int z, int v) {
+        _p.setCell(x+_x1, y+_y1, z, v);
+    }
+
     @Override public void setCell(int x, int y, int v) {
         _p.setCell(x+_x1, y+_y1, v);
     }
@@ -47,12 +51,20 @@ public class WindowedPlane extends AbstractPlane {
         _p.setRGBCell(x+_x1, y+_y1, rgb);
     }
 
+    @Override public int getCell(int x, int y, int z) {
+        return getCell(x, y);
+    }
+
     @Override public int getCell(int x, int y) {
         return _p.getCell(x+_x1, y+_y1);
     }
 
     @Override public int[] getRow(int[] into, int y, int offset) {
         return _p.getRow(into, y+_y1, offset);
+    }
+
+    @Override public int[] getCardinal(int[] into, int x, int y, int z, int offset) {
+        return _p.getCardinal(into, x, y, z, offset);
     }
 
     @Override public int[] getBlock(int[] into, int x, int y, int dx, int dy, int offset) {

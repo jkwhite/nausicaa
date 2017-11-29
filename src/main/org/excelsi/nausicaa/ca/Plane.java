@@ -13,10 +13,13 @@ public interface Plane /*extends Pattern*/ {
     int getDepth();
     void init();
     void setCell(int x, int y, int v);
+    void setCell(int x, int y, int z, int v);
     void setRGBCell(int x, int y, int rgb);
     int getCell(int x, int y);
+    int getCell(int x, int y, int z);
     int[] getRow(int[] into, int y, int offset);
     int[] getBlock(int[] into, int x, int y, int dx, int dy, int offset);
+    int[] getCardinal(int[] into, int x, int y, int z, int offset);
     void setRow(int[] row, int y);
     java.awt.Image toImage();
     java.awt.Image toImage(int width, int height);

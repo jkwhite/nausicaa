@@ -5,6 +5,8 @@ import org.excelsi.nausicaa.ca.Plane;
 import org.excelsi.nausicaa.ca.IntBlockPlane;
 import org.excelsi.nausicaa.ca.CA;
 import org.excelsi.nausicaa.ca.Colors;
+import org.excelsi.nausicaa.ca.Blobs;
+import org.excelsi.nausicaa.ca.Palette;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,40 +32,56 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
 
+import org.fxyz3d.shapes.primitives.ScatterMesh;
+import org.fxyz3d.geometry.Point3D;
+import org.fxyz3d.shapes.primitives.CubeMesh;
+import org.fxyz3d.shapes.primitives.TetrahedraMesh;
+
 
 public class JfxCA extends Group {
+    public enum Render { cells, bounds, mesh, single_mesh, cube_mesh, blob_mesh, best };
     private enum Strategy { all, delta };
+
     private static final double DEFAULT_SCALE = 2f;
     private static final int DEFAULT_DEPTH = 20;
+    private static final boolean FROZEN = true;
 
-    private final double _scale;
+    private static final Render DEFAULT_RENDER = Render.best;
+
+    private double _scale;
     private final int _depth;
     private final CA _ca;
+    private final Map<Integer,Color> _colors = new HashMap<>();
     private final Map<Integer,Material> _materials = new HashMap<>();
     private final Map<PooledBox,Integer> _boxes = new HashMap<>();
     private final PooledBox[] _boxindex;
+    private Render _render;
     private List<Pool<PooledBox>> _pools;
     private int _lastNops;
     private long _lastTime = 0;
+    private Plane _lastPlane;
     private Strategy _strat = Strategy.delta;
 
 
     public JfxCA(CA ca) {
-        this(ca, DEFAULT_SCALE, DEFAULT_DEPTH);
+        this(ca, DEFAULT_SCALE, DEFAULT_DEPTH, DEFAULT_RENDER);
     }
 
-    public JfxCA(CA ca, double scale, int depth) {
+    public JfxCA(CA ca, double scale, int depth, Render render) {
         if(ca==null) {
             throw new IllegalArgumentException("null ca");
         }
         _ca = ca;
         _scale = scale;
         _depth = depth;
+        _render = render;
         int[] cols = _ca.getPalette().getColors();
         for(int i=0;i<cols.length;i++) {
             int[] c = Colors.unpack(cols[i]);
             if(c[0]>0||c[1]>0||c[2]>0) {
-                Material m = new PhongMaterial(new Color(c[2]/255f, c[1]/255f, c[0]/255f, 1f));
+                Color col = new Color(c[2]/255f, c[1]/255f, c[0]/255f, 1f);
+                Material m = new PhongMaterial(col);
+                _colors.put(i, col);
                 _materials.put(i, m);
             }
         }
@@ -74,10 +92,46 @@ public class JfxCA extends Group {
         _boxindex = new PooledBox[ca.getWidth()*ca.getHeight()*ca.getDepth()];
     }
 
+    public void setRender(Render render) {
+        clear(true);
+        _render = render;
+        addPlane(_lastPlane);
+    }
+
+    public void setScale(double scale) {
+        clear(true);
+        _scale = scale;
+        addPlane(_lastPlane);
+    }
+
+    public double getScale() {
+        return _scale;
+    }
+
     public void clear() {
-        while(!getChildren().isEmpty()) {
-            PooledBox b = (PooledBox) getChildren().remove(0);
-            _pools.get(b.poolId()).checkin(b);
+        clear(false);
+    }
+
+    public void clear(boolean raze) {
+        switch(_render) {
+            case cells:
+                int i = 0;
+                while(!getChildren().isEmpty()) {
+                    PooledBox b = (PooledBox) getChildren().remove(0);
+                    _pools.get(b.poolId()).checkin(b);
+                    //if(raze) {
+                        //_boxindex[i++] = null;
+                    //}
+                }
+                if(raze) {
+                    _strat = Strategy.all;
+                }
+                break;
+            default:
+                while(!getChildren().isEmpty()) {
+                    getChildren().remove(0);
+                }
+                break;
         }
         /*
         for(Object o:getChildren()) {
@@ -89,8 +143,41 @@ public class JfxCA extends Group {
     }
 
     public void addPlane(Plane p) {
+        _lastPlane = p;
         if(p instanceof IntBlockPlane) {
-            setBlocks((IntBlockPlane)p);
+            IntBlockPlane bp = (IntBlockPlane) p;
+            List<Blobs.Blob> blobs = null;
+            if(_render==Render.best) {
+                blobs = new Blobs().blobs(p, Blobs.Mode.finite);
+                /*
+                if(blobs.size()<80000) {
+                    _render = Render.mesh;
+                }
+                else {
+                    _render = Render.cells;
+                }*/
+                _render = Render.blob_mesh;
+            }
+            switch(_render) {
+                case cells:
+                    setBlocks(bp);
+                    break;
+                case bounds:
+                    renderBounds(p);
+                    break;
+                case mesh:
+                    renderMesh(p, blobs);
+                    break;
+                case single_mesh:
+                    renderSingleMesh(p);
+                    break;
+                case blob_mesh:
+                    renderBlobMesh(p, blobs);
+                    break;
+                case cube_mesh:
+                    renderCubeMesh(p);
+                    break;
+            }
         }
         else {
             Layer layer = new Layer(p, _scale);
@@ -101,6 +188,83 @@ public class JfxCA extends Group {
             layer.setTranslateZ(-getChildren().size()*_scale);
             getChildren().add(layer);
         }
+    }
+
+    private void renderBounds(Plane p) {
+        clear();
+        final List<Blobs.Blob> blobs = new Blobs().blobs(p, Blobs.Mode.finite);
+        for(Blobs.Blob blob:blobs) {
+            Box b = createBox(blob);
+            b.setTranslateX(blob.x1*_scale);
+            b.setTranslateY(blob.y1*_scale);
+            b.setTranslateZ(blob.z1*_scale);
+            getChildren().add(b);
+        }
+    }
+
+    private void renderMesh(Plane p, List<Blobs.Blob> blobs) {
+        clear();
+        if(blobs==null) {
+            blobs = new Blobs().blobs(p, Blobs.Mode.finite);
+        }
+        int count = 0;
+        System.err.println("creating "+blobs.size()+" blobs");
+        // TODO: autoselect best render
+        // TODO: render local changes faster - relative to current pos
+        for(Blobs.Blob blob:blobs) {
+            Group g = createMesh(blob);
+            count += blob.points().size();
+            g.setTranslateX(blob.x1*_scale);
+            g.setTranslateY(blob.y1*_scale);
+            g.setTranslateZ(blob.z1*_scale);
+            getChildren().add(g);
+        }
+        System.err.println("created "+blobs.size()+" blobs, "+count+" points");
+    }
+
+    private void renderBlobMesh(Plane p, List<Blobs.Blob> blobs) {
+        clear();
+        if(blobs==null) {
+            blobs = new Blobs().blobs(p, Blobs.Mode.finite);
+        }
+        int count = 0;
+        System.err.println("creating "+blobs.size()+" blobs");
+        for(Blobs.Blob blob:blobs) {
+            Group g = createBlobMesh(blob);
+            count += blob.points().size();
+            g.setTranslateX(blob.x1*_scale);
+            g.setTranslateY(blob.y1*_scale);
+            g.setTranslateZ(blob.z1*_scale);
+            getChildren().add(g);
+        }
+        System.err.println("created "+blobs.size()+" blobs, "+count+" points");
+    }
+
+    private void renderSingleMesh(Plane p) {
+        clear();
+        Group g = createMesh(p);
+        getChildren().add(g);
+    }
+
+    private void renderCubeMesh(Plane p) {
+        clear();
+        final Palette pal = p.creator().getPalette();
+        for(int i=0;i<p.getWidth();i++) {
+            for(int j=0;j<p.getHeight();j++) {
+                for(int k=0;k<p.getDepth();k++) {
+                    int c = p.getCell(i,j,k);
+                    if(!pal.isBlack(c)) {
+                        //CubeMesh m = new CubeMesh(0.5);
+                        TetrahedraMesh m = new TetrahedraMesh(2d);
+                        m.setTranslateX(i*_scale);
+                        m.setTranslateY(j*_scale);
+                        m.setTranslateZ(k*_scale);
+                        getChildren().add(m);
+                    }
+                }
+            }
+        }
+        //getChildren().add(g);
     }
 
     private void setBlocks(IntBlockPlane p) {
@@ -127,8 +291,13 @@ public class JfxCA extends Group {
                         _boxindex[count] = null;
                     }
                     int v = p.getCell(i,j,k);
-                    //boolean shouldExist = _materials.containsKey(v) && shouldFill(p,i,j,k,v);
-                    boolean shouldExist = _materials.containsKey(v) && shouldFillFrozen(p,i,j,k,v);
+                    boolean shouldExist;
+                    if(FROZEN) {
+                        shouldExist = _materials.containsKey(v) && shouldFillFrozen(p,i,j,k,v);
+                    }
+                    else {
+                        shouldExist = _materials.containsKey(v) && shouldFill(p,i,j,k,v);
+                    }
                     PooledBox existing = _boxindex[count];
                     boolean same = existing!=null && existing.poolId() == v;
                     if(shouldExist) {
@@ -266,6 +435,51 @@ public class JfxCA extends Group {
         }
     }
 
+    private Box createBox(Blobs.Blob b) {
+        Box box = new Box(_scale*(b.x2-b.x1), _scale*(b.y2-b.y1), _scale*(b.z2-b.z1));
+        Material m = _materials.get(b.c);
+        box.setMaterial(m);
+        return box;
+    }
+
+    private Group createMesh(Blobs.Blob b) {
+        List<Point3D> pnts = new ArrayList<>(b.points().size());
+        for(Blobs.Point p:b.points()) {
+            pnts.add(new Point3D((float)_scale*p.x, (float)_scale*p.y, (float)_scale*p.z));
+        }
+        ScatterMesh mesh = new ScatterMesh(pnts, true, 2d, 2);
+        //Material m = _materials.get(b.c);
+        //mesh.setMaterial(m);
+        mesh.setTextureModeNone(_colors.get(b.c));
+        return mesh;
+    }
+
+    private Group createBlobMesh(Blobs.Blob b) {
+        BlobMesh m = new BlobMesh(b, _scale);
+        Material mat = _materials.get(b.c);
+        m.getMeshView().setMaterial(mat);
+        return m;
+    }
+
+    private Group createMesh(Plane p) {
+        final Palette pal = p.creator().getPalette();
+        List<Point3D> pnts = new LinkedList<>();
+        for(int i=0;i<p.getWidth();i++) {
+            for(int j=0;j<p.getHeight();j++) {
+                for(int k=0;k<p.getDepth();k++) {
+                    int c = p.getCell(i,j,k);
+                    if(!pal.isBlack(c)) {
+                        pnts.add(new Point3D((float)_scale*i, (float)_scale*j, (float)_scale*k));
+                    }
+                }
+            }
+        }
+        ScatterMesh mesh = new ScatterMesh(pnts, true, 2d, 1);
+        //Material m = _materials.get(b.c);
+        //mesh.setMaterial(m);
+        return mesh;
+    }
+
     class Layer extends Group {
         private final double _scale;
 
@@ -318,6 +532,7 @@ public class JfxCA extends Group {
         */
         return _pools.get(v).checkout();
     }
+
 
     static class Pool<E> {
         private final PoolFactory<E> _pf;

@@ -91,6 +91,10 @@ public class WritableImagePlane extends AbstractPlane {
         throw new UnsupportedOperationException();
     }
 
+    @Override public void setCell(int x, int y, int z, int v) {
+        setCell(x, y, v);
+    }
+
     private byte[] _cellBufW = new byte[1];
     public void setCell(int x, int y, int v) {
         //System.err.println(System.identityHashCode(this)+"setting "+x+", "+y+" to "+v);
@@ -99,6 +103,10 @@ public class WritableImagePlane extends AbstractPlane {
         _w.setPixels(x, y, 1, 1, _pf, _cellBufW, 0, 0);
         int c = _r.getArgb(x, y);
         //System.err.println(System.identityHashCode(this)+"set to "+c);
+    }
+
+    @Override public int getCell(int x, int y, int z) {
+        return getCell(x, y);
     }
 
     private byte[] _cellBufR = new byte[1];
@@ -157,6 +165,14 @@ public class WritableImagePlane extends AbstractPlane {
         _r.getPixels(0, y, into.length-2*offset, 1,
             _pfi, into, offset, getWidth());
         return reverse(into);
+    }
+
+    @Override public int[] getCardinal(int[] into, int x, int y, int z, int offset) {
+        into[0] = getCell(x-1,y,0);
+        into[1] = getCell(x+1,y,0);
+        into[2] = getCell(x,y-1,0);
+        into[3] = getCell(x,y+1,0);
+        return into;
     }
 
     public int[] getBlock(int[] into, int x, int y, int w, int h, int offset) {

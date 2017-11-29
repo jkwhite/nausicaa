@@ -30,7 +30,7 @@ public interface Rule extends java.io.Serializable, Humanizable {
     //int getSuggestedInterval(CA c);
     void write(DataOutputStream dos) throws IOException;
     void write(PrintWriter w);
-    float generate(Plane c, int start, int end, ExecutorService pool, boolean stopOnSame, boolean overwrite, Updater u);
+    float generate(Plane c, int start, int end, ExecutorService pool, boolean stopOnSame, boolean overwrite, Updater u, GOptions opt);
     Iterator<Plane> frameIterator(Plane initial, ExecutorService pool, GOptions opt);
 
     default Stream<Plane> stream(Plane initial, ExecutorService pool, GOptions opt) {

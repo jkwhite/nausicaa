@@ -87,11 +87,30 @@ public class JfxUniverse extends Application {
         //paste.setOnAction((e)->{ mc.pasteBuffer(); });
         //edit.getItems().addAll(cut, copy, paste);
 
+        Menu rend = new Menu("Render");
+        MenuItem smesh = new MenuItem("Scatter Mesh");
+        smesh.setOnAction((e)->{ w.setRender(JfxCA.Render.mesh); });
+        MenuItem bmesh = new MenuItem("Blob Mesh");
+        bmesh.setOnAction((e)->{ w.setRender(JfxCA.Render.blob_mesh); });
+        MenuItem cells = new MenuItem("Cells");
+        cells.setOnAction((e)->{ w.setRender(JfxCA.Render.cells); });
+        rend.getItems().addAll(smesh, bmesh, cells);
+
         Menu view = new Menu("View");
         MenuItem fullsc = new MenuItem("Full Screen");
         fullsc.setAccelerator(KeyCombination.keyCombination("Shortcut+ENTER"));
         fullsc.setOnAction((e)->{ stage.setFullScreen(!stage.isFullScreen()); });
         view.getItems().addAll(fullsc);
+
+        view.getItems().add(new SeparatorMenuItem());
+
+        MenuItem scaleup = new MenuItem("Scale up");
+        scaleup.setAccelerator(KeyCombination.keyCombination("Shortcut+="));
+        scaleup.setOnAction((e)->{ w.scaleUp(); });
+        MenuItem scaledown = new MenuItem("Scale down");
+        scaledown.setAccelerator(KeyCombination.keyCombination("Shortcut+-"));
+        scaledown.setOnAction((e)->{ w.scaleDown(); });
+        view.getItems().addAll(scaleup, scaledown);
 
         //Menu window = new Menu("Window");
         //MenuItem shiftr = new MenuItem("Next Tab");
@@ -104,7 +123,7 @@ public class JfxUniverse extends Application {
 
         MenuBar mb = new MenuBar();
         mb.setUseSystemMenuBar(true);
-        mb.getMenus().addAll(file, view);
+        mb.getMenus().addAll(file, rend, view);
         return mb;
     }
 
@@ -118,7 +137,8 @@ public class JfxUniverse extends Application {
         if (selectedFile != null) {
             try {
                 CA ca = CA.fromFile(selectedFile.toString(), "text");
-                ca = ca.prelude(10);
+                System.err.println("PRELUDE: "+ca.getPrelude());
+                //ca = ca.prelude(10);
                 w.setCA(ca);
             }
             catch(IOException e) {

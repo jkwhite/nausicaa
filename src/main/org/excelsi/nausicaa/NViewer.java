@@ -591,6 +591,14 @@ public class NViewer extends JFrame implements UIActions {
         info.setText("Info");
         info.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcut));
 
+        AbstractAction debug = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.debug(NViewer.this);
+            }
+        };
+        JMenuItem deb = auto.add(debug);
+        deb.setText("Debug");
+
         AbstractAction cancel = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _a.cancel(NViewer.this);

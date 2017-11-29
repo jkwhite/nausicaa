@@ -92,7 +92,7 @@ public final class BlockPlane extends AbstractPlane {
         return getCell(x, y, 0);
     }
 
-    public byte getCell(int x, int y, int z) {
+    public int getCell(int x, int y, int z) {
         int nx = normX(x);
         int ny = normY(y);
         int nz = normZ(z);
@@ -113,6 +113,16 @@ public final class BlockPlane extends AbstractPlane {
         throw new UnsupportedOperationException();
     }
 
+    @Override public int[] getCardinal(int[] into, int x, int y, int z, int offset) {
+        into[0] = getCell(x-1,y,z);
+        into[1] = getCell(x+1,y,z);
+        into[2] = getCell(x,y-1,z);
+        into[3] = getCell(x,y+1,z);
+        into[4] = getCell(x,y,z-1);
+        into[5] = getCell(x,y,z+1);
+        return into;
+    }
+
     public byte[] getBlock(byte[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
         //System.err.println("x="+x+", y="+y+", z="+z+", dx="+dx+", dy="+dy+", dz="+dz);
         int idx=offset;
@@ -120,7 +130,7 @@ public final class BlockPlane extends AbstractPlane {
             for(int j=y;j<y+dy;j++) {
                 for(int k=z;k<z+dz;k++) {
                     //System.err.println(i+", "+j+", "+k+" @ "+idx);
-                    into[idx++] = getCell(i,j,k);
+                    into[idx++] = (byte)getCell(i,j,k);
                 }
             }
         }

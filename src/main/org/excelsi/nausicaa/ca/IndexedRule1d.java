@@ -68,7 +68,7 @@ public class IndexedRule1d extends AbstractIndexedRule {
         return _origin;
     }
 
-    @Override public float generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u) {
+    @Override public float generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, final GOptions opt) {
         final int w = c.getWidth();
         final int h = c.getHeight();
         final int size = pattern().archetype().size();
@@ -102,7 +102,7 @@ public class IndexedRule1d extends AbstractIndexedRule {
     }
 
     @Override public Iterator<Plane> frameIterator(final Plane initial, final ExecutorService pool, final GOptions opt) {
-        generate(initial, 1, initial.getHeight(), pool, false, false, null);
+        generate(initial, 1, initial.getHeight(), pool, false, false, null, opt);
 
         return new Iterator<Plane>() {
             Plane p1 = initial;
@@ -124,7 +124,7 @@ public class IndexedRule1d extends AbstractIndexedRule {
                     p1.setRow(p1.getRow(cp, p1.getHeight()-1, 0), 0);
                     //p1 = p2;
                     crow = 1;
-                    generate(p1, 1, p1.getHeight(), pool, false, false, null);
+                    generate(p1, 1, p1.getHeight(), pool, false, false, null, opt);
                 }
                 return p1.subplane(0, crow, p1.getWidth(), crow+1);
             }

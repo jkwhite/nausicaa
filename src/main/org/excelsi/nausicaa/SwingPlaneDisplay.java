@@ -17,6 +17,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import javax.swing.Icon;
 import javax.swing.JTextArea;
 import javax.swing.JDialog;
@@ -187,8 +188,12 @@ public class SwingPlaneDisplay extends PlaneDisplay {
     }
 
     public void setCA(CA ca) {
+        setCA(ca, Pools.prelude(), new GOptions(true, 1, 0));
+    }
+
+    public void setCA(CA ca, ExecutorService pool, GOptions opt) {
         _c = ca;
-        setPlane(_c.createPlane());
+        setPlane(_c.createPlane(pool, opt));
         Info i = new Info(_c);
         Rule r = ca.getRule();
         String text = r.humanize();

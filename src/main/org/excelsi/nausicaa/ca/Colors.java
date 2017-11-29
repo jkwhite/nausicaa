@@ -39,6 +39,13 @@ public class Colors {
         return u;
     }
 
+    public static boolean isBlack(int c) {
+        int r = c & 0xff;
+        int g = (c>>8)&0xff;
+        int b = (c>>16)&0xff;
+        return r==0&&g==0&&b==0;
+    }
+
     public static int alpha(int c) {
         return c>>24&0xff;
     }

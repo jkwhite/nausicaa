@@ -7,6 +7,10 @@ public class GOptions {
     private final int _stride;
 
 
+    public GOptions() {
+        this(true, 1, 0);
+    }
+ 
     public GOptions(boolean db, int par, int s) {
         _doubleBuffer = db;
         _parallel = par;
