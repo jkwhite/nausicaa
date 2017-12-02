@@ -2,6 +2,7 @@ package org.excelsi.nausicaa;
 
 
 import org.excelsi.nausicaa.ca.*;
+import java.util.List;
 import java.io.File;
 import java.io.IOException;
 import javafx.application.*;
@@ -32,6 +33,9 @@ import javafx.scene.input.KeyCombination;
 
 
 public class JfxUniverse extends Application {
+    private JfxWorld _w;
+
+
     @Override
     public void start(final Stage stage) {
         Rectangle2D screen = Screen.getPrimary().getVisualBounds();
@@ -63,16 +67,21 @@ public class JfxUniverse extends Application {
 
         stage.setTitle("Universe");
         //stage.setFullScreen(true);
+        _w = w;
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
+        final List<String> args = getParameters().getRaw();
+        if(args.size()>0) {
+            loadCA(new File(args.get(0)));
+        }
     }
 
     private Node createMenu(final Stage stage, final JfxWorld w) {
         Menu file = new Menu("File");
         MenuItem openc = new MenuItem("Open ...");
         openc.setAccelerator(KeyCombination.keyCombination("Shortcut+O"));
-        openc.setOnAction((e)->{ open(stage, w); });
+        openc.setOnAction((e)->{ open(stage); });
         file.getItems().addAll(openc);
 
         //Menu edit = new Menu("Edit");
@@ -127,7 +136,7 @@ public class JfxUniverse extends Application {
         return mb;
     }
 
-    public void open(Stage stage, JfxWorld w) {
+    public void open(Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("A New World");
         fileChooser.getExtensionFilters().addAll(
@@ -135,15 +144,19 @@ public class JfxUniverse extends Application {
                 new ExtensionFilter("All Files", "*.*"));
         File selectedFile = fileChooser.showOpenDialog(stage);
         if (selectedFile != null) {
-            try {
-                CA ca = CA.fromFile(selectedFile.toString(), "text");
-                System.err.println("PRELUDE: "+ca.getPrelude());
-                //ca = ca.prelude(10);
-                w.setCA(ca);
-            }
-            catch(IOException e) {
-                e.printStackTrace();
-            }
+            loadCA(selectedFile);
+        }
+    }
+
+    private void loadCA(final File selectedFile) {
+        try {
+            CA ca = CA.fromFile(selectedFile.toString(), "text");
+            System.err.println("PRELUDE: "+ca.getPrelude());
+            //ca = ca.prelude(10);
+            _w.setCA(ca);
+        }
+        catch(IOException e) {
+            e.printStackTrace();
         }
     }
 }

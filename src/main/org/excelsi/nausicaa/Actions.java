@@ -228,6 +228,36 @@ public class Actions {
         }
     }
 
+    private final String VIEW3D_PROGRAM = System.getProperty("app.root")+"/bin/nausicaa";
+    public void external3dView(NViewer v, Config c) {
+        final CA ca = v.getActiveCA();
+        File f = null;
+        try {
+            f = File.createTempFile("ca_", ".ca");
+            ca.save(f.toString(), "text");
+            final ProcessBuilder b = new ProcessBuilder(VIEW3D_PROGRAM, "-jfx", f.toString());
+            b.redirectError(ProcessBuilder.Redirect.INHERIT);
+            b.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            final Process p = b.start();
+            final File doomed = f;
+            final Thread t = new Thread("Watch-"+f) {
+                public void run() {
+                    try {
+                        p.waitFor();
+                    }
+                    catch(InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    doomed.delete();
+                }
+            };
+            t.start();
+        }
+        catch(IOException e) {
+            showError(v, "Failed to save: "+e.getClass().getName()+": "+e.getMessage(), e);
+        }
+    }
+
     public void info(NViewer v) {
         final CA ca = v.getActiveCA();
         final Plane plane = v.getPlaneDisplayProvider().getActivePlane();

@@ -445,7 +445,7 @@ public class JfxCA extends Group {
     private Group createMesh(Blobs.Blob b) {
         List<Point3D> pnts = new ArrayList<>(b.points().size());
         for(Blobs.Point p:b.points()) {
-            pnts.add(new Point3D((float)_scale*p.x, (float)_scale*p.y, (float)_scale*p.z));
+            pnts.add(new Point3D((float)_scale*(p.x-b.x1), (float)_scale*(p.y-b.y1), (float)_scale*(p.z-b.z1)));
         }
         ScatterMesh mesh = new ScatterMesh(pnts, true, 2d, 2);
         //Material m = _materials.get(b.c);

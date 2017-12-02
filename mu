@@ -29,7 +29,8 @@ uses:
     - Fxyz-lib-1.0.jar
 #main: org.excelsi.gimmal.AppFactory
 #main: org.excelsi.nausicaa.NViewer
-main: org.excelsi.nausicaa.JfxUniverse
+#main: org.excelsi.nausicaa.JfxUniverse
+main: org.excelsi.nausicaa.Nausicaa
 #main: org.excelsi.ca.Viewer
 #sysargs: -XX:-OmitStackTraceInFastThrow -Dcom.sun.management.jmxremote -Xmx12g -d64
 sysargs: -Xmx12g -XX:-OmitStackTraceInFastThrow -Dcom.sun.management.jmxremote -d64

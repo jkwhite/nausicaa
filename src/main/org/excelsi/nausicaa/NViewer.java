@@ -1050,10 +1050,9 @@ public class NViewer extends JFrame implements UIActions {
         final JMenuItem view3d = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 final ViewType vt = _futures!=null ? _futures.getViewType() : ViewType.view2d;
-                vhack[0].setText(vt==ViewType.view2d?"View in 2D":"View in 3D");
+                vhack[0].setText(vt==ViewType.view2d?"View in 2D":"View in 3D internal");
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        //_a.generate();
                         _futures.setViewType(vt==ViewType.view2d?ViewType.view3d:ViewType.view2d);
                         //_futures.revalidate();
                     }
@@ -1064,6 +1063,19 @@ public class NViewer extends JFrame implements UIActions {
         vhack[0] = view3d;
         view3d.setText("View in 3D");
         //view3d.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, shortcut));
+
+        final JMenuItem eview3d = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        _a.external3dView(NViewer.this, _config);
+                    }
+                });
+            }
+        });
+        eview3d.setText("View in 3D external");
+        eview3d.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, shortcut | InputEvent.SHIFT_DOWN_MASK));
+        window.add(eview3d);
 
         final JMenuItem peditor = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
