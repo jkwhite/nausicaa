@@ -169,6 +169,13 @@ public class IntBlockPlane extends AbstractPlane {
 
     private final int[] _rgb = new int[3];
     private final boolean FIRST = true;
+    public enum Composition {
+        front,
+        avg,
+        channel
+    };
+
+    private final Composition _cmode = Composition.front;
     @Override public java.awt.Image toImage() {
         if(false) {
             return _i;
@@ -193,28 +200,33 @@ public class IntBlockPlane extends AbstractPlane {
                         _i.setRGB(i,j,_p.color(idx));
                     }
                     else {
-                        for(int k=0;k<_d;k++) {
-                            //Colors.unpack(_p.color(getCell(i,j,k)), rgba);
-                            int idx = getCell(i,j,k);
-                            //if(idx<0) idx=-idx;
-                            //if(idx>_p.getColorCount()) idx = idx % _p.getColorCount();
-                            final int[] u = unpacked[idx];
-                            //rgb[0] += (_d-k)*rgba[0];
-                            //rgb[1] += (_d-k)*rgba[1];
-                            //rgb[2] += (_d-k)*rgba[2];
-                            //rgb[0] += (_d-k)*u[0];
-                            //rgb[1] += (_d-k)*u[1];
-                            //rgb[2] += (_d-k)*u[2];
-                            float mult = ((_d-k)/(float)_d);
-                            rgb[0] += (int)(mult*u[0]);
-                            rgb[1] += (int)(mult*u[1]);
-                            rgb[2] += (int)(mult*u[2]);
-                            //if(u[0]>0) System.err.println("k: "+k+", u: "+u[0]+","+u[1]+","+u[2]+", mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
-                            mx += (_d-k);
-                            if(FIRST&&(u[0]>0||u[1]>0||u[2]>0)) break;
+                        if(_cmode==Composition.channel) {
+                            //_i.setRGB(i,j,Colors.pack(
                         }
-                        mx = 1;
-                        _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
+                        else {
+                            for(int k=0;k<_d;k++) {
+                                //Colors.unpack(_p.color(getCell(i,j,k)), rgba);
+                                int idx = getCell(i,j,k);
+                                //if(idx<0) idx=-idx;
+                                //if(idx>_p.getColorCount()) idx = idx % _p.getColorCount();
+                                final int[] u = unpacked[idx];
+                                //rgb[0] += (_d-k)*rgba[0];
+                                //rgb[1] += (_d-k)*rgba[1];
+                                //rgb[2] += (_d-k)*rgba[2];
+                                //rgb[0] += (_d-k)*u[0];
+                                //rgb[1] += (_d-k)*u[1];
+                                //rgb[2] += (_d-k)*u[2];
+                                float mult = ((_d-k)/(float)_d);
+                                rgb[0] += (int)(mult*u[0]);
+                                rgb[1] += (int)(mult*u[1]);
+                                rgb[2] += (int)(mult*u[2]);
+                                //if(u[0]>0) System.err.println("k: "+k+", u: "+u[0]+","+u[1]+","+u[2]+", mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
+                                mx += (_d-k);
+                                if(_cmode==Composition.front&&(u[0]>0||u[1]>0||u[2]>0)) break;
+                            }
+                            mx = 1;
+                            _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
+                        }
                     }
                 }
             }

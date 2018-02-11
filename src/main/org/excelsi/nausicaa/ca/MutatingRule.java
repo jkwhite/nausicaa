@@ -70,6 +70,10 @@ public class MutatingRule extends AbstractRule implements Mutatable, Genomic {
         return _rule.genome();
     }
 
+    @Override public String prettyGenome() {
+        return _rule.prettyGenome();
+    }
+
     @Override public Iterator<Plane> frameIterator(final Plane c, final ExecutorService pool, final GOptions opt) {
         init(c, pool, opt);
         return new Iterator<Plane>() {
@@ -92,8 +96,8 @@ public class MutatingRule extends AbstractRule implements Mutatable, Genomic {
         };
     }
 
-    @Override public float generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u) {
-        return _rule.generate(c, start, end, pool, stopOnSame, overwrite, u);
+    @Override public float generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, GOptions opt) {
+        return _rule.generate(c, start, end, pool, stopOnSame, overwrite, u, opt);
     }
 
     private void internalMutate(final Plane c, final ExecutorService pool, final GOptions opt) {

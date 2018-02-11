@@ -23,6 +23,7 @@ public class JCAGenerator extends JDialog {
         final String _lastHeight = config.<String>getVariable("generatorHeight", "1080");
         final String _lastFrames = config.<String>getVariable("generatorFrames", "1000");
         final String _cores = config.<String>getVariable("generatorCores", "4");
+        final float frameWeight = config.getFloatVariable("weight", 1f);
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         GridLayout gl = null;
@@ -230,7 +231,7 @@ public class JCAGenerator extends JDialog {
                                     if(createGif) {
                                         Plane plane = c.createPlane();
                                         ExecutorService pool = Executors.newFixedThreadPool(1);
-                                        Iterator<Plane> cas = c.getRule().frameIterator(plane, pool, new GOptions(true, 1, 1));
+                                        Iterator<Plane> cas = c.getRule().frameIterator(plane, pool, new GOptions(true, 1, 1, frameWeight));
                                         AnimatedGifEncoder age = new AnimatedGifEncoder();
                                         age.start(selfile+".gif");
                                         age.setRepeat(0);
@@ -283,7 +284,7 @@ public class JCAGenerator extends JDialog {
                                         if(scale==1f) {
                                             System.err.println("skip scaling");
                                             c.getRule()
-                                                .stream(c.createPlane(), pool, new GOptions(true, ccores, 1))
+                                                .stream(c.createPlane(), pool, new GOptions(true, ccores, 1, frameWeight))
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))
                                                 .map(Pipeline.toBufferedImage("p", "b"))
@@ -295,7 +296,7 @@ public class JCAGenerator extends JDialog {
                                         else {
                                             System.err.println("scaling");
                                             c.getRule()
-                                                .stream(c.createPlane(), pool, new GOptions(true, ccores, 1))
+                                                .stream(c.createPlane(), pool, new GOptions(true, ccores, 1, frameWeight))
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))
                                                 .map(Pipeline.toBufferedImage("p", "b"))

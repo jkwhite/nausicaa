@@ -84,6 +84,10 @@ public class NViewer extends JFrame implements UIActions {
         return _futures;
     }
 
+    @Override public PlanescapeProvider getPlanescapeProvider() {
+        return _futures;
+    }
+
     @Override public Frame getRoot() {
         return this;
     }
@@ -91,11 +95,12 @@ public class NViewer extends JFrame implements UIActions {
     public void init() {
         //final int w = 600, h = 600, d = 1;
         //final int w = 300, h = 300, d = 5, pre = 0;
-        final int w = 100, h = 100, d = 100, pre=0;
+        //final int w = 100, h = 100, d = 100, pre=0;
+        final int w = 5, h = 5, d = 0, pre=0;
         _config = new Config(w, h, d);
         createMenu();
         setSize(_width, _height);
-        int dims = 3;
+        int dims = 2;
         int size = 1;
         //int colors = 1001;
         int colors = 1000;

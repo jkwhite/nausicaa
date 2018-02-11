@@ -12,4 +12,5 @@ public interface UIActions {
     CA getActiveCA();
     void setActiveCA(CA c);
     PlaneDisplayProvider getPlaneDisplayProvider();
+    PlanescapeProvider getPlanescapeProvider();
 }

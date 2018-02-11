@@ -1,0 +1,2 @@
+- operate directly on rgba channel values
+- stack of 2d with each rule separate, composited in 2d from 3d

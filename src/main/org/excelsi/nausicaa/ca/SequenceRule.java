@@ -71,6 +71,10 @@ public class SequenceRule extends AbstractRule implements Mutatable, Genomic {
         return _rule.genome();
     }
 
+    @Override public String prettyGenome() {
+        return _rule.prettyGenome();
+    }
+
     @Override public Iterator<Plane> frameIterator(final Plane c, final ExecutorService pool, final GOptions opt) {
         _s.clear();
         _rule = _s.rule();
@@ -98,8 +102,8 @@ public class SequenceRule extends AbstractRule implements Mutatable, Genomic {
         };
     }
 
-    @Override public float generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u) {
-        return _rule.generate(c, start, end, pool, stopOnSame, overwrite, u);
+    @Override public float generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, GOptions opt) {
+        return _rule.generate(c, start, end, pool, stopOnSame, overwrite, u, opt);
     }
 
     private void init(final Plane c, final ExecutorService pool, final GOptions opt) {

@@ -1123,10 +1123,13 @@ public class Codons {
 
         @Override public int op(int[] vs, int m, int e, int[] p) {
             int max = vs[m];
+            //debug("max initial: "+max);
             for(int i=m+1;i<=e;i++) {
                 final int t = vs[i];
+                //debug("max next: "+t);
                 if(t>max) max=t;
             }
+            //debug("max final: "+max);
             return max;
         }
 
@@ -1137,6 +1140,10 @@ public class Codons {
             }
             return new Max(nc);
         }
+    }
+
+    private static void debug(String m) {
+        System.err.println(m);
     }
 
     public static final class MaxN extends NAggregateN {

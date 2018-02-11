@@ -103,7 +103,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         System.err.println("rule compute using "+workers.length+" workers on blocksize "+block);
         for(int i=0;i<workers.length;i++) {
             patterns[i] = createPattern(pool);
-            workers[i] = new Worker(patterns[i], 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block));
+            workers[i] = new Worker(patterns[i], 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block), opt.weight());
         }
         final Future[] futures = new Future[workers.length];
         return new Iterator<Plane>() {

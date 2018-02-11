@@ -63,7 +63,7 @@ public class SpectrumBuilder {
             return Palette.randomCutRainbow(new Random(), colors.length, colors, 40, false, 0);
         }
         else {
-            return new Palette(colors);
+            return new IndexedPalette(colors);
         }
     }
 

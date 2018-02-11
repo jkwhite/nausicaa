@@ -30,8 +30,8 @@ import org.fxyz.cameras.AdvancedCamera;
 import org.fxyz.cameras.controllers.FPSController;
 
 
-public class JfxWorld {
-    private static final boolean HANDLE_UNLOCK = false;
+public class JfxWorld implements PlanescapeProvider, Planescape {
+    private static final boolean HANDLE_UNLOCK = true;
     private static final double SCALE = 0.1f;
 
     private int _w;
@@ -54,6 +54,34 @@ public class JfxWorld {
         _h = h;
         _d = d;
         _useBorder = useBorder;
+    }
+
+    @Override public Plane getPlane() {
+        return _jfxCa.getLastPlane();
+    }
+
+    /*
+    @Override public void setPlane(final Plane p) {
+        if(Platform.isFxApplicationThread()) {
+            _jfxCa.addPlane(p);
+            p.delegateUnlock();
+        }
+        else {
+            Platform.runLater(()->setPlane(p));
+        }
+    }
+    */
+
+    @Override public Rule getRule() {
+        return _jfxCa.getRule();
+    }
+
+    @Override public boolean delegateUnlock() {
+        return true;
+    }
+
+    @Override public Planescape[] getPlanescapes() {
+        return new Planescape[]{this};
     }
 
     public Scene getScene() {
@@ -84,7 +112,7 @@ public class JfxWorld {
             // ????? Platform.runLater(()->{_jfxCa.clear();});
             ExecutorService comp = Pools.named("compute", 4);
             try {
-                setPlane(_c.createPlane(comp, new GOptions(true, 4, 0)));
+                setPlane(_c.createPlane(comp, new GOptions(true, 4, 0, 1f)));
             }
             finally {
                 comp.shutdown();
@@ -132,6 +160,18 @@ public class JfxWorld {
 
     public void scaleDown() {
         _jfxCa.setScale(_jfxCa.getScale()*0.8);
+    }
+
+    private Animation _anim;
+    public void toggleAnimate() {
+        if(_anim==null) {
+            _anim = new Animation(new Config(_jfxCa.getCA().getWidth(), _jfxCa.getCA().getHeight(), _jfxCa.getCA().getDepth()), this, new Timeline(), -1);
+            _anim.start();
+        }
+        else {
+            _anim.stopAnimation();
+            _anim = null;
+        }
     }
 
     public void initScene() {

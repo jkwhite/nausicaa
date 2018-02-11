@@ -19,129 +19,37 @@ import java.awt.image.*;
 import javax.imageio.*;
 
 
-public final class Palette {
-    private final int[] _colors;
+public interface Palette {
+    public enum Mode {
+        rgba,
+        indexed
+    };
 
+    int getColorCount();
 
-    public Palette(final int... colors) {
-        _colors = colors.clone();
-    }
+    int[] getColors();
 
-    public Palette(final List<Integer> colors) {
-        _colors = new int[colors.size()];
-        for(int i=0;i<_colors.length;i++) {
-            _colors[i] = colors.get(i);
-        }
-    }
+    int color(int idx);
 
-    private Palette(boolean dummy, final int... colors) {
-        _colors = colors;
-    }
+    boolean isBlack(int idx);
 
-    public int getColorCount() {
-        return _colors.length;
-    }
+    int[][] unpack();
 
-    public int[] getColors() {
-        return _colors;
-    }
+    Palette replace(int index, int newColor);
 
-    public int color(int idx) {
-        return _colors[idx];
-    }
+    IndexColorModel toColorModel();
 
-    public boolean isBlack(int idx) {
-        //System.err.print("col "+_colors[idx]+" ");
-        //return _colors[idx]==0;
-        return Colors.isBlack(_colors[idx]);
-    }
+    Palette matchCapacity(int colorCount, Random r);
 
-    public int[][] unpack() {
-        final int[][] u = new int[_colors.length][4];
-        for(int i=0;i<u.length;i++) {
-            Colors.unpack(_colors[i], u[i]);
-        }
-        return u;
-    }
+    Palette ensureCapacity(int colorCount, Random r);
 
-    public Palette replace(int index, int newColor) {
-        int[] nc = _colors.clone();
-        nc[index] = newColor;
-        return new Palette(nc);
-    }
+    Map<Integer,Integer> buildColormap();
 
-    public IndexColorModel toColorModel() {
-        byte[] r = new byte[_colors.length];
-        byte[] g = new byte[_colors.length];
-        byte[] b = new byte[_colors.length];
-        for(int i=0;i<_colors.length;i++) {
-            int[] u = Colors.unpack(_colors[i]);
-            //System.err.println(i+"i: "+u[0]+", "+u[1]+", "+u[2]);
-            //r[i] = (byte) (u[0]-128);
-            //g[i] = (byte) (u[1]-128);
-            //b[i] = (byte) (u[2]-128);
-            b[i] = (byte) (u[0]);
-            g[i] = (byte) (u[1]);
-            r[i] = (byte) (u[2]);
-            //System.err.println(i+"r: "+r[i]+", "+g[i]+", "+b[i]);
-        }
-        return new IndexColorModel(bitsPerPixel(_colors.length), _colors.length, r, g, b);
-        //return new IndexColorModel(8, 2,
-            //new byte[]{0, (byte)255},
-            //new byte[]{0, (byte)255},
-            //new byte[]{0, (byte)255}
-        //);
-    }
+    Palette cut(int div, Random om);
 
-    public Palette matchCapacity(int colorCount, Random r) {
-        if(colorCount==_colors.length) {
-            return this;
-        }
-        else {
-            int[] ncolors = new int[colorCount];
-            System.arraycopy(_colors, 0, ncolors, 0, Math.min(_colors.length, ncolors.length));
-            for(int i=_colors.length;i<ncolors.length;i++) {
-                ncolors[i] = Colors.randomColor(r);
-            }
-            return new Palette(ncolors);
-        }
-    }
+    void write(DataOutputStream dos) throws IOException;
 
-    public Palette ensureCapacity(int colorCount, Random r) {
-        if(colorCount<=_colors.length) {
-            return this;
-        }
-        else {
-            int[] ncolors = new int[colorCount];
-            System.arraycopy(_colors, 0, ncolors, 0, _colors.length);
-            for(int i=_colors.length;i<ncolors.length;i++) {
-                ncolors[i] = Colors.randomColor(r);
-            }
-            return new Palette(ncolors);
-        }
-    }
-
-    public Map<Integer,Integer> buildColormap() {
-        Map<Integer,Integer> m = new HashMap<>(_colors.length);
-        for(int i=0;i<_colors.length;i++) {
-            m.put(_colors[i], i);
-        }
-        return m;
-    }
-
-    public void write(DataOutputStream dos) throws IOException {
-        dos.writeInt(_colors.length);
-        for(int c:_colors) {
-            dos.writeInt(c);
-        }
-    }
-
-    public void write(PrintWriter w) {
-        w.println(_colors.length);
-        for(int c:_colors) {
-            w.println(c);
-        }
-    }
+    void write(PrintWriter w);
 
     public static Palette read(DataInputStream dis) throws IOException {
         int len = dis.readInt();
@@ -149,7 +57,7 @@ public final class Palette {
         for(int i=0;i<colors.length;i++) {
             colors[i] = dis.readInt();
         }
-        return new Palette(colors);
+        return new IndexedPalette(colors);
     }
 
     public static Palette read(BufferedReader r, int version) throws IOException {
@@ -158,26 +66,7 @@ public final class Palette {
         for(int i=0;i<colors.length;i++) {
             colors[i] = Integer.parseInt(r.readLine());
         }
-        return new Palette(colors);
-    }
-
-    @Override public String toString() {
-        StringBuilder b = new StringBuilder();
-        b.append("[");
-        for(int i=0;i<_colors.length;i++) {
-            b.append(Colors.toColorString(_colors[i]));
-            if(i<_colors.length-1) {
-                b.append(",");
-            }
-        }
-        b.append("]");
-        return b.toString();
-    }
-
-    private int bitsPerPixel(int cols) {
-        return cols <= 4 ? 2
-            : cols <= 8 ? 4
-            : 8;
+        return new IndexedPalette(colors);
     }
 
     public static Palette random(int numColors, Random rand) {
@@ -192,7 +81,7 @@ public final class Palette {
         if(zeroBlack) {
             packed[0] = Colors.pack(0, 0, 0);
         }
-        return new Palette(packed);
+        return new IndexedPalette(packed);
     }
 
     public static Palette grey(int numColors) {
@@ -201,7 +90,7 @@ public final class Palette {
             int amt = (int) (255 * ((double) i / (double) numColors));
             packed[i] = Colors.pack(amt, amt, amt);
         }
-        return new Palette(packed);
+        return new IndexedPalette(packed);
     }
 
     public static Palette shades(int numColors, int[] max) {
@@ -212,7 +101,7 @@ public final class Palette {
             int blue = (int) (max[2] * ((double) i / (double) numColors));
             packed[i] = Colors.pack(red, green, blue);
         }
-        return new Palette(packed);
+        return new IndexedPalette(packed);
     }
 
     public static Palette allShades(int numColors, int[] max) {
@@ -243,10 +132,10 @@ public final class Palette {
         while(idx<numColors) {
             packed[idx++] = Colors.pack(max[0], max[1], max[2]);
         }
-        return new Palette(packed);
+        return new IndexedPalette(packed);
     }
 
-    private static final int[][] SPECTRUM_RAINBOW = {
+    static final int[][] SPECTRUM_RAINBOW = {
         {148,0,211},
         {75,0,130},
         {0,0,255},
@@ -281,25 +170,7 @@ public final class Palette {
                 i+=len;
             }
         }
-        return new Palette(colors);
-    }
-
-    public Palette cut(int div, Random om) {
-        int[] colors = new int[_colors.length];
-        int chance = div==0?0:Math.max(1,_colors.length/div);
-        for(int i=0;i<colors.length;i++) {
-            if(om.nextInt(colors.length)<chance) {
-                int len = 1+om.nextInt(colors.length/100);
-                for(int j=0;j<len&&i+j<colors.length;j++) {
-                    colors[i+j] = 0;
-                }
-                i+=len;
-            }
-            else {
-                colors[i] = _colors[i];
-            }
-        }
-        return new Palette(true, colors);
+        return new IndexedPalette(colors);
     }
 
     public static Palette randomShinyRainbow(Random om, int numColors, boolean black, int density) {
@@ -345,7 +216,7 @@ public final class Palette {
             int blue = (int) (spectrum[low][2]*(1d-wgt) + spectrum[high][2]*(wgt));
             packed[i] = Colors.pack(red, green, blue);
         }
-        return new Palette(packed);
+        return new IndexedPalette(packed);
     }
 
     public static Palette fromImage(BufferedImage img) {
@@ -397,6 +268,6 @@ public final class Palette {
             colors[i++] = k.c;
         }
         System.err.println("*** color zero: "+colors[0]);
-        return new Palette(true, colors);
+        return new IndexedPalette(true, colors);
     }
 }

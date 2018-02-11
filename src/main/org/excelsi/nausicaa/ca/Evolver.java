@@ -170,7 +170,7 @@ public class Evolver {
             final Plane[] ps = new Plane[runtime.subiterations];
             ps[0] = ica.createPlane();
             if(runtime.subiterations>1) {
-                final Iterator<Plane> ips = ica.getRule().frameIterator(ps[0], runtime.subpool, new GOptions(false, 1, 1));
+                final Iterator<Plane> ips = ica.getRule().frameIterator(ps[0], runtime.subpool, new GOptions(false, 1, 1, 1f));
                 for(int j=0;j<runtime.subiterations-1;j++) {
                     ps[j+1] = ips.next();
                 }

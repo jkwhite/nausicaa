@@ -11,13 +11,15 @@ public class Worker {
     private final int[] _prev;
     private final int[] _pattern;
     private final int[] _pow;
+    private final float _weight;
 
-    public Worker(Pattern p, int x1, int y1, int x2, int y2) {
+    public Worker(Pattern p, int x1, int y1, int x2, int y2, float weight) {
         _x1 = x1;
         _y1 = y1;
         _x2 = x2;
         _y2 = y2;
         _wp = p;
+        _weight = weight;
         _size = _wp.archetype().size();
         final int colors = _wp.archetype().colors();
         _prev = new int[(int)Math.pow(2*_size+1, _wp.archetype().dims())];
@@ -43,7 +45,11 @@ public class Worker {
         }
     }
 
+    //private static final float WEIGHT = 0.05f;
+    //private static final float WEIGHT = 1.0f;
+    //private static final float O_WEIGHT = 1.0f - WEIGHT;
     public void frame3d(final IntBlockPlane p1, final IntBlockPlane p2) {
+        final float oWeight = 1f - _weight;
         final int d = _size*2+1;
         for(int i=_y1;i<_y2;i++) {
             for(int j=_x1;j<_x2;j++) {
@@ -56,9 +62,11 @@ public class Worker {
                             //}
                         //}
                     //}
-                    int v = _wp.next(0, _pattern);
+                    final int v = _wp.next(0, _pattern);
+                    final int ov = _pattern[_pattern.length/2];
+                    final int nv = (int) ((oWeight*ov)+(_weight*v));
                     //dump(j,i,k,_pattern,v);
-                    p2.setCell(j, i, k, v);
+                    p2.setCell(j, i, k, nv);
                 }
             }
         }

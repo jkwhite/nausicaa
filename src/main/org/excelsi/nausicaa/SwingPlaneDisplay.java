@@ -188,7 +188,7 @@ public class SwingPlaneDisplay extends PlaneDisplay {
     }
 
     public void setCA(CA ca) {
-        setCA(ca, Pools.prelude(), new GOptions(true, 1, 0));
+        setCA(ca, Pools.prelude(), new GOptions(true, 1, 0, 1f));
     }
 
     public void setCA(CA ca, ExecutorService pool, GOptions opt) {

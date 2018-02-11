@@ -15,7 +15,7 @@ import org.excelsi.nausicaa.ca.GOptions;
 public class Animation extends Thread implements TimelineListener, ConfigListener {
     enum State { animate, pause, reinit, die };
     private final Config _config;
-    private final PlaneDisplayProvider _f;
+    private final PlanescapeProvider _f;
     private final Timeline _timeline;
     private int _steps;
     private State _state = State.animate;
@@ -23,7 +23,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
     private int _version;
 
 
-    public Animation(Config config, PlaneDisplayProvider f, Timeline timeline, int steps) {
+    public Animation(Config config, PlanescapeProvider f, Timeline timeline, int steps) {
         super("Animation");
         _config = config;
         _f = f;
@@ -94,7 +94,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
 
     public void runFutures() {
         final int version = _version;
-        PlaneDisplay[] ds = _f.getDisplays();
+        Planescape[] ds = _f.getPlanescapes();
         DisplayAnimator[] da = new DisplayAnimator[ds.length];
         //ExecutorService compute = Executors.newFixedThreadPool(Math.min(4,ds.length));
         //ExecutorService render = Executors.newFixedThreadPool(Math.min(4,ds.length));
@@ -103,11 +103,12 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         //ExecutorService render = Pools.named("render", Math.min(4,ds.length));
         int ccores = _config.getIntVariable("animation_computeCores", 2);
         int rcores = Math.min(ds.length, _config.getIntVariable("animation_renderCores", 2));
+        float weight = _config.getFloatVariable("weight", 1f);
         System.err.println("using "+ccores+" compute cores and "+rcores+" render cores");
         ExecutorService compute = Pools.named("compute", ccores);
         ExecutorService render = Pools.named("render", rcores);
         for(int i=0;i<ds.length;i++) {
-            da[i] = new DisplayAnimator(ds[i], compute, ds.length==1?ccores:1);
+            da[i] = new DisplayAnimator(ds[i], compute, ds.length==1?ccores:1, weight);
         }
         try {
 top:        while(_state==State.animate) {
@@ -153,11 +154,11 @@ top:        while(_state==State.animate) {
 
     private class DisplayAnimator implements Runnable {
         private Iterator<Plane> _frames;
-        private PlaneDisplay _d;
+        private Planescape _d;
         private int _parallel;
 
 
-        public DisplayAnimator(PlaneDisplay d, ExecutorService pool, int parallel) {
+        public DisplayAnimator(Planescape d, ExecutorService pool, int parallel, float weight) {
             //_frames = ((Multirule2D)d.getRule()).frames(d.getCA());
             Plane p = d.getPlane();
             while(p==null) {
@@ -169,7 +170,7 @@ top:        while(_state==State.animate) {
                 p = d.getPlane();
             }
             _parallel = parallel;
-            _frames = d.getRule().frameIterator(p, pool, new GOptions(true, _parallel, 1));
+            _frames = d.getRule().frameIterator(p, pool, new GOptions(true, _parallel, 1, weight));
             _d = d;
         }
 

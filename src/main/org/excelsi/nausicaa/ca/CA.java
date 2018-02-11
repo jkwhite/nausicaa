@@ -62,7 +62,7 @@ public final class CA {
     }
 
     public Plane createPlane() {
-        return createPlane(POOL, new GOptions(true, 1, 0));
+        return createPlane(POOL, new GOptions(true, 1, 0, 1f));
     }
 
     public Plane createPlane(ExecutorService pool, GOptions opt) {

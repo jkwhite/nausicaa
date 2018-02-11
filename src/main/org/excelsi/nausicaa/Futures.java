@@ -11,7 +11,7 @@ import java.awt.event.*;
 import org.excelsi.nausicaa.ca.*;
 
 
-public class Futures extends JComponent implements ConfigListener, PlaneDisplayProvider {
+public class Futures extends JComponent implements ConfigListener, PlaneDisplayProvider, PlanescapeProvider {
     //private int _w, _h;
     private boolean _show = true;
     //private java.util.List<Branch<World>> _timeline = new LinkedList<Branch<World>>();
@@ -103,6 +103,15 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     @Override
     public PlaneDisplay[] getDisplays() {
         return _displays;
+    }
+
+    @Override public Planescape[] getPlanescapes() {
+        PlaneDisplay[] planes = getDisplays();
+        Planescape[] ps = new Planescape[planes.length];
+        for(int i=0;i<planes.length;i++) {
+            ps[i] = planes[i];
+        }
+        return ps;
     }
 
     @Override public Plane getActivePlane() {
@@ -219,6 +228,10 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
 
     public int getCAPrelude() {
         return _config.getPrelude();
+    }
+
+    public float getFrameWeight() {
+        return _config.getFloatVariable("weight", 1f);
     }
 
     /*
@@ -382,7 +395,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         _lastInit = init;
         //final ExecutorService pool = Pools.named("compute", 3);
         final ExecutorService pool = Pools.prelude();
-        final GOptions opt = new GOptions(true, _show?1:Pools.preludeSize(), 0);
+        final GOptions opt = new GOptions(true, _show?1:Pools.preludeSize(), 0, getFrameWeight());
         if(_show) {
             int width = getCAWidth() > 60 ? getCAWidth()/3-10 : getCAWidth();
             int height = getCAHeight() > 60 ? getCAHeight()/3-10 : getCAHeight();

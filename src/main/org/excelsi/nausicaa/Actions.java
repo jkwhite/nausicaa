@@ -261,7 +261,7 @@ public class Actions {
     public void info(NViewer v) {
         final CA ca = v.getActiveCA();
         final Plane plane = v.getPlaneDisplayProvider().getActivePlane();
-        final Plane nextPlane = ca.getRule().frameIterator(plane, Pools.adhoc(), new GOptions(false, 1, 1)).next();
+        final Plane nextPlane = ca.getRule().frameIterator(plane, Pools.adhoc(), new GOptions(false, 1, 1, 1f)).next();
         final Stats stats = Stats.forPlane(plane);
         final Stats nextStats = Stats.forPlane(nextPlane);
         final Multistats ms = stats.compareWith(nextStats);
@@ -345,7 +345,7 @@ public class Actions {
             _a = null;
         }
         else {
-            _a = new Animation(v.getConfig(), v.getPlaneDisplayProvider(), timeline, frames);
+            _a = new Animation(v.getConfig(), v.getPlanescapeProvider(), timeline, frames);
             _a.start();
         }
     }
@@ -1136,7 +1136,7 @@ public class Actions {
         final JDialog d = new JDialog(v, "Size");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(4,2));
+        JPanel top = new JPanel(new GridLayout(5,2));
 
         top.add(new JLabel("Width"));
         final JTextField width = new JTextField();
@@ -1174,6 +1174,14 @@ public class Actions {
         pp.add(new JLabel("steps"));
         top.add(pp);
 
+        top.add(new JLabel("Update weight"));
+        JPanel uw = new JPanel();
+        final JTextField updateWeight = new JTextField();
+        updateWeight.setText(""+config.getFloatVariable("weight", 1f));
+        updateWeight.setColumns(6);
+        uw.add(updateWeight);
+        top.add(uw);
+
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
         JButton ne = new JButton("Ok");
@@ -1183,6 +1191,7 @@ public class Actions {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
                 //di.setCASize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
+                config.setVariable("weight", Float.parseFloat(updateWeight.getText()));
                 config.setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(depth.getText()), Integer.parseInt(prelude.getText()));
                 //generate(di);
             }

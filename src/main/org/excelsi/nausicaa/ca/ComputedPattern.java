@@ -78,7 +78,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
                 h = false;
                 return 0;
             }
-            for(;idx<(i+1)*_psize;idx++) {
+            for(;idx<=(i+1)*_psize;idx++) {
                 //if(j<0) throw new IllegalStateException("negative j: "+j+" idx: "+idx+" i: "+i+" psize: "+_psize);
                 //if(idx<0) throw new IllegalStateException("negative idx: "+idx+" j: "+j+" i: "+i+" psize: "+_psize);
                 if(p[j++]!=_p[idx]) {
@@ -157,7 +157,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
     private int _lastN;
     private long _hits;
     private long _misses;
-    //private static final int[] ZEROS = new int[9];
+    private static final int[] ZEROS = new int[9];
     @Override public int next(int pattern, final int[] p2) {
         int r = _cache.find(p2);
         if(_cache.h) {
@@ -189,7 +189,6 @@ public final class ComputedPattern implements Pattern, Mutatable {
         return key;
     }
 
-    /*
     private java.util.Map<String,Integer> _dumpmap = new java.util.HashMap<>();
     private void dumpres(int[] p, int r) {
         StringBuilder b = new StringBuilder();
@@ -206,14 +205,18 @@ public final class ComputedPattern implements Pattern, Mutatable {
         }
         else {
             _dumpmap.put(key, r);
-            if(Arrays.equals(ZEROS, p)) {
+            if(true||Arrays.equals(ZEROS, p)) {
                 System.err.println("PUTTING "+key+" => "+r);
             }
+        }
+        int rp = _logic.next(p);
+        if(r!=rp) {
+            System.err.println("!!!!!!!!! BUG!!!!!!!!!!"+key+"=> said: "+r+" real: "+rp);
+            Thread.dumpStack();
         }
         //b.append("=> ").append(r);
         //System.err.println(b.toString());
     }
-    */
 
     @Override public void tick() {
         _logic.tick();

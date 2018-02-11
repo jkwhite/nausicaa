@@ -3,6 +3,9 @@ package org.excelsi.nausicaa;
 
 import org.excelsi.nausicaa.ca.*;
 import java.util.List;
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.concurrent.*;
 import java.io.File;
 import java.io.IOException;
 import javafx.application.*;
@@ -10,11 +13,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.paint.Color;
+import javafx.util.Callback;
 import javafx.scene.*;
 import javafx.scene.shape.*;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.control.*;
@@ -30,6 +35,8 @@ import javafx.stage.Screen;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.input.KeyCombination;
+import javax.imageio.ImageIO;
+import javafx.embed.swing.SwingFXUtils;
 
 
 public class JfxUniverse extends Application {
@@ -39,12 +46,6 @@ public class JfxUniverse extends Application {
     @Override
     public void start(final Stage stage) {
         Rectangle2D screen = Screen.getPrimary().getVisualBounds();
-
-        //JfxTabs tabs = new JfxTabs(_mc.getShellFactory());
-        //_mc.setDelegate(tabs);
-        //BorderPane root = new BorderPane();
-        //root.setCenter(tabs);
-        //root.setTop(createMenu(stage, tabs));
 
         JfxWorld w = new JfxWorld(100, 100, 100, true);
         //Scene scene = new Scene(root, 1280, 1024, true, SceneAntialiasing.BALANCED);
@@ -82,19 +83,10 @@ public class JfxUniverse extends Application {
         MenuItem openc = new MenuItem("Open ...");
         openc.setAccelerator(KeyCombination.keyCombination("Shortcut+O"));
         openc.setOnAction((e)->{ open(stage); });
-        file.getItems().addAll(openc);
-
-        //Menu edit = new Menu("Edit");
-        //MenuItem cut = new MenuItem("Cut");
-        //cut.setAccelerator(KeyCombination.keyCombination("Shortcut+X"));
-        //cut.setOnAction((e)->{ mc.cutSelection(); });
-        //MenuItem copy = new MenuItem("Copy");
-        //copy.setAccelerator(KeyCombination.keyCombination("Shortcut+C"));
-        //copy.setOnAction((e)->{ mc.copySelection(); });
-        //MenuItem paste = new MenuItem("Paste");
-        //paste.setAccelerator(KeyCombination.keyCombination("Shortcut+V"));
-        //paste.setOnAction((e)->{ mc.pasteBuffer(); });
-        //edit.getItems().addAll(cut, copy, paste);
+        MenuItem screens = new MenuItem("Screenshot ...");
+        screens.setAccelerator(KeyCombination.keyCombination("Shortcut+T"));
+        screens.setOnAction((e)->{ screenshot(stage); });
+        file.getItems().addAll(openc, screens);
 
         Menu rend = new Menu("Render");
         MenuItem smesh = new MenuItem("Scatter Mesh");
@@ -104,6 +96,17 @@ public class JfxUniverse extends Application {
         MenuItem cells = new MenuItem("Cells");
         cells.setOnAction((e)->{ w.setRender(JfxCA.Render.cells); });
         rend.getItems().addAll(smesh, bmesh, cells);
+
+        Menu anim = new Menu("Animation");
+        MenuItem astart = new MenuItem("Start/Stop");
+        astart.setOnAction((e)->{ w.toggleAnimate(); });
+        anim.getItems().addAll(astart);
+
+        anim.getItems().add(new SeparatorMenuItem());
+
+        MenuItem disk = new MenuItem("Generate to disk ...");
+        disk.setOnAction((e)->{ generateAnimation(stage); });
+        anim.getItems().addAll(disk);
 
         Menu view = new Menu("View");
         MenuItem fullsc = new MenuItem("Full Screen");
@@ -121,18 +124,9 @@ public class JfxUniverse extends Application {
         scaledown.setOnAction((e)->{ w.scaleDown(); });
         view.getItems().addAll(scaleup, scaledown);
 
-        //Menu window = new Menu("Window");
-        //MenuItem shiftr = new MenuItem("Next Tab");
-        //shiftr.setAccelerator(KeyCombination.keyCombination("Shortcut+RIGHT"));
-        //shiftr.setOnAction((e)->{ mc.nextTerminal(); });
-        //MenuItem shiftl = new MenuItem("Prev Tab");
-        //shiftl.setAccelerator(KeyCombination.keyCombination("Shortcut+LEFT"));
-        //shiftl.setOnAction((e)->{ mc.prevTerminal(); });
-        //window.getItems().addAll(shiftr, shiftl);
-
         MenuBar mb = new MenuBar();
         mb.setUseSystemMenuBar(true);
-        mb.getMenus().addAll(file, rend, view);
+        mb.getMenus().addAll(file, rend, anim, view);
         return mb;
     }
 
@@ -148,6 +142,100 @@ public class JfxUniverse extends Application {
         }
     }
 
+    public void screenshot(final Stage stage) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save screnshot");
+        File selectedFile = fileChooser.showSaveDialog(stage);
+        if (selectedFile != null) {
+            if(!selectedFile.toString().endsWith(".png")) {
+                selectedFile = new File(selectedFile.toString()+".png");
+            }
+            snap(selectedFile);
+        }
+    }
+
+    static class GeneratorConfig {
+        public String file;
+        public int frames;
+
+        public GeneratorConfig() {
+        }
+
+        public GeneratorConfig file(String file) {
+            this.file = file;
+            return this;
+        }
+
+        public GeneratorConfig frames(int f) {
+            frames = f;
+            return this;
+        }
+
+        public int frames() { return frames; }
+        public String file() { return file; }
+    }
+
+    public void generateAnimation(final Stage stage) {
+        Dialog<GeneratorConfig> d = new Dialog<>();
+        d.setTitle("Generate animation");
+        d.setResizable(true);
+
+        GridPane p = new GridPane();
+
+        p.add(new Label("File"), 1, 1);
+        TextField file = new TextField();
+        p.add(file, 2, 1);
+
+        p.add(new Label("Frames"), 1, 2);
+        TextField frames = new TextField();
+        p.add(frames, 2, 2);
+
+        d.getDialogPane().setContent(p);
+
+        ButtonType ok = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
+        d.getDialogPane().getButtonTypes().add(ok);
+
+        d.setResultConverter(new Callback<ButtonType, GeneratorConfig>() {
+            @Override
+            public GeneratorConfig call(ButtonType b) {
+                if (b == ok) {
+                    return new GeneratorConfig().file(file.getText()).frames(Integer.parseInt(frames.getText()));
+                }
+                return null;
+            }
+        });
+        Optional<GeneratorConfig> res = d.showAndWait();
+        if(res.isPresent()) {
+            generate(res.get());
+        }
+    }
+
+    private void generate(final GeneratorConfig c) {
+        final ExecutorService pool = Pools.named("compute", 3);
+        final Iterator<Plane> frames = _w.getRule().frameIterator(_w.getPlane(), pool, new GOptions(true, 3, 1, 1f));
+        final Thread t = new Thread("coordinator") {
+            @Override public void run() {
+                for(int i=0;i<c.frames();i++) {
+                    final String file = c.file()+"-"+i+".png";
+                    System.err.println("generating "+file);
+                    final Plane p = frames.next();
+                    _w.setPlane(p);
+                    p.lockWrite();
+                    System.err.println("writing");
+                    snap(new File(file));
+                    p.unlockWrite();
+                    try {
+                        Thread.sleep(500);
+                    }
+                    catch(InterruptedException e) {
+                        e.printStackTrace();
+                    };
+                }
+            }
+        };
+        t.start();
+    }
+
     private void loadCA(final File selectedFile) {
         try {
             CA ca = CA.fromFile(selectedFile.toString(), "text");
@@ -157,6 +245,36 @@ public class JfxUniverse extends Application {
         }
         catch(IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void snap(final File save) {
+        if(Platform.isFxApplicationThread()) {
+            synchronized(save) {
+                try {
+                    final WritableImage i = _w.getScene().snapshot(null);
+                    try {
+                        ImageIO.write(SwingFXUtils.fromFXImage(i, null), "png", save);
+                    }
+                    catch(IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                finally {
+                    save.notify();
+                }
+            }
+        }
+        else {
+            synchronized(save) {
+                Platform.runLater(()->snap(save));
+                try {
+                    save.wait();
+                }
+                catch(InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

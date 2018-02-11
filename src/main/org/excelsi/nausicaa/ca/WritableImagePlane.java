@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.io.File;
 import java.util.Arrays;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
@@ -12,6 +13,8 @@ import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.PixelFormat;
+import javafx.embed.swing.SwingFXUtils;
+import javax.imageio.ImageIO;
 
 
 public class WritableImagePlane extends AbstractPlane {
@@ -218,7 +221,7 @@ public class WritableImagePlane extends AbstractPlane {
     }
 
     @Override public void save(String filename) throws IOException {
-        throw new UnsupportedOperationException();
+        ImageIO.write(SwingFXUtils.fromFXImage(_i, null), "png", new File(filename));
     }
 
     @Override public Plane subplane(int x1, int y1, int x2, int y2) {

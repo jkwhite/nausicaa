@@ -1,12 +1,7 @@
 package org.excelsi.nausicaa;
 
 
-import org.excelsi.nausicaa.ca.Plane;
-import org.excelsi.nausicaa.ca.IntBlockPlane;
-import org.excelsi.nausicaa.ca.CA;
-import org.excelsi.nausicaa.ca.Colors;
-import org.excelsi.nausicaa.ca.Blobs;
-import org.excelsi.nausicaa.ca.Palette;
+import org.excelsi.nausicaa.ca.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +75,8 @@ public class JfxCA extends Group {
             int[] c = Colors.unpack(cols[i]);
             if(c[0]>0||c[1]>0||c[2]>0) {
                 Color col = new Color(c[2]/255f, c[1]/255f, c[0]/255f, 1f);
-                Material m = new PhongMaterial(col);
+                PhongMaterial m = new PhongMaterial(col);
+                m.setSpecularPower(64d);
                 _colors.put(i, col);
                 _materials.put(i, m);
             }
@@ -90,6 +86,18 @@ public class JfxCA extends Group {
             _pools.add(new Pool<PooledBox>(new BoxFactory(i)));
         }
         _boxindex = new PooledBox[ca.getWidth()*ca.getHeight()*ca.getDepth()];
+    }
+
+    public CA getCA() {
+        return _ca;
+    }
+
+    public Rule getRule() {
+        return _ca.getRule();
+    }
+
+    public Plane getLastPlane() {
+        return _lastPlane;
     }
 
     public void setRender(Render render) {
@@ -149,14 +157,13 @@ public class JfxCA extends Group {
             List<Blobs.Blob> blobs = null;
             if(_render==Render.best) {
                 blobs = new Blobs().blobs(p, Blobs.Mode.finite);
-                /*
-                if(blobs.size()<80000) {
-                    _render = Render.mesh;
+                if(blobs.size()<90000) {
+                    _render = Render.blob_mesh;
                 }
                 else {
                     _render = Render.cells;
-                }*/
-                _render = Render.blob_mesh;
+                }
+                //_render = Render.blob_mesh;
             }
             switch(_render) {
                 case cells:

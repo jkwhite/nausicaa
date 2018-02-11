@@ -11,6 +11,7 @@ import org.excelsi.nausicaa.ca.Rule;
 import org.excelsi.nausicaa.ca.CA;
 import org.excelsi.nausicaa.ca.IndexedRule;
 import org.excelsi.nausicaa.ca.Palette;
+import org.excelsi.nausicaa.ca.IndexedPalette;
 
 
 public class PaletteEditor extends JComponent implements TimelineListener {
@@ -62,7 +63,7 @@ public class PaletteEditor extends JComponent implements TimelineListener {
                     c.setColor(_colors[idx]);
                     _ui.doWait(new Runnable() {
                         public void run() {
-                            _ui.setActiveCA(current.palette(new Palette(_colors)));
+                            _ui.setActiveCA(current.palette(new IndexedPalette(_colors)));
                         }
                     }, 1000);
                 }

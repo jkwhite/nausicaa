@@ -155,6 +155,22 @@ public class Config {
         }
     }
 
+    public float getFloatVariable(String name, float dvalue) {
+        Object v = (Object) _variables.get(name);
+        if(v instanceof String) {
+            return Float.parseFloat((String)v);
+        }
+        else if(v instanceof Float) {
+            return ((Float)v).floatValue();
+        }
+        else if(v instanceof Integer) {
+            return (float) ((Integer)v).intValue();
+        }
+        else {
+            return dvalue;
+        }
+    }
+
     public void notify(final String p) {
         for(ConfigListener l:new ArrayList<>(_listeners)) {
             l.configChanged(this, p);
