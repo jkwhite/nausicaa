@@ -348,12 +348,13 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     }
 
     private PlaneDisplay createPlaneDisplay(final CA ca) {
+        GOptions g = new GOptions(true, 1, 0, getFrameWeight());
         switch(_viewType) {
             case view3d:
-                return new JfxPlaneDisplay(ca);
+                return new JfxPlaneDisplay(ca, g);
             case view2d:
             default:
-                return new SwingPlaneDisplay(ca);
+                return new SwingPlaneDisplay(ca, g);
         }
     }
 

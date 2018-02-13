@@ -74,6 +74,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     private Rule _r;
     private CA _c;
     private Plane _p;
+    private GOptions _gopt;
     private int _w;
     private int _h;
     private int _d;
@@ -108,8 +109,9 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         Platform.runLater(()->{ initScene(); });
     }
 
-    public JfxPlaneDisplay(CA ca) {
+    public JfxPlaneDisplay(CA ca, GOptions gopt) {
         this(ca.getWidth(), ca.getHeight(), ca.getDepth());
+        _gopt = gopt;
         setCA(ca);
     }
 
@@ -299,7 +301,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     }
 
     public void setCA(CA ca) {
-        setCA(ca, Pools.prelude(), new GOptions(true, 1, 0, 1f));
+        setCA(ca, Pools.prelude(), _gopt!=null?_gopt:new GOptions(true,1,0,1f));
     }
 
     public void setCA(CA ca, ExecutorService pool, GOptions opt) {

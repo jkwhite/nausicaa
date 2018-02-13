@@ -155,7 +155,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                 if(++count%500==0) {
                     System.err.println("frame "+count);
                 }
-                return p2;
+                return p1;
             }
 
             @Override public boolean hasNext() {

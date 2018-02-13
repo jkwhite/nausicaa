@@ -54,14 +54,16 @@ public class SwingPlaneDisplay extends PlaneDisplay {
     //private Branch<World> _b;
     private CA _c;
     private Plane _p;
+    private GOptions _gopt;
     private int _w;
     private int _h;
     private float _scale = 1.0f;
     private final boolean useNew = false;
 
 
-    public SwingPlaneDisplay(CA ca) {
+    public SwingPlaneDisplay(CA ca, GOptions g) {
         this(ca.getWidth(), ca.getHeight());
+        _gopt = g;
         setCA(ca);
     }
 
@@ -188,7 +190,7 @@ public class SwingPlaneDisplay extends PlaneDisplay {
     }
 
     public void setCA(CA ca) {
-        setCA(ca, Pools.prelude(), new GOptions(true, 1, 0, 1f));
+        setCA(ca, Pools.prelude(), _gopt);
     }
 
     public void setCA(CA ca, ExecutorService pool, GOptions opt) {
@@ -321,11 +323,11 @@ public class SwingPlaneDisplay extends PlaneDisplay {
             throw new IllegalArgumentException("null initializer");
         }
         _c.setInitializer(i);
-        setPlane(_c.createPlane());
+        setPlane(_c.createPlane(Pools.prelude(), _gopt));
     }
 
     public void generate(Initializer i) {
         _c.setInitializer(i);
-        setPlane(_c.createPlane());
+        setPlane(_c.createPlane(Pools.prelude(), _gopt));
     }
 }

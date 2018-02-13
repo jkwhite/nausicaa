@@ -115,7 +115,8 @@ public final class CA {
                     break;
                 case 2:
                 default:
-                    _r.generate(p, 1, _d, pool, false, true, null, opt);
+                    //_r.generate(p, 1, _d, pool, false, true, null, opt);
+                    _r.generate(p, 1, _prelude, pool, false, true, null, opt);
                     break;
             }
         //}

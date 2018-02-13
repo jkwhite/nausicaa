@@ -23,6 +23,8 @@ public class JCAGenerator extends JDialog {
         final String _lastHeight = config.<String>getVariable("generatorHeight", "1080");
         final String _lastFrames = config.<String>getVariable("generatorFrames", "1000");
         final String _cores = config.<String>getVariable("generatorCores", "4");
+        final String _skipframes = config.<String>getVariable("generatorSkipframes", "0");
+        final String initFramerate = config.<String>getVariable("generateFramerate", "15");
         final float frameWeight = config.getFloatVariable("weight", 1f);
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -31,7 +33,7 @@ public class JCAGenerator extends JDialog {
             gl = new GridLayout(2,2);
         }
         else {
-            gl = new GridLayout(12,2);
+            gl = new GridLayout(13,2);
         }
         JPanel top = new JPanel(gl);
         top.add(new JLabel("Width"));
@@ -60,6 +62,7 @@ public class JCAGenerator extends JDialog {
         JTextField framerate = null;
         JTextField scalingf = null;
         JTextField coresf = null;
+        JTextField skipf = null;
         if(rule.dimensions()>1) {
             JPanel an = new JPanel();
             animat = new JCheckBox("Animate");
@@ -70,7 +73,7 @@ public class JCAGenerator extends JDialog {
             frame.setColumns(6);
             JPanel frate = new JPanel();
             framerate = new JTextField();
-            framerate.setText("15");
+            framerate.setText(initFramerate);
             framerate.setColumns(4);
             JPanel scalingp = new JPanel();
             scalingf = new JTextField();
@@ -80,6 +83,11 @@ public class JCAGenerator extends JDialog {
             coresf = new JTextField();
             coresf.setText(_cores);
             coresf.setColumns(4);
+
+            JPanel skipfp = new JPanel();
+            skipf = new JTextField();
+            skipf.setText(_skipframes);
+            skipf.setColumns(4);
 
             an.add(animat);
             top.add(an);
@@ -100,6 +108,10 @@ public class JCAGenerator extends JDialog {
             top.add(new JLabel("Cores"));
             coresp.add(coresf);
             top.add(coresp);
+
+            top.add(new JLabel("Skip frames"));
+            skipfp.add(skipf);
+            top.add(skipfp);
 
             mp4 = new JCheckBox("Create MP4");
             JPanel p4 = new JPanel();
@@ -140,6 +152,7 @@ public class JCAGenerator extends JDialog {
         final JTextField frates = framerate;
         final JTextField scaling = scalingf;
         final JTextField cores = coresf;
+        final JTextField skipframes = skipf;
         final JCheckBox reverse = revers;
 
         p.add(top, BorderLayout.NORTH);
@@ -168,6 +181,9 @@ public class JCAGenerator extends JDialog {
                     final int ccores = Integer.parseInt(cores.getText());
                     config.setVariable("generatorWidth", Integer.toString(w));
                     config.setVariable("generatorHeight", Integer.toString(h));
+                    final int skipFrames = Integer.parseInt(skipframes.getText());
+                    config.setVariable("generatorFramerate", skipframes.getText());
+                    config.setVariable("generatorSkipframes", skipframes.getText());
                     //_lastWidth = w;
                     //_lastHeight = h;
                     final JProgressBar prog = new JProgressBar(1, h);
@@ -214,6 +230,7 @@ public class JCAGenerator extends JDialog {
                                     int numFrames = Integer.parseInt(frames.getText());
                                     config.setVariable("generatorFrames", Integer.toString(numFrames));
                                     int frameRate = Integer.parseInt(frates.getText());
+                                    config.setVariable("generatorFramerate", Integer.toString(frameRate));
                                     float scale = Float.parseFloat(scaling.getText());
                                     prog.setMaximum(numFrames);
                                     boolean intermediate = animate.isSelected();
@@ -233,7 +250,7 @@ public class JCAGenerator extends JDialog {
                                         ExecutorService pool = Executors.newFixedThreadPool(1);
                                         Iterator<Plane> cas = c.getRule().frameIterator(plane, pool, new GOptions(true, 1, 1, frameWeight));
                                         AnimatedGifEncoder age = new AnimatedGifEncoder();
-                                        age.start(selfile+".gif");
+                                        age.start(selfile.endsWith(".gif")?selfile:(selfile+".gif"));
                                         age.setRepeat(0);
                                         if(!bb) {
                                             age.setDelay(frameRate);
@@ -252,7 +269,9 @@ public class JCAGenerator extends JDialog {
                                                 age.addFrame(plane.toBufferedImage());
                                             }
                                             prog.setValue(i);
-                                            plane = cas.next();
+                                            for(int j=0;j<=skipFrames;j++) {
+                                                plane = cas.next();
+                                            }
                                         }
                                         prog.setIndeterminate(true);
                                         if(bb) {
