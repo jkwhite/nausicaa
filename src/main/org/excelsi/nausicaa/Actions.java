@@ -108,7 +108,7 @@ public class Actions {
                 Ruleset rs = new ComputedRuleset(a);
                 Rule rule = rs.random(rand).next();
                 Palette pal = Palette.random(colors, rand, true);
-                CA ca = new CA(rule, pal, v.getActiveCA().getInitializer(), rand, 0, v.getConfig().getWidth(), v.getConfig().getHeight(), v.getConfig().getDepth(), v.getConfig().getPrelude());
+                CA ca = new CA(rule, pal, v.getActiveCA().getInitializer(), rand, 0, v.getConfig().getWidth(), v.getConfig().getHeight(), v.getConfig().getDepth(), v.getConfig().getPrelude(), v.getConfig().getWeight());
                 v.setActiveCA(ca);
             }
         });
@@ -1177,7 +1177,8 @@ public class Actions {
         top.add(new JLabel("Update weight"));
         JPanel uw = new JPanel();
         final JTextField updateWeight = new JTextField();
-        updateWeight.setText(""+config.getFloatVariable("weight", 1f));
+        //updateWeight.setText(""+config.getFloatVariable("weight", 1f));
+        updateWeight.setText(""+v.getActiveCA().getWeight());
         updateWeight.setColumns(6);
         uw.add(updateWeight);
         top.add(uw);
@@ -1191,8 +1192,8 @@ public class Actions {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
                 //di.setCASize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
-                config.setVariable("weight", Float.parseFloat(updateWeight.getText()));
-                config.setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(depth.getText()), Integer.parseInt(prelude.getText()));
+                //config.setVariable("weight", Float.parseFloat(updateWeight.getText()));
+                config.setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(depth.getText()), Integer.parseInt(prelude.getText()), Float.parseFloat(updateWeight.getText()));
                 //generate(di);
             }
         });

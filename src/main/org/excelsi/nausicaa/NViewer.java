@@ -94,10 +94,11 @@ public class NViewer extends JFrame implements UIActions {
 
     public void init() {
         //final int w = 600, h = 600, d = 1;
-        //final int w = 300, h = 300, d = 5, pre = 0;
+        final int w = 300, h = 300, d = 0, pre = 0;
+        final float weight = 1f;
         //final int w = 100, h = 100, d = 100, pre=0;
-        final int w = 5, h = 5, d = 0, pre=0;
-        _config = new Config(w, h, d);
+        //final int w = 5, h = 5, d = 0, pre=0;
+        _config = new Config(w, h, d, weight);
         createMenu();
         setSize(_width, _height);
         int dims = 2;
@@ -121,7 +122,7 @@ public class NViewer extends JFrame implements UIActions {
         //Palette pal = Palette.grey(colors);
         Palette pal = Palette.rainbow(colors,true);
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
-        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre);
+        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre, weight);
         //org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.single.create(), rand, 0, w, h, d, pre);
 
         JPanel main = new JPanel(new BorderLayout());
@@ -980,7 +981,7 @@ public class NViewer extends JFrame implements UIActions {
         mutate.add(remseg);
         remseg.setText("Remove active rule stage");
 
-        final JCheckBoxMenuItem[] mhack = new JCheckBoxMenuItem[2];
+        final JCheckBoxMenuItem[] mhack = new JCheckBoxMenuItem[4];
         /*
         JCheckBoxMenuItem forceSym = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -996,6 +997,7 @@ public class NViewer extends JFrame implements UIActions {
         forceSym.setSelected(_config.getForceSymmetry());
         */
 
+        mutate.addSeparator();
         JCheckBoxMenuItem incHueVariations = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _config.setHueVariations(!_config.getHueVariations());
@@ -1008,6 +1010,32 @@ public class NViewer extends JFrame implements UIActions {
         incHueVariations.setText("Hue variations");
         incHueVariations.setState(_config.getHueVariations());
         incHueVariations.setSelected(_config.getHueVariations());
+
+        JCheckBoxMenuItem incWeightVariations = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _config.setWeightVariations(!_config.getWeightVariations());
+                mhack[2].setState(!mhack[2].getState());
+                mhack[2].setSelected(!mhack[2].getState());
+            }
+        });
+        mutate.add(incWeightVariations);
+        mhack[2] = incWeightVariations;
+        incWeightVariations.setText("Weight variations");
+        incWeightVariations.setState(_config.getWeightVariations());
+        incWeightVariations.setSelected(_config.getWeightVariations());
+
+        JCheckBoxMenuItem incRuleVariations = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _config.setRuleVariations(!_config.getRuleVariations());
+                mhack[3].setState(!mhack[3].getState());
+                mhack[3].setSelected(!mhack[3].getState());
+            }
+        });
+        mutate.add(incRuleVariations);
+        mhack[3] = incRuleVariations;
+        incRuleVariations.setText("Rule variations");
+        incRuleVariations.setState(_config.getRuleVariations());
+        incRuleVariations.setSelected(_config.getRuleVariations());
 
         JMenuItem mparams = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {

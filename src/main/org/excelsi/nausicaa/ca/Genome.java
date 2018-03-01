@@ -15,6 +15,9 @@ public final class Genome {
 
 
     public Genome(String c) {
+        if("".equals(c)) {
+            throw new IllegalArgumentException("illegal genome '"+c+"'");
+        }
         _c = c;
     }
 
@@ -187,7 +190,12 @@ public final class Genome {
             b.append("-");
         }
         b.setLength(b.length()-1);
-        return fromCodons(cs).prune(a);
+        try {
+            return fromCodons(cs).prune(a);
+        }
+        catch(Exception e) {
+            throw new IllegalStateException("illegal genome '"+b+"': "+e, e);
+        }
     }
 
     public String c() {

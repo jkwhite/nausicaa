@@ -13,19 +13,23 @@ public class Config {
     private int _h;
     private int _d;
     private int _prelude = 0;
+    private float _weight = 1f;
     private long _seed = System.currentTimeMillis(); //19450806L;
     private float _scale = 1f;
     private long _animationDelay = 100;
     private boolean _forceSymmetry = true;
+    private boolean _ruleVariations = true;
     private boolean _hueVariations = false;
+    private boolean _weightVariations = true;
     private final Map<String,Object> _variables = new HashMap<>();
     private String _dir = System.getProperty("user.home");
 
 
-    public Config(int w, int h, int d) {
+    public Config(int w, int h, int d, float weight) {
         _w = w;
         _h = h;
         _d = d;
+        _weight = weight;
     }
 
     public void addListener(ConfigListener l) {
@@ -54,6 +58,15 @@ public class Config {
         _h = h;
         _d = d;
         _prelude = prelude;
+        notify("size");
+    }
+
+    public void setSize(int w, int h, int d, int prelude, float weight) {
+        _w = w;
+        _h = h;
+        _d = d;
+        _prelude = prelude;
+        _weight = weight;
         notify("size");
     }
 
@@ -86,6 +99,14 @@ public class Config {
         return _prelude;
     }
 
+    public float getWeight() {
+        return _weight;
+    }
+
+    public void setWeight(float w) {
+        _weight = w;
+    }
+
     public void setSeed(long seed) {
         _seed = seed;
         notify("seed");
@@ -115,6 +136,15 @@ public class Config {
         return _forceSymmetry;
     }
 
+    public void setRuleVariations(boolean ruleVariations) {
+        _ruleVariations = ruleVariations;
+        notify("ruleVariations");
+    }
+
+    public boolean getRuleVariations() {
+        return _ruleVariations;
+    }
+
     public void setHueVariations(boolean hueVariations) {
         _hueVariations = hueVariations;
         notify("hueVariations");
@@ -122,6 +152,15 @@ public class Config {
 
     public boolean getHueVariations() {
         return _hueVariations;
+    }
+
+    public void setWeightVariations(boolean weightVariations) {
+        _weightVariations = weightVariations;
+        notify("weightVariations");
+    }
+
+    public boolean getWeightVariations() {
+        return _weightVariations;
     }
 
     public void setDir(String dir) {

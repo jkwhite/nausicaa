@@ -165,7 +165,7 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
     private Animation _anim;
     public void toggleAnimate() {
         if(_anim==null) {
-            _anim = new Animation(new Config(_jfxCa.getCA().getWidth(), _jfxCa.getCA().getHeight(), _jfxCa.getCA().getDepth()), this, new Timeline(), -1);
+            _anim = new Animation(new Config(_jfxCa.getCA().getWidth(), _jfxCa.getCA().getHeight(), _jfxCa.getCA().getDepth(), _jfxCa.getCA().getWeight()), this, new Timeline(), -1);
             _anim.start();
         }
         else {

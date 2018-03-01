@@ -193,6 +193,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                     public void run() {
                         //_ca = mutate(_ca);
                         _ca = d.getCA();
+                        _config.setWeight(_ca.getWeight());
                         reroll(_lastInit);
                         //_timeline.notifyListeners(new TimelineEvent("tock"));
                     }
@@ -208,7 +209,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     }
 
     public CA mutate(CA ca) {
-        final CA res = new MultiTransform(_random, createMutationFactor(), _config.getForceSymmetry()?new Symmetry(true):null).hueVariations(_config.getHueVariations()).transform(ca);
+        final CA res = new MultiTransform(_random, createMutationFactor(), _config.getForceSymmetry()?new Symmetry(true):null).ruleVariations(_config.getRuleVariations()).hueVariations(_config.getHueVariations()).weightVariations(_config.getWeightVariations()).transform(ca);
         return res;
     }
 
@@ -228,6 +229,10 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
 
     public int getCAPrelude() {
         return _config.getPrelude();
+    }
+
+    public float getCAWeight() {
+        return _config.getWeight();
     }
 
     public float getFrameWeight() {
@@ -309,8 +314,9 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             int height = getCAHeight() > 60 ? getCAHeight()/3-10 : getCAHeight();
             int depth = _config.getDepth();
             int prelude = _config.getPrelude();
+            float weight = _config.getWeight();
             //WHAT
-            _ca = _ca.size(width, height, depth, prelude);
+            _ca = _ca.size(width, height, depth, prelude).weight(weight);
             PlaneDisplay root = createPlaneDisplay(_ca);
             //PlaneDisplay root = createPlaneDisplay(_ca.size(width, height, depth, prelude));
             root.setScale(_scale);
@@ -337,7 +343,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             _displays = new PlaneDisplay[1];
             final int width = getCAWidth();
             final int height = getCAHeight();
-            _ca = _ca.size(width, height, _config.getDepth(), _config.getPrelude());
+            _ca = _ca.size(width, height, _config.getDepth(), _config.getPrelude()).weight(_config.getWeight());
             PlaneDisplay d = createPlaneDisplay(_ca);
             //PlaneDisplay d = createPlaneDisplay(_ca.size(width, height, _config.getDepth(), _config.getPrelude()));
             d.setScale(_scale);
@@ -348,7 +354,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     }
 
     private PlaneDisplay createPlaneDisplay(final CA ca) {
-        GOptions g = new GOptions(true, 1, 0, getFrameWeight());
+        GOptions g = new GOptions(true, 1, 0, ca.getWeight() /*getFrameWeight()*/);
         switch(_viewType) {
             case view3d:
                 return new JfxPlaneDisplay(ca, g);
@@ -396,7 +402,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         _lastInit = init;
         //final ExecutorService pool = Pools.named("compute", 3);
         final ExecutorService pool = Pools.prelude();
-        final GOptions opt = new GOptions(true, _show?1:Pools.preludeSize(), 0, getFrameWeight());
+        final GOptions opt = new GOptions(true, _show?1:Pools.preludeSize(), 0, _ca.getWeight() /*getFrameWeight()*/);
         if(_show) {
             int width = getCAWidth() > 60 ? getCAWidth()/3-10 : getCAWidth();
             int height = getCAHeight() > 60 ? getCAHeight()/3-10 : getCAHeight();
