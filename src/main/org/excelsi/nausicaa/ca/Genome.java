@@ -12,18 +12,25 @@ import static org.excelsi.nausicaa.ca.WeightedFactory.Weight;
 
 public final class Genome {
     private final String _c;
+    private final int _v;
 
 
     public Genome(String c) {
+        this(c, 2);
+    }
+
+    public Genome(String c, int version) {
         if("".equals(c)) {
             throw new IllegalArgumentException("illegal genome '"+c+"'");
         }
         _c = c;
+        _v = version;
     }
 
     public Codon[] codons(Archetype a) {
         final List<Codon> ops = new ArrayList<>();
-        for(final String op:_c.split("-")) {
+        final String sep = _v==1?"-":" ";
+        for(final String op:_c.split(sep)) {
             ops.add(Codons.codon(op, a));
         }
         return ops.toArray(new Codon[0]);
@@ -217,7 +224,7 @@ public final class Genome {
         StringBuilder b = new StringBuilder();
         for(Codon c:cs) {
             b.append(c.code());
-            b.append("-");
+            b.append(" ");
         }
         b.setLength(b.length()-1);
         return new Genome(b.toString());

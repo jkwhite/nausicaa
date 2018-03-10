@@ -724,9 +724,9 @@ public class Codons {
         @Override public Codon destabilize(Random r) {
             int v = Math.max(1,_p/3);
             int np = _p+((1+r.nextInt(v))*(r.nextBoolean()?1:-1));
-            if(np<0) {
-                np = 0;
-            }
+            //if(np<0) {
+                //np = 0;
+            //}
             return new Constant(np);
         }
     }

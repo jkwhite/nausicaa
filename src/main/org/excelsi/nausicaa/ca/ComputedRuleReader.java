@@ -22,6 +22,6 @@ public class ComputedRuleReader {
         }
         Archetype a = Archetype.read(_r);
         String genome = _r.readLine();
-        return new ComputedRuleset(a).create(genome);
+        return new ComputedRuleset(a).create(genome, _version);
     }
 }

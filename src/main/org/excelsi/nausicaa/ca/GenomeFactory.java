@@ -127,13 +127,13 @@ public class GenomeFactory {
 
     public Genome generate(final Archetype a, final Random r) {
         final WeightedFactory<Codon> f = buildFactory(a);
-        final StringBuilder b = new StringBuilder(Codons.PUSH_ALL+"-");
+        final StringBuilder b = new StringBuilder(Codons.PUSH_ALL+" ");
         //final StringBuilder b = new StringBuilder(Codons.HISTO+"-");
         int len = 1+r.nextInt(6);
         for(int i=0;i<len;i++) {
             final Codon c = f.random(r);
             b.append(c.generate(r));
-            b.append("-");
+            b.append(" ");
         }
         b.setLength(b.length()-1);
         return new Genome(b.toString());
