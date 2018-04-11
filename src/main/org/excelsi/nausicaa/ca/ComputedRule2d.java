@@ -131,14 +131,17 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                     }
                     try {
                         for(int i=0;i<futures.length;i++) {
-                            futures[i].get();
-                            patterns[i].tick();
+                            try {
+                                futures[i].get();
+                                patterns[i].tick();
+                            }
+                            catch(ExecutionException e) {
+                                System.err.println(humanize()+": "+e);
+                                e.printStackTrace();
+                            }
                         }
                     }
                     catch(InterruptedException e) {
-                    }
-                    catch(ExecutionException e) {
-                        e.printStackTrace();
                     }
                 }
                 finally {

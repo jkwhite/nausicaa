@@ -404,7 +404,7 @@ public class Actions {
         final JDialog d = new JDialog(v, "Palette options");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(2,2));
+        JPanel top = new JPanel(new GridLayout(3,2));
 
         top.add(new JLabel("Black Zero"));
         final JCheckBox bz = new JCheckBox();
@@ -417,6 +417,12 @@ public class Actions {
         dense.setColumns(3);
         top.add(dense);
 
+        top.add(new JLabel("Invisible %"));
+        final JTextField invis = new JTextField();
+        invis.setText(config.getVariable("palette_invisible", "0"));
+        invis.setColumns(3);
+        top.add(invis);
+
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
         JButton ne = new JButton("Ok");
@@ -427,6 +433,7 @@ public class Actions {
                 d.dispose();
                 config.setVariable("palette_blackzero", ""+bz.isSelected());
                 config.setVariable("palette_cut", dense.getText());
+                config.setVariable("palette_invisible", invis.getText());
                 config.notify("palette");
             }
         });
@@ -927,7 +934,7 @@ public class Actions {
         final JDialog d = new JDialog(v, "Custom Spectrum");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(3,2));
+        JPanel top = new JPanel(new GridLayout(4,2));
 
         top.add(new JLabel("Number of colors"));
         final JTextField cols = new JTextField();
@@ -946,6 +953,12 @@ public class Actions {
         bz.setSelected("true".equals(config.getVariable("customspectrum_blackzero", "true")));
         top.add(bz);
 
+        top.add(new JLabel("Invisible %"));
+        final JTextField invis = new JTextField();
+        invis.setColumns(10);
+        invis.setText(config.getVariable("customspectrum_invisible", "0"));
+        top.add(invis);
+
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
         JButton ne = new JButton("Ok");
@@ -958,10 +971,12 @@ public class Actions {
                 int clrs = Integer.parseInt(cols.getText());
                 int de = Integer.parseInt(dens.getText());
                 boolean blz = bz.isSelected();
+                int inv = Integer.parseInt(invis.getText());
                 config.setVariable("customspectrum_colors", cc);
                 config.setVariable("customspectrum_density", ""+de);
                 config.setVariable("customspectrum_blackzero", ""+blz);
-                v.setActiveCA(v.getActiveCA().palette(Palette.randomCutRainbow(v.getRandom(), v.getActiveCA().archetype().colors(), de, blz, clrs)));
+                config.setVariable("customspectrum_invisible", ""+inv);
+                v.setActiveCA(v.getActiveCA().palette(Palette.randomCutRainbow(v.getRandom(), v.getActiveCA().archetype().colors(), de, blz, clrs, inv)));
             }
         });
         bot.add(ne);

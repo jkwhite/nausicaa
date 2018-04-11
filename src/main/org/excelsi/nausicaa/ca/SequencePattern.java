@@ -136,7 +136,7 @@ public class SequencePattern implements Pattern, Mutatable {
                     _i = 0;
                 }
                 final SEntry s = _s.get(_i); 
-                System.err.println("switch to pattern "+_i+": "+s.p);
+                //System.err.println("switch to pattern "+_i+": "+s.p);
                 _t = s.t;
                 return 0;
             }

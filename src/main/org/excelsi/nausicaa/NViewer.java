@@ -486,7 +486,7 @@ public class NViewer extends JFrame implements UIActions {
         AbstractAction cutsp = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _lastPaletteAction = this;
-                setActiveCA(getActiveCA().palette(Palette.randomCutRainbow(v.getRandom(), getActiveCA().archetype().colors(), 60, blackZero(_config), getActiveCA().archetype().colors()/4)));
+                setActiveCA(getActiveCA().palette(Palette.randomCutRainbow(v.getRandom(), getActiveCA().archetype().colors(), 60, blackZero(_config), getActiveCA().archetype().colors()/4, 0)));
             }
         };
         JMenuItem cutsps = pal.add(cutsp);
@@ -495,7 +495,7 @@ public class NViewer extends JFrame implements UIActions {
         AbstractAction neongs = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _lastPaletteAction = this;
-                setActiveCA(getActiveCA().palette(Palette.randomCutRainbow(v.getRandom(), getActiveCA().archetype().colors(), 20, blackZero(_config), getActiveCA().archetype().colors()/4)));
+                setActiveCA(getActiveCA().palette(Palette.randomCutRainbow(v.getRandom(), getActiveCA().archetype().colors(), 20, blackZero(_config), getActiveCA().archetype().colors()/4, 0)));
             }
         };
         JMenuItem neong = pal.add(neongs);

@@ -153,13 +153,13 @@ public interface Palette {
         return rainbow(numColors, black, s);
     }
 
-    public static Palette randomCutRainbow(Random om, int numColors, int div, boolean black, int density) {
-        Palette p = randomShinyRainbow(om, numColors, black, density);
+    public static Palette randomCutRainbow(Random om, int numColors, int div, boolean black, int density, int invisible) {
+        Palette p = randomShinyRainbow(om, numColors, black, density, invisible);
         int[] colors = p.getColors();
-        return randomCutRainbow(om, numColors, colors, div, black, density);
+        return randomCutRainbow(om, numColors, colors, div, black, density, invisible);
     }
 
-    public static Palette randomCutRainbow(Random om, int numColors, int[] colors, int div, boolean black, int density) {
+    public static Palette randomCutRainbow(Random om, int numColors, int[] colors, int div, boolean black, int density, int invisible) {
         int chance = div==0?0:Math.max(1,numColors/div);
         for(int i=0;i<colors.length;i++) {
             if(om.nextInt(numColors)<chance) {
@@ -174,10 +174,17 @@ public interface Palette {
     }
 
     public static Palette randomShinyRainbow(Random om, int numColors, boolean black, int density) {
+        return randomShinyRainbow(om, numColors, black, density, 0);
+    }
+
+    public static Palette randomShinyRainbow(Random om, int numColors, boolean black, int density, int invisible) {
         final int[][] s = new int[2+om.nextInt(density)][3];
         for(int i=0;i<s.length;i++) {
             if(false&&om.nextInt(2+density)<=density/10) {
                 Colors.unpackRgb(Colors.pack(255,255,255), s[i]);
+            }
+            else if(om.nextInt(101)<invisible) {
+                Colors.unpackRgb(Colors.pack(0,0,0), s[i]);
             }
             else {
                 Colors.unpackRgb(Colors.randomColor(om, 32), s[i]);
