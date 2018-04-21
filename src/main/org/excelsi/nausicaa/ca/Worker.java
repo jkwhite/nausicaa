@@ -12,6 +12,7 @@ public class Worker {
     private final int[] _pattern;
     private final int[] _pow;
     private final float _weight;
+    private final float _oWeight;
 
     public Worker(Pattern p, int x1, int y1, int x2, int y2, float weight) {
         _x1 = x1;
@@ -20,6 +21,7 @@ public class Worker {
         _y2 = y2;
         _wp = p;
         _weight = weight;
+        _oWeight = 1f - weight;
         _size = _wp.archetype().size();
         final int colors = _wp.archetype().colors();
         _prev = new int[(int)Math.pow(2*_size+1, _wp.archetype().dims())];
@@ -49,22 +51,14 @@ public class Worker {
     //private static final float WEIGHT = 1.0f;
     //private static final float O_WEIGHT = 1.0f - WEIGHT;
     public void frame3d(final IntBlockPlane p1, final IntBlockPlane p2) {
-        final float oWeight = 1f - _weight;
         final int d = _size*2+1;
         for(int i=_y1;i<_y2;i++) {
             for(int j=_x1;j<_x2;j++) {
                 for(int k=0;k<p1.getDepth();k++) {
                     p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
-                    //if(i==2&&j==4&&k==0) {
-                        //for(int w=0;w<_pattern.length;w++) {
-                            //if(_pattern[w]!=0) {
-                                //System.err.println("got nz pattern at "+w);
-                            //}
-                        //}
-                    //}
                     final int v = _wp.next(0, _pattern);
                     final int ov = _pattern[_pattern.length/2];
-                    final int nv = (int) ((oWeight*ov)+(_weight*v));
+                    final int nv = (int) ((_oWeight*ov)+(_weight*v));
                     //dump(j,i,k,_pattern,v);
                     p2.setCell(j, i, k, nv);
                 }
@@ -115,6 +109,44 @@ public class Worker {
         }
         //mutateRule();
         //System.err.println("set "+counts+" cells");
+    }
+
+    public void frame(final Plane c) {
+        if(_wp.archetype().dims()!=1) {
+            throw new IllegalStateException("1-arity frame method only compatible with 1d rules");
+        }
+        final int w = c.getWidth();
+        final int h = c.getHeight();
+        final int size = _wp.archetype().size();
+        final int colors = _wp.archetype().colors();
+
+        int[] prev = new int[2*size+1];
+        int[] pattern = new int[prev.length];
+
+        //int[] pow = new int[_wp.length()];
+        //for(int i=0;i<pow.length;i++) {
+            //pow[pow.length-1-i] = (int) Math.pow(colors, i);
+        //}
+
+        //final Pattern p = createPattern(pool);
+        //System.err.println("created pattern: "+p);
+        for(int i=_y1;i<_y2;i++) {
+            for(int j=0;j<w;j++) {
+                c.getBlock(prev, j-size, i-1, prev.length, 1, 0);
+                //int idx = 0;
+                for(int k=0;k<prev.length;k++) {
+                    pattern[k] = (int) (prev[k]);
+                    //idx += prev[k] * pow[k];
+                }
+                final int v = _wp.next(0, pattern);
+                final int ov = pattern[pattern.length/2];
+                final int nv = (int) ((_oWeight*ov)+(_weight*v));
+                c.setCell(j, i, nv);
+                //System.err.print(".");
+            }
+            //mutateRule(p);
+            _wp.tick();
+        }
     }
 
     public void frame(final Plane p1, final Plane p2, final Plane meta) {

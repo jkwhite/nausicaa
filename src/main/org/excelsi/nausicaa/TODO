@@ -1,2 +1,7 @@
 - operate directly on rgba channel values
 - stack of 2d with each rule separate, composited in 2d from 3d
+- allow a reduced color spectrum for rendering
+- minimum threshold for non-invisible cells for rendering
+- plot along 1d/2d/3d based on parameterized rules e.g. fractal plane
+- 1d rules are broken
+- allow update weight to vary by multisequence

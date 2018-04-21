@@ -24,7 +24,12 @@ public final class ComputedPattern implements Pattern, Mutatable {
         // 7=>29000
         // -11833
         int csize = Math.max(5000, -11833*_a.size()+110000);
-        _cache = new PCache(csize, size);
+        if(a.sourceLength()<9) {
+            _cache = new ShortPCache(csize, size);
+        }
+        else {
+            _cache = new PCache(csize, size);
+        }
     }
 
     public ComputedPattern copy() {
@@ -40,15 +45,48 @@ public final class ComputedPattern implements Pattern, Mutatable {
         throw new UnsupportedOperationException();
     }
 
-    static final class PCache {
+    static class ShortPCache extends PCache {
+        public ShortPCache(int csize, int psize) {
+            super(csize, psize);
+        }
+
+        public int find(int[] p) {
+            h = false;
+            return 0;
+        }
+
+        protected int key(int[] p) {
+            int k = (p[0]<<24^p[1]<<16^p[2]<<8);
+            //k = k^(p[7]<<24^p[8]); //<<16^p[9]<<8^p[10]^p[11]<<8^p[12]<<16^p[13]<<24);
+            k = k % _p.length;
+            //if(k<0) k=-k;
+            //return k;
+            //int k = p[0];
+            //final int l = p.length;
+            //for(int i=1;i<l;i+=4) {
+                //k = 7*k + p[i];
+            //}
+            //int k = 7*p[0]+31*p[1]+113*p[2]+7*p[3]+31*p[4]+113*p[5]+11*p[6];
+            //k = k * 7*p[7]+31*p[8]+113*p[9]+7*p[10]+31*p[11]+113*p[12]+11*p[13];
+            //k = k * 7*p[14]+31*p[15]+113*p[16]+7*p[17]+31*p[18]+113*p[19]+11*p[20];
+            //k = k * 7*p[21]+31*p[22]+113*p[23]+7*p[24]+31*p[25]+113*p[26]+11*p[27];
+            if(k<0) k=-k;
+            //k = k % _p.length;
+            //k = k % _csize;
+            k = k % _csize;
+            return k;
+        }
+    }
+
+    static class PCache {
         public boolean h;
         public int lk;
         private final int _psize;
-        private final int _csize;
+        protected final int _csize;
         private final int _bsize;
         private final int[] _c;
         //private final int[][] _p;
-        private final int[] _p;
+        protected final int[] _p;
         private final int[] _hot;
 
         public PCache(int csize, int psize) {
@@ -129,7 +167,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
             System.err.println("total writes: "+w+" total buckets in use: "+b+" / "+_hot.length+" max: "+max+"("+mb+") min: "+min);
         }
 
-        private int key(int[] p) {
+        protected int key(int[] p) {
             int k = (p[0]<<24^p[1]<<16^p[2]<<8^p[3]^p[4]<<8^p[5]<<16^p[6]<<24);
             k = k^(p[7]<<24^p[8]); //<<16^p[9]<<8^p[10]^p[11]<<8^p[12]<<16^p[13]<<24);
             k = k % _p.length;

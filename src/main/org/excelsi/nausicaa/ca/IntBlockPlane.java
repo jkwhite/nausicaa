@@ -107,7 +107,8 @@ public class IntBlockPlane extends AbstractPlane {
     }
 
     @Override public int[] getBlock(int[] into, int x, int y, int dx, int dy, int offset) {
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
+        return getBlock(into, x, y, /*z*/ 0, dx, dy, /*dz*/ 1, offset);
     }
 
     @Override public int[] getCardinal(int[] into, int x, int y, int z, int offset) {

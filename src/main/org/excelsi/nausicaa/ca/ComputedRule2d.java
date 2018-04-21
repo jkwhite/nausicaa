@@ -171,9 +171,27 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
     }
 
     @Override public float generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, final GOptions opt) {
-        final Iterator<Plane> ps = frameIterator(c, pool, opt);
-        for(int i=start;i<end;i++) {
-            Plane p = ps.next();
+        switch(_p.archetype().dims()) {
+            case 1:
+                Plane p1 = c;
+                //Plane p2 = c.copy();
+                //Plane tmp;
+                final Pattern pat = createPattern(pool);
+                Worker w = new Worker(pat, 0, 1, c.getWidth(), c.getHeight(), opt.weight());
+                //for(int frames=start;frames<end;frames++) {
+                w.frame(p1);
+                    //tmp = p1;
+                    //p1 = p2;
+                    //p2 = tmp;
+                    //p.tick();
+                //}
+                break;
+            default:
+                final Iterator<Plane> ps = frameIterator(c, pool, opt);
+                for(int i=start;i<end;i++) {
+                    Plane p = ps.next();
+                }
+                break;
         }
         /*
         Plane p1 = c;
