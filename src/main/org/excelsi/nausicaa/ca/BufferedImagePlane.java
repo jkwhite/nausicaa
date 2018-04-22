@@ -68,6 +68,16 @@ public class BufferedImagePlane extends AbstractPlane implements java.io.Seriali
         return p;
     }
 
+    @Override public Plane withDepth(int d) {
+        IntBlockPlane p = new IntBlockPlane(_creator, getWidth(), getHeight(), d, _palette);
+        for(int i=0;i<getWidth();i++) {
+            for(int j=0;j<getHeight();j++) {
+                p.setCell(i, j, 0, getCell(i, j));
+            }
+        }
+        return p;
+    }
+
     @Override public void init() {
     }
 

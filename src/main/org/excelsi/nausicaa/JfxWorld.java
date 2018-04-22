@@ -201,13 +201,21 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
         move.getChildren().add(t);
         _root.getChildren().add(move);
 
+        //move.setTranslateX(2000);
+        //move.setTranslateY(700);
+        //move.setTranslateZ(6000);
+
+        //move.getTransforms().add(new Rotate(-45, new Point3D(1,0,0)));
+        //pos: x=2070.0, y=665.0, z=6200.0
+        //rot: x=-10.5y=183.0, z=0.0
+
         Group camGroup = move;
-        final CameraAnimator forwardX = new CameraAnimator(()->camGroup.setTranslateX(camGroup.getTranslateX()+INC));
-        final CameraAnimator forwardY = new CameraAnimator(()->camGroup.setTranslateY(camGroup.getTranslateY()+INC));
-        final CameraAnimator forwardZ = new CameraAnimator(()->camGroup.setTranslateZ(camGroup.getTranslateZ()+INC));
-        final CameraAnimator backwardX = new CameraAnimator(()->camGroup.setTranslateX(camGroup.getTranslateX()-INC));
-        final CameraAnimator backwardY = new CameraAnimator(()->camGroup.setTranslateY(camGroup.getTranslateY()-INC));
-        final CameraAnimator backwardZ = new CameraAnimator(()->camGroup.setTranslateZ(camGroup.getTranslateZ()-INC));
+        final CameraAnimator forwardX = new CameraAnimator(()->camGroup.setTranslateX(camGroup.getTranslateX()-INC));
+        final CameraAnimator forwardY = new CameraAnimator(()->camGroup.setTranslateY(camGroup.getTranslateY()-INC));
+        final CameraAnimator forwardZ = new CameraAnimator(()->camGroup.setTranslateZ(camGroup.getTranslateZ()-INC));
+        final CameraAnimator backwardX = new CameraAnimator(()->camGroup.setTranslateX(camGroup.getTranslateX()+INC));
+        final CameraAnimator backwardY = new CameraAnimator(()->camGroup.setTranslateY(camGroup.getTranslateY()+INC));
+        final CameraAnimator backwardZ = new CameraAnimator(()->camGroup.setTranslateZ(camGroup.getTranslateZ()+INC));
 
         CameraTransformer rotateX = t;
         CameraTransformer rotateY = t;
@@ -220,6 +228,13 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
         final CameraAnimator rotFront = new CameraAnimator(()->rotateZ.setRz(rotateZ.getRz()+ROT));
         final CameraAnimator rotBack = new CameraAnimator(()->rotateZ.setRz(rotateZ.getRz()-ROT));
 
+        camGroup.setTranslateX(2000);
+        camGroup.setTranslateY(700);
+        camGroup.setTranslateZ(3000);
+        rotateY.setRy(180);
+        rotateX.setRx(-10);
+        rotateZ.setRz(0);
+
         s.setOnKeyPressed(new EventHandler<javafx.scene.input.KeyEvent>() {
             public void handle(javafx.scene.input.KeyEvent e) {
                 switch(e.getCode()) {
@@ -229,7 +244,7 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
                     case W:
                         forwardZ.start();
                         break;
-                    case Z:
+                    case Q:
                         forwardY.start();
                         break;
                     case A:
@@ -238,7 +253,7 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
                     case S:
                         backwardZ.start();
                         break;
-                    case Q:
+                    case Z:
                         backwardY.start();
                         break;
                     case LEFT:
@@ -259,6 +274,10 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
                     case P:
                         rotBack.start();
                         break;
+                    case B:
+                        System.err.println("pos: x="+camGroup.getTranslateX()+", y="+camGroup.getTranslateY()+", z="+camGroup.getTranslateZ());
+                        System.err.println("rot: x="+rotateX.getRx()+"y="+rotateY.getRy()+", z="+rotateZ.getRz());
+                        break;
                 }
             }
         });
@@ -271,7 +290,7 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
                     case W:
                         forwardZ.stop();
                         break;
-                    case Z:
+                    case Q:
                         forwardY.stop();
                         break;
                     case A:
@@ -280,7 +299,7 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
                     case S:
                         backwardZ.stop();
                         break;
-                    case Q:
+                    case Z:
                         backwardY.stop();
                         break;
                     case LEFT:

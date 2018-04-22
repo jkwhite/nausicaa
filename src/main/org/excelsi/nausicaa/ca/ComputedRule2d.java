@@ -107,10 +107,24 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         }
         final Future[] futures = new Future[workers.length];
         return new Iterator<Plane>() {
-            Plane p1 = c;
-            Plane p2 = c.copy();
+            Plane p1;
+            Plane p2;
             Plane tmp;
             long count;
+            int depthIdx;
+
+            {
+                if(opt.higherDim()>1) {
+                    p1 = c.withDepth(opt.higherDim());
+                    p2 = p1;
+                    System.err.println("switched to higher dim "+opt.higherDim());
+                }
+                else {
+                    p1 = c;
+                    p2 = c.copy();
+                    //depthIdx = Math.min(0,c.getDepth());
+                }
+            }
 
             @Override public Plane next() {
                 //if(metarator!=null) {
@@ -123,6 +137,10 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                 final Plane frameP1 = p1;
                 final Plane frameP2 = p2;
                 //frameP2.lock(2);
+                if(opt.higherDim()>1) {
+                    ((IntBlockPlane)frameP1).setReadDepth(depthIdx++);
+                    ((IntBlockPlane)frameP2).setWriteDepth(depthIdx);
+                }
                 try {
                     frameP2.lockWrite();
                     for(int i=0;i<workers.length;i++) {
@@ -170,7 +188,8 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         };
     }
 
-    @Override public float generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, final GOptions opt) {
+    @Override public Plane generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, final GOptions opt) {
+        Plane ret = null;
         switch(_p.archetype().dims()) {
             case 1:
                 Plane p1 = c;
@@ -180,16 +199,21 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                 Worker w = new Worker(pat, 0, 1, c.getWidth(), c.getHeight(), opt.weight());
                 //for(int frames=start;frames<end;frames++) {
                 w.frame(p1);
+                ret = p1;
                     //tmp = p1;
                     //p1 = p2;
                     //p2 = tmp;
                     //p.tick();
                 //}
                 break;
+            case 2:
+            case 3:
             default:
+                //System.err.println("**** Generating ****");
                 final Iterator<Plane> ps = frameIterator(c, pool, opt);
                 for(int i=start;i<end;i++) {
-                    Plane p = ps.next();
+                    ret = ps.next();
+                    //System.err.println("ret: "+ret);
                 }
                 break;
         }
@@ -207,7 +231,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
             p.tick();
         }
         */
-        return 0f;
+        return ret;
     }
 
     @Override public Mutatable mutate(MutationFactor m) {

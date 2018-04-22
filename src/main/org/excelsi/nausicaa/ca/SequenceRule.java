@@ -102,7 +102,7 @@ public class SequenceRule extends AbstractRule implements Mutatable, Genomic {
         };
     }
 
-    @Override public float generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, GOptions opt) {
+    @Override public Plane generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, GOptions opt) {
         return _rule.generate(c, start, end, pool, stopOnSame, overwrite, u, opt);
     }
 

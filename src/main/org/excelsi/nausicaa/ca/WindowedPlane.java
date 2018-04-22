@@ -103,6 +103,10 @@ public class WindowedPlane extends AbstractPlane {
         return new WindowedPlane(_p.copy(), _x1, _y1, _x2, _y2);
     }
 
+    @Override public Plane withDepth(int d) {
+        throw new UnsupportedOperationException();
+    }
+
     @Override public Plane scale(float scale) {
         return new WindowedPlane(_p.scale(scale), _x1, _y1, _x2, _y2);
     }

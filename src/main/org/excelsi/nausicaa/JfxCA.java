@@ -13,6 +13,7 @@ import javafx.scene.shape.DrawMode;
 import javafx.scene.CacheHint;
 import javafx.scene.Scene;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Sphere;
 import javafx.scene.shape.Box;
@@ -46,6 +47,7 @@ public class JfxCA extends Group {
     private double _scale;
     private final int _depth;
     private final CA _ca;
+    private final boolean _stack;
     private final Map<Integer,Color> _colors = new HashMap<>();
     private final Map<Integer,Material> _materials = new HashMap<>();
     private final Map<PooledBox,Integer> _boxes = new HashMap<>();
@@ -70,6 +72,7 @@ public class JfxCA extends Group {
         _scale = scale;
         _depth = depth;
         _render = render;
+        _stack = ca.getRule().archetype().dims()<3;
         int[] cols = _ca.getPalette().getColors();
         for(int i=0;i<cols.length;i++) {
             int[] c = Colors.unpack(cols[i]);
@@ -86,6 +89,7 @@ public class JfxCA extends Group {
             _pools.add(new Pool<PooledBox>(new BoxFactory(i)));
         }
         _boxindex = new PooledBox[ca.getWidth()*ca.getHeight()*ca.getDepth()];
+        getTransforms().add(new Rotate(-180, new javafx.geometry.Point3D(0,1,0)));
     }
 
     public CA getCA() {
@@ -125,8 +129,11 @@ public class JfxCA extends Group {
             case cells:
                 int i = 0;
                 while(!getChildren().isEmpty()) {
-                    PooledBox b = (PooledBox) getChildren().remove(0);
-                    _pools.get(b.poolId()).checkin(b);
+                    Node nc = getChildren().remove(0);
+                    if(nc instanceof PooledBox) {
+                        PooledBox b = (PooledBox) nc;
+                        _pools.get(b.poolId()).checkin(b);
+                    }
                     //if(raze) {
                         //_boxindex[i++] = null;
                     //}
@@ -152,7 +159,7 @@ public class JfxCA extends Group {
 
     public void addPlane(Plane p) {
         _lastPlane = p;
-        if(p instanceof IntBlockPlane) {
+        if(p.getDepth()>1 /*!_stack*/ /*p instanceof IntBlockPlane*/) {
             IntBlockPlane bp = (IntBlockPlane) p;
             List<Blobs.Blob> blobs = null;
             if(_render==Render.best) {

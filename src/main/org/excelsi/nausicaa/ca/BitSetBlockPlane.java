@@ -248,6 +248,10 @@ public class BitSetBlockPlane extends AbstractPlane {
         return new BitSetBlockPlane(_ca, _w, _h, _d, s);
     }
 
+    @Override public Plane withDepth(int d) {
+        throw new UnsupportedOperationException();
+    }
+
     @Override public Plane scale(float scale) {
         throw new UnsupportedOperationException();
     }

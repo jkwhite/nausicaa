@@ -51,6 +51,16 @@ public class WritableImagePlane extends AbstractPlane {
         return new WritableImagePlane(_creator, _width, _height, _p);
     }
 
+    @Override public Plane withDepth(int d) {
+        IntBlockPlane p = new IntBlockPlane(_creator, _width, _height, d, _p);
+        for(int i=0;i<_width;i++) {
+            for(int j=0;j<_height;j++) {
+                p.setCell(i, j, 0, getCell(i, j));
+            }
+        }
+        return p;
+    }
+
     @Override public Plane scale(float scale) {
         throw new UnsupportedOperationException();
     }

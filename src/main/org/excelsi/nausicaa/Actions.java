@@ -108,7 +108,7 @@ public class Actions {
                 Ruleset rs = new ComputedRuleset(a);
                 Rule rule = rs.random(rand).next();
                 Palette pal = Palette.random(colors, rand, true);
-                CA ca = new CA(rule, pal, v.getActiveCA().getInitializer(), rand, 0, v.getConfig().getWidth(), v.getConfig().getHeight(), v.getConfig().getDepth(), v.getConfig().getPrelude(), v.getConfig().getWeight());
+                CA ca = new CA(rule, pal, v.getActiveCA().getInitializer(), rand, 0, v.getConfig().getWidth(), v.getConfig().getHeight(), v.getConfig().getDepth(), v.getConfig().getPrelude(), v.getConfig().getWeight(), 0);
                 v.setActiveCA(ca);
             }
         });

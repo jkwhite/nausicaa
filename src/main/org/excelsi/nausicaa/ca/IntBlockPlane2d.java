@@ -30,4 +30,14 @@ public class IntBlockPlane2d extends IntBlockPlane {
         System.arraycopy(s, 0, sc, 0, s.length);
         return new IntBlockPlane2d(creator(), getWidth(), getHeight(), getDepth(), getPalette(), sc);
     }
+
+    @Override public Plane withDepth(int d) {
+        IntBlockPlane p = new IntBlockPlane(creator(), getWidth(), getHeight(), d, getPalette());
+        for(int i=0;i<getWidth();i++) {
+            for(int j=0;j<getHeight();j++) {
+                p.setCell(i, j, 0, getCell(i, j, 0));
+            }
+        }
+        return p;
+    }
 }

@@ -37,13 +37,14 @@ public final class CA {
     private int _h;
     private int _d;
     private int _prelude;
+    private int _coda;
     private Random _rand;
     private long _seed;
     private float _weight;
-    private static final byte VERSION = 2;
+    private static final byte VERSION = 3;
 
 
-    public CA(Rule r, Palette p, Initializer i, Random rand, long seed, int w, int h, int d, int prelude, float weight) {
+    public CA(Rule r, Palette p, Initializer i, Random rand, long seed, int w, int h, int d, int prelude, float weight, int coda) {
         if(i==null) {
             throw new IllegalArgumentException("null initializer");
         }
@@ -57,6 +58,7 @@ public final class CA {
         _d = d;
         _prelude = prelude;
         _weight = weight;
+        _coda = coda;
     }
 
     public Archetype archetype() {
@@ -70,14 +72,14 @@ public final class CA {
     public Plane createPlane(ExecutorService pool, GOptions opt) {
         if(archetype().dims()==3) {
             //BlockPlane p = new BlockPlane(this, getWidth(), getHeight(), getDepth(), _p, BlockPlane.Mode.argb);
-            IntBlockPlane p = new IntBlockPlane(this, getWidth(), getHeight(), getDepth(), _p);
-            populatePlane(p, pool, opt);
+            Plane p = new IntBlockPlane(this, getWidth(), getHeight(), getDepth(), _p);
+            p = populatePlane(p, pool, opt);
             return p;
         }
         else {
             if(_p.getColorCount()>=127) {
-                IntBlockPlane p = new IntBlockPlane2d(this, getWidth(), getHeight(), 1, _p);
-                populatePlane(p, pool, opt);
+                Plane p = new IntBlockPlane2d(this, getWidth(), getHeight(), 1, _p);
+                p = populatePlane(p, pool, opt);
                 return p;
             }
             else {
@@ -119,6 +121,10 @@ public final class CA {
                 default:
                     //_r.generate(p, 1, _d, pool, false, true, null, opt);
                     _r.generate(p, 1, _prelude, pool, false, true, null, opt);
+                    if(_d>1) {
+                        p = _r.generate(p, 1, _d, pool, false, true, null, opt.higherDim(_d));
+                        //System.err.println("****** expanding dimension result: "+p);
+                    }
                     break;
             }
         //}
@@ -173,6 +179,10 @@ public final class CA {
         return _prelude;
     }
 
+    public int getCoda() {
+        return _coda;
+    }
+
     public float getWeight() {
         return _weight;
     }
@@ -187,23 +197,23 @@ public final class CA {
     }
 
     public CA mutate(Rule r, Random om) {
-        return new CA(r, _p.matchCapacity(r.colorCount(), om), _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight);
+        return new CA(r, _p.matchCapacity(r.colorCount(), om), _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda);
     }
 
     public CA size(int w, int h) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, _d, _prelude, _weight);
+        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, _d, _prelude, _weight, _coda);
     }
 
     public CA size(int w, int h, int d) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d, _prelude, _weight);
+        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d, _prelude, _weight, _coda);
     }
 
     public CA size(int w, int h, int d, int prelude) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d, prelude, _weight);
+        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d, prelude, _weight, _coda);
     }
 
     public CA copy() {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight);
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda);
     }
 
     public CA seed() {
@@ -211,23 +221,27 @@ public final class CA {
     }
 
     public CA seed(long seed) {
-        return new CA(_r, _p, _i, branchRandom(), seed, _w, _h, _d, _prelude, _weight);
+        return new CA(_r, _p, _i, branchRandom(), seed, _w, _h, _d, _prelude, _weight, _coda);
     }
 
     public CA palette(Palette p) {
-        return new CA(_r, p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight);
+        return new CA(_r, p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda);
     }
 
     public CA initializer(Initializer i) {
-        return new CA(_r, _p, i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight);
+        return new CA(_r, _p, i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda);
     }
 
     public CA prelude(int pre) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, pre, _weight);
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, pre, _weight, _coda);
+    }
+
+    public CA coda(int coda) {
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, coda);
     }
 
     public CA weight(float weight) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, weight);
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, weight, _coda);
     }
 
     public Initializer getInitializer() {
@@ -307,7 +321,7 @@ public final class CA {
         Random rand = new Random();
         Rule rule = rs.random(rand).next();
         ImageInitializer init = new ImageInitializer(new File(filename));
-        CA ca = new CA(rule, p, init, rand, 0, w, h, d, 0, 1f);
+        CA ca = new CA(rule, p, init, rand, 0, w, h, d, 0, 1f, 0);
         return ca;
     }
 
@@ -335,7 +349,7 @@ public final class CA {
             Palette p = Palette.read(dis);
             Initializer i = Initializers.read(dis);
             Rule r = new IndexedRuleReader(dis).read();
-            return new CA(r, p, i, new Random(), seed, w, h, 10, 10, 1f);
+            return new CA(r, p, i, new Random(), seed, w, h, 10, 10, 1f, 0);
         }
         finally {
             if(in!=null) {
@@ -356,6 +370,7 @@ public final class CA {
         int prelude;
         long seed;
         float weight;
+        int coda;
     }
 
     private static CA fromTextFile(String filename) throws IOException {
@@ -399,7 +414,7 @@ public final class CA {
             if(i==null) {
                 throw new IOException("missing initializer");
             }
-            return new CA(rule, p, i, new Random(), h.seed, h.w, h.h, h.d, h.prelude, h.weight);
+            return new CA(rule, p, i, new Random(), h.seed, h.w, h.h, h.d, h.prelude, h.weight, h.coda);
         }
         finally {
             if(in!=null) {
@@ -427,6 +442,7 @@ public final class CA {
                 h.prelude = Integer.parseInt(r.readLine());
                 h.seed = Long.parseLong(r.readLine());
                 h.weight = 1f;
+                h.coda = 0;
                 break;
             case 2:
                 h.w = Integer.parseInt(r.readLine());
@@ -435,6 +451,16 @@ public final class CA {
                 h.prelude = Integer.parseInt(r.readLine());
                 h.seed = Long.parseLong(r.readLine());
                 h.weight = Float.parseFloat(r.readLine());
+                h.coda = 0;
+                break;
+            case 3:
+                h.w = Integer.parseInt(r.readLine());
+                h.h = Integer.parseInt(r.readLine());
+                h.d = Integer.parseInt(r.readLine());
+                h.prelude = Integer.parseInt(r.readLine());
+                h.seed = Long.parseLong(r.readLine());
+                h.weight = Float.parseFloat(r.readLine());
+                h.coda = Integer.parseInt(r.readLine());
                 break;
             default:
                 throw new IOException("unsupported version "+h.version);
@@ -465,6 +491,7 @@ public final class CA {
         w.println(_prelude);
         w.println(_seed);
         w.println(_weight);
+        w.println(_coda);
         w.println("}");
         w.println("palette {");
         _p.write(w);

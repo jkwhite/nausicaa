@@ -19,6 +19,8 @@ public class IntBlockPlane extends AbstractPlane {
     private final BufferedImage _i;
     private final WritableRaster _r;
     private final int[][] _unpacked;
+    private int _readDepthIdx;
+    private int _writeDepthIdx;
     //private int _lockOwner = -1;
 
 
@@ -38,6 +40,8 @@ public class IntBlockPlane extends AbstractPlane {
         _dstride = _hstride*_h;
         _i = new BufferedImage(_w, _h, BufferedImage.TYPE_INT_ARGB);
         _r = _i.getRaster();
+        //_readDepthIdx = -1;
+        //_writeDepthIdx = -1;
     }
 
     @Override public int getWidth() {
@@ -60,7 +64,7 @@ public class IntBlockPlane extends AbstractPlane {
     }
 
     @Override public void setCell(int x, int y, int v) {
-        setCell(x, y, 0, v);
+        setCell(x, y, _writeDepthIdx, v);
         //throw new UnsupportedOperationException();
     }
 
@@ -82,7 +86,7 @@ public class IntBlockPlane extends AbstractPlane {
     }
 
     @Override public int getCell(int x, int y) {
-        return getCell(x, y, 0);
+        return getCell(x, y, _readDepthIdx);
     }
 
     public int getCell(int x, int y, int z) {
@@ -108,7 +112,7 @@ public class IntBlockPlane extends AbstractPlane {
 
     @Override public int[] getBlock(int[] into, int x, int y, int dx, int dy, int offset) {
         //throw new UnsupportedOperationException();
-        return getBlock(into, x, y, /*z*/ 0, dx, dy, /*dz*/ 1, offset);
+        return getBlock(into, x, y, /*z*/ _readDepthIdx, dx, dy, /*dz*/ 1, offset);
     }
 
     @Override public int[] getCardinal(int[] into, int x, int y, int z, int offset) {
@@ -176,7 +180,7 @@ public class IntBlockPlane extends AbstractPlane {
         channel
     };
 
-    private final Composition _cmode = Composition.front;
+    private final Composition _cmode = Composition.avg;
     @Override public java.awt.Image toImage() {
         if(false) {
             return _i;
@@ -261,6 +265,19 @@ public class IntBlockPlane extends AbstractPlane {
         return new IntBlockPlane(_ca, _w, _h, _d, _p, sc);
     }
 
+    @Override public Plane withDepth(int d) {
+        IntBlockPlane p = new IntBlockPlane(_ca, _w, _h, d, _p);
+        int md = _d<d?_d:d;
+        for(int i=0;i<_w;i++) {
+            for(int j=0;j<_h;j++) {
+                for(int k=0;k<md;k++) {
+                    p.setCell(i, j, k, getCell(i, j, k));
+                }
+            }
+        }
+        return p;
+    }
+
     @Override public Plane scale(float scale) {
         throw new UnsupportedOperationException();
     }
@@ -282,6 +299,14 @@ public class IntBlockPlane extends AbstractPlane {
     }
 
     @Override public void tick() {
+    }
+
+    public void setReadDepth(int idx) {
+        _readDepthIdx = idx;
+    }
+
+    public void setWriteDepth(int idx) {
+        _writeDepthIdx = idx;
     }
 //
     //@Override public synchronized boolean lock(int id) {

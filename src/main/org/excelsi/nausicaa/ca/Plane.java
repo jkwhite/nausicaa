@@ -28,6 +28,7 @@ public interface Plane /*extends Pattern*/ {
     Image toJfxImage(WritableImage jfxImage);
     CA creator();
     Plane copy();
+    Plane withDepth(int d);
     Plane scale(float scale);
     Plane scale(float scale, boolean antialias);
     void save(String file) throws IOException;

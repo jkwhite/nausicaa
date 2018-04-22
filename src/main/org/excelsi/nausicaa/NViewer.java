@@ -122,7 +122,7 @@ public class NViewer extends JFrame implements UIActions {
         //Palette pal = Palette.grey(colors);
         Palette pal = Palette.rainbow(colors,true);
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
-        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre, weight);
+        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre, weight, 0);
         //org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.single.create(), rand, 0, w, h, d, pre);
 
         JPanel main = new JPanel(new BorderLayout());

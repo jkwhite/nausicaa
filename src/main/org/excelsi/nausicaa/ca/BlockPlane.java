@@ -203,6 +203,10 @@ public final class BlockPlane extends AbstractPlane {
         return new BlockPlane(_ca, _w, _h, _d, _p, _m, sc);
     }
 
+    @Override public Plane withDepth(int d) {
+        throw new UnsupportedOperationException();
+    }
+
     @Override public Plane scale(float scale) {
         throw new UnsupportedOperationException();
     }

@@ -13,6 +13,7 @@ public class Worker {
     private final int[] _pow;
     private final float _weight;
     private final float _oWeight;
+    private final boolean _useDepth;
 
     public Worker(Pattern p, int x1, int y1, int x2, int y2, float weight) {
         _x1 = x1;
@@ -26,6 +27,7 @@ public class Worker {
         final int colors = _wp.archetype().colors();
         _prev = new int[(int)Math.pow(2*_size+1, _wp.archetype().dims())];
         _pattern = new int[_prev.length];
+        _useDepth = p.archetype().dims()==3;
 
         //_pow = new int[_wp.length()];
         _pow = new int[_wp.archetype().sourceLength()];
@@ -77,7 +79,7 @@ public class Worker {
     }
 
     public void frame(final Plane p1, final Plane p2) {
-        if(p1 instanceof IntBlockPlane) {
+        if(_useDepth /*p1 instanceof IntBlockPlane*/) {
             frame3d((IntBlockPlane)p1, (IntBlockPlane)p2);
             return;
         }
@@ -98,13 +100,16 @@ public class Worker {
                 int idx = 0;
                 for(int k=0;k<_prev.length;k++) {
                     _pattern[k] = (int) (_prev[k]);
-                    idx += _prev[k] * _pow[k];
+                    //idx += _prev[k] * _pow[k];
                     //System.err.println(String.format("prev[%d]=%d, pow[%d]=%d", k, _prev[k], k, _pow[k]));
                 }
                 //System.err.println(idx+" ");
                 //p2.setCell(j, i, _wp.next(idx));
                 //p2.setCell(j, i, _wp.next(idx, distance(tw, th, mw, mh, i, j)));
-                p2.setCell(j, i, _wp.next(idx, _pattern));
+                final int v = _wp.next(0, _pattern);
+                final int ov = _pattern[_pattern.length/2];
+                final int nv = (int) ((_oWeight*ov)+(_weight*v));
+                p2.setCell(j, i, nv /*_wp.next(idx, _pattern)*/);
             }
         }
         //mutateRule();
