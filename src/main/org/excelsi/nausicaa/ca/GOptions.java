@@ -5,8 +5,9 @@ public class GOptions {
     private final boolean _doubleBuffer;
     private final int _parallel;
     private final int _stride;
-    private final float _weight;
+    @Deprecated private final float _weight;
     private final int _hd;
+    @Deprecated private final ComputeMode _compMode;
 
 
     public GOptions() {
@@ -18,11 +19,16 @@ public class GOptions {
     }
  
     public GOptions(boolean db, int par, int s, float w, int hd) {
+        this(db, par, s, w, hd, ComputeMode.combined);
+    }
+
+    public GOptions(boolean db, int par, int s, float w, int hd, ComputeMode comp) {
         _doubleBuffer = db;
         _parallel = par;
         _stride = s;
         _weight = w;
         _hd = hd;
+        _compMode = comp;
     }
 
     public boolean doubleBuffer() { return _doubleBuffer; }
@@ -30,6 +36,7 @@ public class GOptions {
     public int stride() { return _stride; }
     public float weight() { return _weight; }
     public int higherDim() { return _hd; }
+    public ComputeMode computeMode() { return _compMode; }
 
     public GOptions stride(int s) {
         return new GOptions(_doubleBuffer, _parallel, s, _weight, _hd);
@@ -41,5 +48,9 @@ public class GOptions {
 
     public GOptions higherDim(int hd) {
         return new GOptions(_doubleBuffer, _parallel, _stride, _weight, hd);
+    }
+
+    public GOptions computeMode(ComputeMode comp) {
+        return new GOptions(_doubleBuffer, _parallel, _stride, _weight, _hd, comp);
     }
 }

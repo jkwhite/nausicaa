@@ -10,12 +10,14 @@ public class Worker {
     private final int _size;
     private final int[] _prev;
     private final int[] _pattern;
+    private final int[][] _chanpattern;
     private final int[] _pow;
     private final float _weight;
     private final float _oWeight;
     private final boolean _useDepth;
+    private final boolean _channels;
 
-    public Worker(Pattern p, int x1, int y1, int x2, int y2, float weight) {
+    public Worker(Pattern p, int x1, int y1, int x2, int y2, float weight, ComputeMode cmode) {
         _x1 = x1;
         _y1 = y1;
         _x2 = x2;
@@ -27,7 +29,10 @@ public class Worker {
         final int colors = _wp.archetype().colors();
         _prev = new int[(int)Math.pow(2*_size+1, _wp.archetype().dims())];
         _pattern = new int[_prev.length];
+        _chanpattern = new int[4][_prev.length];
         _useDepth = p.archetype().dims()==3;
+        _channels = cmode==ComputeMode.channel;
+        if(_channels) System.err.println("using by-channel compute mode");
 
         //_pow = new int[_wp.length()];
         _pow = new int[_wp.archetype().sourceLength()];
@@ -58,15 +63,36 @@ public class Worker {
             for(int j=_x1;j<_x2;j++) {
                 for(int k=0;k<p1.getDepth();k++) {
                     p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
-                    final int v = _wp.next(0, _pattern);
-                    final int ov = _pattern[_pattern.length/2];
-                    final int nv = (int) ((_oWeight*ov)+(_weight*v));
-                    //dump(j,i,k,_pattern,v);
-                    p2.setCell(j, i, k, nv);
+                    //final int v = _wp.next(0, _pattern);
+                    //final int ov = _pattern[_pattern.length/2];
+                    //final int nv = (int) ((_oWeight*ov)+(_weight*v));
+                    //p2.setCell(j, i, k, nv);
+                    if(_channels) {
+                        p2.setCell(j, i, k, channels());
+                    }
+                    else {
+                        p2.setCell(j, i, k, next(_pattern));
+                    }
                 }
             }
         }
         //System.err.println("-----");
+    }
+
+    private final int channels() {
+        Colors.extractChannels(_pattern, _chanpattern);
+        final int r = next(_chanpattern[0]);
+        final int g = next(_chanpattern[1]);
+        final int b = next(_chanpattern[2]);
+        final int a = next(_chanpattern[3]);
+        return Colors.pack(r,g,b,a);
+    }
+
+    private final int next(final int[] pattern) {
+        final int v = _wp.next(0, pattern);
+        final int ov = pattern[pattern.length/2];
+        final int nv = (int) ((_oWeight*ov)+(_weight*v));
+        return nv;
     }
 
     private static void dump(int x, int y, int z, int[] p, int v) {
@@ -103,13 +129,16 @@ public class Worker {
                     //idx += _prev[k] * _pow[k];
                     //System.err.println(String.format("prev[%d]=%d, pow[%d]=%d", k, _prev[k], k, _pow[k]));
                 }
-                //System.err.println(idx+" ");
-                //p2.setCell(j, i, _wp.next(idx));
-                //p2.setCell(j, i, _wp.next(idx, distance(tw, th, mw, mh, i, j)));
-                final int v = _wp.next(0, _pattern);
-                final int ov = _pattern[_pattern.length/2];
-                final int nv = (int) ((_oWeight*ov)+(_weight*v));
-                p2.setCell(j, i, nv /*_wp.next(idx, _pattern)*/);
+                if(_channels) {
+                    p2.setCell(j, i, channels());
+                }
+                else {
+                    //final int v = _wp.next(0, _pattern);
+                    //final int ov = _pattern[_pattern.length/2];
+                    //final int nv = (int) ((_oWeight*ov)+(_weight*v));
+                    //p2.setCell(j, i, nv);
+                    p2.setCell(j, i, next(_pattern));
+                }
             }
         }
         //mutateRule();

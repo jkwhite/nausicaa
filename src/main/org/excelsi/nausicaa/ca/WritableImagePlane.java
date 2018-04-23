@@ -104,6 +104,18 @@ public class WritableImagePlane extends AbstractPlane {
         throw new UnsupportedOperationException();
     }
 
+    public java.awt.Image toImage(Rendering rend) {
+        throw new UnsupportedOperationException();
+    }
+
+    public java.awt.Image toImage(Rendering rend, int width, int height) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public BufferedImage toBufferedImage(Rendering rend) {
+        throw new UnsupportedOperationException();
+    }
+
     @Override public void setCell(int x, int y, int z, int v) {
         setCell(x, y, v);
     }

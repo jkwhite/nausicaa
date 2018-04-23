@@ -22,8 +22,11 @@ public interface Plane /*extends Pattern*/ {
     int[] getCardinal(int[] into, int x, int y, int z, int offset);
     void setRow(int[] row, int y);
     java.awt.Image toImage();
+    java.awt.Image toImage(Rendering rend);
     java.awt.Image toImage(int width, int height);
+    java.awt.Image toImage(Rendering rend, int width, int height);
     BufferedImage toBufferedImage();
+    BufferedImage toBufferedImage(Rendering rend);
     Image toJfxImage();
     Image toJfxImage(WritableImage jfxImage);
     CA creator();

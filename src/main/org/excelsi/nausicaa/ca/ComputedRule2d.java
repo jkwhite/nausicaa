@@ -103,7 +103,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         System.err.println("rule compute using "+workers.length+" workers on blocksize "+block);
         for(int i=0;i<workers.length;i++) {
             patterns[i] = createPattern(pool);
-            workers[i] = new Worker(patterns[i], 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block), c.creator().getWeight());
+            workers[i] = new Worker(patterns[i], 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block), c.creator().getWeight(), c.creator().getComputeMode());
         }
         final Future[] futures = new Future[workers.length];
         return new Iterator<Plane>() {
@@ -117,7 +117,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                 if(opt.higherDim()>1) {
                     p1 = c.withDepth(opt.higherDim());
                     p2 = p1;
-                    System.err.println("switched to higher dim "+opt.higherDim());
+                    //System.err.println("switched to higher dim "+opt.higherDim());
                 }
                 else {
                     p1 = c;
@@ -196,7 +196,8 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                 //Plane p2 = c.copy();
                 //Plane tmp;
                 final Pattern pat = createPattern(pool);
-                Worker w = new Worker(pat, 0, 1, c.getWidth(), c.getHeight(), opt.weight());
+                //Worker w = new Worker(pat, 0, 1, c.getWidth(), c.getHeight(), opt.weight());
+                Worker w = new Worker(pat, 0, 1, c.getWidth(), c.getHeight(), c.creator().getWeight(), c.creator().getComputeMode());
                 //for(int frames=start;frames<end;frames++) {
                 w.frame(p1);
                 ret = p1;

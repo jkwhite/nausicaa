@@ -174,6 +174,7 @@ public class Config {
 
     public void setVariable(String name, Object o) {
         _variables.put(name, o);
+        notify(name);
     }
 
     public <T> T getVariable(String name, T dvalue) {

@@ -41,17 +41,17 @@ public class RandomInitializer implements Initializer {
         else {
             r = random;
         }
-        int[] colors = rule.colors();
+        int colors = rule.archetype().colors();
         switch(rule.dimensions()) {
             case 1:
                 for(int x=0;x<plane.getWidth();x++) {
-                    plane.setCell(x, 0, colors[computeColor(r, colors.length)]);
+                    plane.setCell(x, 0, computeColor(r, colors));
                 }
                 break;
             case 2:
                 for(int y=0;y<plane.getHeight();y++) {
                     for(int x=0;x<plane.getWidth();x++) {
-                        plane.setCell(x, y, colors[computeColor(r, colors.length)]);
+                        plane.setCell(x, y, computeColor(r, colors));
                     }
                 }
                 break;
@@ -60,7 +60,7 @@ public class RandomInitializer implements Initializer {
                 for(int y=0;y<bp.getHeight();y++) {
                     for(int x=0;x<bp.getWidth();x++) {
                         for(int z=0;z<bp.getDepth();z++) {
-                            bp.setCell(x, y, z, colors[computeColor(r, colors.length)]);
+                            bp.setCell(x, y, z, computeColor(r, colors));
                         }
                     }
                 }

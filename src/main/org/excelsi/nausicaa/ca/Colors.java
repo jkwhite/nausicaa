@@ -11,6 +11,10 @@ public class Colors {
     public static final int ALPHA_MASK = 0xff000000;
 
 
+    public static int opacify(int c) {
+        return c | ALPHA_MASK;
+    }
+
     public static int pack(int r, int g, int b) {
         return pack(r, g, b, 255);
     }
@@ -58,6 +62,20 @@ public class Colors {
         a += offset;
         c = (c&COLOR_MASK) | ((a&0xff)<<24);
         return c;
+    }
+
+    public static void extractChannels(int[] src, int[][] chans) {
+        final int[] r = chans[0];
+        final int[] g = chans[1];
+        final int[] b = chans[2];
+        final int[] a = chans[3];
+        for(int i=0;i<src.length;i++) {
+            final int v = src[i];
+            b[i] = v & 0xff;
+            g[i] = (v>>8) & 0xff;
+            r[i] = (v>>16) & 0xff;
+            a[i] = (v>>24) & 0xff;
+        }
     }
 
     public static String toColorString(int c) {

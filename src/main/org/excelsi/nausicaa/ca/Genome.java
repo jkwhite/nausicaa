@@ -38,7 +38,7 @@ public final class Genome {
 
     public Genome prune(Archetype a) {
         final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(a)));
-        System.err.println("prune init codons: "+cs);
+        //System.err.println("prune init codons: "+cs);
         while(cs.size()>1) {
             if(!cs.get(0).usesPattern()) {
                 cs.remove(0);
@@ -47,7 +47,7 @@ public final class Genome {
                 break;
             }
         }
-        System.err.println("prune final codons: "+cs);
+        //System.err.println("prune final codons: "+cs);
         return fromCodons(cs);
     }
 
@@ -236,7 +236,7 @@ public final class Genome {
     }
 
     private static void symmetry(final Archetype a, final List<Codon> cs) {
-        System.err.println("before sym: "+cs);
+        //System.err.println("before sym: "+cs);
         for(int i=0;i<cs.size()&&cs.size()>1;i++) {
             Codon c = cs.get(i);
             if(!c.symmetric()) {
@@ -252,8 +252,9 @@ public final class Genome {
             }
         }
         if(!pat) {
-            cs.add(0, new Codons.Histo(a.colors()));
+            //cs.add(0, new Codons.Histo(a.colors()));
+            cs.add(0, new Codons.PushA());
         }
-        System.err.println("after sym: "+cs);
+        //System.err.println("after sym: "+cs);
     }
 }

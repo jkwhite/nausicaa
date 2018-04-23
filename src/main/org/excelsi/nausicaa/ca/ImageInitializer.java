@@ -75,16 +75,19 @@ public class ImageInitializer implements Initializer {
                 }
             }
             else {
-                Map<Integer,Integer> colormap = p.buildColormap();
+                Map<Integer,Integer> colormap = p.hasColormap() ? p.buildColormap() : null;
                 if(_params.tile) {
                     for(int j=0;j<plane.getHeight();j++) {
                         for(int i=0;i<plane.getWidth();i++) {
                             int v = _lastImage.getRGB(i % w, j % h);
-                            Integer iv = colormap.get(v);
-                            if(iv==null) {
-                                throw new IllegalStateException("colormap missing color "+v);
+                            if(colormap!=null) {
+                                Integer iv = colormap.get(v);
+                                if(iv==null) {
+                                    throw new IllegalStateException("colormap missing color "+v);
+                                }
+                                v = iv;
                             }
-                            plane.setCell(i, j, iv);
+                            plane.setCell(i, j, v);
                         }
                     }
                 }
@@ -94,12 +97,15 @@ public class ImageInitializer implements Initializer {
                     for(int j=0;j<_lastImage.getHeight();j++) {
                         for(int i=0;i<_lastImage.getWidth();i++) {
                             int v = _lastImage.getRGB(i, j);
-                            Integer iv = colormap.get(v);
-                            if(iv==null) {
-                                throw new IllegalStateException("colormap missing color "+v);
+                            if(colormap!=null) {
+                                Integer iv = colormap.get(v);
+                                if(iv==null) {
+                                    throw new IllegalStateException("colormap missing color "+v);
+                                }
+                                v = iv;
                             }
                             if(i+xoff>=0 && j+yoff>=0 && i+xoff<plane.getWidth() && j+yoff<plane.getHeight()) {
-                                plane.setCell(i+xoff, j+yoff, iv);
+                                plane.setCell(i+xoff, j+yoff, v);
                             }
                         }
                     }

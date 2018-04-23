@@ -103,14 +103,19 @@ public class NViewer extends JFrame implements UIActions {
         setSize(_width, _height);
         int dims = 2;
         int size = 1;
+        Random rand = new Random();
+        Palette pal = Palette.random(2, rand, true);
+        //Palette pal = Palette.grey(colors);
+        //Palette pal = Palette.rainbow(colors,true);
+        //Palette pal = new RGBAPalette();
         //int colors = 1001;
-        int colors = 1000;
+        //int colors = 1000;
+        int colors = pal.getColorCount();
         //int colors = 2;
         _timeline = new Timeline();
         org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors);
         org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
         org.excelsi.nausicaa.ca.Archetype a2 = new org.excelsi.nausicaa.ca.Archetype(2, size, colors);
-        Random rand = new Random();
         _random = rand;
         //Ruleset rs = new IndexedRuleset1d(a);
         //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset2d(a2));
@@ -118,11 +123,9 @@ public class NViewer extends JFrame implements UIActions {
         Ruleset rs = new ComputedRuleset(a);
         //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset1d(a1));
         Rule rule = rs.random(rand).next();
-        //Palette pal = Palette.random(colors, rand, true);
-        //Palette pal = Palette.grey(colors);
-        Palette pal = Palette.rainbow(colors,true);
+        ComputeMode cmode = ComputeMode.combined;
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
-        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre, weight, 0);
+        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre, weight, 0, cmode);
         //org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.single.create(), rand, 0, w, h, d, pre);
 
         JPanel main = new JPanel(new BorderLayout());
@@ -189,6 +192,7 @@ public class NViewer extends JFrame implements UIActions {
         createAutomataMenu(shortcut, bar);
         createPaletteMenu(shortcut, bar);
         createMutateMenu(shortcut, bar);
+        createRenderMenu(shortcut, bar);
         createWindowMenu(shortcut, bar);
         root().setJMenuBar(bar);
     }
@@ -200,9 +204,19 @@ public class NViewer extends JFrame implements UIActions {
                 _a.newCA(NViewer.this);
             }
         };
-        AbstractAction newCAImage = new AbstractAction() {
+        AbstractAction newCAImageRGB = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.newCAImage(NViewer.this, _config);
+                _a.newCAImageRGB(NViewer.this, _config);
+            }
+        };
+        AbstractAction newCAImageRGBA = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.newCAImageRGBA(NViewer.this, _config);
+            }
+        };
+        AbstractAction newCAImageIndexed = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.newCAImageIndexed(NViewer.this, _config);
             }
         };
         AbstractAction open = new AbstractAction() {
@@ -233,9 +247,23 @@ public class NViewer extends JFrame implements UIActions {
         JMenuItem ni = file.add(newCA);
         ni.setText("New ...");
         ni.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, shortcut));
-        JMenuItem niimg = file.add(newCAImage);
-        niimg.setText("New from image...");
-        //ni.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, shortcut));
+
+
+
+        //JMenuItem niimg = file.add(newCAImage);
+        //niimg.setText("New from image...");
+
+        JMenu newimg = new JMenu("New from image");
+        file.add(newimg);
+
+        JMenuItem niimgrgb = newimg.add(newCAImageRGB);
+        niimgrgb.setText("RGB");
+        JMenuItem niimgrgba = newimg.add(newCAImageRGBA);
+        niimgrgba.setText("RGBA");
+        JMenuItem niimgidx = newimg.add(newCAImageIndexed);
+        niimgidx.setText("Indexed");
+
+
         JMenuItem oi = file.add(open);
         oi.setText("Open ...");
         oi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, shortcut));
@@ -1057,6 +1085,105 @@ public class NViewer extends JFrame implements UIActions {
         bar.add(mutate);
     }
 
+    private void createRenderMenu(int shortcut, JMenuBar bar) {
+        JMenu render = new JMenu("Render");
+
+        JMenu rgbopt = new JMenu("RGB compute mode");
+        final JCheckBoxMenuItem[] rgbhack = new JCheckBoxMenuItem[2];
+        JCheckBoxMenuItem rgbcomb = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                rgbhack[0].setState(true);
+                rgbhack[1].setState(false);
+                _config.setVariable("rgb_computemode", "combined");
+                setActiveCA(getActiveCA().computeMode(ComputeMode.combined));
+            }
+        });
+        rgbcomb.setText("Combined");
+        rgbopt.add(rgbcomb);
+        JCheckBoxMenuItem rgbchan = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                rgbhack[0].setState(false);
+                rgbhack[1].setState(true);
+                _config.setVariable("rgb_computemode", "channel");
+                setActiveCA(getActiveCA().computeMode(ComputeMode.channel));
+            }
+        });
+        rgbchan.setText("By channel");
+        rgbopt.add(rgbchan);
+        rgbhack[0] = rgbcomb;
+        rgbhack[1] = rgbchan;
+        rgbhack[_config.getVariable("rgb_computemode","combined").equals("combined")?0:1].setState(true);
+
+        render.add(rgbopt);
+
+        JMenu compopt = new JMenu("Composition mode");
+        final JCheckBoxMenuItem[] comphack = new JCheckBoxMenuItem[2];
+        JCheckBoxMenuItem compfirst = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                comphack[0].setState(true);
+                comphack[1].setState(false);
+                _config.setVariable("composite_mode", "firstonly");
+            }
+        });
+        compfirst.setText("Nearest only");
+        compopt.add(compfirst);
+        JCheckBoxMenuItem compavg = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                comphack[0].setState(false);
+                comphack[1].setState(true);
+                _config.setVariable("composite_mode", "weightedavg");
+            }
+        });
+        compavg.setText("Weighted average");
+        compopt.add(compavg);
+        comphack[0] = compfirst;
+        comphack[1] = compavg;
+        comphack[_config.getVariable("composite_mode","firstonly").equals("firstonly")?0:1].setState(true);
+
+        render.add(compopt);
+
+        final JMenuItem[] vhack = new JMenuItem[1];
+        final JMenuItem view3d = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                final ViewType vt = _futures!=null ? _futures.getViewType() : ViewType.view2d;
+                vhack[0].setText(vt==ViewType.view2d?"View in 2D":"View in 3D internal");
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        _futures.setViewType(vt==ViewType.view2d?ViewType.view3d:ViewType.view2d);
+                        //_futures.revalidate();
+                    }
+                });
+            }
+        });
+        render.add(view3d);
+        vhack[0] = view3d;
+        view3d.setText("View in 3D");
+        //view3d.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, shortcut));
+
+        final JMenuItem eview3d = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        _a.external3dView(NViewer.this, _config);
+                    }
+                });
+            }
+        });
+        eview3d.setText("View in 3D external");
+        eview3d.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, shortcut | InputEvent.SHIFT_DOWN_MASK));
+        render.add(eview3d);
+
+        final JMenuItem viewh = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.view3d(NViewer.this);
+            }
+        });
+        viewh.setText("View from higher dimension");
+        render.add(viewh);
+
+        bar.add(render);
+    }
+
     private void createWindowMenu(int shortcut, JMenuBar bar) {
         JMenu window = new JMenu("Window");
         final JMenuItem[] fhack = new JMenuItem[1];
@@ -1079,37 +1206,6 @@ public class NViewer extends JFrame implements UIActions {
         full.setText("Hide mutations");
         full.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, shortcut));
 
-        final JMenuItem[] vhack = new JMenuItem[1];
-        final JMenuItem view3d = new JMenuItem(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                final ViewType vt = _futures!=null ? _futures.getViewType() : ViewType.view2d;
-                vhack[0].setText(vt==ViewType.view2d?"View in 2D":"View in 3D internal");
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        _futures.setViewType(vt==ViewType.view2d?ViewType.view3d:ViewType.view2d);
-                        //_futures.revalidate();
-                    }
-                });
-            }
-        });
-        window.add(view3d);
-        vhack[0] = view3d;
-        view3d.setText("View in 3D");
-        //view3d.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, shortcut));
-
-        final JMenuItem eview3d = new JMenuItem(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        _a.external3dView(NViewer.this, _config);
-                    }
-                });
-            }
-        });
-        eview3d.setText("View in 3D external");
-        eview3d.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, shortcut | InputEvent.SHIFT_DOWN_MASK));
-        window.add(eview3d);
-
         final JMenuItem peditor = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 //_editor = !_editor;
@@ -1120,14 +1216,6 @@ public class NViewer extends JFrame implements UIActions {
         peditor.setText("Show palette editor");
         //peditor.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcut));
         window.add(peditor);
-
-        final JMenuItem viewh = new JMenuItem(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _a.view3d(NViewer.this);
-            }
-        });
-        viewh.setText("View from higher dimension");
-        window.add(viewh);
 
         final JMenuItem formed = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {

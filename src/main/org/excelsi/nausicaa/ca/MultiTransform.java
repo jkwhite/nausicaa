@@ -56,7 +56,7 @@ public class MultiTransform implements Transform {
     }
 
     private CA runTransform(CA c) throws MutationFailedException {
-        System.err.println("multi: hv: "+_hueVariations+", wv: "+_weightVariations);
+        //System.err.println("multi: hv: "+_hueVariations+", wv: "+_weightVariations);
         Transform t = null;
         int tries = 0;
         do {

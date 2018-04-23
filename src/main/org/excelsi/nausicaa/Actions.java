@@ -1,46 +1,7 @@
 package org.excelsi.nausicaa;
 
 
-import org.excelsi.nausicaa.ca.Archetype;
-import org.excelsi.nausicaa.ca.Blobs;
-import org.excelsi.nausicaa.ca.Mutator;
-import org.excelsi.nausicaa.ca.Symmetry;
-import org.excelsi.nausicaa.ca.SymmetryForcer;
-import org.excelsi.nausicaa.ca.Colors;
-import org.excelsi.nausicaa.ca.CA;
-import org.excelsi.nausicaa.ca.MutatorFactory;
-import org.excelsi.nausicaa.ca.Plane;
-import org.excelsi.nausicaa.ca.Palette;
-import org.excelsi.nausicaa.ca.Rule;
-import org.excelsi.nausicaa.ca.RuleTransform;
-import org.excelsi.nausicaa.ca.Evolver;
-import org.excelsi.nausicaa.ca.EvolverBuilder;
-import org.excelsi.nausicaa.ca.Fitness;
-import org.excelsi.nausicaa.ca.FitnessCriteria;
-import org.excelsi.nausicaa.ca.Encoder;
-import org.excelsi.nausicaa.ca.RandomMutationStrategy;
-import org.excelsi.nausicaa.ca.RandomInitializer;
-import org.excelsi.nausicaa.ca.GaussianInitializer;
-import org.excelsi.nausicaa.ca.CAInitializer;
-import org.excelsi.nausicaa.ca.ClusteredGaussianInitializer;
-import org.excelsi.nausicaa.ca.WordEncoder;
-import org.excelsi.nausicaa.ca.ByteInitializer;
-import org.excelsi.nausicaa.ca.WordInitializer;
-import org.excelsi.nausicaa.ca.ImageInitializer;
-import org.excelsi.nausicaa.ca.SingleInitializer;
-import org.excelsi.nausicaa.ca.Initializer;
-import org.excelsi.nausicaa.ca.Training;
-import org.excelsi.nausicaa.ca.RetryingMutationStrategy;
-import org.excelsi.nausicaa.ca.MutationStrategies;
-import org.excelsi.nausicaa.ca.Mutatable;
-import org.excelsi.nausicaa.ca.MutationFactor;
-import org.excelsi.nausicaa.ca.Stats;
-import org.excelsi.nausicaa.ca.Multistats;
-import org.excelsi.nausicaa.ca.Pools;
-import org.excelsi.nausicaa.ca.Ruleset;
-import org.excelsi.nausicaa.ca.ComputedRuleset;
-import org.excelsi.nausicaa.ca.Initializers;
-import org.excelsi.nausicaa.ca.GOptions;
+import org.excelsi.nausicaa.ca.*;
 
 import java.math.BigInteger;
 import java.awt.*;
@@ -69,7 +30,7 @@ public class Actions {
         //Things.centerWindow(v);
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(3,2));
+        JPanel top = new JPanel(new GridLayout(4,2));
 
         top.add(new JLabel("Dimensions"));
         final JTextField alpha = new JTextField();
@@ -77,17 +38,64 @@ public class Actions {
         alpha.setColumns(3);
         top.add(alpha);
 
-        top.add(new JLabel("Colors"));
-        final JTextField mc = new JTextField();
-        mc.setText(config.getVariable("default_colors", "2"));
-        mc.setColumns(3);
-        top.add(mc);
-
         top.add(new JLabel("Size"));
         final JTextField siz = new JTextField();
         siz.setText(config.getVariable("default_size", "1"));
         siz.setColumns(3);
         top.add(siz);
+
+        final String[] colhack = new String[1];
+        final JComponent[] idxhack = new JComponent[2];
+        top.add(new JLabel("Kind"));
+        ButtonGroup kind = new ButtonGroup();
+
+        AbstractAction rgb = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                colhack[0] = "rgb";
+                idxhack[0].setEnabled(false);
+                idxhack[1].setEnabled(false);
+            }
+        };
+        JRadioButton rrgb = new JRadioButton(rgb);
+        rrgb.setText("RGB");
+        kind.add(rrgb);
+        AbstractAction rgba = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                colhack[0] = "rgba";
+                idxhack[0].setEnabled(false);
+                idxhack[1].setEnabled(false);
+            }
+        };
+        JRadioButton rrgba = new JRadioButton(rgb);
+        rrgba.setText("RGBA");
+        kind.add(rrgba);
+        AbstractAction indexed = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                colhack[0] = "indexed";
+                idxhack[0].setEnabled(true);
+                idxhack[1].setEnabled(true);
+            }
+        };
+        colhack[0] = "indexed";
+        JRadioButton rindexed = new JRadioButton(indexed);
+        rindexed.setText("Indexed");
+        rindexed.setSelected(true);
+        kind.add(rindexed);
+        JPanel kinds = new JPanel();
+        //BoxLayout kindb = new BoxLayout(kinds, BoxLayout.Y_AXIS);
+        //kinds.setLayout(kindb);
+        kinds.add(rindexed);
+        kinds.add(rrgb);
+        kinds.add(rrgba);
+        top.add(kinds);
+
+        idxhack[0] = new JLabel("Colors");
+        top.add(idxhack[0]);
+        final JTextField mc = new JTextField();
+        idxhack[1] = mc;
+        mc.setText(config.getVariable("default_colors", "2"));
+        mc.setColumns(3);
+        top.add(mc);
 
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
@@ -103,12 +111,24 @@ public class Actions {
                 config.setVariable("default_dimensions", alpha.getText());
                 config.setVariable("default_colors", mc.getText());
                 config.setVariable("default_size", siz.getText());
-                Archetype a = new Archetype(dims, size, colors);
                 Random rand = new Random();
+                Palette pal;
+                switch(colhack[0]) {
+                    case "rgb":
+                        pal = new RGBPalette();
+                        break;
+                    case "rgba":
+                        pal = new RGBAPalette();
+                        break;
+                    case "indexed":
+                    default:
+                        pal = Palette.random(colors, rand, true);
+                        break;
+                }
+                Archetype a = new Archetype(dims, size, pal.getColorCount());
                 Ruleset rs = new ComputedRuleset(a);
                 Rule rule = rs.random(rand).next();
-                Palette pal = Palette.random(colors, rand, true);
-                CA ca = new CA(rule, pal, v.getActiveCA().getInitializer(), rand, 0, v.getConfig().getWidth(), v.getConfig().getHeight(), v.getConfig().getDepth(), v.getConfig().getPrelude(), v.getConfig().getWeight(), 0);
+                CA ca = new CA(rule, pal, v.getActiveCA().getInitializer(), rand, 0, v.getConfig().getWidth(), v.getConfig().getHeight(), v.getConfig().getDepth(), v.getConfig().getPrelude(), v.getConfig().getWeight(), 0, ComputeMode.combined);
                 v.setActiveCA(ca);
             }
         });
@@ -123,7 +143,19 @@ public class Actions {
         d.setVisible(true);
     }
 
-    public void newCAImage(NViewer v, Config config) {
+    public void newCAImageRGB(NViewer v, Config config) {
+        newCAImage(v, config, "rgb");
+    }
+
+    public void newCAImageRGBA(NViewer v, Config config) {
+        newCAImage(v, config, "rgba");
+    }
+
+    public void newCAImageIndexed(NViewer v, Config config) {
+        newCAImage(v, config, "indexed");
+    }
+
+    private void newCAImage(NViewer v, Config config, String paletteMode) {
         JFileChooser f = new JFileChooser(config.getDir());
         f.setDialogTitle("New CA from image");
         f.setDialogType(f.OPEN_DIALOG);
@@ -132,7 +164,7 @@ public class Actions {
         if(ret==f.APPROVE_OPTION) {
             try {
                 config.setDir(f.getSelectedFile().getParent());
-                final CA ca = CA.fromImage(f.getSelectedFile().toString());
+                final CA ca = CA.fromImage(f.getSelectedFile().toString(), paletteMode);
                 config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth(), ca.getPrelude());
                 //config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth());
                 v.setActiveCA(ca);

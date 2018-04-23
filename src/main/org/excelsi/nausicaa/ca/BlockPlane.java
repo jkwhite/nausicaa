@@ -141,6 +141,10 @@ public final class BlockPlane extends AbstractPlane {
         throw new UnsupportedOperationException();
     }
 
+    @Override public java.awt.Image toImage(Rendering rend) {
+        return toImage();
+    }
+
     @Override public java.awt.Image toImage() {
         if(_m==Mode.indexed) {
             return _i;
@@ -181,8 +185,16 @@ public final class BlockPlane extends AbstractPlane {
         return toImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
     }
 
+    @Override public java.awt.Image toImage(Rendering rend, int width, int height) {
+        return toImage(width, height);
+    }
+
     @Override public BufferedImage toBufferedImage() {
         return (BufferedImage) toImage();
+    }
+
+    @Override public BufferedImage toBufferedImage(Rendering rend) {
+        return (BufferedImage) toImage(rend);
     }
 
     @Override public javafx.scene.image.Image toJfxImage() {

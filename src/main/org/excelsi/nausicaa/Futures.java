@@ -85,6 +85,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     @Override
     public void configChanged(Config c, String p) {
         switch(p) {
+            case "composite_mode":
             case "mutator":
             case "size":
                 reinit();
@@ -354,13 +355,14 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     }
 
     private PlaneDisplay createPlaneDisplay(final CA ca) {
-        GOptions g = new GOptions(true, 1, 0, ca.getWeight() /*getFrameWeight()*/);
+        GOptions g = new GOptions(true, 1, 0, ca.getWeight())
+            .computeMode(ComputeMode.from(_config.<String>getVariable("rgb_computemode","combined")));
         switch(_viewType) {
             case view3d:
                 return new JfxPlaneDisplay(ca, g);
             case view2d:
             default:
-                return new SwingPlaneDisplay(ca, g);
+                return new SwingPlaneDisplay(ca, g, _config);
         }
     }
 

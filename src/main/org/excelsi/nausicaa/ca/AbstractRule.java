@@ -49,7 +49,8 @@ public abstract class AbstractRule /*extends WritableImagePlane*/ implements Rul
     }
 
     @Override public int colorCount() {
-        return colors().length;
+        //return colors().length;
+        return archetype().colors();
     }
 
     @Override public Archetype archetype() {

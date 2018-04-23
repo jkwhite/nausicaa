@@ -752,7 +752,7 @@ public class Codons {
             int mid = p.length/2;
             //t.pushAll(p, mid);
             //t.pushAll(p, mid, mid+1);
-            int start = p[mid]%p.length;
+            int start = Math.abs(p[mid]%p.length);
             //int c1 = start<mid?start-mid:p.length-start;
             //t.pushAll(p, c1, start);
             //int i2 = c1+start<mid?i1+1:mid;

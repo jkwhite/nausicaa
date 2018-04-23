@@ -161,11 +161,11 @@ public class SequencePattern implements Pattern, Mutatable {
                         final SEntry s = _s.get(i);
                         ComputedPattern np;
                         if(m.stage()==-1 || i==m.stage()) {
-                            System.err.println("MUTATING "+i);
+                            //System.err.println("MUTATING "+i);
                             np = (ComputedPattern)s.p.mutate(m);
                         }
                         else {
-                            System.err.println("COPYING "+i);
+                            //System.err.println("COPYING "+i);
                             np = (ComputedPattern)s.p.copy();
                         }
                         ns.add(new SEntry(s.t, np));
@@ -187,7 +187,7 @@ public class SequencePattern implements Pattern, Mutatable {
                     break;
             }
             Sequence news = new Sequence(ns);
-            System.err.println("GOT NEWS: "+news.humanize());
+            //System.err.println("GOT NEWS: "+news.humanize());
             return news;
         }
 

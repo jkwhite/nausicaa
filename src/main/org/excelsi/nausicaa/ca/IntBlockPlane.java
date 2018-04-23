@@ -18,7 +18,7 @@ public class IntBlockPlane extends AbstractPlane {
     private final Palette _p;
     private final BufferedImage _i;
     private final WritableRaster _r;
-    private final int[][] _unpacked;
+    //private final int[][] _unpacked;
     private int _readDepthIdx;
     private int _writeDepthIdx;
     //private int _lockOwner = -1;
@@ -34,7 +34,7 @@ public class IntBlockPlane extends AbstractPlane {
         _h = h;
         _d = d;
         _p = p;
-        _unpacked = p.unpack();
+        //_unpacked = p.unpack();
         _s = s;
         _hstride = w;
         _dstride = _hstride*_h;
@@ -173,15 +173,16 @@ public class IntBlockPlane extends AbstractPlane {
     }
 
     private final int[] _rgb = new int[3];
+    private final int[] _unpack = new int[4];
     private final boolean FIRST = true;
-    public enum Composition {
-        front,
-        avg,
-        channel
-    };
 
-    private final Composition _cmode = Composition.avg;
+    //private final Composition _cmode = Composition.front;
+    private final Rendering DEFAULT_RENDERING = new Rendering();
     @Override public java.awt.Image toImage() {
+        return toImage(DEFAULT_RENDERING);
+    }
+
+    @Override public java.awt.Image toImage(Rendering rend) {
         if(false) {
             return _i;
         }
@@ -191,7 +192,7 @@ public class IntBlockPlane extends AbstractPlane {
             //System.err.print(".");
             //final int[] rgba = new int[4];
             final int[] rgb = _rgb; //new int[3];
-            final int[][] unpacked = _unpacked;
+            //final int[][] unpacked = _unpacked;
             for(int i=0;i<_w;i++) {
                 for(int j=0;j<_h;j++) {
                     rgb[0]=0;
@@ -205,7 +206,7 @@ public class IntBlockPlane extends AbstractPlane {
                         _i.setRGB(i,j,_p.color(idx));
                     }
                     else {
-                        if(_cmode==Composition.channel) {
+                        if(rend.composition()==Rendering.Composition.channel) {
                             //_i.setRGB(i,j,Colors.pack(
                         }
                         else {
@@ -214,7 +215,8 @@ public class IntBlockPlane extends AbstractPlane {
                                 int idx = getCell(i,j,k);
                                 //if(idx<0) idx=-idx;
                                 //if(idx>_p.getColorCount()) idx = idx % _p.getColorCount();
-                                final int[] u = unpacked[idx];
+                                //final int[] u = unpacked[idx];
+                                final int[] u = _p.unpack(idx, _unpack);
                                 //rgb[0] += (_d-k)*rgba[0];
                                 //rgb[1] += (_d-k)*rgba[1];
                                 //rgb[2] += (_d-k)*rgba[2];
@@ -227,7 +229,7 @@ public class IntBlockPlane extends AbstractPlane {
                                 rgb[2] += (int)(mult*u[2]);
                                 //if(u[0]>0) System.err.println("k: "+k+", u: "+u[0]+","+u[1]+","+u[2]+", mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
                                 mx += (_d-k);
-                                if(_cmode==Composition.front&&(u[0]>0||u[1]>0||u[2]>0)) break;
+                                if(rend.composition()==Rendering.Composition.front&&(u[0]>0||u[1]>0||u[2]>0)) break;
                             }
                             mx = 1;
                             _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
@@ -243,8 +245,16 @@ public class IntBlockPlane extends AbstractPlane {
         return toImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
     }
 
+    @Override public java.awt.Image toImage(Rendering rend, int width, int height) {
+        return toImage(rend).getScaledInstance(width, height, Image.SCALE_SMOOTH);
+    }
+
     @Override public BufferedImage toBufferedImage() {
         return (BufferedImage) toImage();
+    }
+
+    @Override public BufferedImage toBufferedImage(Rendering rend) {
+        return (BufferedImage) toImage(rend);
     }
 
     @Override public javafx.scene.image.Image toJfxImage() {

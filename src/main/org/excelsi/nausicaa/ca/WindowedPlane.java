@@ -87,6 +87,18 @@ public class WindowedPlane extends AbstractPlane {
         return _p.toBufferedImage();
     }
 
+    @Override public java.awt.Image toImage(Rendering rend) {
+        return _p.toImage(rend);
+    }
+
+    @Override public java.awt.Image toImage(Rendering rend, int width, int height) {
+        return _p.toImage(rend, width, height);
+    }
+
+    @Override public BufferedImage toBufferedImage(Rendering rend) {
+        return _p.toBufferedImage(rend);
+    }
+
     @Override public javafx.scene.image.Image toJfxImage() {
         return _p.toJfxImage();
     }

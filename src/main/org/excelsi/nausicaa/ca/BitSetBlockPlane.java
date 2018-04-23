@@ -160,6 +160,10 @@ public class BitSetBlockPlane extends AbstractPlane {
         throw new UnsupportedOperationException();
     }
 
+    @Override public java.awt.Image toImage(Rendering rend) {
+        return toImage();
+    }
+
     private final int[] _rgb = new int[3];
     private final boolean FIRST = true;
     @Override public java.awt.Image toImage() {
@@ -224,8 +228,16 @@ public class BitSetBlockPlane extends AbstractPlane {
         return toImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
     }
 
+    @Override public java.awt.Image toImage(Rendering rend, int width, int height) {
+        return toImage(width, height);
+    }
+
     @Override public BufferedImage toBufferedImage() {
         return (BufferedImage) toImage();
+    }
+
+    @Override public BufferedImage toBufferedImage(Rendering rend) {
+        return (BufferedImage) toImage(rend);
     }
 
     @Override public javafx.scene.image.Image toJfxImage() {

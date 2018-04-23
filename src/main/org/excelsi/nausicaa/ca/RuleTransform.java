@@ -46,7 +46,7 @@ public class RuleTransform implements Transform {
         }
         else if(root instanceof Mutatable) {
             //Rule mut = (Rule)((Mutatable)root).mutate(_rand);
-            System.err.println("********* MUTATING WITH STAGE: "+_f.stage());
+            //System.err.println("********* MUTATING WITH STAGE: "+_f.stage());
             Rule mut = (Rule)((Mutatable)root).mutate(_f);
             return c.mutate(mut, _rand);
         }

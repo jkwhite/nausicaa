@@ -55,15 +55,18 @@ public class SwingPlaneDisplay extends PlaneDisplay {
     private CA _c;
     private Plane _p;
     private GOptions _gopt;
+    private Config _config;
+    private Rendering _rend;
     private int _w;
     private int _h;
     private float _scale = 1.0f;
     private final boolean useNew = false;
 
 
-    public SwingPlaneDisplay(CA ca, GOptions g) {
+    public SwingPlaneDisplay(CA ca, GOptions g, Config c) {
         this(ca.getWidth(), ca.getHeight());
         _gopt = g;
+        _config = c;
         setCA(ca);
     }
 
@@ -195,11 +198,13 @@ public class SwingPlaneDisplay extends PlaneDisplay {
 
     public void setCA(CA ca, ExecutorService pool, GOptions opt) {
         _c = ca;
+        Rendering.Composition comp = _config.getVariable("composite_mode","firstonly").equals("firstonly")?Rendering.Composition.front:Rendering.Composition.avg;
+        _rend = new Rendering().composition(comp);
         setPlane(_c.createPlane(pool, opt));
         Info i = new Info(_c);
         Rule r = ca.getRule();
         String text = r.humanize();
-        System.err.println("******** RULE: "+System.identityHashCode(r)+" SET RULE: "+text);
+        //System.err.println("******** RULE: "+System.identityHashCode(r)+" SET RULE: "+text);
         if(text.length()>56) {
             text = "..."+text.substring(text.length()-56,text.length());
         }
@@ -267,10 +272,10 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         else {
             ImageIcon i;
             if(_scale==1f) {
-                i = new ImageIcon(_p.toImage());
+                i = new ImageIcon(_p.toImage(_rend));
             }
             else {
-                i = new ImageIcon(_p.toImage((int)(_p.getWidth()*_scale), (int) (_p.getHeight()*_scale)));
+                i = new ImageIcon(_p.toImage(_rend, (int)(_p.getWidth()*_scale), (int) (_p.getHeight()*_scale)));
             }
             final ImageIcon icon = i;
             r = new Runnable() {

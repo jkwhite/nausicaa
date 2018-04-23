@@ -89,6 +89,14 @@ public class BufferedImagePlane extends AbstractPlane implements java.io.Seriali
         return _i.getScaledInstance(width, height, Image.SCALE_SMOOTH);
     }
 
+    @Override public Image toImage(Rendering rend) {
+        return _i;
+    }
+
+    @Override public Image toImage(Rendering rend, int width, int height) {
+        return _i.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+    }
+
     @Override public Plane scale(float scale) {
         return scale(scale, true);
     }
@@ -103,6 +111,10 @@ public class BufferedImagePlane extends AbstractPlane implements java.io.Seriali
     }
 
     @Override public BufferedImage toBufferedImage() {
+        return _i;
+    }
+
+    @Override public BufferedImage toBufferedImage(Rendering rend) {
         return _i;
     }
 

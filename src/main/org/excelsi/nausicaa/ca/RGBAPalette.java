@@ -19,9 +19,10 @@ import java.awt.image.*;
 import javax.imageio.*;
 
 
-public final class RGBAPalette implements Palette {
+public class RGBAPalette implements Palette {
     public int getColorCount() {
-        return 16777216;
+        //return 4294967296;
+        return 2147483647;
     }
 
     public int[] getColors() {
@@ -33,11 +34,16 @@ public final class RGBAPalette implements Palette {
     }
 
     public boolean isBlack(int idx) {
-        return idx==0;
+        return (idx & Colors.ALPHA_MASK) == 0 || (idx & Colors.COLOR_MASK) == 0;
     }
 
     public int[][] unpack() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override public int[] unpack(int idx, int[] rgba) {
+        Colors.unpack(idx, rgba);
+        return rgba;
     }
 
     public Palette replace(int index, int newColor) {
@@ -54,6 +60,10 @@ public final class RGBAPalette implements Palette {
 
     public Palette ensureCapacity(int colorCount, Random r) {
         return this;
+    }
+
+    public boolean hasColormap() {
+        return false;
     }
 
     public Map<Integer,Integer> buildColormap() {

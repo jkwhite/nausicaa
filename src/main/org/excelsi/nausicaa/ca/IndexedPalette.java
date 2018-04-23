@@ -21,10 +21,11 @@ import javax.imageio.*;
 
 public final class IndexedPalette implements Palette {
     private final int[] _colors;
-
+    private final int[][] _unpacked;
 
     public IndexedPalette(final int... colors) {
         _colors = colors.clone();
+        _unpacked = unpack(_colors);
     }
 
     public IndexedPalette(final List<Integer> colors) {
@@ -32,10 +33,12 @@ public final class IndexedPalette implements Palette {
         for(int i=0;i<_colors.length;i++) {
             _colors[i] = colors.get(i);
         }
+        _unpacked = unpack(_colors);
     }
 
     protected IndexedPalette(boolean dummy, final int... colors) {
         _colors = colors;
+        _unpacked = unpack(_colors);
     }
 
     public int getColorCount() {
@@ -56,12 +59,24 @@ public final class IndexedPalette implements Palette {
         return Colors.isBlack(_colors[idx]);
     }
 
+    private static int[][] unpack(int[] colors) {
+        final int[][] u = new int[colors.length][4];
+        for(int i=0;i<u.length;i++) {
+            Colors.unpack(colors[i], u[i]);
+        }
+        return u;
+    }
+
     public int[][] unpack() {
         final int[][] u = new int[_colors.length][4];
         for(int i=0;i<u.length;i++) {
             Colors.unpack(_colors[i], u[i]);
         }
         return u;
+    }
+
+    @Override public int[] unpack(int idx, int[] rgba) {
+        return _unpacked[idx];
     }
 
     public Palette replace(int index, int newColor) {
@@ -119,6 +134,10 @@ public final class IndexedPalette implements Palette {
             }
             return new IndexedPalette(ncolors);
         }
+    }
+
+    public boolean hasColormap() {
+        return true;
     }
 
     public Map<Integer,Integer> buildColormap() {

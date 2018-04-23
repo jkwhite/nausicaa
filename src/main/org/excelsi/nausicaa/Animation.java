@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
 import org.excelsi.nausicaa.ca.Plane;
 import org.excelsi.nausicaa.ca.Pools;
 import org.excelsi.nausicaa.ca.GOptions;
+import org.excelsi.nausicaa.ca.ComputeMode;
 
 
 public class Animation extends Thread implements TimelineListener, ConfigListener {
@@ -170,7 +171,10 @@ top:        while(_state==State.animate) {
                 p = d.getPlane();
             }
             _parallel = parallel;
-            _frames = d.getRule().frameIterator(p, pool, new GOptions(true, _parallel, 0, weight));
+            _frames = d.getRule().frameIterator(p, pool,
+                new GOptions(true, _parallel, 0, weight)
+                    .computeMode(ComputeMode.from(_config.<String>getVariable("rgb_computemode","combined")))
+                );
             _d = d;
         }
 

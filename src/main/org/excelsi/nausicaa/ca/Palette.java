@@ -35,6 +35,8 @@ public interface Palette {
 
     int[][] unpack();
 
+    int[] unpack(int idx, int[] rgba);
+
     Palette replace(int index, int newColor);
 
     IndexColorModel toColorModel();
@@ -42,6 +44,8 @@ public interface Palette {
     Palette matchCapacity(int colorCount, Random r);
 
     Palette ensureCapacity(int colorCount, Random r);
+
+    boolean hasColormap();
 
     Map<Integer,Integer> buildColormap();
 
