@@ -198,8 +198,9 @@ public class SwingPlaneDisplay extends PlaneDisplay {
 
     public void setCA(CA ca, ExecutorService pool, GOptions opt) {
         _c = ca;
-        Rendering.Composition comp = _config.getVariable("composite_mode","firstonly").equals("firstonly")?Rendering.Composition.front:Rendering.Composition.avg;
-        _rend = new Rendering().composition(comp);
+        //Rendering.Composition comp = _config.getVariable("composite_mode","front").equals("firstonly")?Rendering.Composition.front:Rendering.Composition.avg;
+        _rend = new Rendering()
+            .composition(Rendering.Composition.from(_config.getVariable("composite_mode","front")));
         setPlane(_c.createPlane(pool, opt));
         Info i = new Info(_c);
         Rule r = ca.getRule();

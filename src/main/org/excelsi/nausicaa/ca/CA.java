@@ -42,7 +42,7 @@ public final class CA {
     private long _seed;
     private float _weight;
     private ComputeMode _cmode;
-    private static final byte VERSION = 3;
+    private static final byte VERSION = 4;
 
 
     public CA(Rule r, Palette p, Initializer i, Random rand, long seed, int w, int h, int d, int prelude, float weight, int coda, ComputeMode cmode) {
@@ -392,6 +392,7 @@ public final class CA {
         long seed;
         float weight;
         int coda;
+        ComputeMode computeMode;
     }
 
     private static CA fromTextFile(String filename) throws IOException {
@@ -482,6 +483,17 @@ public final class CA {
                 h.seed = Long.parseLong(r.readLine());
                 h.weight = Float.parseFloat(r.readLine());
                 h.coda = Integer.parseInt(r.readLine());
+                h.computeMode = ComputeMode.combined;
+                break;
+            case 4:
+                h.w = Integer.parseInt(r.readLine());
+                h.h = Integer.parseInt(r.readLine());
+                h.d = Integer.parseInt(r.readLine());
+                h.prelude = Integer.parseInt(r.readLine());
+                h.seed = Long.parseLong(r.readLine());
+                h.weight = Float.parseFloat(r.readLine());
+                h.coda = Integer.parseInt(r.readLine());
+                h.computeMode = ComputeMode.from(r.readLine());
                 break;
             default:
                 throw new IOException("unsupported version "+h.version);
@@ -513,6 +525,7 @@ public final class CA {
         w.println(_seed);
         w.println(_weight);
         w.println(_coda);
+        w.println(_cmode);
         w.println("}");
         w.println("palette {");
         _p.write(w);

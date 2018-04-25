@@ -668,8 +668,9 @@ public class NViewer extends JFrame implements UIActions {
         JCheckBoxMenuItem fix = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _init = Initializers.single;
-                _initializer = new SingleInitializer();
-                setActiveCA(getActiveCA().initializer(_initializer));
+                _a.chooseSingle(NViewer.this, _config);
+                //_initializer = new SingleInitializer();
+                //setActiveCA(getActiveCA().initializer(_initializer));
                 hack[0].setState(false);
                 hack[1].setState(true);
                 hack[2].setState(false);
@@ -1117,28 +1118,80 @@ public class NViewer extends JFrame implements UIActions {
         render.add(rgbopt);
 
         JMenu compopt = new JMenu("Composition mode");
-        final JCheckBoxMenuItem[] comphack = new JCheckBoxMenuItem[2];
+        final JCheckBoxMenuItem[] comphack = new JCheckBoxMenuItem[5];
+
         JCheckBoxMenuItem compfirst = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 comphack[0].setState(true);
                 comphack[1].setState(false);
-                _config.setVariable("composite_mode", "firstonly");
+                comphack[2].setState(false);
+                comphack[3].setState(false);
+                comphack[4].setState(false);
+                _config.setVariable("composite_mode", "front");
             }
         });
         compfirst.setText("Nearest only");
         compopt.add(compfirst);
-        JCheckBoxMenuItem compavg = new JCheckBoxMenuItem(new AbstractAction() {
+
+        JCheckBoxMenuItem complast = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 comphack[0].setState(false);
                 comphack[1].setState(true);
-                _config.setVariable("composite_mode", "weightedavg");
+                comphack[2].setState(false);
+                comphack[3].setState(false);
+                comphack[4].setState(false);
+                _config.setVariable("composite_mode", "back");
+            }
+        });
+        complast.setText("Farthest only");
+        compopt.add(complast);
+
+        JCheckBoxMenuItem compavg = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                comphack[0].setState(false);
+                comphack[1].setState(false);
+                comphack[2].setState(true);
+                comphack[3].setState(false);
+                comphack[4].setState(false);
+                _config.setVariable("composite_mode", "wavg");
             }
         });
         compavg.setText("Weighted average");
         compopt.add(compavg);
+
+        JCheckBoxMenuItem compravg = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                comphack[0].setState(false);
+                comphack[1].setState(false);
+                comphack[2].setState(false);
+                comphack[3].setState(true);
+                comphack[4].setState(false);
+                _config.setVariable("composite_mode", "revwavg");
+            }
+        });
+        compravg.setText("Weighted average reverse");
+        compopt.add(compravg);
+
+        JCheckBoxMenuItem comppavg = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                comphack[0].setState(false);
+                comphack[1].setState(false);
+                comphack[2].setState(false);
+                comphack[3].setState(false);
+                comphack[4].setState(true);
+                _config.setVariable("composite_mode", "avg");
+            }
+        });
+        comppavg.setText("Average");
+        compopt.add(comppavg);
+
         comphack[0] = compfirst;
-        comphack[1] = compavg;
-        comphack[_config.getVariable("composite_mode","firstonly").equals("firstonly")?0:1].setState(true);
+        comphack[1] = complast;
+        comphack[2] = compavg;
+        comphack[3] = compravg;
+        comphack[4] = comppavg;
+
+        comphack[0].setState(true);
 
         render.add(compopt);
 

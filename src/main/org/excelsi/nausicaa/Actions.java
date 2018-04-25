@@ -547,6 +547,67 @@ public class Actions {
         d.setVisible(true);
     }
 
+    public void chooseSingle(final NViewer v, Config config) {
+        final JDialog d = new JDialog(v, "Fixed initializer");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(4,2));
+
+        top.add(new JLabel("Color"));
+        final JTextField color = new JTextField();
+        color.setText(config.getVariable("single_color", "-1"));
+        color.setColumns(10);
+        top.add(color);
+
+        top.add(new JLabel("X"));
+        final JTextField cx = new JTextField();
+        cx.setText(config.getVariable("single_x", "-1"));
+        cx.setColumns(10);
+        top.add(cx);
+
+        top.add(new JLabel("Y"));
+        final JTextField cy = new JTextField();
+        cy.setText(config.getVariable("single_y", "-1"));
+        cy.setColumns(10);
+        top.add(cy);
+
+        top.add(new JLabel("Z"));
+        final JTextField cz = new JTextField();
+        cz.setText(config.getVariable("single_z", "-1"));
+        cz.setColumns(10);
+        top.add(cz);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                config.setVariable("single_color", color.getText());
+                config.setVariable("single_x", cx.getText());
+                config.setVariable("single_y", cy.getText());
+                config.setVariable("single_z", cz.getText());
+                v.setInitializer(new SingleInitializer(
+                    Integer.parseInt(color.getText()),
+                    Integer.parseInt(cx.getText()),
+                    Integer.parseInt(cy.getText()),
+                    Integer.parseInt(cz.getText())
+                ));
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
     public void chooseRandom(final NViewer v, Config config) {
         final JDialog d = new JDialog(v, "Random initializer");
         JPanel p = new JPanel(new BorderLayout());

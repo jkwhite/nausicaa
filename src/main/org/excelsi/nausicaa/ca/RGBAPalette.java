@@ -79,6 +79,6 @@ public class RGBAPalette implements Palette {
     }
 
     public void write(PrintWriter w) {
-        throw new UnsupportedOperationException();
+        w.println("rgba");
     }
 }

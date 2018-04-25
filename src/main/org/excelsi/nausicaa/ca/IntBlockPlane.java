@@ -183,16 +183,12 @@ public class IntBlockPlane extends AbstractPlane {
     }
 
     @Override public java.awt.Image toImage(Rendering rend) {
+        final Rendering.Composition comp = rend.composition();
         if(false) {
             return _i;
         }
         else {
-            //final BufferedImage p = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_BYTE_INDEXED, _p.toColorModel());
-            //final WritableRaster r = p.getRaster();
-            //System.err.print(".");
-            //final int[] rgba = new int[4];
-            final int[] rgb = _rgb; //new int[3];
-            //final int[][] unpacked = _unpacked;
+            final int[] rgb = _rgb;
             for(int i=0;i<_w;i++) {
                 for(int j=0;j<_h;j++) {
                     rgb[0]=0;
@@ -201,28 +197,13 @@ public class IntBlockPlane extends AbstractPlane {
                     int mx = 0;
                     if(_d==1) {
                         int idx = getCell(i,j,0);
-                        //if(idx<0) idx=-idx;
-                        //if(idx>_p.getColorCount()) idx = idx % _p.getColorCount();
                         _i.setRGB(i,j,_p.color(idx));
                     }
                     else {
-                        if(rend.composition()==Rendering.Composition.channel) {
-                            //_i.setRGB(i,j,Colors.pack(
-                        }
-                        else {
+                        if(comp==Rendering.Composition.front||comp==Rendering.Composition.wavg) {
                             for(int k=0;k<_d;k++) {
-                                //Colors.unpack(_p.color(getCell(i,j,k)), rgba);
                                 int idx = getCell(i,j,k);
-                                //if(idx<0) idx=-idx;
-                                //if(idx>_p.getColorCount()) idx = idx % _p.getColorCount();
-                                //final int[] u = unpacked[idx];
                                 final int[] u = _p.unpack(idx, _unpack);
-                                //rgb[0] += (_d-k)*rgba[0];
-                                //rgb[1] += (_d-k)*rgba[1];
-                                //rgb[2] += (_d-k)*rgba[2];
-                                //rgb[0] += (_d-k)*u[0];
-                                //rgb[1] += (_d-k)*u[1];
-                                //rgb[2] += (_d-k)*u[2];
                                 float mult = ((_d-k)/(float)_d);
                                 rgb[0] += (int)(mult*u[0]);
                                 rgb[1] += (int)(mult*u[1]);
@@ -232,6 +213,36 @@ public class IntBlockPlane extends AbstractPlane {
                                 if(rend.composition()==Rendering.Composition.front&&(u[0]>0||u[1]>0||u[2]>0)) break;
                             }
                             mx = 1;
+                            _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
+                        }
+                        else if(comp==Rendering.Composition.back||comp==Rendering.Composition.revwavg) {
+                            for(int k=_d-1;k>=0;k--) {
+                                int idx = getCell(i,j,k);
+                                final int[] u = _p.unpack(idx, _unpack);
+                                float mult = ((1+k)/(float)_d);
+                                rgb[0] += (int)(mult*u[0]);
+                                rgb[1] += (int)(mult*u[1]);
+                                rgb[2] += (int)(mult*u[2]);
+                                //if(u[0]>0) System.err.println("k: "+k+", u: "+u[0]+","+u[1]+","+u[2]+", mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
+                                mx += (_d-k);
+                                if(rend.composition()==Rendering.Composition.back&&(u[0]>0||u[1]>0||u[2]>0)) break;
+                            }
+                            mx = 1;
+                            _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
+                        }
+                        else if(comp==Rendering.Composition.avg) {
+                            for(int k=0;k<_d;k++) {
+                                int idx = getCell(i,j,k);
+                                final int[] u = _p.unpack(idx, _unpack);
+                                //float mult = ((1+k)/(float)_d);
+                                rgb[0] += u[0];
+                                rgb[1] += u[1];
+                                rgb[2] += u[2];
+                                //if(u[0]>0) System.err.println("k: "+k+", u: "+u[0]+","+u[1]+","+u[2]+", mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
+                                mx += (_d-k);
+                                //if(rend.composition()==Rendering.Composition.back&&(u[0]>0||u[1]>0||u[2]>0)) break;
+                            }
+                            mx = _d;
                             _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
                         }
                     }

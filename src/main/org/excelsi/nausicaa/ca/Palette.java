@@ -65,12 +65,27 @@ public interface Palette {
     }
 
     public static Palette read(BufferedReader r, int version) throws IOException {
-        int len = Integer.parseInt(r.readLine());
-        int[] colors = new int[len];
-        for(int i=0;i<colors.length;i++) {
-            colors[i] = Integer.parseInt(r.readLine());
+        String type;
+        if(version<4) {
+            type = "indexed";
         }
-        return new IndexedPalette(colors);
+        else {
+            type = r.readLine();
+        }
+        switch(type) {
+            case "indexed":
+                int len = Integer.parseInt(r.readLine());
+                int[] colors = new int[len];
+                for(int i=0;i<colors.length;i++) {
+                    colors[i] = Integer.parseInt(r.readLine());
+                }
+                return new IndexedPalette(colors);
+            case "rgb":
+                return new RGBPalette();
+            case "rgba":
+                return new RGBAPalette();
+        }
+        throw new IllegalStateException("unknown palette type '"+type+"'");
     }
 
     public static Palette random(int numColors, Random rand) {

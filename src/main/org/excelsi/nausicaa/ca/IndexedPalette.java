@@ -156,6 +156,7 @@ public final class IndexedPalette implements Palette {
     }
 
     public void write(PrintWriter w) {
+        w.println("indexed");
         w.println(_colors.length);
         for(int c:_colors) {
             w.println(c);

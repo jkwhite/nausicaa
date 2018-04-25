@@ -85,7 +85,7 @@ public class Worker {
         final int g = next(_chanpattern[1]);
         final int b = next(_chanpattern[2]);
         final int a = next(_chanpattern[3]);
-        return Colors.pack(r,g,b,a);
+        return Colors.packBounded(r,g,b,a);
     }
 
     private final int next(final int[] pattern) {

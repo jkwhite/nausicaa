@@ -5,7 +5,7 @@ import java.util.Random;
 import javafx.scene.paint.Color;
 
 
-public class Colors {
+public final class Colors {
     public static final int BLACK = pack(0,0,0,256);
     public static final int COLOR_MASK = 0x00ffffff;
     public static final int ALPHA_MASK = 0xff000000;
@@ -15,13 +15,22 @@ public class Colors {
         return c | ALPHA_MASK;
     }
 
+    public static int bound(int c) {
+        c = c % 256;
+        if(c<0) c = 256 + c;
+        return c;
+    }
+
     public static int pack(int r, int g, int b) {
         return pack(r, g, b, 255);
     }
 
     public static int pack(int r, int g, int b, int a) {
-        //return a+(r<<8)+(g<<16)+(b<<24);
         return b|(g<<8)|(r<<16)|(a<<24);
+    }
+
+    public static int packBounded(int r, int g, int b, int a) {
+        return bound(b)|(bound(g)<<8)|(bound(r)<<16)|(bound(a)<<24);
     }
 
     public static int[] unpack(int c) {
