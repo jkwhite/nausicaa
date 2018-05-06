@@ -160,6 +160,15 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         }, _show?0:500);
     }
 
+    public void pickRandom() {
+        if(_displays.length==1) {
+            tick(_displays[0], true);
+        }
+        else {
+            tick(_displays[_random.nextInt(_displays.length)]);
+        }
+    }
+
     public void tick(Rule r) {
         //Branch<World> child = getBranch().grow(new World(r, World.getSize(), World.getSize()), "");
         //addBranch(child);
@@ -174,6 +183,10 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     }
 
     private void tick(final PlaneDisplay d) {
+        tick(d, false);
+    }
+
+    private void tick(final PlaneDisplay d, final boolean mutate) {
         //Branch<World> child = getBranch().grow(new World(d.getRule(), World.getSize(), World.getSize()), "");
         //addBranch(child);
         //_timeline.notifyListeners(new TimelineEvent("tick"));
@@ -192,8 +205,12 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                 }
                 NViewer.getUIActions().doWait(new Runnable() {
                     public void run() {
-                        //_ca = mutate(_ca);
-                        _ca = d.getCA();
+                        if(mutate) {
+                            _ca = mutate(d.getCA());
+                        }
+                        else {
+                            _ca = d.getCA();
+                        }
                         _config.setWeight(_ca.getWeight());
                         reroll(_lastInit);
                         //_timeline.notifyListeners(new TimelineEvent("tock"));
@@ -366,12 +383,14 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         }
     }
 
+    /*
     private Rule createMutation(Rule root) {
         System.err.println("orig: "+root);
         Rule m = root.origin().random(_random).next();
         System.err.println("mut: "+m);
         return m;
     }
+    */
 
     public void setShow(boolean show) {
         if(_show!=show) {

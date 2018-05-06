@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadFactory;
 
 
 public class Pools {
-    private static final ExecutorService ADHOC = Executors.newFixedThreadPool(1, new ThreadFactory() {
+    private static final ExecutorService ADHOC = Executors.newFixedThreadPool(4, new ThreadFactory() {
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r);
             t.setDaemon(true);

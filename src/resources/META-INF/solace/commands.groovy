@@ -28,7 +28,7 @@ init_random = { rnd=__random__, seed=19771026, zero=0 ->
     new RandomInitializer(rnd, seed, new RandomInitializer.Params(zero))
 }
 
-ca = { dims, rule, pal=null, init=null ->
+ca = { dims, rule, pal=null, init=null, prelude=0, weight=1f ->
     if(pal==null) {
         p = Palette.random(rule.archetype().colors(), __random__);
     }
@@ -36,12 +36,12 @@ ca = { dims, rule, pal=null, init=null ->
         p = pal
     }
     else {
-        p = new Palette(pal.collect { Colors.fromString(it) })
+        p = new IndexedPalette(pal.collect { Colors.fromString(it) })
     }
     if(init==null) {
         init = Initializers.random.create()
     }
-    def c = new CA(rule, p, init, __random__, __random__.nextInt(), dims[0], dims[1], dims.size()>2?dims[2]:1, 0);
+    def c = new CA(rule, p, init, __random__, __random__.nextInt(), dims[0], dims[1], dims.size()>2?dims[2]:1, prelude, weight, 0, ComputeMode.channel);
     //rule.init(c, Rule.Initialization.single);
     //rule.generate(c, 1, hei, false, false, null);
     //c.rule = rule;
@@ -95,7 +95,7 @@ org.excelsi.nausicaa.ca.CA.metaClass.evolve = { epicycles, cycles, subcycles, po
 org.excelsi.nausicaa.ca.CA.metaClass.stats = { depth=1 ->
     def c = delegate.size(delegate.width, delegate.height, depth)
     def p = c.createPlane()
-    def np = c.rule.frameIterator(p, Pools.bgr(), false).next()
+    def np = c.rule.frameIterator(p, Pools.adhoc(), false).next()
     def ms = Stats.forPlane(p).compareWith(Stats.forPlane(np))
 }
 
@@ -141,7 +141,7 @@ $r.register(
         Node render(Object o, Painter p, JfxRendererRegistry renderers) {
             Plane init = o.getCA().createPlane();
             Node img = renderers.render(init.toJfxImage(), p);
-            Iterator fr = o.getCA().getRule().frameIterator(init, Pools.bgr(), true)
+            Iterator fr = o.getCA().getRule().frameIterator(init, Pools.adhoc(), new GOptions())
             Runnable r = new Runnable() {
                 public void run() {
                     Thread.sleep(250)
@@ -154,11 +154,11 @@ $r.register(
                         }
                     })
                     if(img.isVisible()) {
-                        Pools.bgr().submit(this)
+                        Pools.adhoc().submit(this)
                     }
                 }
             };
-            Pools.bgr().submit(r)
+            Pools.adhoc().submit(r)
             return img;
         }
     })
@@ -213,3 +213,13 @@ pal_grey = { d ->
     pal
 }
 
+new_ca = { d=1, c=2, s=1, dims=[200,200,1], pal=null, init=null ->
+    ca(dims, rules(d,s,c).random(__random__).next(), pal, init)
+}
+
+load_ca = { f ->
+    CA.fromTextFile(f)
+}
+
+incant = { s ->
+}

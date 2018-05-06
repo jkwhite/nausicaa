@@ -13,17 +13,19 @@ public class SingleInitializer implements Initializer {
     private final int _y;
     private final int _z;
     private final int _color;
+    private final int _size;
 
 
     public SingleInitializer() {
-        this(-1, -1, -1, 1);
+        this(-1, -1, -1, 1, 1);
     }
 
-    public SingleInitializer(int color, int x, int y, int z) {
+    public SingleInitializer(int color, int x, int y, int z, int size) {
         _color = color;
         _x = x;
         _y = y;
         _z = z;
+        _size = size;
     }
 
     public void init(Plane plane, Rule rule, Random random) {
@@ -33,6 +35,10 @@ public class SingleInitializer implements Initializer {
                 for(int x=0;x<plane.getWidth();x++) {
                     plane.setCell(x, 0, 0);
                 }
+                //int cx = coordX(plane, _x);
+                //int sx = cx - _size/2;
+                //int ex = cx + _size/2;
+                //fill(plane, sx, ex, 0, 0, color(colors, random, _color));
                 plane.setCell(coordX(plane, _x), 0, color(colors, random, _color));
                 break;
             case 2:
@@ -67,6 +73,7 @@ public class SingleInitializer implements Initializer {
         w.println(_x);
         w.println(_y);
         w.println(_z);
+        w.println(_size);
     }
 
     private int coordX(Plane p, int v) {
@@ -91,6 +98,7 @@ public class SingleInitializer implements Initializer {
         }
         else {
             return new SingleInitializer(
+                Integer.parseInt(r.readLine()),
                 Integer.parseInt(r.readLine()),
                 Integer.parseInt(r.readLine()),
                 Integer.parseInt(r.readLine()),

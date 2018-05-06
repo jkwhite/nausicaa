@@ -74,6 +74,10 @@ public class NViewer extends JFrame implements UIActions {
         _futures.setCA(ca);
     }
 
+    public void pickRandom() {
+        _futures.pickRandom();
+    }
+
     public void setInitializer(Initializer initializer) {
         _initializer = initializer;
         setActiveCA(getActiveCA().initializer(_initializer));
@@ -604,7 +608,7 @@ public class NViewer extends JFrame implements UIActions {
     }
 
     private void createAutomataMenu(int shortcut, JMenuBar bar) {
-        final JCheckBoxMenuItem[] hack = new JCheckBoxMenuItem[7];
+        final JCheckBoxMenuItem[] hack = new JCheckBoxMenuItem[8];
         JMenu auto = new JMenu("Automata");
 
         //AbstractAction opentab = new AbstractAction() {
@@ -656,6 +660,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[4].setState(false);
                 hack[5].setState(false);
                 hack[6].setState(false);
+                hack[7].setState(false);
                 //_a.generate(NViewer.this);
             }
         });
@@ -678,6 +683,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[4].setState(false);
                 hack[5].setState(false);
                 hack[6].setState(false);
+                hack[7].setState(false);
                 //_a.generate(NViewer.this);
             }
         });
@@ -699,6 +705,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[4].setState(false);
                 hack[5].setState(false);
                 hack[6].setState(false);
+                hack[7].setState(false);
                 //hack[3].setState(false);
                 //_a.generate(NViewer.this);
             }
@@ -721,6 +728,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[4].setState(false);
                 hack[5].setState(false);
                 hack[6].setState(false);
+                hack[7].setState(false);
                 //_a.generate(NViewer.this);
             }
         });
@@ -773,6 +781,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[4].setState(true);
                 hack[5].setState(false);
                 hack[6].setState(false);
+                hack[7].setState(false);
                 //_a.generate(NViewer.this);
             }
         });
@@ -795,6 +804,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[4].setState(false);
                 hack[5].setState(true);
                 hack[6].setState(false);
+                hack[7].setState(false);
                 //_a.generate(NViewer.this);
             }
         });
@@ -808,8 +818,6 @@ public class NViewer extends JFrame implements UIActions {
             public void actionPerformed(ActionEvent e) {
                 _init = Initializers.random;
                 _a.chooseCAInitializer(NViewer.this, _config);
-                //_initializer = new RandomInitializer();
-                //setActiveCA(getActiveCA().initializer(_initializer));
                 hack[0].setState(false);
                 hack[1].setState(false);
                 hack[2].setState(false);
@@ -817,7 +825,7 @@ public class NViewer extends JFrame implements UIActions {
                 hack[4].setState(false);
                 hack[5].setState(false);
                 hack[6].setState(true);
-                //_a.generate(NViewer.this);
+                hack[7].setState(false);
             }
         });
         auto.add(cai);
@@ -825,6 +833,26 @@ public class NViewer extends JFrame implements UIActions {
         cai.setText("CA initial state ...");
         cai.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcut));
         cai.setState(_init==Initializers.ca);
+
+        JCheckBoxMenuItem custi = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _init = Initializers.custom;
+                _a.chooseCustomInitializer(NViewer.this, _config);
+                hack[0].setState(false);
+                hack[1].setState(false);
+                hack[2].setState(false);
+                hack[3].setState(false);
+                hack[4].setState(false);
+                hack[5].setState(false);
+                hack[6].setState(false);
+                hack[7].setState(true);
+            }
+        });
+        auto.add(custi);
+        hack[7] = custi;
+        custi.setText("Custom initial state ...");
+        //cai.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcut));
+        custi.setState(_init==Initializers.custom);
 
         auto.addSeparator();
 
@@ -1082,6 +1110,15 @@ public class NViewer extends JFrame implements UIActions {
         });
         mutate.add(evolver);
         evolver.setText("Evolver ...");
+
+        mutate.addSeparator();
+        JMenuItem automode = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.automutate(NViewer.this);
+            }
+        });
+        mutate.add(automode);
+        automode.setText("Toggle auto mutate");
 
         bar.add(mutate);
     }

@@ -5,6 +5,8 @@ import java.awt.image.*;
 import java.awt.Image;
 import java.io.*;
 import javafx.scene.image.WritableImage;
+import javafx.embed.swing.SwingFXUtils;
+    
 
 
 public class IntBlockPlane extends AbstractPlane {
@@ -269,11 +271,13 @@ public class IntBlockPlane extends AbstractPlane {
     }
 
     @Override public javafx.scene.image.Image toJfxImage() {
-        throw new UnsupportedOperationException();
+        return SwingFXUtils.toFXImage(toBufferedImage(), null);
+        //throw new UnsupportedOperationException();
     }
 
     @Override public javafx.scene.image.Image toJfxImage(WritableImage jfxImage) {
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
+        return SwingFXUtils.toFXImage(toBufferedImage(), jfxImage);
     }
 
     @Override public CA creator() {

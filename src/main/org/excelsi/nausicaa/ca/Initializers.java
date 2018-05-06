@@ -15,7 +15,8 @@ public enum Initializers {
     image((byte)4),
     gaussian((byte)5),
     clusteredgaussian((byte)6),
-    ca((byte)7);
+    ca((byte)7),
+    custom((byte)8);
 
     private final byte _id;
 
@@ -41,6 +42,8 @@ public enum Initializers {
                 return new GaussianInitializer();
             case clusteredgaussian:
                 return new ClusteredGaussianInitializer();
+            case custom:
+                return new CustomInitializer();
             case ca:
                 return new CAInitializer();
             case random:
@@ -76,6 +79,8 @@ public enum Initializers {
                 return ClusteredGaussianInitializer.read(r, v);
             case "ca":
                 return CAInitializer.read(r, v);
+            case "custom":
+                return CustomInitializer.read(r, v);
             case "random":
                 return RandomInitializer.read(r, v);
             default:

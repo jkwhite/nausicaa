@@ -551,7 +551,7 @@ public class Actions {
         final JDialog d = new JDialog(v, "Fixed initializer");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(4,2));
+        JPanel top = new JPanel(new GridLayout(5,2));
 
         top.add(new JLabel("Color"));
         final JTextField color = new JTextField();
@@ -577,6 +577,12 @@ public class Actions {
         cz.setColumns(10);
         top.add(cz);
 
+        top.add(new JLabel("Size"));
+        final JTextField sz = new JTextField();
+        sz.setText(config.getVariable("single_size", "1"));
+        sz.setColumns(10);
+        top.add(sz);
+
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
         JButton ne = new JButton("Ok");
@@ -589,11 +595,13 @@ public class Actions {
                 config.setVariable("single_x", cx.getText());
                 config.setVariable("single_y", cy.getText());
                 config.setVariable("single_z", cz.getText());
+                config.setVariable("single_size", sz.getText());
                 v.setInitializer(new SingleInitializer(
                     Integer.parseInt(color.getText()),
                     Integer.parseInt(cx.getText()),
                     Integer.parseInt(cy.getText()),
-                    Integer.parseInt(cz.getText())
+                    Integer.parseInt(cz.getText()),
+                    Integer.parseInt(sz.getText())
                 ));
             }
         });
@@ -630,6 +638,43 @@ public class Actions {
                 d.dispose();
                 config.setVariable("random_zeroweight", zeroWeight.getText());
                 v.setInitializer(new RandomInitializer(null, 0, new RandomInitializer.Params(Float.parseFloat(zeroWeight.getText()))));
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
+    public void chooseCustomInitializer(final NViewer v, Config config) {
+        final JDialog d = new JDialog(v, "Custom initializer");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(2,2));
+
+        top.add(new JLabel("Variables"));
+        top.add(new JLabel("a: archetype; i: image; r: random"));
+        top.add(new JLabel("Rule"));
+        final JTextArea rule = new JTextArea(10, 40);
+        rule.setText(config.getVariable("custom_rule", ""));
+        //zeroWeight.setColumns(10);
+        top.add(rule);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                config.setVariable("custom_rule", rule.getText());
+                v.setInitializer(new CustomInitializer(rule.getText()));
             }
         });
         bot.add(ne);
@@ -1081,6 +1126,30 @@ public class Actions {
         d.setSize(dim);
         Things.centerWindow(d);
         d.setVisible(true);
+    }
+
+    private Thread _automutate;
+    public void automutate(NViewer v) {
+        if(_automutate==null) {
+            _automutate = new Thread() {
+                @Override public void run() {
+                    while(!Thread.currentThread().isInterrupted()) {
+                        v.pickRandom();
+                        try {
+                            Thread.sleep(30000);
+                        }
+                        catch(InterruptedException e) {
+                            break;
+                        }
+                    }
+                }
+            };
+            _automutate.start();
+        }
+        else {
+            _automutate.interrupt();
+            _automutate = null;
+        }
     }
 
     public void evolver(NViewer v, Random random) {
