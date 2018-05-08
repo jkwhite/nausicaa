@@ -16,7 +16,7 @@ public class Noise extends AbstractMutator {
     }
 
     @Override public Rule mutate(Rule r) {
-        return new ComputedRule2d(new ComputedPattern(r.archetype(), ComputedPattern.random(r.archetype(), _om)));
+        return new ComputedRule2d(new ComputedPattern(r.archetype(), ComputedPattern.random(r.archetype(), new Datamap(), _om)));
     }
 
     @Override public boolean supports(Rule r) {

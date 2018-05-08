@@ -176,7 +176,7 @@ public class SequencePattern implements Pattern, Mutatable {
                     for(SEntry s:_s) {
                         ns.add(new SEntry(s.t, (ComputedPattern)s.p.copy()));
                     }
-                    ns.add(new SEntry(m.random().nextInt(70)+70, new ComputedPattern(a, ComputedPattern.random(a, m.random()))));
+                    ns.add(new SEntry(m.random().nextInt(70)+70, new ComputedPattern(a, ComputedPattern.random(a, new Datamap(), m.random()))));
                     break;
                 case "remove":
                     for(int i=0;i<_s.size();i++) {

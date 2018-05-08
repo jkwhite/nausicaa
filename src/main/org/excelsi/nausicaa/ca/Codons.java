@@ -50,6 +50,7 @@ public class Codons {
     public static final String MAX_N = "ri";
     public static final String SKIP = "ro";
     public static final String NON_ZERO = "zu";
+    public static final String DATA = "da";
     public static final String DUPLICATE = "do";
     public static final String EXCLAMATORY = "ha";
     public static final String HISTO = "hi";
@@ -59,9 +60,11 @@ public class Codons {
     public static final String LT = "bu";
     public static final String GT = "be";
     public static final String NEGATE = "bo";
+    public static final String PUSH_CARDINAL = "pa";
+    public static final String EQUAL_A = "po";
 
 
-    public static Codon codon(final String s, final Archetype a) {
+    public static Codon codon(final String s, final Implicate im) {
         //System.err.println("op '"+s+"'");
         int i=0;
         for(;i<s.length()&&Character.isAlphabetic(s.charAt(i));i++);
@@ -72,111 +75,121 @@ public class Codons {
             p = Integer.parseInt(s.substring(i));
         }
         //System.err.println("arg '"+p+"'");
-        switch(code) {
-            case SUM:
-                return p==-1?new Sum():new Sumn(p);
-            case SUM_N:
-                return new SumnN();
-            case PUSH:
-                return new Push(p, a.sourceLength());
-            case PUSH_N:
-                return new PushN();
-            case PUSH_S:
-                return new PushS();
-            case MOD:
-                return new Mod();
-            case PUSH_SURROUND:
-                return new PushO();
-            case PUSH_ALL:
-                return new PushA();
-            case PUSH_ALL_ROT:
-                return new PushARot();
-            case INTERSECT:
-                return new Intersects();
-            case NOT_INTERSECT:
-                return new NotIntersects();
-            case INTERSECT_S:
-                return new IntersectsSelf();
-            case CONS:
-                return new Constant(p);
-            case EQUAL:
-                return new Equals();
-            case NOT_EQUAL:
-                return new NotEquals();
-            case IF:
-                return new If();
-            case SUBTRACT:
-                return new Subtract();
-            case MULTIPLY:
-                return new Multiply();
-            case DIVIDE:
-                return new Divide();
-            case POW:
-                return new Pow();
-            case MIN:
-                return new Min(p);
-            case MAX:
-                return new Max(p);
-            case AVG:
-                return new Avg(p);
-            case MIN_N:
-                return new MinN();
-            case MAX_N:
-                return new MaxN();
-            case AVG_N:
-                return new AvgN();
-            case XOR:
-                return new Xor();
-            case AND:
-                return new And();
-            case OR:
-                return new Or();
-            case ROT_RIGHT:
-                return new Rotright();
-            case ROT_LEFT:
-                return new Rotleft();
-            case SKIP:
-                return new Skip(p);
-            case SKIP_N:
-                return new SkipN();
-            case NON_ZERO:
-                return new Nonzero(p);
-            case TIME:
-                return new Time();
-            case HISTO:
-                return new Histo(a.colors());
-            case DUPLICATE:
-                return new Duplicate();
-            case EXCLAMATORY:
-                return new Exclamatory();
-            case SUPERSYMMETRY:
-                return new Supersymmetry(a.colors()-1);
-            case ROT_VEC_N:
-                return new RotVecN(a.sourceLength());
-            case GT:
-                return new GreaterThan();
-            case LT:
-                return new LessThan();
-            case NEGATE:
-                return new Negate();
-            case LESSER:
-                return new Lesser();
-            case GREATER:
-                return new Greater();
-            case SQRT:
-                return new Sqrt();
-            case CBRT:
-                return new Cbrt();
-            case FORK:
-                return new Fork(p, 10, a.colors()-1);
-            case STOP:
-                return new Stop();
-            case POS:
-                return new Pos();
-            case NOT:
-                return new Not();
-            default:
-                throw new IllegalStateException("unknown opcode '"+code+"'");
+        if(code.startsWith(DATA)) {
+            final String name = code.substring(DATA.length());
+            return new Data(name, im.datamap().find(name));
+        }
+        else {
+            switch(code) {
+                case SUM:
+                    return p==-1?new Sum():new Sumn(p);
+                case SUM_N:
+                    return new SumnN();
+                case PUSH:
+                    return new Push(p, im.archetype().sourceLength());
+                case PUSH_N:
+                    return new PushN();
+                case PUSH_SURROUND:
+                    return new PushO();
+                case PUSH_S:
+                    return new PushS();
+                case MOD:
+                    return new Mod();
+                case PUSH_CARDINAL:
+                    return new PushC();
+                case PUSH_ALL:
+                    return new PushA();
+                case PUSH_ALL_ROT:
+                    return new PushARot();
+                case INTERSECT:
+                    return new Intersects();
+                case NOT_INTERSECT:
+                    return new NotIntersects();
+                case INTERSECT_S:
+                    return new IntersectsSelf();
+                case CONS:
+                    return new Constant(p);
+                case EQUAL:
+                    return new Equals();
+                case EQUAL_A:
+                    return new EqualsA(p);
+                case NOT_EQUAL:
+                    return new NotEquals();
+                case IF:
+                    return new If();
+                case SUBTRACT:
+                    return new Subtract();
+                case MULTIPLY:
+                    return new Multiply();
+                case DIVIDE:
+                    return new Divide();
+                case POW:
+                    return new Pow();
+                case MIN:
+                    return new Min(p);
+                case MAX:
+                    return new Max(p);
+                case AVG:
+                    return new Avg(p);
+                case MIN_N:
+                    return new MinN();
+                case MAX_N:
+                    return new MaxN();
+                case AVG_N:
+                    return new AvgN();
+                case XOR:
+                    return new Xor();
+                case AND:
+                    return new And();
+                case OR:
+                    return new Or();
+                case ROT_RIGHT:
+                    return new Rotright();
+                case ROT_LEFT:
+                    return new Rotleft();
+                case SKIP:
+                    return new Skip(p);
+                case SKIP_N:
+                    return new SkipN();
+                case NON_ZERO:
+                    return new Nonzero(p);
+                case TIME:
+                    return new Time();
+                case HISTO:
+                    return new Histo(im.archetype().colors());
+                case DUPLICATE:
+                    return new Duplicate();
+                case EXCLAMATORY:
+                    return new Exclamatory();
+                case SUPERSYMMETRY:
+                    return new Supersymmetry(im.archetype().colors()-1);
+                case ROT_VEC_N:
+                    return new RotVecN(im.archetype().sourceLength());
+                case GT:
+                    return new GreaterThan();
+                case LT:
+                    return new LessThan();
+                case NEGATE:
+                    return new Negate();
+                case LESSER:
+                    return new Lesser();
+                case GREATER:
+                    return new Greater();
+                case SQRT:
+                    return new Sqrt();
+                case CBRT:
+                    return new Cbrt();
+                case FORK:
+                    return new Fork(p, 10, im.archetype().colors()-1);
+                case STOP:
+                    return new Stop();
+                case POS:
+                    return new Pos();
+                case NOT:
+                    return new Not();
+                default:
+                    throw new IllegalStateException("unknown opcode '"+code+"'");
+            }
         }
     }
 
@@ -788,6 +801,41 @@ public class Codons {
         }
     }
 
+    public static class PushC implements Codon {
+        @Override public String code() {
+            return PUSH_CARDINAL;
+        }
+
+        @Override public Codon copy() {
+            return new PushC();
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
+        @Override public boolean symmetric() { return false; }
+
+        @Override public void op(int[] p, Tape t) {
+            //t.pushAll(p, p.length);
+            //int n = p[p.length/2]%p.length; //t.pop() % p.length;
+            //if(n<0) n=-n;
+            //t.pushAll(p, p.length-n, n);
+            //t.pushAll(p, n);
+            if(p.length==9) {
+                t.push(p[5]);
+                t.push(p[7]);
+                t.push(p[3]);
+                t.push(p[1]);
+            }
+            else {
+                for(int i=1;i<p.length;i+=2) {
+                    t.push(p[i]);
+                }
+            }
+        }
+    }
+
     public static class PushARot implements Codon {
         @Override public Codon copy() {
             return new PushARot();
@@ -895,6 +943,53 @@ public class Codons {
             int v2 = t.pop();
             int eq = (v1==v2)?1:0;
             t.push(eq);
+        }
+    }
+
+    public static class EqualsA implements Codon {
+        private final int _c;
+        private final int[] _s1;
+        private final int[] _s2;
+
+
+        public EqualsA(int c) {
+            _c = c;
+            _s1 = new int[_c<0?0:_c];
+            _s2 = new int[_c<0?0:_c];
+        }
+
+        @Override public Codon copy() {
+            return new EqualsA(_c);
+        }
+
+        @Override public String generate(Random r) {
+            return EQUAL_A+(_c==-1?r.nextInt(9):_c);
+        }
+
+        @Override public String code() {
+            return EQUAL_A;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            t.popAll(_s1, _c);
+            t.popAll(_s2, _c);
+            //debug("comparing "+_c);
+            //for(int i=0;i<_c;i++) {
+                //debug("arr 0: "+i+":"+_s1[i]);
+                //debug("arr 0: "+i+":"+_s2[i]);
+            //}
+            boolean e = Arrays.equals(_s1, _s2);
+            //if(e) {
+                //debug("############################# pushing "+e);
+            //}
+            //else {
+                //debug("pushing "+e);
+            //}
+            t.push(e?1:0);
         }
     }
 
@@ -1286,6 +1381,7 @@ public class Codons {
             int fl = t.pop();
             int tr = t.pop();
             int res = cond!=0?tr:fl;
+            //if(true||cond!=0) debug("!!!!!!!! "+cond+" "+tr+" "+fl);
             t.push(res);
         }
     }
@@ -1423,4 +1519,35 @@ public class Codons {
         }
     }
 
+    public static class Data implements Codon {
+        private final String _name;
+        private final Index _i;
+        private final int[] _s;
+
+        public Data(String name, Index idx) {
+            _name = name;
+            _i = idx;
+            _s = new int[idx.size()];
+        }
+
+        @Override public Codon copy() { return new Data(_name, _i); }
+
+        @Override public String code() {
+            return DATA+_name;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            for(int i=0;i<_s.length;i++) {
+                _s[i] = t.pop();
+            }
+            int r = _i.find(_s);
+            if(r!=-1) {
+                t.push(r);
+            }
+        }
+    }
 }

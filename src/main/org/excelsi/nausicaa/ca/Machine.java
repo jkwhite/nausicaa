@@ -6,22 +6,24 @@ import java.util.Random;
 
 public class Machine {
     private final Archetype _a;
+    private final Datamap _d;
     private final Genome _g;
     private final Codon[] _prg;
     private final int[] _inst;
     private final Tape _t;
 
 
-    public Machine(Archetype a, Genome g) {
+    public Machine(Archetype a, Datamap d, Genome g) {
         _a = a;
+        _d = d;
         _g = g;
-        _prg = g.codons(a);
+        _prg = g.codons(new Implicate(a, d));
         _inst = new int[_prg.length];
         _t = new Tape(32768);
     }
 
     public Machine copy() {
-        return new Machine(_a, _g);
+        return new Machine(_a, _d, _g);
     }
 
     public int compute(final int[] p) {
@@ -44,7 +46,7 @@ public class Machine {
     }
 
     public Machine mutate(Archetype a, GenomeFactory gf, MutationFactor m) {
-        return new Machine(_a, _g.mutate(_a, gf, m));
+        return new Machine(_a, _d, _g.mutate(new Implicate(_a, _d), gf, m));
     }
 
     public void tick() {

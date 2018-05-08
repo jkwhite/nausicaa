@@ -23,7 +23,7 @@ public class Collapse extends AbstractMutator {
             throw new MutationFailedException("only 2 colors");
         }
         final Archetype a = r.archetype().asColors(r.archetype().colors()-1);
-        return new ComputedRule2d(new ComputedPattern(a, ComputedPattern.random(a, _om)));
+        return new ComputedRule2d(new ComputedPattern(a, ComputedPattern.random(a, new Datamap(), _om)));
     }
 
     @Override public boolean supports(Rule r) {

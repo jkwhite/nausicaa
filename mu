@@ -18,7 +18,8 @@ uses:
     - gimmal-1.0.jar
     - groovy-all-1.8.9.jar
     - log4j-1.2.15.jar
-    - snakeyaml-1.7.jar
+    #- snakeyaml-1.7.jar
+    - snakeyaml-1.21.jar
     - swingxbuilder-0.1.5.jar
     - swingx-0.9.1.jar
     - batik-1.7.jar

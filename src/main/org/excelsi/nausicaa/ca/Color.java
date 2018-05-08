@@ -24,7 +24,7 @@ public class Color extends AbstractMutator {
 
     @Override public Rule mutate(Rule r) {
         final Archetype a = r.archetype().asColors(1+r.archetype().colors());
-        return new ComputedRule2d(new ComputedPattern(a, ComputedPattern.random(a, _om)));
+        return new ComputedRule2d(new ComputedPattern(a, ComputedPattern.random(a, new Datamap(), _om)));
     }
 
     @Override public boolean supports(Rule r) {

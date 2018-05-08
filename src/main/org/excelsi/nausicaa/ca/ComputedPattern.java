@@ -400,10 +400,10 @@ public final class ComputedPattern implements Pattern, Mutatable {
             });
     }
 
-    public static RuleLogic random(final Archetype a, final Random r) {
+    public static RuleLogic random(final Archetype a, final Datamap d, final Random r) {
         //return new MachineElf(new Machine(new Genome("pO-s-c2-c3-i-pO-s8-c3-eq-p4-if")));
         GenomeFactory gf = new GenomeFactory();
-        return new MachineElf(new Machine(a, gf.generate(a, r)));
+        return new MachineElf(new Machine(a, d, gf.generate(a, r)));
         //return new MachineElf(new Machine(new Genome("pO-s-c2-c3-i-pO-s8-c3-eq-p3-if")));
         //return new MachineElf(new Machine(new Genome("pO-s-c4-c7-i")));
     }

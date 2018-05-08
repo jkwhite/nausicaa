@@ -79,7 +79,7 @@ public final class CA {
             return p;
         }
         else {
-            if(_p.getColorCount()>=127) {
+            if(true||_p.getColorCount()>=127) {
                 Plane p = new IntBlockPlane2d(this, getWidth(), getHeight(), 1, _p);
                 p = populatePlane(p, pool, opt);
                 return p;

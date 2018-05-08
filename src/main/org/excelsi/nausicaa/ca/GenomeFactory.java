@@ -10,6 +10,7 @@ public class GenomeFactory {
     private static final WeightedFactory<Codon> buildFactory(final Archetype a) {
         return new WeightedFactory<Codon>(
             weight(2, new PushO()),
+            weight(1, new PushC()),
             weight(1, new Sum()),
             weight(1, new Sumn(1)),
             weight(1, new SumnN()),
@@ -38,6 +39,7 @@ public class GenomeFactory {
             //weight(2, new Histo(1)),
             //weight(1, new Sumn(-1)),
             weight(1, new Equals()),
+            weight(1, new EqualsA(-1)),
             weight(1, new NotEquals()),
             weight(1, new Intersects()),
             weight(1, new IntersectsSelf()),
@@ -139,7 +141,7 @@ public class GenomeFactory {
         return new Genome(b.toString());
     }
 
-    public Codon randomCodon(final Archetype a, final Random r) {
-        return Codons.codon(buildFactory(a).random(r).generate(r), a);
+    public Codon randomCodon(final Implicate im, final Random r) {
+        return Codons.codon(buildFactory(im.archetype()).random(r).generate(r), im);
     }
 }

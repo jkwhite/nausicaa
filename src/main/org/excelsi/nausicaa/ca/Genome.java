@@ -27,17 +27,17 @@ public final class Genome {
         _v = version;
     }
 
-    public Codon[] codons(Archetype a) {
+    public Codon[] codons(Implicate i) {
         final List<Codon> ops = new ArrayList<>();
         final String sep = _v==1?"-":" ";
         for(final String op:_c.split(sep)) {
-            ops.add(Codons.codon(op, a));
+            ops.add(Codons.codon(op, i));
         }
         return ops.toArray(new Codon[0]);
     }
 
-    public Genome prune(Archetype a) {
-        final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(a)));
+    public Genome prune(Implicate im) {
+        final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(im)));
         //System.err.println("prune init codons: "+cs);
         while(cs.size()>1) {
             if(!cs.get(0).usesPattern()) {
@@ -51,7 +51,7 @@ public final class Genome {
         return fromCodons(cs);
     }
 
-    public Genome mutate(final Archetype a, final GenomeFactory gf, final MutationFactor m) {
+    public Genome mutate(final Implicate im, final GenomeFactory gf, final MutationFactor m) {
         final Random r = m.random();
         final WeightedFactory<Mutator> mf = new WeightedFactory<>(
             new Weight<>(5,
@@ -63,7 +63,7 @@ public final class Genome {
                 // replace
                 (cs)->{
                     int idx = r.nextInt(cs.size());
-                    cs.set(idx, gf.randomCodon(a, r));
+                    cs.set(idx, gf.randomCodon(im, r));
                 }),
             new Weight<>(30,
                 // swap
@@ -82,7 +82,7 @@ public final class Genome {
                 // insert
                 (cs)->{
                     int idx = r.nextInt(cs.size());
-                    cs.add(idx, gf.randomCodon(a, r));
+                    cs.add(idx, gf.randomCodon(im, r));
                 }),
             new Weight<>(20,
                 // duplicate
@@ -121,7 +121,7 @@ public final class Genome {
             new Weight<>(10,
                 // symmetry
                 (cs)->{
-                    symmetry(a, cs);
+                    symmetry(im.archetype(), cs);
                     /*
                     System.err.println("before sym: "+cs);
                     for(int i=0;i<cs.size()&&cs.size()>1;i++) {
@@ -147,7 +147,7 @@ public final class Genome {
             new Weight<>(40,
                 // add
                 (cs)->{
-                    cs.add(gf.randomCodon(a, r));
+                    cs.add(gf.randomCodon(im, r));
                 }),
             new Weight<>(30,
                 // adjust
@@ -172,7 +172,7 @@ public final class Genome {
         int tries = 0;
         Genome child;
         do {
-            child = replicate(a, mf, m);
+            child = replicate(im, mf, m);
             if(tries==999) {
                 System.err.println("failed to mutate "+this);
             }
@@ -181,15 +181,15 @@ public final class Genome {
         return child;
     }
 
-    private Genome replicate(final Archetype a, final WeightedFactory<Mutator> mutators, final MutationFactor mf) {
-        final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(a)));
+    private Genome replicate(final Implicate im, final WeightedFactory<Mutator> mutators, final MutationFactor mf) {
+        final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(im)));
         int max = 1+mf.random().nextInt(Math.max(1,cs.size()/3));
         for(int i=0;i<max;i++) {
             final Mutator m = mutators.random(mf.random());
             m.mutate(cs);
         }
         if(mf.symmetry()) {
-            symmetry(a, cs);
+            symmetry(im.archetype(), cs);
         }
         StringBuilder b = new StringBuilder();
         for(Codon c:cs) {
@@ -198,7 +198,7 @@ public final class Genome {
         }
         b.setLength(b.length()-1);
         try {
-            return fromCodons(cs).prune(a);
+            return fromCodons(cs).prune(im);
         }
         catch(Exception e) {
             throw new IllegalStateException("illegal genome '"+b+"': "+e, e);
