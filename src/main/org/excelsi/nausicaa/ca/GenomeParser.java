@@ -84,7 +84,8 @@ public class GenomeParser {
                 }
                 else if(cg[0].trim().startsWith("da")) {
                     n = cg[0].trim().substring("da".length());
-                    dm.index(n, new Index(grs));
+                    ps.add(new S(0, n, grs));
+                    dm.index(n, new Index(n, grs));
                 }
                 //ps[i] = new S(c, n, grs);
             }
@@ -95,8 +96,13 @@ public class GenomeParser {
 
         SequencePattern.Sequence s = new SequencePattern.Sequence();
         for(S seq:ps) {
-            s.s(seq.c, new ComputedPattern(_a,
-                new ComputedPattern.MachineElf(new Machine(_a, dm, new Genome(seq.g, 2)))));
+            if(seq.n==null) {
+                s.s(seq.c, new ComputedPattern(_a,
+                    new ComputedPattern.MachineElf(new Machine(_a, dm, new Genome(seq.g, 2)))));
+            }
+            else {
+                s.d(seq.n, dm.find(seq.n));
+            }
         }
         SequencePattern sp;
         //if(args.length>1 && args[1] instanceof MutationFactor) {

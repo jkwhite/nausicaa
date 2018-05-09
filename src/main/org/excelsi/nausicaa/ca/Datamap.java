@@ -19,4 +19,13 @@ public class Datamap {
     public Index find(String name) {
         return _m.get(name);
     }
+
+    public Datamap copy() {
+        Datamap d = new Datamap();
+        Map<String,Index> m = new HashMap<>();
+        for(Map.Entry<String,Index> e:_m.entrySet()) {
+            d.index(e.getKey(), e.getValue().copy());
+        }
+        return d;
+    }
 }

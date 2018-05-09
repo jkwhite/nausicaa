@@ -16,6 +16,27 @@ public class Painter {
         return _p;
     }
 
+    public Painter draw(int x, int y, String s) {
+        return draw(x, y, 0, s);
+    }
+
+    public Painter draw(final int x, final int y, final int z, String s) {
+        int i = x, j = y, k = z;
+        for(int d=0;d<s.length();d++) {
+            char c = s.charAt(d);
+            if(c=='\n') {
+                i = x;
+                j++;
+            }
+            else if(Character.isDigit(c)) {
+                int p = Integer.parseInt(""+c);
+                _p.setCell(i, j, k, p);
+            }
+            i++;
+        }
+        return this;
+    }
+
     public Painter dot(int c, int x, int y) {
         return dot(c, x, y, 0);
     }

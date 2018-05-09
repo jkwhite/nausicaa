@@ -54,7 +54,7 @@ public class RuleEditor extends JComponent implements TimelineListener {
         if(_rule instanceof Genomic) {
             rule.setText(((Genomic)_rule).prettyGenome());
         }
-        scr.add(rule);
+        scr.add(new JScrollPane(rule));
         rule.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 if(e.getModifiers()!=0) {
@@ -64,7 +64,7 @@ public class RuleEditor extends JComponent implements TimelineListener {
                     _ui.doWait(new Runnable() {
                         public void run() {
                             String g = rule.getText();
-                            System.err.println("*** FACTOR: "+_f.transition());
+                            //System.err.println("*** FACTOR: "+_f.transition());
                             _ui.setActiveCA(current.mutate(_rule.origin().create(g, 2, _f), _ui.getActiveCA().getRandom()));
                             rule.setText(g);
                             rule.requestFocus();

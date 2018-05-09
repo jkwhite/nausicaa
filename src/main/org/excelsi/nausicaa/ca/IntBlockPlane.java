@@ -67,12 +67,12 @@ public class IntBlockPlane extends AbstractPlane {
 
     @Override public void setCell(int x, int y, int v) {
         setCell(x, y, _writeDepthIdx, v);
-        //throw new UnsupportedOperationException();
     }
 
     public void setCell(int x, int y, int z, int v) {
         //try {
-            _s[x+_hstride*y+_dstride*z] = v;
+            //_s[x+_hstride*y+_dstride*z] = v;
+            _s[normX(x)+_hstride*normY(y)+_dstride*normZ(z)] = v;
             //if(_m==Mode.indexed && z==0) {
                 //_r.setSample(x,y,0,v);
             //}

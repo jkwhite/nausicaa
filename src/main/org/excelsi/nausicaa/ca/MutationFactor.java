@@ -13,6 +13,7 @@ public final class MutationFactor {
     private int _stage;
     private float _transition;
     private boolean _symmetry;
+    private Datamap _data;
 
 
     public MutationFactor() {
@@ -89,6 +90,15 @@ public final class MutationFactor {
 
     public boolean symmetry() {
         return _symmetry;
+    }
+
+    public MutationFactor withDatamap(Datamap dm) {
+        _data = dm;
+        return this;
+    }
+
+    public Datamap datamap() {
+        return _data;
     }
 
     public String toString() {

@@ -240,7 +240,8 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
     }
 
     @Override public String humanize() {
-        StringBuilder b = new StringBuilder(archetype().dims()+"d / "+_p);
+        StringBuilder b = new StringBuilder(archetype().dims()+"d / "
+            +(_p instanceof Humanizable ? ((Humanizable)_p).humanize() : _p.toString()));
         return b.toString();
     }
 
@@ -249,11 +250,11 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
     }
 
     @Override public String genome() {
-        return _p.toString();
+        return _p instanceof Genomic ? ((Genomic)_p).genome() : _p.toString();
     }
 
     @Override public String prettyGenome() {
-        return _p.toString().replace(',','\n');
+        return genome().replace(',','\n');
     }
 
     @Override public String toString() {

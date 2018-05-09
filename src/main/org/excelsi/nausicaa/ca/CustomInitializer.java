@@ -23,6 +23,10 @@ public class CustomInitializer implements Initializer {
         _text = text;
     }
 
+    public String getText() {
+        return _text;
+    }
+
     public void init(Plane plane, Rule rule, Random random) {
         Binding b = new Binding();
         GroovyShell interpreter = new GroovyShell(b);

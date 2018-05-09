@@ -7,7 +7,7 @@ import java.util.Random;
 import java.util.SplittableRandom;
 
 
-public class SequencePattern implements Pattern, Mutatable {
+public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic {
     private static final Random R = new Random();
     private static final int[] OFFSETS = new int[30059];
     static {
@@ -97,12 +97,25 @@ public class SequencePattern implements Pattern, Mutatable {
         return _p[ix].next(pattern, p2);
     }
 
+    @Override public String humanize() {
+        return _s.humanize();
+    }
+
+    @Override public String genome() {
+        return _s.genome();
+    }
+
+    @Override public String prettyGenome() {
+        return _s.prettyGenome();
+    }
+
     @Override public String toString() {
         return _s.humanize();
     }
 
-    public static class Sequence {
+    public static class Sequence implements Humanizable, Genomic {
         private final List<SEntry> _s = new ArrayList<>();
+        private final List<DEntry> _d = new ArrayList<>();
         private int _t;
         private int _i;
 
@@ -114,6 +127,11 @@ public class SequencePattern implements Pattern, Mutatable {
             _s.add(new SEntry(t, p));
             _t = _s.get(0).t;
             _i = 0;
+            return this;
+        }
+
+        public Sequence d(String n, Index i) {
+            _d.add(new DEntry(n, i));
             return this;
         }
 
@@ -144,16 +162,30 @@ public class SequencePattern implements Pattern, Mutatable {
         }
 
         public Sequence copy() {
+            Datamap dm = new Datamap();
+            List<DEntry> nd = new ArrayList<>();
+            for(DEntry d:_d) {
+                nd.add(new DEntry(d.n, d.i));
+                dm.index(d.n, d.i);
+            }
             List<SEntry> ns = new ArrayList<>();
             for(SEntry s:_s) {
-                ns.add(new SEntry(s.t, (ComputedPattern)s.p.copy()));
+                ns.add(new SEntry(s.t, (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm))));
             }
-            return new Sequence(ns);
+            return new Sequence(ns, nd);
         }
 
         //public Sequence mutate(Random r) {
         public Sequence mutate(MutationFactor m) {
             List<SEntry> ns = new ArrayList<>();
+            List<DEntry> nd = new ArrayList<>();
+            Datamap dm = new Datamap();
+            for(DEntry d:_d) {
+                Index idx = (Index) d.i.mutate(m);
+                dm.index(d.n, idx);
+                nd.add(new DEntry(d.n, idx));
+            }
+            m = m.withDatamap(dm);
             switch(m.mode()) {
                 case "normal":
                     System.err.println("stage mutate: "+m.stage()+" of max "+_s.size());
@@ -166,7 +198,7 @@ public class SequencePattern implements Pattern, Mutatable {
                         }
                         else {
                             //System.err.println("COPYING "+i);
-                            np = (ComputedPattern)s.p.copy();
+                            np = (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm));
                         }
                         ns.add(new SEntry(s.t, np));
                     }
@@ -174,19 +206,20 @@ public class SequencePattern implements Pattern, Mutatable {
                 case "add":
                     final Archetype a = _s.get(0).p.archetype();
                     for(SEntry s:_s) {
-                        ns.add(new SEntry(s.t, (ComputedPattern)s.p.copy()));
+                        ns.add(new SEntry(s.t, (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm))));
                     }
-                    ns.add(new SEntry(m.random().nextInt(70)+70, new ComputedPattern(a, ComputedPattern.random(a, new Datamap(), m.random()))));
+                    ns.add(new SEntry(m.random().nextInt(70)+70, new ComputedPattern(a, ComputedPattern.random(a, dm, m.random()))));
                     break;
                 case "remove":
                     for(int i=0;i<_s.size();i++) {
                         if(i!=m.stage()) {
-                            ns.add(new SEntry(m.random().nextInt(70)+70, (ComputedPattern)_s.get(i).p.copy()));
+                            Archetype a2 = _s.get(i).p.archetype();
+                            ns.add(new SEntry(m.random().nextInt(70)+70, (ComputedPattern)_s.get(i).p.copy(new Implicate(a2, dm))));
                         }
                     }
                     break;
             }
-            Sequence news = new Sequence(ns);
+            Sequence news = new Sequence(ns, nd);
             //System.err.println("GOT NEWS: "+news.humanize());
             return news;
         }
@@ -196,12 +229,31 @@ public class SequencePattern implements Pattern, Mutatable {
             _t = _s.get(0).t;
         }
 
-        private Sequence(List<SEntry> s) {
+        private Sequence(List<SEntry> s, List<DEntry> d) {
             _s.addAll(s);
+            _d.addAll(d);
             clear();
         }
 
-        public String humanize() {
+        @Override public String genome() {
+            StringBuilder b = new StringBuilder();
+            for(SEntry s:_s) {
+                b.append(s.t).append(":");
+                b.append(s.p.toString()).append(",");
+            }
+            for(DEntry d:_d) {
+                b.append("da").append(d.n).append(":");
+                b.append(d.i.genome()).append(",");
+            }
+            b.setLength(b.length()-1);
+            return b.toString();
+        }
+
+        @Override public String prettyGenome() {
+            return genome();
+        }
+
+        @Override public String humanize() {
             StringBuilder b = new StringBuilder();
             for(SEntry s:_s) {
                 b.append(s.t).append(":");
@@ -219,6 +271,16 @@ public class SequencePattern implements Pattern, Mutatable {
         public SEntry(int t, ComputedPattern p) {
             this.t = t;
             this.p = p;
+        }
+    }
+
+    private static class DEntry {
+        public final String n;
+        public final Index i;
+
+        public DEntry(String n, Index i) {
+            this.n = n;
+            this.i = i;
         }
     }
 }

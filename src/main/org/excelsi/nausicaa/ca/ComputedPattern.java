@@ -32,8 +32,8 @@ public final class ComputedPattern implements Pattern, Mutatable {
         }
     }
 
-    public ComputedPattern copy() {
-        return new ComputedPattern(_a, _logic.copy());
+    public ComputedPattern copy(Implicate im) {
+        return new ComputedPattern(_a, _logic.copy(im));
     }
 
     @Override public Archetype archetype() {
@@ -262,13 +262,13 @@ public final class ComputedPattern implements Pattern, Mutatable {
 
     @Override public ComputedPattern mutate(MutationFactor m) {
         GenomeFactory gf = new GenomeFactory();
-        return new ComputedPattern(_a, _logic.mutate(_a, gf, m));
+        return new ComputedPattern(_a, _logic.mutate(new Implicate(_a, m.datamap()), gf, m));
     }
 
     public interface RuleLogic {
         int next(int[] pattern);
-        RuleLogic copy();
-        default RuleLogic mutate(Archetype a, GenomeFactory gf, MutationFactor mf) {
+        RuleLogic copy(Implicate im);
+        default RuleLogic mutate(Implicate im, GenomeFactory gf, MutationFactor mf) {
             return this;
         }
         default void tick() {
@@ -296,7 +296,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
             return _a.activate(_r.reduce(pattern));
         }
 
-        @Override public RARule copy() {
+        @Override public RARule copy(Implicate im) {
             return new RARule(_n, _r.copy(), _a.copy());
         }
 
@@ -319,12 +319,12 @@ public final class ComputedPattern implements Pattern, Mutatable {
             return _m.compute(pattern);
         }
 
-        @Override public RuleLogic copy() {
-            return new MachineElf(_m.copy());
+        @Override public RuleLogic copy(Implicate im) {
+            return new MachineElf(_m.copy(im));
         }
 
-        @Override public MachineElf mutate(Archetype a, GenomeFactory gf, MutationFactor m) {
-            return new MachineElf(_m.mutate(a, gf, m));
+        @Override public MachineElf mutate(Implicate im, GenomeFactory gf, MutationFactor m) {
+            return new MachineElf(_m.mutate(im, gf, m));
         }
 
         @Override public void tick() {

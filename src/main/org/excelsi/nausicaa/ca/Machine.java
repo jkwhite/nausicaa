@@ -22,8 +22,8 @@ public class Machine {
         _t = new Tape(32768);
     }
 
-    public Machine copy() {
-        return new Machine(_a, _d, _g);
+    public Machine copy(Implicate im) {
+        return new Machine(_a, im.datamap(), _g);
     }
 
     public int compute(final int[] p) {
@@ -45,8 +45,10 @@ public class Machine {
         return (int) res;
     }
 
-    public Machine mutate(Archetype a, GenomeFactory gf, MutationFactor m) {
-        return new Machine(_a, _d, _g.mutate(new Implicate(_a, _d), gf, m));
+    //public Machine mutate(Archetype a, GenomeFactory gf, MutationFactor m) {
+    public Machine mutate(Implicate im, GenomeFactory gf, MutationFactor m) {
+        //return new Machine(_a, _d, _g.mutate(new Implicate(_a, _d), gf, m));
+        return new Machine(_a, im.datamap(), _g.mutate(im, gf, m));
     }
 
     public void tick() {

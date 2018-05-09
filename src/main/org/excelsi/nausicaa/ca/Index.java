@@ -4,17 +4,21 @@ package org.excelsi.nausicaa.ca;
 import java.util.*;
 
 
-public final class Index {
+public final class Index implements Genomic, Mutatable {
     private enum Expand {
         none,
         rot4
     };
 
+    private final String _genome;
+    private final String _name;
     private final int[] _target;
     private int _size;
 
 
-    public Index(final String g) {
+    public Index(final String name, final String g) {
+        _name = name;
+        _genome = g;
         final int[] n = new int[2];
         int i = 0;
         while(Character.isDigit(g.charAt(i++)));
@@ -54,6 +58,25 @@ public final class Index {
         }
     }
 
+    public Index copy() {
+        return new Index(_name, _genome);
+    }
+
+    @Override public Mutatable mutate(MutationFactor m) {
+        char[] g = _genome.toCharArray();
+        int i=0;
+        while(Character.isDigit(g[i++]));
+        while(!Character.isWhitespace(g[i])) { i++; }
+        for(;i<g.length;i++) {
+            if(Character.isDigit(g[i])
+                && m.random().nextInt(1000)<m.alpha()) {
+                g[i] = (char)(m.random().nextInt(10)+'0');
+                System.err.println("mutated index to '"+g[i]+"' #########");
+            }
+        }
+        return new Index(_name, new String(g));
+    }
+
     public int size() {
         return _size;
     }
@@ -64,6 +87,14 @@ public final class Index {
 
     public int find(int[] src) {
         return find(src[0]+10*src[1]+100*src[2]+1000*src[3]+10000*src[4]);
+    }
+
+    @Override public String genome() {
+        return _genome;
+    }
+
+    @Override public String prettyGenome() {
+        return _genome;
     }
 
     @Override public String toString() {
@@ -84,7 +115,7 @@ public final class Index {
         final int end = i;
         int cur = end;
         int tgt = Integer.parseInt(g.substring(cur-dsize,cur));
-        System.err.println("parsed target '"+g.substring(cur-dsize,cur)+"' for "+tgt);
+        //System.err.println("parsed target '"+g.substring(cur-dsize,cur)+"' for "+tgt);
         //cur -= dsize;
         //int scl = 1;
         //int src = 0;
@@ -101,7 +132,7 @@ public final class Index {
     }
 
     private void source(StringBuilder g, int dsize, int tgt, Expand exp, final Map<Integer,Integer> tmap) {
-        System.err.println("src="+g);
+        //System.err.println("src="+g);
         int ent = g.length()/dsize;
         _size = ent;
         if(ent==5) {
@@ -110,7 +141,7 @@ public final class Index {
             int e = parseInt(g,dsize,2);
             int s = parseInt(g,dsize,3);
             int w = parseInt(g,dsize,4);
-            System.err.println("c="+c+", n="+n+", e="+e+", s="+s+", w="+w+" tgt="+tgt);
+            //System.err.println("c="+c+", n="+n+", e="+e+", s="+s+", w="+w+" tgt="+tgt);
             if(exp==Expand.none) {
                 tmap.put(n+10*w+100*c+1000*e+10000*s, tgt);
             }

@@ -655,15 +655,20 @@ public class Actions {
         final JDialog d = new JDialog(v, "Custom initializer");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(2,2));
+        //JPanel top = new JPanel(new GridLayout(2,2));
+        JPanel top = new JPanel();
 
-        top.add(new JLabel("Variables"));
+        //top.add(new JLabel("Variables"));
         top.add(new JLabel("a: archetype; i: image; r: random"));
-        top.add(new JLabel("Rule"));
+        //top.add(new JLabel("Rule"));
         final JTextArea rule = new JTextArea(10, 40);
-        rule.setText(config.getVariable("custom_rule", ""));
-        //zeroWeight.setColumns(10);
-        top.add(rule);
+        String ruleText = config.getVariable("custom_rule", "");
+        final Initializer in = v.getActiveCA().getInitializer();
+        if(in instanceof CustomInitializer) {
+            ruleText = ((CustomInitializer)in).getText();
+        }
+        rule.setText(ruleText);
+        top.add(new JScrollPane(rule));
 
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
@@ -1501,6 +1506,14 @@ public class Actions {
         a.setWrapStyleWord(false);
         Font f = a.getFont();
         a.setFont(f.deriveFont(Font.ITALIC, f.getSize()-2));
+        return scroll ? new JScrollPane(a) : a;
+    }
+
+    private static JComponent createTextArea(String str, int rows, int cols, boolean scroll) {
+        JTextArea a = new JTextArea(str, rows, cols);
+        a.setEditable(true);
+        a.setLineWrap(false);
+        a.setWrapStyleWord(false);
         return scroll ? new JScrollPane(a) : a;
     }
 
