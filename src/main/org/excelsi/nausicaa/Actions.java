@@ -30,7 +30,7 @@ public class Actions {
         //Things.centerWindow(v);
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(4,2));
+        JPanel top = new JPanel(new GridLayout(5,2));
 
         top.add(new JLabel("Dimensions"));
         final JTextField alpha = new JTextField();
@@ -44,6 +44,37 @@ public class Actions {
         siz.setColumns(3);
         top.add(siz);
 
+        // Neighborhood
+        final Archetype.Neighborhood[] neihack = new Archetype.Neighborhood[1];
+        top.add(new JLabel("Neighborhood"));
+        ButtonGroup nei = new ButtonGroup();
+
+        AbstractAction von = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                neihack[0] = Archetype.Neighborhood.vonneumann;
+            }
+        };
+        JRadioButton rvon = new JRadioButton(von);
+        rvon.setText("von Neumann");
+        nei.add(rvon);
+
+        AbstractAction moo = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                neihack[0] = Archetype.Neighborhood.moore;
+            }
+        };
+        JRadioButton rmoo = new JRadioButton(moo);
+        rmoo.setText("Moore");
+        nei.add(rmoo);
+
+        JPanel neis = new JPanel();
+        neis.add(rvon);
+        neis.add(rmoo);
+        rmoo.setSelected(true);
+        neihack[0] = Archetype.Neighborhood.moore;
+        top.add(neis);
+
+        // Color kind
         final String[] colhack = new String[1];
         final JComponent[] idxhack = new JComponent[2];
         top.add(new JLabel("Kind"));
@@ -82,8 +113,6 @@ public class Actions {
         rindexed.setSelected(true);
         kind.add(rindexed);
         JPanel kinds = new JPanel();
-        //BoxLayout kindb = new BoxLayout(kinds, BoxLayout.Y_AXIS);
-        //kinds.setLayout(kindb);
         kinds.add(rindexed);
         kinds.add(rrgb);
         kinds.add(rrgba);
@@ -125,7 +154,7 @@ public class Actions {
                         pal = Palette.random(colors, rand, true);
                         break;
                 }
-                Archetype a = new Archetype(dims, size, pal.getColorCount());
+                Archetype a = new Archetype(dims, size, pal.getColorCount(), neihack[0]);
                 Ruleset rs = new ComputedRuleset(a);
                 Rule rule = rs.random(rand).next();
                 CA ca = new CA(rule, pal, v.getActiveCA().getInitializer(), rand, 0, v.getConfig().getWidth(), v.getConfig().getHeight(), v.getConfig().getDepth(), v.getConfig().getPrelude(), v.getConfig().getWeight(), 0, ComputeMode.combined);

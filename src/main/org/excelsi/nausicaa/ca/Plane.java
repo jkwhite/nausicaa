@@ -19,7 +19,8 @@ public interface Plane /*extends Pattern*/ {
     int getCell(int x, int y, int z);
     int[] getRow(int[] into, int y, int offset);
     int[] getBlock(int[] into, int x, int y, int dx, int dy, int offset);
-    int[] getCardinal(int[] into, int x, int y, int z, int offset);
+    int[] getCardinal(int[] into, int x, int y, int dx, int dy, int offset);
+    int[] getCardinal(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset);
     void setRow(int[] row, int y);
     java.awt.Image toImage();
     java.awt.Image toImage(Rendering rend);

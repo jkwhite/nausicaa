@@ -14,6 +14,7 @@ public class Worker {
     private final int[] _pow;
     private final float _weight;
     private final float _oWeight;
+    private final boolean _moore;
     private final boolean _useDepth;
     private final boolean _channels;
 
@@ -27,20 +28,21 @@ public class Worker {
         _oWeight = 1f - weight;
         _size = _wp.archetype().size();
         final int colors = _wp.archetype().colors();
-        _prev = new int[(int)Math.pow(2*_size+1, _wp.archetype().dims())];
+        //_prev = new int[(int)Math.pow(2*_size+1, _wp.archetype().dims())];
+        _prev = new int[_wp.archetype().sourceLength()];
         _pattern = new int[_prev.length];
         _chanpattern = new int[4][_prev.length];
         _useDepth = p.archetype().dims()==3;
+        _moore = p.archetype().neighborhood()==Archetype.Neighborhood.moore;
         _channels = cmode==ComputeMode.channel;
-        if(_channels) System.err.println("using by-channel compute mode");
+        //if(_channels) System.err.println("using by-channel compute mode");
 
-        //_pow = new int[_wp.length()];
         _pow = new int[_wp.archetype().sourceLength()];
         for(int i=0;i<_pow.length;i++) {
             _pow[_pow.length-1-i] = (int) Math.pow(colors, i);
-            if(Rand.om.nextInt(100)<0) {
-                _pow[_pow.length-1-i] = _pow[_pow.length-1-i] + (int) (Rand.om.nextGaussian()*_pow[_pow.length-1-i]);
-            }
+            //if(Rand.om.nextInt(100)<0) {
+                //_pow[_pow.length-1-i] = _pow[_pow.length-1-i] + (int) (Rand.om.nextGaussian()*_pow[_pow.length-1-i]);
+            //}
         }
         //System.err.println(String.format("worker dims: %dx%d+%dx%d", _x1, _y1, _x2, _y2));
         //System.err.println(String.format("prev array size: %d, pow array size: %d", _prev.length, _pow.length));
@@ -54,19 +56,17 @@ public class Worker {
         }
     }
 
-    //private static final float WEIGHT = 0.05f;
-    //private static final float WEIGHT = 1.0f;
-    //private static final float O_WEIGHT = 1.0f - WEIGHT;
     public void frame3d(final IntBlockPlane p1, final IntBlockPlane p2) {
         final int d = _size*2+1;
         for(int i=_y1;i<_y2;i++) {
             for(int j=_x1;j<_x2;j++) {
                 for(int k=0;k<p1.getDepth();k++) {
-                    p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
-                    //final int v = _wp.next(0, _pattern);
-                    //final int ov = _pattern[_pattern.length/2];
-                    //final int nv = (int) ((_oWeight*ov)+(_weight*v));
-                    //p2.setCell(j, i, k, nv);
+                    if(_moore) {
+                        p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
+                    }
+                    else {
+                        p1.getCardinal(_pattern, j, i, k, /*dx*/ _size, /*dy*/ _size, /*dz*/ _size, 0);
+                    }
                     if(_channels) {
                         p2.setCell(j, i, k, channels());
                     }
@@ -105,7 +105,7 @@ public class Worker {
     }
 
     public void frame(final Plane p1, final Plane p2) {
-        if(_useDepth /*p1 instanceof IntBlockPlane*/) {
+        if(_useDepth) {
             frame3d((IntBlockPlane)p1, (IntBlockPlane)p2);
             return;
         }
@@ -120,23 +120,20 @@ public class Worker {
         for(int i=_y1;i<_y2;i++) {
             for(int j=_x1;j<_x2;j++) {
                 counts++;
-                //System.err.println(String.format("working: %d,%d", j, i));
-                //p1.getBlock(_prev, j-_size, i-1, /*dx*/ 3, /*dy*/ 3, 0);
-                p1.getBlock(_prev, j-_size, i-_size, /*dx*/ d, /*dy*/ d, 0);
+                if(_moore) {
+                    p1.getBlock(_prev, j-_size, i-_size, /*dx*/ d, /*dy*/ d, 0);
+                }
+                else {
+                    p1.getCardinal(_prev, j, i, _size, _size, 0);
+                }
                 int idx = 0;
                 for(int k=0;k<_prev.length;k++) {
                     _pattern[k] = (int) (_prev[k]);
-                    //idx += _prev[k] * _pow[k];
-                    //System.err.println(String.format("prev[%d]=%d, pow[%d]=%d", k, _prev[k], k, _pow[k]));
                 }
                 if(_channels) {
                     p2.setCell(j, i, channels());
                 }
                 else {
-                    //final int v = _wp.next(0, _pattern);
-                    //final int ov = _pattern[_pattern.length/2];
-                    //final int nv = (int) ((_oWeight*ov)+(_weight*v));
-                    //p2.setCell(j, i, nv);
                     p2.setCell(j, i, next(_pattern));
                 }
             }

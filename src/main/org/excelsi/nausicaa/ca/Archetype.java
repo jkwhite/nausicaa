@@ -11,18 +11,42 @@ import java.io.IOException;
 
 
 public final class Archetype {
+    public enum Neighborhood {
+        vonneumann,
+        moore;
+
+        public static Neighborhood from(String s) {
+            switch(s) {
+                case "vonneumann":
+                    return vonneumann;
+                case "moore":
+                    return moore;
+                default:
+                    throw new IllegalArgumentException("no such neighborhood '"+s+"'");
+            }
+        }
+    };
     private final int _dims;
     private final int _size;
     private final int _colors;
+    private final Neighborhood _neighborhood;
 
 
     public Archetype(int dims, int size, int colors) {
+        this(dims, size, colors, Neighborhood.moore);
+    }
+
+    public Archetype(int dims, int size, int colors, Neighborhood neighborhood) {
         if(colors<2) {
             throw new IllegalArgumentException("colors must be at least 2: "+colors);
+        }
+        if(dims==1 && neighborhood==Neighborhood.vonneumann) {
+            throw new IllegalArgumentException("1-dimensional neighborhood cannot be vonneumann");
         }
         _dims = dims;
         _size = size;
         _colors = colors;
+        _neighborhood = neighborhood;
     }
 
     public int dims() {
@@ -37,19 +61,33 @@ public final class Archetype {
         return _colors;
     }
 
+    public Neighborhood neighborhood() {
+        return _neighborhood;
+    }
+
     public Archetype asDims(int dims) {
-        return new Archetype(dims, _size, _colors);
+        return new Archetype(dims, _size, _colors, _neighborhood);
     }
 
     public Archetype asColors(int colors) {
-        return new Archetype(_dims, _size, colors);
+        return new Archetype(_dims, _size, colors, _neighborhood);
     }
 
     /**
      * Length of source pattern only.
      */
     public int sourceLength() {
-        return (int) Math.pow(2*size()+1, dims());
+        switch(_neighborhood) {
+            case vonneumann:
+                return 1+dims()*(2*size());
+            case moore:
+            default:
+                return (int) Math.pow(2*size()+1, dims());
+        }
+        //2 1 -> 5
+        //2 2 -> 9
+        //3 1 -> 7
+        //3 2 -> 13
     }
 
     /**
@@ -140,14 +178,24 @@ public final class Archetype {
         w.println(_dims);
         w.println(_size);
         w.println(_colors);
+        w.println(_neighborhood.toString());
     }
 
-    public static Archetype read(BufferedReader r) throws IOException {
-        return new Archetype(
-            Integer.parseInt(r.readLine()),
-            Integer.parseInt(r.readLine()),
-            Integer.parseInt(r.readLine())
-        );
+    public static Archetype read(BufferedReader r, int version) throws IOException {
+        if(version<5) {
+            return new Archetype(
+                Integer.parseInt(r.readLine()),
+                Integer.parseInt(r.readLine()),
+                Integer.parseInt(r.readLine())
+            );
+        }
+        else {
+            int dims = Integer.parseInt(r.readLine());
+            int size = Integer.parseInt(r.readLine());
+            int cols = Integer.parseInt(r.readLine());
+            Neighborhood n = Neighborhood.from(r.readLine());
+            return new Archetype(dims, size, cols, n);
+        }
     }
 
     @Override public String toString() {

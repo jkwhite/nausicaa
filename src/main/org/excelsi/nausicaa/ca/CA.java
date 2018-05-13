@@ -42,7 +42,7 @@ public final class CA {
     private long _seed;
     private float _weight;
     private ComputeMode _cmode;
-    private static final byte VERSION = 4;
+    private static final byte VERSION = 5;
 
 
     public CA(Rule r, Palette p, Initializer i, Random rand, long seed, int w, int h, int d, int prelude, float weight, int coda, ComputeMode cmode) {
@@ -486,6 +486,7 @@ public final class CA {
                 h.computeMode = ComputeMode.combined;
                 break;
             case 4:
+            case 5:
                 h.w = Integer.parseInt(r.readLine());
                 h.h = Integer.parseInt(r.readLine());
                 h.d = Integer.parseInt(r.readLine());

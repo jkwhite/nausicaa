@@ -117,13 +117,23 @@ public class IntBlockPlane extends AbstractPlane {
         return getBlock(into, x, y, /*z*/ _readDepthIdx, dx, dy, /*dz*/ 1, offset);
     }
 
-    @Override public int[] getCardinal(int[] into, int x, int y, int z, int offset) {
-        into[0] = getCell(x-1,y,z);
-        into[1] = getCell(x+1,y,z);
-        into[2] = getCell(x,y-1,z);
-        into[3] = getCell(x,y+1,z);
-        into[4] = getCell(x,y,z-1);
-        into[5] = getCell(x,y,z+1);
+    @Override public int[] getCardinal(int[] into, int x, int y, int dx, int dy, int offset) {
+        into[offset++] = getCell(x,y,_readDepthIdx);
+        into[offset++] = getCell(x,y-1,_readDepthIdx);
+        into[offset++] = getCell(x+1,y,_readDepthIdx);
+        into[offset++] = getCell(x,y+1,_readDepthIdx);
+        into[offset++] = getCell(x-1,y,_readDepthIdx);
+        return into;
+    }
+
+    @Override public int[] getCardinal(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
+        into[offset++] = getCell(x,y,0);
+        into[offset++] = getCell(x,y-1,0);
+        into[offset++] = getCell(x+1,y,0);
+        into[offset++] = getCell(x,y+1,0);
+        into[offset++] = getCell(x-1,y,0);
+        into[offset++] = getCell(x,y,z-1);
+        into[offset++] = getCell(x,y,z+1);
         return into;
     }
 
@@ -304,11 +314,13 @@ public class IntBlockPlane extends AbstractPlane {
     }
 
     @Override public Plane scale(float scale) {
-        throw new UnsupportedOperationException();
+        return new BufferedImagePlane((BufferedImage)toImage()).scale(scale);
+        //throw new UnsupportedOperationException();
     }
 
     @Override public Plane scale(float scale, boolean antialias) {
-        throw new UnsupportedOperationException();
+        return new BufferedImagePlane((BufferedImage)toImage()).scale(scale, antialias);
+        //throw new UnsupportedOperationException();
     }
 
     @Override public void save(String filename) throws IOException {

@@ -63,8 +63,12 @@ public class WindowedPlane extends AbstractPlane {
         return _p.getRow(into, y+_y1, offset);
     }
 
-    @Override public int[] getCardinal(int[] into, int x, int y, int z, int offset) {
-        return _p.getCardinal(into, x, y, z, offset);
+    @Override public int[] getCardinal(int[] into, int x, int y, int dx, int dy, int offset) {
+        return _p.getCardinal(into, x, y, dx, dy, offset);
+    }
+
+    @Override public int[] getCardinal(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
+        return _p.getCardinal(into, x, y, z, dx, dy, dz, offset);
     }
 
     @Override public int[] getBlock(int[] into, int x, int y, int dx, int dy, int offset) {

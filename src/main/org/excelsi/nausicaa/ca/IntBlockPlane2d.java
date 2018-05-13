@@ -24,6 +24,24 @@ public class IntBlockPlane2d extends IntBlockPlane {
         return into;
     }
 
+    @Override public int[] getCardinal(int[] into, int x, int y, int dx, int dy, int offset) {
+        into[0] = getCell(x,y,0);
+        into[1] = getCell(x,y-1,0);
+        into[2] = getCell(x+1,y,0);
+        into[3] = getCell(x,y+1,0);
+        into[4] = getCell(x-1,y,0);
+        return into;
+    }
+
+    @Override public int[] getCardinal(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
+        into[0] = getCell(x,y,0);
+        into[1] = getCell(x,y-1,0);
+        into[2] = getCell(x+1,y,0);
+        into[3] = getCell(x,y+1,0);
+        into[4] = getCell(x-1,y,0);
+        return into;
+    }
+
     @Override public Plane copy() {
         int[] s = getBuffer();
         int[] sc = new int[s.length];

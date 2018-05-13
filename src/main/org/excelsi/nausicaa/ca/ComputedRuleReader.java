@@ -20,7 +20,7 @@ public class ComputedRuleReader {
         if(!"computed".equals(line)) {
             throw new IOException("not a computed rule: "+line);
         }
-        Archetype a = Archetype.read(_r);
+        Archetype a = Archetype.read(_r, _version);
         String genome = _r.readLine();
         return new ComputedRuleset(a).create(genome, _version);
     }
