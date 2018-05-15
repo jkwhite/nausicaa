@@ -634,6 +634,9 @@ public class Codons {
             if(np>_m) {
                 np = _m;
             }
+            else if(np<0) {
+                np = 0;
+            }
             return new Push(np, _m);
         }
     }
@@ -794,10 +797,18 @@ public class Codons {
 
         @Override public void op(int[] p, Tape t) {
             //t.pushAll(p, p.length);
-            int n = p[p.length/2]%p.length; //t.pop() % p.length;
-            if(n<0) n=-n;
-            t.pushAll(p, p.length-n, n);
-            t.pushAll(p, n);
+
+            //int n = p[p.length/2]%p.length;
+            //if(n<0) n=-n;
+            //t.pushAll(p, p.length-n, n);
+            //t.pushAll(p, n);
+            int n = p.length/2;
+            int m = 0;
+            m += t.pushAll(p, p.length-n-1, n+1);
+            m += t.pushAll(p, n);
+            t.push(p[n]);
+            m += 1;
+            //System.err.println("pushed "+m+" on go");
         }
     }
 
@@ -826,6 +837,12 @@ public class Codons {
                 t.push(p[5]);
                 t.push(p[7]);
                 t.push(p[3]);
+                t.push(p[1]);
+            }
+            else if(p.length==5) {
+                t.push(p[0]);
+                t.push(p[3]);
+                t.push(p[4]);
                 t.push(p[1]);
             }
             else {

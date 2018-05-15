@@ -210,6 +210,16 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                     }
                     ns.add(new SEntry(m.random().nextInt(70)+70, new ComputedPattern(a, ComputedPattern.random(a, dm, m.random()))));
                     break;
+                case "add_data":
+                    final Archetype ar = _s.get(0).p.archetype();
+                    for(SEntry s:_s) {
+                        ns.add(new SEntry(s.t, (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm))));
+                    }
+                    final String nm = Datamap.randomName(m.random());
+                    final Index idx = new IndexGenerator().build(ar, m.random(), nm);
+                    dm.index(nm, idx);
+                    nd.add(new DEntry(nm, idx));
+                    break;
                 case "remove":
                     for(int i=0;i<_s.size();i++) {
                         if(i!=m.stage()) {

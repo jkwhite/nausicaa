@@ -193,18 +193,18 @@ public class WritableImagePlane extends AbstractPlane {
     }
 
     @Override public int[] getCardinal(int[] into, int x, int y, int dx, int dy, int offset) {
-        into[offset++] = getCell(x,y,0);
-        into[offset++] = getCell(x,y-1,0);
         into[offset++] = getCell(x+1,y,0);
+        into[offset++] = getCell(x,y-1,0);
+        into[offset++] = getCell(x,y,0);
         into[offset++] = getCell(x,y+1,0);
         into[offset++] = getCell(x-1,y,0);
         return into;
     }
 
     @Override public int[] getCardinal(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
-        into[offset++] = getCell(x,y,0);
-        into[offset++] = getCell(x,y-1,0);
         into[offset++] = getCell(x+1,y,0);
+        into[offset++] = getCell(x,y-1,0);
+        into[offset++] = getCell(x,y,0);
         into[offset++] = getCell(x,y+1,0);
         into[offset++] = getCell(x-1,y,0);
         return into;

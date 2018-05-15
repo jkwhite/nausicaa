@@ -82,7 +82,10 @@ public final class Index implements Genomic, Mutatable {
     }
 
     public int find(int src) {
-        return src>=0&&src<_target.length?_target[src]:-1;
+        if(src<0) src=-src;
+        if(src>=_target.length) src %= _target.length;
+        //return src>=0&&src<_target.length?_target[src]:-1;
+        return _target[src];
     }
 
     public int find(int[] src) {

@@ -25,20 +25,20 @@ public class IntBlockPlane2d extends IntBlockPlane {
     }
 
     @Override public int[] getCardinal(int[] into, int x, int y, int dx, int dy, int offset) {
-        into[0] = getCell(x,y,0);
-        into[1] = getCell(x,y-1,0);
-        into[2] = getCell(x+1,y,0);
-        into[3] = getCell(x,y+1,0);
-        into[4] = getCell(x-1,y,0);
+        into[offset++] = getCell(x+1,y,0);
+        into[offset++] = getCell(x,y-1,0);
+        into[offset++] = getCell(x,y,0);
+        into[offset++] = getCell(x,y+1,0);
+        into[offset++] = getCell(x-1,y,0);
         return into;
     }
 
     @Override public int[] getCardinal(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
-        into[0] = getCell(x,y,0);
-        into[1] = getCell(x,y-1,0);
-        into[2] = getCell(x+1,y,0);
-        into[3] = getCell(x,y+1,0);
-        into[4] = getCell(x-1,y,0);
+        into[offset++] = getCell(x+1,y,0);
+        into[offset++] = getCell(x,y-1,0);
+        into[offset++] = getCell(x,y,0);
+        into[offset++] = getCell(x,y+1,0);
+        into[offset++] = getCell(x-1,y,0);
         return into;
     }
 

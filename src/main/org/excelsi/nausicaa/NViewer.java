@@ -1030,6 +1030,14 @@ public class NViewer extends JFrame implements UIActions {
         mutate.add(addseg);
         addseg.setText("Add rule stage");
 
+        JMenuItem adddseg = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.addDataStage(NViewer.this, _config, _random);
+            }
+        });
+        mutate.add(adddseg);
+        adddseg.setText("Add data stage");
+
         JMenuItem remseg = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _a.removeRuleStage(NViewer.this, _config, _random);

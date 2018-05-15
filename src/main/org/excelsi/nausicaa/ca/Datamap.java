@@ -5,6 +5,7 @@ import java.util.*;
 
 
 public class Datamap {
+    private static final String NS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private final Map<String,Index> _m = new HashMap<>();
 
 
@@ -27,5 +28,13 @@ public class Datamap {
             d.index(e.getKey(), e.getValue().copy());
         }
         return d;
+    }
+
+    public static String randomName(Random r) {
+        String b = "";
+        for(int i=0;i<3;i++) {
+            b = b+NS.charAt(r.nextInt(NS.length()));
+        }
+        return b;
     }
 }

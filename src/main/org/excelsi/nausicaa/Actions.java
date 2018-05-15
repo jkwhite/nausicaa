@@ -1445,6 +1445,16 @@ public class Actions {
         }
     }
 
+    public void addDataStage(final NViewer v, Config config, Random rand) {
+        final CA ca = v.getActiveCA();
+        final Rule r = ca.getRule();
+        if(r instanceof Mutatable) {
+            v.setActiveCA(ca.mutate((Rule)((Mutatable)r).mutate(createMutationFactor(config, rand).withMode("add_data")), rand));
+            int nstage = 1+Integer.parseInt(config.getVariable("mutator_stage", "0"));
+            config.setVariable("mutator_stage", ""+nstage);
+        }
+    }
+
     public void removeRuleStage(final NViewer v, Config config, Random rand) {
         final CA ca = v.getActiveCA();
         final Rule r = ca.getRule();
