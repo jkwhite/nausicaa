@@ -199,6 +199,31 @@ public class NViewer extends JFrame implements UIActions {
         createRenderMenu(shortcut, bar);
         createWindowMenu(shortcut, bar);
         root().setJMenuBar(bar);
+
+        try {
+            Class.forName("org.excelsi.nausicaa.MacCustomizer").getMethod("run", new Class[]{JMenuBar.class}).invoke(null, new Object[]{bar});
+        }
+        catch(Throwable t) {
+            t.printStackTrace();
+            createNonMacMenu(shortcut, bar);
+        }
+    }
+
+    private void createNonMacMenu(int shortcut, JMenuBar bar) {
+        JMenu help = new JMenu("Help");
+        AbstractAction about = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, 
+                    "<html>Copyright (C) 2007-2018 John K White <dhcmrlchtdj@gmail.com><br/>Licensed under the terms of the GNU General Public License Version 3</html>", 
+                    "NausiCAä 1.0", 
+                    JOptionPane.INFORMATION_MESSAGE,
+                    new ImageIcon(MacCustomizer.class.getResource("/na1.png"))
+                );
+            }
+        };
+        JMenuItem abouti = help.add(about);
+        abouti.setText("About");
+        bar.add(help);
     }
 
     private void createFileMenu(int shortcut, JMenuBar bar) {

@@ -139,11 +139,34 @@ public final class Index implements Genomic, Mutatable {
         int ent = g.length()/dsize;
         _size = ent;
         if(ent==5) {
+            // CNESWC'
             int c = parseInt(g,dsize,0);
             int n = parseInt(g,dsize,1);
             int e = parseInt(g,dsize,2);
             int s = parseInt(g,dsize,3);
             int w = parseInt(g,dsize,4);
+            //System.err.println("c="+c+", n="+n+", e="+e+", s="+s+", w="+w+" tgt="+tgt);
+            if(exp==Expand.none) {
+                tmap.put(n+10*w+100*c+1000*e+10000*s, tgt);
+            }
+            else if(exp==Expand.rot4) {
+                tmap.put(c+10*n+100*e+1000*s+10000*w, tgt);
+                tmap.put(c+10*e+100*s+1000*w+10000*n, tgt);
+                tmap.put(c+10*s+100*w+1000*n+10000*e, tgt);
+                tmap.put(c+10*w+100*n+1000*e+10000*s, tgt);
+            }
+        }
+        else if(ent==9) {
+            //C,N,NE,E,SE,S,SW,W,NW,C'
+            int c = parseInt(g,dsize,0);
+            int n = parseInt(g,dsize,1);
+            int ne = parseInt(g,dsize,2);
+            int e = parseInt(g,dsize,3);
+            int se = parseInt(g,dsize,4);
+            int s = parseInt(g,dsize,5);
+            int sw = parseInt(g,dsize,6);
+            int w = parseInt(g,dsize,7);
+            int nw = parseInt(g,dsize,8);
             //System.err.println("c="+c+", n="+n+", e="+e+", s="+s+", w="+w+" tgt="+tgt);
             if(exp==Expand.none) {
                 tmap.put(n+10*w+100*c+1000*e+10000*s, tgt);
