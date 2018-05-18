@@ -62,6 +62,7 @@ public class Codons {
     public static final String NEGATE = "bo";
     public static final String PUSH_CARDINAL = "pa";
     public static final String EQUAL_A = "po";
+    public static final String FILTER = "pi";
 
 
     public static Codon codon(final String s, final Implicate im) {
@@ -187,6 +188,8 @@ public class Codons {
                     return new Pos();
                 case NOT:
                     return new Not();
+                case FILTER:
+                    return new Filter(p);
                 default:
                     throw new IllegalStateException("unknown opcode '"+code+"'");
             }
@@ -1493,6 +1496,37 @@ public class Codons {
             int v = t.pop();
             int x = Maths.excl(v);
             t.push(x);
+        }
+    }
+
+    public static class Filter implements Codon {
+        private final int _c;
+
+
+        public Filter(int c) {
+            _c = c;
+        }
+
+        @Override public Codon copy() { return new Filter(_c); }
+
+        @Override public String code() {
+            return FILTER;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public void op(int[] p, Tape t) {
+            final int v = t.pop();
+            int m = 0;
+            for(int i=0;i<_c;i++) {
+                int n = t.pop();
+                if(n==v) {
+                    m++;
+                }
+            }
+            t.push(m);
         }
     }
 
