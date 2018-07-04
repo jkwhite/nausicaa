@@ -95,10 +95,13 @@ public class JfxUniverse extends Application {
         bmesh.setOnAction((e)->{ w.setRender(JfxCA.Render.blob_mesh); });
         MenuItem cells = new MenuItem("Cells");
         cells.setOnAction((e)->{ w.setRender(JfxCA.Render.cells); });
-        rend.getItems().addAll(smesh, bmesh, cells);
+        MenuItem best = new MenuItem("Auto");
+        best.setOnAction((e)->{ w.setRender(JfxCA.Render.best); });
+        rend.getItems().addAll(smesh, bmesh, cells, best);
 
         Menu anim = new Menu("Animation");
         MenuItem astart = new MenuItem("Start/Stop");
+        astart.setAccelerator(KeyCombination.keyCombination("Shortcut+A"));
         astart.setOnAction((e)->{ w.toggleAnimate(); });
         anim.getItems().addAll(astart);
 

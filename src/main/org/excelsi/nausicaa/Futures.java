@@ -376,9 +376,11 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             .computeMode(ComputeMode.from(_config.<String>getVariable("rgb_computemode","combined")));
         switch(_viewType) {
             case view3d:
+                System.err.println("creating 3d view");
                 return new JfxPlaneDisplay(ca, g);
             case view2d:
             default:
+                System.err.println("creating 2d view");
                 return new SwingPlaneDisplay(ca, g, _config);
         }
     }

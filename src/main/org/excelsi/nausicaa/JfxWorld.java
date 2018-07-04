@@ -175,7 +175,7 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
     }
 
     public void initScene() {
-        final double INC = 5d;
+        final double INC = 15d;
         Scene s;
         if(_useBorder) {
             BorderPane bp = new BorderPane();
@@ -327,12 +327,12 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
         Group parent = new Group();
         _root.getChildren().add(parent);
 
-        //Light.Point l = new Light.Point();
-        //Light.Distant l = new Light.Distant();
-        //Lighting li = new Lighting();
-        //li.setLight(l);
-        //li.setSurfaceScale(50.0);
-        //parent.setEffect(li);
+        Light.Point l = new Light.Point();
+        Light.Distant l = new Light.Distant();
+        Lighting li = new Lighting();
+        li.setLight(l);
+        li.setSurfaceScale(50.0);
+        parent.setEffect(li);
 
         _parent = parent;
         _scene = s;

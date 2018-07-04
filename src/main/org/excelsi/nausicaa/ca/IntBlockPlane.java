@@ -127,11 +127,11 @@ public class IntBlockPlane extends AbstractPlane {
     }
 
     @Override public int[] getCardinal(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
-        into[offset++] = getCell(x,y+1,0);
-        into[offset++] = getCell(x,y-1,0);
-        into[offset++] = getCell(x+1,y,0);
-        into[offset++] = getCell(x,y,0);
-        into[offset++] = getCell(x-1,y,0);
+        into[offset++] = getCell(x,y+1,z);
+        into[offset++] = getCell(x,y-1,z);
+        into[offset++] = getCell(x+1,y,z);
+        into[offset++] = getCell(x,y,z);
+        into[offset++] = getCell(x-1,y,z);
         into[offset++] = getCell(x,y,z-1);
         into[offset++] = getCell(x,y,z+1);
         return into;

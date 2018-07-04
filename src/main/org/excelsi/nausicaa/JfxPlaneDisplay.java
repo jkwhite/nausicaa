@@ -109,6 +109,8 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         add(scr, BorderLayout.CENTER);
         _show = scr;
         Platform.runLater(()->{ initScene(); });
+        Platform.setImplicitExit(false);
+        System.err.println("scheduled initScene");
     }
 
     public JfxPlaneDisplay(CA ca, GOptions gopt) {
@@ -123,9 +125,11 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     }
 
     private void initScene() {
+        System.err.println("running initScene");
         final double INC = 5d;
         _root = new Group();
-        Scene s = new Scene(_root, 1000, 1000, true, SceneAntialiasing.DISABLED);
+        final int sz = 300;
+        Scene s = new Scene(_root, sz, sz, true, SceneAntialiasing.DISABLED);
         s.setFill(javafx.scene.paint.Color.BLACK);
         final PerspectiveCamera cam = new PerspectiveCamera(false);
         cam.setFarClip(6000);
@@ -137,8 +141,8 @@ public class JfxPlaneDisplay extends PlaneDisplay {
 
         Group rotParent = new Group();
         Group parent = new Group();
-        parent.setTranslateX(800);
-        parent.setTranslateY(400);
+        parent.setTranslateX((int)(sz*.8));
+        parent.setTranslateY((int)(sz*.4));
         parent.getTransforms().add(new Rotate(-45, new Point3D(1,0,0)));
 
         //_jfxCa = new JfxCA(_ca);
@@ -154,6 +158,11 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         t.setByAngle(360);
         t.setCycleCount(t.INDEFINITE);
         t.play();
+
+        //RotateTransition t2 = new RotateTransition(Duration.millis(76000), parent);
+        //t2.setByAngle(360);
+        //t2.setCycleCount(t.INDEFINITE);
+        //t2.play();
 
         /*
         Group move = new Group();
@@ -330,7 +339,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
                 //_parent.getChildren().remove(_jfxCa);
                 _rotParent.getChildren().remove(_jfxCa);
             }
-            _jfxCa = new JfxCA(ca, _scale*SCALE_MULT, 40, JfxCA.Render.blob_mesh);
+            _jfxCa = new JfxCA(ca, _scale*SCALE_MULT, 40, JfxCA.Render.best);
             //_jfxCa.setTranslateX(-ca.getWidth()*_scale*SCALE_MULT/3);
             _jfxCa.setTranslateZ(-ca.getHeight()*_scale*SCALE_MULT/2);
             //_parent.getChildren().add(_jfxCa);
