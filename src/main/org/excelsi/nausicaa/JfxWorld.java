@@ -42,10 +42,12 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
     private Plane _p;
     private Group _root;
     private Group _parent;
+    private Group _rotParent;
     private Scene _scene;
     private JfxCA _jfxCa;
     private final boolean _useBorder;
     private BorderPane _border;
+    private List<RotateTransition> _rots;
     private volatile int _queue;
 
 
@@ -102,8 +104,17 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
             if(_jfxCa!=null) {
                 _parent.getChildren().remove(_jfxCa);
             }
-            _jfxCa = new JfxCA(ca, _scale*8, _d, JfxCA.Render.best);
-            _parent.getChildren().add(_jfxCa);
+            final double sc = _scale*8;
+            _jfxCa = new JfxCA(ca, sc, _d, JfxCA.Render.best);
+            //_parent.getChildren().add(_jfxCa);
+            _rotParent.getChildren().add(_jfxCa);
+
+            _jfxCa.setTranslateX(ca.getWidth()*sc/2);
+            _jfxCa.setTranslateY(ca.getHeight()*sc/2);
+            _jfxCa.setTranslateZ(ca.getDepth()*sc/2);
+            //_rotParent.setTranslateX(-ca.getWidth()*sc/2);
+            //_rotParent.setTranslateY(-ca.getHeight()*sc/2);
+            //_rotParent.setTranslateZ(-ca.getDepth()*sc/2);
             //RotateTransition t = new RotateTransition(Duration.millis(72000), _jfxCa);
             //t.setByAngle(360);
             //t.setCycleCount(t.INDEFINITE);
@@ -172,6 +183,19 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
             _anim.stopAnimation();
             _anim = null;
         }
+    }
+
+    private boolean _rotsEnabled;
+    public void toggleRotation() {
+        for(RotateTransition t:_rots) {
+            if(_rotsEnabled) {
+                t.pause();
+            }
+            else {
+                t.play();
+            }
+        }
+        _rotsEnabled = !_rotsEnabled;
     }
 
     public void initScene() {
@@ -327,14 +351,33 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
         Group parent = new Group();
         _root.getChildren().add(parent);
 
-        Light.Point l = new Light.Point();
-        Light.Distant l = new Light.Distant();
-        Lighting li = new Lighting();
-        li.setLight(l);
-        li.setSurfaceScale(50.0);
-        parent.setEffect(li);
+        //Light.Point l = new Light.Point();
+        //Light.Distant l = new Light.Distant();
+        //Lighting li = new Lighting();
+        //li.setLight(l);
+        //li.setSurfaceScale(50.0);
+        //parent.setEffect(li);
+
+        List<RotateTransition> trans = new ArrayList<>();
+        RotateTransition tr = new RotateTransition(Duration.millis(36000), parent);
+        tr.setByAngle(360);
+        tr.setCycleCount(tr.INDEFINITE);
+        //tr.play();
+        trans.add(tr);
+
+        Group rotParent = new Group();
+        //rotParent.getTransforms().add(new Rotate(-45, new Point3D(1,0,0)));
+        parent.getChildren().add(rotParent);
+
+        //RotateTransition tr2 = new RotateTransition(Duration.millis(48000), rotParent);
+        //tr2.setByAngle(360);
+        //tr2.setCycleCount(tr2.INDEFINITE);
+        //tr2.play();
 
         _parent = parent;
+        _rotParent = rotParent;
+        _rots = trans;
+        _rotsEnabled = false;
         _scene = s;
     }
 }

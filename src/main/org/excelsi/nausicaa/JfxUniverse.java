@@ -100,10 +100,13 @@ public class JfxUniverse extends Application {
         rend.getItems().addAll(smesh, bmesh, cells, best);
 
         Menu anim = new Menu("Animation");
-        MenuItem astart = new MenuItem("Start/Stop");
+        MenuItem astart = new MenuItem("Toggle update");
         astart.setAccelerator(KeyCombination.keyCombination("Shortcut+A"));
         astart.setOnAction((e)->{ w.toggleAnimate(); });
-        anim.getItems().addAll(astart);
+        MenuItem arot = new MenuItem("Toggle rotation");
+        //astart.setAccelerator(KeyCombination.keyCombination("Shortcut+A"));
+        arot.setOnAction((e)->{ w.toggleRotation(); });
+        anim.getItems().addAll(astart, arot);
 
         anim.getItems().add(new SeparatorMenuItem());
 
