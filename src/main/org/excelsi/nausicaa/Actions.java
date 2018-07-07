@@ -157,7 +157,15 @@ public class Actions {
                 Archetype a = new Archetype(dims, size, pal.getColorCount(), neihack[0]);
                 Ruleset rs = new ComputedRuleset(a);
                 Rule rule = rs.random(rand).next();
-                CA ca = new CA(rule, pal, v.getActiveCA().getInitializer(), rand, 0, v.getConfig().getWidth(), v.getConfig().getHeight(), v.getConfig().getDepth(), v.getConfig().getPrelude(), v.getConfig().getWeight(), 0, ComputeMode.combined);
+                CA ca = new CA(rule, pal, v.getActiveCA().getInitializer(), rand, 0,
+                        v.getConfig().getWidth(),
+                        v.getConfig().getHeight(),
+                        v.getConfig().getDepth(),
+                        v.getConfig().getPrelude(),
+                        v.getConfig().getWeight(),
+                        0,
+                        ComputeMode.combined,
+                        new UpdateMode.SimpleSynchronous());
                 v.setActiveCA(ca);
             }
         });

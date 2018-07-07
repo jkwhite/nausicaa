@@ -129,7 +129,7 @@ public class NViewer extends JFrame implements UIActions {
         Rule rule = rs.random(rand).next();
         ComputeMode cmode = ComputeMode.combined;
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
-        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre, weight, 0, cmode);
+        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre, weight, 0, cmode, new UpdateMode.SimpleSynchronous());
         //org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.single.create(), rand, 0, w, h, d, pre);
 
         JPanel main = new JPanel(new BorderLayout());
@@ -194,9 +194,11 @@ public class NViewer extends JFrame implements UIActions {
         JMenuBar bar = new JMenuBar();
         createFileMenu(shortcut, bar);
         createAutomataMenu(shortcut, bar);
+        createAnimationMenu(shortcut, bar);
         createPaletteMenu(shortcut, bar);
         createMutateMenu(shortcut, bar);
         createRenderMenu(shortcut, bar);
+        createViewMenu(shortcut, bar);
         createWindowMenu(shortcut, bar);
         root().setJMenuBar(bar);
 
@@ -632,6 +634,100 @@ public class NViewer extends JFrame implements UIActions {
         bar.add(pal);
     }
 
+    private void createAnimationMenu(int shortcut, JMenuBar bar) {
+        JMenu auto = new JMenu("Animation");
+
+        AbstractAction an = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.animate(NViewer.this, _timeline, -1);
+            }
+        };
+        JMenuItem animate = auto.add(an);
+        animate.setText("Animate");
+        animate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, shortcut));
+
+        AbstractAction stp = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.animate(NViewer.this, _timeline, 2);
+            }
+        };
+        JMenuItem stepone = auto.add(stp);
+        stepone.setText("Step");
+        stepone.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, shortcut));
+
+        AbstractAction animfst = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.animateSpeedup(NViewer.this);
+            }
+        };
+        JMenuItem animfaster = auto.add(animfst);
+        animfaster.setText("Speed up animation");
+        animfaster.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, shortcut | InputEvent.SHIFT_DOWN_MASK));
+
+        AbstractAction animslw = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.animateSlowdown(NViewer.this);
+            }
+        };
+        JMenuItem animslower = auto.add(animslw);
+        animslower.setText("Slow down animation");
+        animslower.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, shortcut | InputEvent.SHIFT_DOWN_MASK));
+
+        AbstractAction animcrs = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.coreConfig(NViewer.this, _config);
+            }
+        };
+        JMenuItem animcores = auto.add(animcrs);
+        animcores.setText("Configure animation ...");
+
+        auto.addSeparator();
+
+        AbstractAction gen = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.generateToFile(NViewer.this);
+            }
+        };
+        JMenuItem genl = auto.add(gen);
+        genl.setText("Generate to disk ...");
+        genl.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, shortcut));
+
+        bar.add(auto);
+    }
+
+    private void createViewMenu(int shortcut, JMenuBar bar) {
+        JMenu auto = new JMenu("View");
+
+        AbstractAction zi = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.zoomIn(NViewer.this);
+            }
+        };
+        JMenuItem zoomin = auto.add(zi);
+        zoomin.setText("Zoom in");
+        zoomin.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, shortcut));
+
+        AbstractAction zo = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.zoomOut(NViewer.this);
+            }
+        };
+        JMenuItem zoomout = auto.add(zo);
+        zoomout.setText("Zoom out");
+        zoomout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, shortcut));
+
+        AbstractAction z1 = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.zoomOne(NViewer.this);
+            }
+        };
+        JMenuItem zoomone = auto.add(z1);
+        zoomone.setText("Actual size");
+        zoomone.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, shortcut));
+
+        bar.add(auto);
+    }
+
     private void createAutomataMenu(int shortcut, JMenuBar bar) {
         final JCheckBoxMenuItem[] hack = new JCheckBoxMenuItem[8];
         JMenu auto = new JMenu("Automata");
@@ -891,116 +987,71 @@ public class NViewer extends JFrame implements UIActions {
         reroll.setText("Reroll");
         reroll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, shortcut));
 
-        //AbstractAction spl = new AbstractAction() {
-            //public void actionPerformed(ActionEvent e) {
-                //split();
-            //}
-        //};
-        //JMenuItem split = auto.add(spl);
-        //split.setText("Branch");
-        //split.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, shortcut));
-
-        AbstractAction an = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _a.animate(NViewer.this, _timeline, -1);
-            }
-        };
-        JMenuItem animate = auto.add(an);
-        animate.setText("Animate");
-        animate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, shortcut));
-
-        AbstractAction stp = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _a.animate(NViewer.this, _timeline, 2);
-            }
-        };
-        JMenuItem stepone = auto.add(stp);
-        stepone.setText("Step");
-        stepone.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, shortcut));
-
-        AbstractAction animfst = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _a.animateSpeedup(NViewer.this);
-            }
-        };
-        JMenuItem animfaster = auto.add(animfst);
-        animfaster.setText("Speed up animation");
-        animfaster.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, shortcut | InputEvent.SHIFT_DOWN_MASK));
-
-        AbstractAction animslw = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _a.animateSlowdown(NViewer.this);
-            }
-        };
-        JMenuItem animslower = auto.add(animslw);
-        animslower.setText("Slow down animation");
-        animslower.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, shortcut | InputEvent.SHIFT_DOWN_MASK));
-
-        AbstractAction animcrs = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _a.coreConfig(NViewer.this, _config);
-            }
-        };
-        JMenuItem animcores = auto.add(animcrs);
-        animcores.setText("Configure animation ...");
-
-        auto.addSeparator();
-
-        AbstractAction gen = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _a.generateToFile(NViewer.this);
-            }
-        };
-        JMenuItem genl = auto.add(gen);
-        genl.setText("Generate to disk ...");
-        genl.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, shortcut));
-
         AbstractAction size = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _a.resizeCA(NViewer.this);
             }
         };
         JMenuItem siz = auto.add(size);
-        siz.setText("Set size ...");
+        siz.setText("Configure parameters ...");
         siz.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcut));
 
         auto.addSeparator();
 
-        AbstractAction zi = new AbstractAction() {
+        JMenu updateopt = new JMenu("Update mode");
+        final JCheckBoxMenuItem[] updatehack = new JCheckBoxMenuItem[3];
+        JCheckBoxMenuItem updsync = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.zoomIn(NViewer.this);
+                updatehack[0].setState(true);
+                updatehack[1].setState(false);
+                updatehack[2].setState(false);
+                _config.setVariable("updatemode", "sync");
+                setActiveCA(getActiveCA().updateMode(UpdateMode.create("sync")));
             }
-        };
-        JMenuItem zoomin = auto.add(zi);
-        zoomin.setText("Zoom in");
-        zoomin.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, shortcut));
+        });
+        updsync.setText("Synchronous");
+        updateopt.add(updsync);
 
-        AbstractAction zo = new AbstractAction() {
+        JCheckBoxMenuItem updasync = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.zoomOut(NViewer.this);
+                updatehack[0].setState(false);
+                updatehack[1].setState(true);
+                updatehack[2].setState(false);
+                _config.setVariable("updatemode", "async");
+                setActiveCA(getActiveCA().updateMode(UpdateMode.create("async 30")));
             }
-        };
-        JMenuItem zoomout = auto.add(zo);
-        zoomout.setText("Zoom out");
-        zoomout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, shortcut));
+        });
+        updasync.setText("Asynchronous");
+        updateopt.add(updasync);
 
-        AbstractAction z1 = new AbstractAction() {
+        JCheckBoxMenuItem updasynclocal = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.zoomOne(NViewer.this);
+                updatehack[0].setState(false);
+                updatehack[1].setState(false);
+                updatehack[2].setState(true);
+                _config.setVariable("updatemode", "localasync");
+                setActiveCA(getActiveCA().updateMode(UpdateMode.create("localasync 20")));
             }
-        };
-        JMenuItem zoomone = auto.add(z1);
-        zoomone.setText("Actual size");
-        zoomone.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, shortcut));
+        });
+        updasynclocal.setText("Local Asynchronous");
+        updateopt.add(updasynclocal);
 
-        //AbstractAction dimup = new AbstractAction() {
-            //public void actionPerformed(ActionEvent e) {
-                //open3d();
-            //}
-        //};
-        //JMenuItem dimensions = auto.add(dimup);
-        //dimensions.setText("View from higher dimension ...");
-        //siz.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcut));
+        updatehack[0] = updsync;
+        updatehack[1] = updasync;
+        updatehack[2] = updasynclocal;
+        switch(_config.getVariable("updatemode","sync")) {
+            case "sync":
+                updatehack[0].setState(true);
+                break;
+            case "async":
+                updatehack[1].setState(true);
+                break;
+            case "localasync":
+                updatehack[2].setState(true);
+                break;
+        }
+        
+        auto.add(updateopt);
 
         bar.add(auto);
     }

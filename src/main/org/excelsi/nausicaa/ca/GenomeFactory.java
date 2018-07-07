@@ -2,13 +2,17 @@ package org.excelsi.nausicaa.ca;
 
 
 import java.util.Random;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import static org.excelsi.nausicaa.ca.WeightedFactory.Weight;
 import static org.excelsi.nausicaa.ca.WeightedFactory.weight;
 import static org.excelsi.nausicaa.ca.Codons.*;
 
 
 public class GenomeFactory {
     private static final WeightedFactory<Codon> buildFactory(final Archetype a) {
-        return new WeightedFactory<Codon>(
+        List<Weight<Codon>> cs = new ArrayList<>(Arrays.asList(
             weight(2, new PushO()),
             weight(1, new PushC()),
             weight(1, new Sum()),
@@ -66,11 +70,15 @@ public class GenomeFactory {
             weight(1, new Stop()),
             weight(1, new Pos()),
             weight(1, new Mod())
-        );
+        ));
+        if(a.colors()<1000000) {
+            cs.add(weight(1,new Histo(1)));
+        }
+        return new WeightedFactory<Codon>(cs.toArray(new Weight[0]));
     }
 
     private static final WeightedFactory<Codon> buildSymmetricFactory(final Archetype a) {
-        return new WeightedFactory<Codon>(
+        List<Weight<Codon>> cs = new ArrayList<>(Arrays.asList(
             //weight(2, new PushO()),
             weight(1, new Sum()),
             weight(1, new Sumn(1)),
@@ -123,7 +131,11 @@ public class GenomeFactory {
             weight(1, new Pos()),
             weight(1, new Not()),
             weight(1, new Mod())
-        );
+        ));
+        if(a.colors()<1000000) {
+            cs.add(weight(1,new Histo(1)));
+        }
+        return new WeightedFactory<Codon>(cs.toArray(new Weight[0]));
     }
 
 

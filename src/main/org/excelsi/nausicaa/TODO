@@ -5,3 +5,8 @@
 - plot along 1d/2d/3d based on parameterized rules e.g. fractal plane
 - 1d rules are broken
 - allow update weight to vary by multisequence
+- asynchronous updates
+- json format
+- abort codon
+- randomness
+- 
