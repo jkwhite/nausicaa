@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.BufferedReader;
+import com.google.gson.*;
 
 
 public enum Initializers {
@@ -85,6 +86,33 @@ public enum Initializers {
                 return RandomInitializer.read(r, v);
             default:
                 throw new IOException("unknown initializer '"+type+"'");
+        }
+    }
+
+    public static Initializer fromJson(JsonElement e) throws IOException {
+        JsonObject o = (JsonObject) e;
+        String type = Json.string(o, "type");
+        switch(type) {
+            case "single":
+                return SingleInitializer.fromJson(o);
+            case "neapolitan":
+                return NeapolitanInitializer.fromJson(o);
+            case "word":
+                return WordInitializer.fromJson(o);
+            case "image":
+                return ImageInitializer.fromJson(o);
+            case "gaussian":
+                return GaussianInitializer.fromJson(o);
+            case "clusteredgaussian":
+                return ClusteredGaussianInitializer.fromJson(o);
+            case "ca":
+                return CAInitializer.fromJson(o);
+            case "custom":
+                return CustomInitializer.fromJson(o);
+            case "random":
+                return RandomInitializer.fromJson(o);
+            default:
+                throw new IllegalArgumentException("unknown initializer '"+type+"'");
         }
     }
 }

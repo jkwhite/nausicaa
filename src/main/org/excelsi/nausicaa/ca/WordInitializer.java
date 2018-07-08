@@ -6,6 +6,7 @@ import java.io.DataOutputStream;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.IOException;
+import com.google.gson.*;
 
 
 public class WordInitializer implements Initializer {
@@ -107,10 +108,26 @@ public class WordInitializer implements Initializer {
         w.println(_input);
     }
 
+    @Override public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("type", "word");
+        o.addProperty("alphabet", _alphabet);
+        o.addProperty("input", _input);
+        return o;
+    }
+
     public static WordInitializer read(BufferedReader r, int version) throws IOException {
         return new WordInitializer(
             r.readLine(),
             r.readLine()
+        );
+    }
+
+    public static WordInitializer fromJson(JsonElement e) {
+        JsonObject o = (JsonObject) e;
+        return new WordInitializer(
+            Json.string(o, "alphabet"),
+            Json.string(o, "input")
         );
     }
 }

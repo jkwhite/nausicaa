@@ -18,16 +18,15 @@ uses:
     - gimmal-1.0.jar
     - groovy-all-1.8.9.jar
     - log4j-1.2.15.jar
-    #- snakeyaml-1.7.jar
     - snakeyaml-1.21.jar
     - swingxbuilder-0.1.5.jar
     - swingx-0.9.1.jar
     - batik-1.7.jar
     - batik-awt-util-1.7.jar
     - imgscalr-lib-4.2.jar
-    - solace-1.0.jar
     - Fxyz-Core-1.0.jar
     - Fxyz-lib-1.0.jar
+    - gson-2.8.5.jar
 #main: org.excelsi.gimmal.AppFactory
 #main: org.excelsi.nausicaa.NViewer
 #main: org.excelsi.nausicaa.JfxUniverse

@@ -2,6 +2,7 @@ package org.excelsi.nausicaa.ca;
 
 
 import java.io.PrintWriter;
+import com.google.gson.*;
 
 
 public class RGBPalette extends RGBAPalette {
@@ -19,5 +20,11 @@ public class RGBPalette extends RGBAPalette {
 
     public void write(PrintWriter w) {
         w.println("rgb");
+    }
+
+    @Override public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("type","rgb");
+        return o;
     }
 }

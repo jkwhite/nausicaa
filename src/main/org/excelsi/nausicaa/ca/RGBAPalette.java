@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Random;
 import java.awt.image.*;
 import javax.imageio.*;
+import com.google.gson.*;
 
 
 public class RGBAPalette implements Palette {
@@ -80,5 +81,11 @@ public class RGBAPalette implements Palette {
 
     public void write(PrintWriter w) {
         w.println("rgba");
+    }
+
+    @Override public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("type","rgba");
+        return o;
     }
 }

@@ -584,6 +584,78 @@ public class Actions {
         d.setVisible(true);
     }
 
+    public void chooseAsynchronousUpdate(final NViewer v) {
+        final JDialog d = new JDialog(v, "Asynchronous Update");
+        final Config config = v.getConfig();
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(1,2));
+
+        top.add(new JLabel("Chance"));
+        final JTextField chance = new JTextField();
+        chance.setText(config.getVariable("asynchronous_chance", "50"));
+        chance.setColumns(10);
+        top.add(chance);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                config.setVariable("asynchronous_chance", chance.getText());
+                v.setActiveCA(v.getActiveCA().updateMode(UpdateMode.create("async", Integer.parseInt(chance.getText()))));
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
+    public void chooseAsynchronousLocalUpdate(final NViewer v) {
+        final JDialog d = new JDialog(v, "Local Asynchronous Update");
+        final Config config = v.getConfig();
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(1,2));
+
+        top.add(new JLabel("Chance"));
+        final JTextField chance = new JTextField();
+        chance.setText(config.getVariable("localasynchronous_chance", "50"));
+        chance.setColumns(10);
+        top.add(chance);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                config.setVariable("localasynchronous_chance", chance.getText());
+                v.setActiveCA(v.getActiveCA().updateMode(UpdateMode.create("localasync", Integer.parseInt(chance.getText()))));
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
     public void chooseSingle(final NViewer v, Config config) {
         final JDialog d = new JDialog(v, "Fixed initializer");
         JPanel p = new JPanel(new BorderLayout());

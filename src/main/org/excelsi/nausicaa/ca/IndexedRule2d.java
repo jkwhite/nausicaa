@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import com.google.gson.*;
 
 
 public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
@@ -149,5 +150,11 @@ public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
 
     @Override public String toString() {
         return "IndexedRule2d::{pattern:"+pattern()+"}";
+    }
+
+    @Override public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("type", "indexed1d");
+        return o;
     }
 }

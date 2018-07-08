@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Random;
 import java.awt.image.*;
 import javax.imageio.*;
+import com.google.gson.*;
 
 
 public final class IndexedPalette implements Palette {
@@ -161,6 +162,17 @@ public final class IndexedPalette implements Palette {
         for(int c:_colors) {
             w.println(c);
         }
+    }
+
+    @Override public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("type","indexed");
+        JsonArray a = new JsonArray(_colors.length);
+        for(int c:_colors) {
+            a.add(c);
+        }
+        o.add("colors",a);
+        return o;
     }
 
     @Override public String toString() {

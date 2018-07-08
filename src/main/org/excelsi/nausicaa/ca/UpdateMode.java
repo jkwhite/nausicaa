@@ -3,6 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import com.google.gson.*;
 
 
 public interface UpdateMode {
@@ -10,19 +11,26 @@ public interface UpdateMode {
 
     boolean update(Plane p, int x, int y, int z);
 
+    JsonElement toJson();
 
-    public static UpdateMode create(String recipe) {
-        String[] ps = recipe.split(" ");
+    public static UpdateMode fromJson(JsonElement e) {
+        JsonObject o = (JsonObject) e;
+        String type = Json.string(o, "type");
+        int chance = Json.integer(o, "chance", 0);
+        return create(type, chance);
+    }
+
+    public static UpdateMode create(String type, int chance) {
         final Random r = new Random();
-        switch(ps[0]) {
+        switch(type) {
             case "sync":
                 return new SimpleSynchronous();
             case "async":
-                return new SimpleAsynchronous(r, Integer.parseInt(ps[1]));
+                return new SimpleAsynchronous(r, chance);
             case "localasync":
-                return new LocalAsynchronous(r, Integer.parseInt(ps[1]), new int[0]);
+                return new LocalAsynchronous(r, chance, new int[0]);
             default:
-                throw new IllegalArgumentException("unknown recipe '"+recipe+"'");
+                throw new IllegalArgumentException("unknown type '"+type+"'");
         }
     }
 
@@ -33,6 +41,12 @@ public interface UpdateMode {
 
         @Override public boolean update(Plane p, int x, int y, int z) {
             return true;
+        }
+
+        @Override public JsonElement toJson() {
+            JsonObject o = new JsonObject();
+            o.addProperty("type","sync");
+            return o;
         }
     }
 
@@ -52,6 +66,13 @@ public interface UpdateMode {
 
         @Override public boolean update(Plane p, int x, int y, int z) {
             return _r.nextInt(1000)<_chance;
+        }
+
+        @Override public JsonElement toJson() {
+            JsonObject o = new JsonObject();
+            o.addProperty("type","async");
+            o.addProperty("chance",_chance);
+            return o;
         }
     }
 
@@ -78,6 +99,13 @@ public interface UpdateMode {
             final int d = (x-cx)*(x-cx)+(y-cy)*(y-cy)+(z-cz)*(z-cz);
             final int md = p.getWidth()*p.getWidth()+p.getHeight()*p.getHeight()+p.getDepth()*p.getDepth();
             return _r.nextInt(md+_chance)>d;
+        }
+
+        @Override public JsonElement toJson() {
+            JsonObject o = new JsonObject();
+            o.addProperty("type","localasync");
+            o.addProperty("chance",_chance);
+            return o;
         }
     }
 }

@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.Random;
+import com.google.gson.*;
 
 
 public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
@@ -261,7 +262,22 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         return "ComputedRule2d::{pattern:"+_p+"}";
     }
 
+    @Override public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("type","computed");
+        o.add("archetype", archetype().toJson());
+        o.addProperty("genome",genome());
+        return o;
+    }
+
     protected final Pattern createPattern(final ExecutorService pool) {
         return _p.copy();
+    }
+
+    public static Rule fromJson(JsonElement e) {
+        JsonObject o = (JsonObject) e;
+        Archetype a = Archetype.fromJson(o.get("archetype"));
+        String genome = Json.string(o, "genome");
+        return new ComputedRuleset(a).create(genome);
     }
 }

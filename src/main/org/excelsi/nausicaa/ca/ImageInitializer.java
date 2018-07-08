@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.io.File;
 import java.io.IOException;
 import org.imgscalr.Scalr;
+import com.google.gson.*;
 
 
 public class ImageInitializer implements Initializer {
@@ -126,6 +127,16 @@ public class ImageInitializer implements Initializer {
         w.println(""+_params.scale);
     }
 
+    @Override public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("type", "image");
+        o.addProperty("url", _url!=null?_url.toString():"-");
+        o.addProperty("center", _params.center);
+        o.addProperty("tile", _params.tile);
+        o.addProperty("scale", _params.scale);
+        return o;
+    }
+
     public static ImageInitializer read(BufferedReader r, int version) throws IOException {
         return new ImageInitializer(
             new File(r.readLine()),
@@ -135,6 +146,23 @@ public class ImageInitializer implements Initializer {
                 Boolean.valueOf(r.readLine())
             )
         );
+    }
+
+    public static ImageInitializer fromJson(JsonElement e) {
+        JsonObject o = (JsonObject) e;
+        try {
+            return new ImageInitializer(
+                new File(Json.string(o, "url")),
+                new Params(
+                    Json.bool(o, "center", false),
+                    Json.bool(o, "tile", false),
+                    Json.bool(o, "scale", false)
+                )
+            );
+        }
+        catch(IOException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 
     public static class Params {

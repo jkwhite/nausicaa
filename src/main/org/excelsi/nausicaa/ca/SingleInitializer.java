@@ -6,6 +6,7 @@ import java.io.DataOutputStream;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.IOException;
+import com.google.gson.*;
 
 
 public class SingleInitializer implements Initializer {
@@ -76,6 +77,17 @@ public class SingleInitializer implements Initializer {
         w.println(_size);
     }
 
+    @Override public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("type","single");
+        o.addProperty("color",_color);
+        o.addProperty("x",_x);
+        o.addProperty("y",_y);
+        o.addProperty("z",_z);
+        o.addProperty("size",_size);
+        return o;
+    }
+
     private int coordX(Plane p, int v) {
         return v==-1?p.getWidth()/2:v%p.getWidth();
     }
@@ -105,5 +117,16 @@ public class SingleInitializer implements Initializer {
                 Integer.parseInt(r.readLine())
             );
         }
+    }
+
+    public static SingleInitializer fromJson(JsonElement e) {
+        JsonObject o = (JsonObject) e;
+        return new SingleInitializer(
+            Json.integer(o, "color", -1),
+            Json.integer(o, "x", -1),
+            Json.integer(o, "y", -1),
+            Json.integer(o, "z", -1),
+            Json.integer(o, "size", 1)
+        );
     }
 }

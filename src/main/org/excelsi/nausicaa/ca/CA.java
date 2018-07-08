@@ -26,6 +26,9 @@ import java.util.concurrent.ExecutorService;
 import javax.imageio.ImageIO;
 import java.awt.image.*;
 import org.excelsi.rlyehian.Codec;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 
 
 public final class CA {
@@ -43,7 +46,7 @@ public final class CA {
     private float _weight;
     private ComputeMode _cmode;
     private UpdateMode _umode;
-    private static final byte VERSION = 5;
+    private static final byte VERSION = 6;
 
 
     public CA(Rule r, Palette p, Initializer i, Random rand, long seed, int w, int h, int d, int prelude, float weight, int coda, ComputeMode cmode, UpdateMode umode) {
@@ -405,7 +408,79 @@ public final class CA {
         ComputeMode computeMode;
     }
 
+    private static String readTextFileType(String filename) throws IOException {
+        InputStream in = null;
+        try {
+            in = new FileInputStream(filename);
+            if(filename.endsWith(".gz")) {
+                in = new GZIPInputStream(in);
+            }
+            BufferedReader r = new BufferedReader(new InputStreamReader(in));
+            String line = r.readLine();
+            if(line.startsWith("ca {")) {
+                return "nausicaa_legacy";
+            }
+            else if(line.startsWith("{")) {
+                return "nausicaa_json";
+            }
+            else {
+                return "unknown";
+            }
+        }
+        finally {
+            try {
+                in.close();
+            }
+            catch(IOException e) {
+            }
+        }
+    }
+
     private static CA fromTextFile(String filename) throws IOException {
+        switch(readTextFileType(filename)) {
+            case "nausicaa_json":
+                return fromJsonTextFile(filename);
+            case "nausicaa_legacy":
+                return fromLegacyTextFile(filename);
+        }
+        throw new UnsupportedOperationException("unsupported file '"+filename+"'");
+    }
+
+    private static CA fromJsonTextFile(String filename) throws IOException {
+        InputStream in = null;
+        try {
+            in = new FileInputStream(filename);
+            if(filename.endsWith(".gz")) {
+                in = new GZIPInputStream(in);
+            }
+            BufferedReader r = new BufferedReader(new InputStreamReader(in));
+            JsonElement e = new JsonParser().parse(r);
+            return fromJson(e);
+        }
+        finally {
+            try { in.close(); } catch(IOException e) {}
+        }
+    }
+
+    private static CA fromJson(JsonElement e) throws IOException {
+        JsonObject o = (JsonObject) e;
+        int version = Json.integer(o, "version", 6);
+        int w = Json.integer(o, "width", 100);
+        int h = Json.integer(o, "height", 100);
+        int d = Json.integer(o, "depth", 1);
+        int pre = Json.integer(o, "prelude", 0);
+        int seed = Json.integer(o, "seed", 0);
+        float weight = Json.flot(o, "weight", 1f);
+        int coda = Json.integer(o, "coda", 0);
+        ComputeMode cmode = ComputeMode.from(Json.string(o, "compute_mode", "combined"));
+        UpdateMode umode = UpdateMode.fromJson(o.get("update_mode"));
+        Initializer i = Initializers.fromJson(o.get("initializer"));
+        Rule r = ComputedRuleReader.fromJson(o.get("rule"));
+        Palette p = Palette.fromJson(o.get("palette"));
+        return new CA(r, p, i, new Random(), seed, w, h, d, pre, weight, coda, cmode, umode);
+    }
+
+    private static CA fromLegacyTextFile(String filename) throws IOException {
         InputStream in = null;
         try {
             in = new FileInputStream(filename);
@@ -527,26 +602,48 @@ public final class CA {
     }
 
     public void write(PrintWriter w) throws IOException {
-        w.println("ca {");
-        w.println(VERSION);
-        w.println(_w);
-        w.println(_h);
-        w.println(_d);
-        w.println(_prelude);
-        w.println(_seed);
-        w.println(_weight);
-        w.println(_coda);
-        w.println(_cmode);
-        w.println("}");
-        w.println("palette {");
-        _p.write(w);
-        w.println("}");
-        w.println("initializer {");
-        _i.write(w);
-        w.println("}");
-        w.println("rule {");
-        new ComputedRuleWriter(w).writeRule(_r);
-        w.println("}");
+        if(true) {
+            Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create();
+            JsonObject o = new JsonObject();
+            o.addProperty("version", VERSION);
+            o.addProperty("width", _w);
+            o.addProperty("height", _h);
+            o.addProperty("depth", _d);
+            o.addProperty("prelude", _prelude);
+            o.addProperty("seed", _seed);
+            o.addProperty("weight", _weight);
+            o.addProperty("coda", _coda);
+            o.addProperty("compute_mode", _cmode.toString());
+            o.add("update_mode", _umode.toJson());
+            o.add("initializer", _i.toJson());
+            o.add("rule", _r.toJson());
+            o.add("palette", _p.toJson());
+            gson.toJson(o, w);
+        }
+        else {
+            w.println("ca {");
+            w.println(VERSION);
+            w.println(_w);
+            w.println(_h);
+            w.println(_d);
+            w.println(_prelude);
+            w.println(_seed);
+            w.println(_weight);
+            w.println(_coda);
+            w.println(_cmode);
+            w.println("}");
+            w.println("palette {");
+            _p.write(w);
+            w.println("}");
+            w.println("initializer {");
+            _i.write(w);
+            w.println("}");
+            w.println("rule {");
+            new ComputedRuleWriter(w).writeRule(_r);
+            w.println("}");
+        }
     }
 
     @Override public String toString() {

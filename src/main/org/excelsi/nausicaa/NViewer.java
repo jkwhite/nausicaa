@@ -1006,7 +1006,7 @@ public class NViewer extends JFrame implements UIActions {
                 updatehack[1].setState(false);
                 updatehack[2].setState(false);
                 _config.setVariable("updatemode", "sync");
-                setActiveCA(getActiveCA().updateMode(UpdateMode.create("sync")));
+                setActiveCA(getActiveCA().updateMode(UpdateMode.create("sync", 0)));
             }
         });
         updsync.setText("Synchronous");
@@ -1018,10 +1018,11 @@ public class NViewer extends JFrame implements UIActions {
                 updatehack[1].setState(true);
                 updatehack[2].setState(false);
                 _config.setVariable("updatemode", "async");
-                setActiveCA(getActiveCA().updateMode(UpdateMode.create("async 30")));
+                _a.chooseAsynchronousUpdate(NViewer.this);
+                //setActiveCA(getActiveCA().updateMode(UpdateMode.create("async 30")));
             }
         });
-        updasync.setText("Asynchronous");
+        updasync.setText("Asynchronous ...");
         updateopt.add(updasync);
 
         JCheckBoxMenuItem updasynclocal = new JCheckBoxMenuItem(new AbstractAction() {
@@ -1030,10 +1031,11 @@ public class NViewer extends JFrame implements UIActions {
                 updatehack[1].setState(false);
                 updatehack[2].setState(true);
                 _config.setVariable("updatemode", "localasync");
-                setActiveCA(getActiveCA().updateMode(UpdateMode.create("localasync 20")));
+                _a.chooseAsynchronousLocalUpdate(NViewer.this);
+                //setActiveCA(getActiveCA().updateMode(UpdateMode.create("localasync 20")));
             }
         });
-        updasynclocal.setText("Local Asynchronous");
+        updasynclocal.setText("Local Asynchronous ...");
         updateopt.add(updasynclocal);
 
         updatehack[0] = updsync;

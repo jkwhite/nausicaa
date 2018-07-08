@@ -25,6 +25,7 @@ public interface Rule extends java.io.Serializable, Humanizable {
     String id();
     void copy(Plane p);
     void tick();
+    com.google.gson.JsonElement toJson();
     //String toIncantation();
     //void init(CA c, Initialization i);
     //int getSuggestedInterval(CA c);

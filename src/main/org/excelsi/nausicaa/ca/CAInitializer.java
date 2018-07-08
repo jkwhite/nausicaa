@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.io.File;
 import java.io.IOException;
 import org.imgscalr.Scalr;
+import com.google.gson.*;
 
 
 public class CAInitializer implements Initializer {
@@ -139,11 +140,32 @@ public class CAInitializer implements Initializer {
         w.println(_iterations);
     }
 
+    @Override public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("type","ca");
+        o.addProperty("url",_url!=null?_url.toString():"-");
+        o.addProperty("iterations", _iterations);
+        return o;
+    }
+
     public static CAInitializer read(BufferedReader r, int version) throws IOException {
         return new CAInitializer(
             r.readLine(),
             Integer.parseInt(r.readLine())
         );
+    }
+
+    public static CAInitializer fromJson(JsonElement e) {
+        JsonObject o = (JsonObject) e;
+        try {
+            return new CAInitializer(
+                Json.string(o, "url"),
+                Json.integer(o, "iterations", 10)
+            );
+        }
+        catch(IOException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 
     private static class CKey {

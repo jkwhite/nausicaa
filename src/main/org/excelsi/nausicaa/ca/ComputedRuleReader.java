@@ -3,6 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import com.google.gson.*;
 
 
 public class ComputedRuleReader {
@@ -23,5 +24,16 @@ public class ComputedRuleReader {
         Archetype a = Archetype.read(_r, _version);
         String genome = _r.readLine();
         return new ComputedRuleset(a).create(genome, _version);
+    }
+
+    public static Rule fromJson(JsonElement e) {
+        JsonObject o = (JsonObject) e;
+        String type = Json.string(o, "type");
+        switch(type) {
+            case "computed":
+                return ComputedRule2d.fromJson(e);
+            default:
+                throw new IllegalArgumentException("unsupported type '"+type+"'");
+        }
     }
 }

@@ -6,6 +6,7 @@ import java.io.DataOutputStream;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.IOException;
+import com.google.gson.*;
 
 
 public class GaussianInitializer implements Initializer {
@@ -153,6 +154,17 @@ public class GaussianInitializer implements Initializer {
         w.println(_params.density);
     }
 
+    @Override public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("type","gaussian");
+        o.addProperty("seed",_seed);
+        o.addProperty("zero_weight",_params.zeroWeight);
+        o.addProperty("max_points",_params.maxPoints);
+        o.addProperty("max_radius",_params.maxRadius);
+        o.addProperty("density",_params.density);
+        return o;
+    }
+
     public static GaussianInitializer read(BufferedReader r, int version) throws IOException {
         return new GaussianInitializer(
             null,
@@ -162,6 +174,20 @@ public class GaussianInitializer implements Initializer {
                 Integer.parseInt(r.readLine()),
                 Float.parseFloat(r.readLine()),
                 Float.parseFloat(r.readLine())
+            )
+        );
+    }
+
+    public static GaussianInitializer fromJson(JsonElement e) {
+        JsonObject o = (JsonObject) e;
+        return new GaussianInitializer(
+            null,
+            Json.lng(o, "seed", 0),
+            new Params(
+                Json.flot(o, "zero_weight", 0f),
+                Json.integer(o, "max_points", 5),
+                Json.flot(o, "max_radius", 0.1f),
+                Json.flot(o, "density", 0.2f)
             )
         );
     }

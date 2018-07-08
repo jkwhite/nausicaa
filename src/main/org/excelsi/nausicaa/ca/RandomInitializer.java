@@ -6,6 +6,7 @@ import java.io.DataOutputStream;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.IOException;
+import com.google.gson.*;
 
 
 public class RandomInitializer implements Initializer {
@@ -88,11 +89,30 @@ public class RandomInitializer implements Initializer {
         _params.write(w);
     }
 
+    @Override public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("type","random");
+        o.addProperty("seed", _seed);
+        o.addProperty("zero_weight", _params.zeroWeight);
+        return o;
+    }
+
     public static RandomInitializer read(BufferedReader r, int version) throws IOException {
         return new RandomInitializer(
             null,
             Long.parseLong(r.readLine()),
             new Params(Float.parseFloat(r.readLine()))
+        );
+    }
+
+    public static RandomInitializer fromJson(JsonElement e) {
+        JsonObject o = (JsonObject) e;
+        return new RandomInitializer(
+            null,
+            Json.lng(o, "seed", 0),
+            new Params(
+                Json.flot(o, "zero_weight", 0)
+            )
         );
     }
 

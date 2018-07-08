@@ -8,6 +8,7 @@ import java.io.DataOutputStream;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.IOException;
+import com.google.gson.*;
 
 
 public final class Archetype {
@@ -181,6 +182,15 @@ public final class Archetype {
         w.println(_neighborhood.toString());
     }
 
+    public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("dims",_dims);
+        o.addProperty("size",_size);
+        o.addProperty("colors",_colors);
+        o.addProperty("neighborhood",_neighborhood.toString());
+        return o;
+    }
+
     public static Archetype read(BufferedReader r, int version) throws IOException {
         if(version<5) {
             return new Archetype(
@@ -196,6 +206,16 @@ public final class Archetype {
             Neighborhood n = Neighborhood.from(r.readLine());
             return new Archetype(dims, size, cols, n);
         }
+    }
+
+    public static Archetype fromJson(JsonElement e) {
+        JsonObject o = (JsonObject) e;
+        return new Archetype(
+            Json.integer(o, "dims", 2),
+            Json.integer(o, "size", 1),
+            Json.integer(o, "colors", 2),
+            Neighborhood.from(Json.string(o, "neighborhood", "moore"))
+        );
     }
 
     @Override public String toString() {

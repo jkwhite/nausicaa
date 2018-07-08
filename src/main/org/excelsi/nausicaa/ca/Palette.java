@@ -10,6 +10,7 @@ import java.awt.image.IndexColorModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.Random;
 import java.awt.image.*;
 import javax.imageio.*;
+import com.google.gson.*;
 
 
 public interface Palette {
@@ -36,8 +38,7 @@ public interface Palette {
     int[][] unpack();
 
     int[] unpack(int idx, int[] rgba);
-
-    Palette replace(int index, int newColor);
+Palette replace(int index, int newColor);
 
     IndexColorModel toColorModel();
 
@@ -54,6 +55,8 @@ public interface Palette {
     void write(DataOutputStream dos) throws IOException;
 
     void write(PrintWriter w);
+
+    JsonElement toJson();
 
     public static Palette read(DataInputStream dis) throws IOException {
         int len = dis.readInt();
@@ -84,6 +87,27 @@ public interface Palette {
                 return new RGBPalette();
             case "rgba":
                 return new RGBAPalette();
+        }
+        throw new IllegalStateException("unknown palette type '"+type+"'");
+    }
+
+    public static Palette fromJson(JsonElement e) {
+        JsonObject o = (JsonObject) e;
+        String type = Json.string(o, "type");
+        switch(type) {
+            case "rgb":
+                return new RGBPalette();
+            case "rgba":
+                return new RGBAPalette();
+            case "indexed":
+                JsonArray cols = (JsonArray) o.get("colors");
+                int[] colors = new int[cols.size()];
+                int j = 0;
+                for(Iterator<JsonElement> it=cols.iterator();it.hasNext();) {
+                    int c = it.next().getAsInt();
+                    colors[j++] = c;
+                }
+                return new IndexedPalette(true, colors);
         }
         throw new IllegalStateException("unknown palette type '"+type+"'");
     }

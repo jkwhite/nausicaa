@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.Iterator;
+import com.google.gson.*;
 
 
 public class IndexedRule1d extends AbstractIndexedRule {
@@ -135,5 +136,11 @@ public class IndexedRule1d extends AbstractIndexedRule {
         StringBuilder b = new StringBuilder("1d / ");
         b.append(super.humanize());
         return b.toString();
+    }
+
+    @Override public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("type", "indexed1d");
+        return o;
     }
 }

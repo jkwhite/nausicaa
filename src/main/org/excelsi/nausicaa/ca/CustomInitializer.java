@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import groovy.lang.GroovyShell;
 import groovy.lang.Binding;
+import com.google.gson.*;
 
 
 public class CustomInitializer implements Initializer {
@@ -52,6 +53,13 @@ public class CustomInitializer implements Initializer {
         w.println("====");
     }
 
+    @Override public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("type","custom");
+        o.addProperty("text",_text);
+        return o;
+    }
+
     public static CustomInitializer read(BufferedReader r, int version) throws IOException {
         StringBuilder t = new StringBuilder();
         String delim = r.readLine();
@@ -64,5 +72,12 @@ public class CustomInitializer implements Initializer {
             t.append(line).append("\n");
         }
         return new CustomInitializer(t.toString());
+    }
+
+    public static CustomInitializer fromJson(JsonElement e) {
+        JsonObject o = (JsonObject) e;
+        return new CustomInitializer(
+            Json.string(o, "text")
+        );
     }
 }
