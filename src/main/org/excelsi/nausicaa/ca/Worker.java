@@ -68,17 +68,22 @@ public class Worker {
         for(int i=_y1;i<_y2;i++) {
             for(int j=_x1;j<_x2;j++) {
                 for(int k=0;k<p1.getDepth();k++) {
-                    if(_moore) {
-                        p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
+                    if(_umode!=null&&!_umode.update(p1, j, i, k)) {
+                        p2.setCell(j,i,k,p1.getCell(j,i,k));
                     }
                     else {
-                        p1.getCardinal(_pattern, j, i, k, /*dx*/ _size, /*dy*/ _size, /*dz*/ _size, 0);
-                    }
-                    if(_channels) {
-                        p2.setCell(j, i, k, channels());
-                    }
-                    else {
-                        p2.setCell(j, i, k, next(_pattern));
+                        if(_moore) {
+                            p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
+                        }
+                        else {
+                            p1.getCardinal(_pattern, j, i, k, /*dx*/ _size, /*dy*/ _size, /*dz*/ _size, 0);
+                        }
+                        if(_channels) {
+                            p2.setCell(j, i, k, channels());
+                        }
+                        else {
+                            p2.setCell(j, i, k, next(_pattern));
+                        }
                     }
                 }
             }
@@ -178,17 +183,20 @@ public class Worker {
         //System.err.println("created pattern: "+p);
         for(int i=_y1;i<_y2;i++) {
             for(int j=0;j<w;j++) {
-                c.getBlock(prev, j-size, i-1, prev.length, 1, 0);
-                //int idx = 0;
-                for(int k=0;k<prev.length;k++) {
-                    pattern[k] = (int) (prev[k]);
-                    //idx += prev[k] * pow[k];
+                if(_umode!=null&&!_umode.update(c, j, 0, 0)) {
+                    c.setCell(j,i,c.getCell(j,i-1));
                 }
-                final int v = _wp.next(0, pattern);
-                final int ov = pattern[pattern.length/2];
-                final int nv = (int) ((_oWeight*ov)+(_weight*v));
-                c.setCell(j, i, nv);
-                //System.err.print(".");
+                else {
+                    c.getBlock(pattern, j-size, i-1, pattern.length, 1, 0);
+                    //for(int k=0;k<prev.length;k++) {
+                        //pattern[k] = (int) (prev[k]);
+                    //}
+                    final int v = _wp.next(0, pattern);
+                    final int ov = pattern[pattern.length/2];
+                    final int nv = (int) ((_oWeight*ov)+(_weight*v));
+                    c.setCell(j, i, nv);
+                    //System.err.print(".");
+                }
             }
             //mutateRule(p);
             _wp.tick();

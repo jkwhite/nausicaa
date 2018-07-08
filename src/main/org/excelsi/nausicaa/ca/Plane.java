@@ -3,8 +3,10 @@ package org.excelsi.nausicaa.ca;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.PrintWriter;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
+import com.google.gson.JsonElement;
 
 
 public interface Plane /*extends Pattern*/ {
@@ -43,4 +45,6 @@ public interface Plane /*extends Pattern*/ {
     void unlockRead();
     void lockWrite();
     void unlockWrite();
+    JsonElement toJson();
+    void export(PrintWriter w) throws IOException;
 }

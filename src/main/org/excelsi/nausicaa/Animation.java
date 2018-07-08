@@ -136,20 +136,6 @@ top:        while(_state==State.animate) {
         finally {
             compute.shutdownNow();
             render.shutdownNow();
-            /*
-            try {
-                compute.awaitTermination(10, TimeUnit.SECONDS);
-            }
-            catch(Exception e) {
-                System.err.println("compute failed to terminate");
-            }
-            try {
-                render.awaitTermination(10, TimeUnit.SECONDS);
-            }
-            catch(Exception e) {
-                System.err.println("render failed to terminate");
-            }
-            */
         }
     }
 
@@ -188,8 +174,7 @@ top:        while(_state==State.animate) {
                 System.err.println("done");
                 return;
             }
-            final Plane frame = _frames.next(); //.copy();
-            //frame.lock(1);
+            final Plane frame = _frames.next();
             frame.lockRead();
             if(isInterrupted()) {
                 if(!_d.delegateUnlock()) {

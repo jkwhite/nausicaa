@@ -601,26 +601,30 @@ public final class CA {
         _r.write(dos);
     }
 
+    public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("version", VERSION);
+        o.addProperty("width", _w);
+        o.addProperty("height", _h);
+        o.addProperty("depth", _d);
+        o.addProperty("prelude", _prelude);
+        o.addProperty("seed", _seed);
+        o.addProperty("weight", _weight);
+        o.addProperty("coda", _coda);
+        o.addProperty("compute_mode", _cmode.toString());
+        o.add("update_mode", _umode.toJson());
+        o.add("initializer", _i.toJson());
+        o.add("rule", _r.toJson());
+        o.add("palette", _p.toJson());
+        return o;
+    }
+
     public void write(PrintWriter w) throws IOException {
         if(true) {
             Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .create();
-            JsonObject o = new JsonObject();
-            o.addProperty("version", VERSION);
-            o.addProperty("width", _w);
-            o.addProperty("height", _h);
-            o.addProperty("depth", _d);
-            o.addProperty("prelude", _prelude);
-            o.addProperty("seed", _seed);
-            o.addProperty("weight", _weight);
-            o.addProperty("coda", _coda);
-            o.addProperty("compute_mode", _cmode.toString());
-            o.add("update_mode", _umode.toJson());
-            o.add("initializer", _i.toJson());
-            o.add("rule", _r.toJson());
-            o.add("palette", _p.toJson());
-            gson.toJson(o, w);
+            gson.toJson(toJson(), w);
         }
         else {
             w.println("ca {");

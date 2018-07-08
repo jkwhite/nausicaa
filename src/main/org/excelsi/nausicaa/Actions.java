@@ -271,6 +271,24 @@ public class Actions {
         }
     }
 
+    public void exportGenerated(NViewer v, Config config) {
+        JFileChooser f = new JFileChooser(config.getDir());
+        f.setDialogTitle("Export Generated CA");
+        f.setDialogType(f.SAVE_DIALOG);
+        f.setMultiSelectionEnabled(false);
+        int ret = f.showSaveDialog(v.getRoot());
+        Plane plane = v.getPlaneDisplayProvider().getActivePlane();
+        if(ret==f.APPROVE_OPTION) {
+            try(PrintWriter w = new PrintWriter(new BufferedWriter(new FileWriter(f.getSelectedFile().toString())))) {
+                config.setDir(f.getSelectedFile().getParent());
+                plane.export(w);
+            }
+            catch(IOException e) {
+                showError(v, "Failed to save "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);
+            }
+        }
+    }
+
     public void exportRule(NViewer v, Config config) {
         JFileChooser f = new JFileChooser(config.getDir());
         f.setDialogTitle("Export rule");
@@ -593,7 +611,7 @@ public class Actions {
 
         top.add(new JLabel("Chance"));
         final JTextField chance = new JTextField();
-        chance.setText(config.getVariable("asynchronous_chance", "50"));
+        chance.setText(config.getVariable("asynchronous_chance", "0.5"));
         chance.setColumns(10);
         top.add(chance);
 
@@ -606,7 +624,7 @@ public class Actions {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
                 config.setVariable("asynchronous_chance", chance.getText());
-                v.setActiveCA(v.getActiveCA().updateMode(UpdateMode.create("async", Integer.parseInt(chance.getText()))));
+                v.setActiveCA(v.getActiveCA().updateMode(UpdateMode.create("async", Float.parseFloat(chance.getText()))));
             }
         });
         bot.add(ne);
@@ -629,7 +647,7 @@ public class Actions {
 
         top.add(new JLabel("Chance"));
         final JTextField chance = new JTextField();
-        chance.setText(config.getVariable("localasynchronous_chance", "50"));
+        chance.setText(config.getVariable("localasynchronous_chance", "0.5"));
         chance.setColumns(10);
         top.add(chance);
 
@@ -642,7 +660,7 @@ public class Actions {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
                 config.setVariable("localasynchronous_chance", chance.getText());
-                v.setActiveCA(v.getActiveCA().updateMode(UpdateMode.create("localasync", Integer.parseInt(chance.getText()))));
+                v.setActiveCA(v.getActiveCA().updateMode(UpdateMode.create("localasync", Float.parseFloat(chance.getText()))));
             }
         });
         bot.add(ne);

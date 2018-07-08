@@ -41,6 +41,7 @@ public class Codons {
     public static final String SUBTRACT = "su";
     public static final String NOT = "se";
     public static final String NOT_INTERSECT = "so";
+    public static final String ABORT = "ga";
     public static final String AVG = "gi";
     public static final String PUSH_ALL_ROT = "ge";
     public static final String PUSH_ALL = "go";
@@ -184,6 +185,8 @@ public class Codons {
                     return new Fork(p, 10, im.archetype().colors()-1);
                 case STOP:
                     return new Stop();
+                case ABORT:
+                    return new Abort();
                 case POS:
                     return new Pos();
                 case NOT:
@@ -571,6 +574,31 @@ public class Codons {
 
         @Override public String generate(Random r) {
             return STOP;
+        }
+    }
+
+    public static class Abort implements Codon {
+        @Override public Codon copy() {
+            return new Abort();
+        }
+
+        @Override public String code() {
+            return ABORT;
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
+        @Override public boolean reversible() { return true; }
+
+        @Override public void op(int[] p, Tape t) {
+            t.push(p[p.length/2]);
+            t.stop();
+        }
+
+        @Override public String generate(Random r) {
+            return ABORT;
         }
     }
 

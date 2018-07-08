@@ -270,9 +270,9 @@ public class NViewer extends JFrame implements UIActions {
                 _a.exportImage(NViewer.this, _config);
             }
         };
-        AbstractAction exportRule = new AbstractAction() {
+        AbstractAction exportGenerated = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.exportRule(NViewer.this, _config);
+                _a.exportGenerated(NViewer.this, _config);
             }
         };
         JMenuItem ni = file.add(newCA);
@@ -299,16 +299,16 @@ public class NViewer extends JFrame implements UIActions {
         oi.setText("Open ...");
         oi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, shortcut));
         JMenuItem si = file.add(save);
-        si.setText("Save");
+        si.setText("Save ...");
         si.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, shortcut));
         JMenuItem cl = file.add(close);
         cl.setText("Close");
         cl.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));
         file.addSeparator();
         JMenuItem expImg = file.add(exportImg);
-        expImg.setText("Export image...");
-        JMenuItem expRule = file.add(exportRule);
-        expRule.setText("Export rule...");
+        expImg.setText("Export generated image ...");
+        JMenuItem expGenerated = file.add(exportGenerated);
+        expGenerated.setText("Export generated data ...");
         //exp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));
         bar.add(file);
     }

@@ -16,11 +16,11 @@ public interface UpdateMode {
     public static UpdateMode fromJson(JsonElement e) {
         JsonObject o = (JsonObject) e;
         String type = Json.string(o, "type");
-        int chance = Json.integer(o, "chance", 0);
+        float chance = Json.flot(o, "chance", 0);
         return create(type, chance);
     }
 
-    public static UpdateMode create(String type, int chance) {
+    public static UpdateMode create(String type, float chance) {
         final Random r = new Random();
         switch(type) {
             case "sync":
@@ -52,10 +52,10 @@ public interface UpdateMode {
 
     public static final class SimpleAsynchronous implements UpdateMode {
         private final Random _r;
-        private final int _chance;
+        private final float _chance;
 
 
-        public SimpleAsynchronous(Random r, int chance) {
+        public SimpleAsynchronous(Random r, float chance) {
             _r = r;
             _chance = chance;
         }
@@ -65,7 +65,7 @@ public interface UpdateMode {
         }
 
         @Override public boolean update(Plane p, int x, int y, int z) {
-            return _r.nextInt(1000)<_chance;
+            return _r.nextFloat()<_chance;
         }
 
         @Override public JsonElement toJson() {
@@ -78,11 +78,11 @@ public interface UpdateMode {
 
     public static final class LocalAsynchronous implements UpdateMode {
         private final Random _r;
-        private final int _chance;
+        private final float _chance;
         private final int[] _center;
 
 
-        public LocalAsynchronous(Random r, int chance, int[] center) {
+        public LocalAsynchronous(Random r, float chance, int[] center) {
             _r = r;
             _chance = chance;
             _center = center;
@@ -97,8 +97,9 @@ public interface UpdateMode {
             final int cy = p.getHeight()/2;
             final int cz = p.getDepth()/2;
             final int d = (x-cx)*(x-cx)+(y-cy)*(y-cy)+(z-cz)*(z-cz);
-            final int md = p.getWidth()*p.getWidth()+p.getHeight()*p.getHeight()+p.getDepth()*p.getDepth();
-            return _r.nextInt(md+_chance)>d;
+            final int md = p.getWidth()/2*p.getWidth()/2+p.getHeight()/2*p.getHeight()/2+p.getDepth()/2*p.getDepth()/2;
+            //final int cmod = _chance*_chance*(_chance>=0?1:-1);
+            return _r.nextInt((int)(md*_chance))>d;
         }
 
         @Override public JsonElement toJson() {
