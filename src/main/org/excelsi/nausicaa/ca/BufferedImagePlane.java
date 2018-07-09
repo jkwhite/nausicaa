@@ -20,6 +20,8 @@ import org.imgscalr.Scalr;
 public class BufferedImagePlane extends AbstractPlane implements java.io.Serializable {
     private final CA _creator;
     private final Palette _palette;
+    private final boolean _wrap;
+    private final int _oob;
     private transient BufferedImage _i;
     private transient WritableRaster _r;
     private transient JFrame _d;
@@ -27,14 +29,22 @@ public class BufferedImagePlane extends AbstractPlane implements java.io.Seriali
     private int _lockOwner = -1;
 
 
-    public BufferedImagePlane(CA creator, int width, int time, Palette p) {
+    public BufferedImagePlane(CA creator, int width, int time, Palette p, Integer oob) {
         _creator = creator;
         _i = new BufferedImage(width, time, BufferedImage.TYPE_BYTE_INDEXED, p.toColorModel());
         _r = _i.getRaster();
+        if(oob!=null) {
+            _wrap = false;
+            _oob = oob.intValue();
+        }
+        else {
+            _wrap = true;
+            _oob = 0;
+        }
         _palette = p;
     }
 
-    public BufferedImagePlane(CA creator, int width, int time) {
+    public BufferedImagePlane(CA creator, int width, int time, Integer oob) {
         _creator = creator;
         _i = new BufferedImage(width, time, BufferedImage.TYPE_BYTE_INDEXED,
             new IndexColorModel(8, 2,
@@ -43,6 +53,14 @@ public class BufferedImagePlane extends AbstractPlane implements java.io.Seriali
                 new byte[]{0, 127}
             ));
         _r = _i.getRaster();
+        if(oob!=null) {
+            _wrap = false;
+            _oob = oob.intValue();
+        }
+        else {
+            _wrap = true;
+            _oob = 0;
+        }
         _palette = null;
     }
 
@@ -50,6 +68,8 @@ public class BufferedImagePlane extends AbstractPlane implements java.io.Seriali
         _creator = null;
         _i = i;
         _palette = null;
+        _wrap = true;
+        _oob = 0;
     }
 
     @Override public CA creator() {
@@ -59,17 +79,17 @@ public class BufferedImagePlane extends AbstractPlane implements java.io.Seriali
     @Override public Plane copy() {
         BufferedImagePlane p;
         if(_palette!=null) {
-            p = new BufferedImagePlane(_creator, getWidth(), getHeight(), _palette);
+            p = new BufferedImagePlane(_creator, getWidth(), getHeight(), _palette, _wrap?null:_oob);
         }
         else {
-            p = new BufferedImagePlane(_creator, getWidth(), getHeight());
+            p = new BufferedImagePlane(_creator, getWidth(), getHeight(), _wrap?null:_oob);
         }
         p._i.setData(_i.getData());
         return p;
     }
 
     @Override public Plane withDepth(int d) {
-        IntBlockPlane p = new IntBlockPlane(_creator, getWidth(), getHeight(), d, _palette);
+        IntBlockPlane p = new IntBlockPlane(_creator, getWidth(), getHeight(), d, _palette, _wrap?null:_oob);
         for(int i=0;i<getWidth();i++) {
             for(int j=0;j<getHeight();j++) {
                 p.setCell(i, j, 0, getCell(i, j));
@@ -223,17 +243,25 @@ public class BufferedImagePlane extends AbstractPlane implements java.io.Seriali
 
     @Override public int getCell(int x, int y) {
         //System.err.println(String.format("init %d,%d", x, y));
+        boolean mod = false;
         if(x<0) {
             x += getWidth();
+            mod = true;
         }
         else if(x>=getWidth()) {
             x -= getWidth();
+            mod = true;
         }
         if(y<0) {
             y += getHeight();
+            mod = true;
         }
         else if(y>=getHeight()) {
             y -= getHeight();
+            mod = true;
+        }
+        if(mod&&!_wrap) {
+            return _oob;
         }
         //return _i.getData().getSample(x, y, 0);
         //System.err.println(String.format("cell %d,%d", x, y));

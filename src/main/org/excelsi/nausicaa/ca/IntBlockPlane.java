@@ -20,17 +20,19 @@ public class IntBlockPlane extends AbstractPlane {
     private final Palette _p;
     private final BufferedImage _i;
     private final WritableRaster _r;
+    private final boolean _wrap;
+    private final int _oob;
     //private final int[][] _unpacked;
     private int _readDepthIdx;
     private int _writeDepthIdx;
     //private int _lockOwner = -1;
 
 
-    public IntBlockPlane(CA ca, int w, int h, int d, Palette p) {
-        this(ca, w, h, d, p, new int[w*h*d]);
+    public IntBlockPlane(CA ca, int w, int h, int d, Palette p, Integer oob) {
+        this(ca, w, h, d, p, oob, new int[w*h*d]);
     }
 
-    public IntBlockPlane(CA ca, int w, int h, int d, Palette p, int[] s) {
+    public IntBlockPlane(CA ca, int w, int h, int d, Palette p, Integer oob, int[] s) {
         _ca = ca;
         _w = w;
         _h = h;
@@ -42,6 +44,14 @@ public class IntBlockPlane extends AbstractPlane {
         _dstride = _hstride*_h;
         _i = new BufferedImage(_w, _h, BufferedImage.TYPE_INT_ARGB);
         _r = _i.getRaster();
+        if(oob!=null) {
+            _wrap = false;
+            _oob = oob.intValue();
+        }
+        else {
+            _wrap = true;
+            _oob = 0;
+        }
         //_readDepthIdx = -1;
         //_writeDepthIdx = -1;
     }
@@ -95,6 +105,9 @@ public class IntBlockPlane extends AbstractPlane {
         int nx = normX(x);
         int ny = normY(y);
         int nz = normZ(z);
+        if(!_wrap && (nx!=x||ny!=y||nz!=z)) {
+            return _oob;
+        }
         //try {
             final int idx = nx+_hstride*ny+_dstride*nz;
             //if(idx==12) {
@@ -297,11 +310,11 @@ public class IntBlockPlane extends AbstractPlane {
     @Override public Plane copy() {
         int[] sc = new int[_s.length];
         System.arraycopy(_s, 0, sc, 0, _s.length);
-        return new IntBlockPlane(_ca, _w, _h, _d, _p, sc);
+        return new IntBlockPlane(_ca, _w, _h, _d, _p, oob(), sc);
     }
 
     @Override public Plane withDepth(int d) {
-        IntBlockPlane p = new IntBlockPlane(_ca, _w, _h, d, _p);
+        IntBlockPlane p = new IntBlockPlane(_ca, _w, _h, d, _p, oob());
         int md = _d<d?_d:d;
         for(int i=0;i<_w;i++) {
             for(int j=0;j<_h;j++) {
@@ -364,6 +377,10 @@ public class IntBlockPlane extends AbstractPlane {
 
     protected int[] getBuffer() {
         return _s;
+    }
+
+    protected Integer oob() {
+        return _wrap?null:_oob;
     }
 
     private final int normX(int x) {

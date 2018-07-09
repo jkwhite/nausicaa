@@ -2,12 +2,12 @@ package org.excelsi.nausicaa.ca;
 
 
 public class IntBlockPlane2d extends IntBlockPlane {
-    public IntBlockPlane2d(CA ca, int w, int h, int d, Palette p) {
-        this(ca, w, h, d, p, new int[w*h*d]);
+    public IntBlockPlane2d(CA ca, int w, int h, int d, Palette p, Integer oob) {
+        this(ca, w, h, d, p, oob, new int[w*h*d]);
     }
 
-    public IntBlockPlane2d(CA ca, int w, int h, int d, Palette p, int[] s) {
-        super(ca, w, h, d, p, s);
+    public IntBlockPlane2d(CA ca, int w, int h, int d, Palette p, Integer oob, int[] s) {
+        super(ca, w, h, d, p, oob, s);
     }
 
     public int[] getBlock(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
@@ -46,11 +46,11 @@ public class IntBlockPlane2d extends IntBlockPlane {
         int[] s = getBuffer();
         int[] sc = new int[s.length];
         System.arraycopy(s, 0, sc, 0, s.length);
-        return new IntBlockPlane2d(creator(), getWidth(), getHeight(), getDepth(), getPalette(), sc);
+        return new IntBlockPlane2d(creator(), getWidth(), getHeight(), getDepth(), getPalette(), oob(), sc);
     }
 
     @Override public Plane withDepth(int d) {
-        IntBlockPlane p = new IntBlockPlane(creator(), getWidth(), getHeight(), d, getPalette());
+        IntBlockPlane p = new IntBlockPlane(creator(), getWidth(), getHeight(), d, getPalette(), oob());
         for(int i=0;i<getWidth();i++) {
             for(int j=0;j<getHeight();j++) {
                 p.setCell(i, j, 0, getCell(i, j, 0));

@@ -165,7 +165,8 @@ public class Actions {
                         v.getConfig().getWeight(),
                         0,
                         ComputeMode.combined,
-                        new UpdateMode.SimpleSynchronous());
+                        new UpdateMode.SimpleSynchronous(),
+                        EdgeMode.defaultMode());
                 v.setActiveCA(ca);
             }
         });
@@ -602,6 +603,89 @@ public class Actions {
         d.setVisible(true);
     }
 
+    public void chooseConstantEdgeMode(final NViewer v) {
+        final JDialog d = new JDialog(v, "Constant Edge Mode");
+        final Config config = v.getConfig();
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(1,2));
+
+        top.add(new JLabel("Color"));
+        final JTextField value = new JTextField();
+        value.setText(config.getVariable("edgemode_constant", "0"));
+        value.setColumns(10);
+        top.add(value);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                config.setVariable("edgemode_constant", value.getText());
+                v.setActiveCA(v.getActiveCA().edgeMode(new EdgeMode(EdgeMode.Type.constant, Integer.parseInt(value.getText()))));
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
+    public void chooseAsynchronousEnergyUpdate(final NViewer v) {
+        final JDialog d = new JDialog(v, "Asynchronous Energy Update");
+        final Config config = v.getConfig();
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(2,2));
+
+        top.add(new JLabel("Chance Coefficient"));
+        final JTextField chance = new JTextField();
+        chance.setText(config.getVariable("energyasynchronous_chance", "1.0"));
+        chance.setColumns(10);
+        top.add(chance);
+
+        top.add(new JLabel("Size"));
+        final JTextField size = new JTextField();
+        size.setText(config.getVariable("energyasynchronous_size", "1"));
+        size.setColumns(10);
+        top.add(size);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                config.setVariable("energyasynchronous_chance", chance.getText());
+                config.setVariable("energyasynchronous_size", size.getText());
+                v.setActiveCA(v.getActiveCA().updateMode(
+                    UpdateMode.create("energy",
+                        Float.parseFloat(chance.getText()),
+                        Integer.parseInt(size.getText())
+                )));
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
     public void chooseAsynchronousUpdate(final NViewer v) {
         final JDialog d = new JDialog(v, "Asynchronous Update");
         final Config config = v.getConfig();
@@ -624,7 +708,7 @@ public class Actions {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
                 config.setVariable("asynchronous_chance", chance.getText());
-                v.setActiveCA(v.getActiveCA().updateMode(UpdateMode.create("async", Float.parseFloat(chance.getText()))));
+                v.setActiveCA(v.getActiveCA().updateMode(UpdateMode.create("async", Float.parseFloat(chance.getText()), 0)));
             }
         });
         bot.add(ne);
@@ -645,7 +729,7 @@ public class Actions {
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JPanel top = new JPanel(new GridLayout(1,2));
 
-        top.add(new JLabel("Chance"));
+        top.add(new JLabel("Chance Coefficient"));
         final JTextField chance = new JTextField();
         chance.setText(config.getVariable("localasynchronous_chance", "0.5"));
         chance.setColumns(10);
@@ -660,7 +744,7 @@ public class Actions {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
                 config.setVariable("localasynchronous_chance", chance.getText());
-                v.setActiveCA(v.getActiveCA().updateMode(UpdateMode.create("localasync", Float.parseFloat(chance.getText()))));
+                v.setActiveCA(v.getActiveCA().updateMode(UpdateMode.create("localasync", Float.parseFloat(chance.getText()), 0)));
             }
         });
         bot.add(ne);

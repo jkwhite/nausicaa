@@ -28,10 +28,12 @@ public class WritableImagePlane extends AbstractPlane {
     private final int[] _colors;
     private final int _width;
     private final int _height;
+    private final boolean _wrap;
+    private final int _oob;
     private int _lockOwner = -1;
 
 
-    public WritableImagePlane(CA creator, int w, int h, Palette p) {
+    public WritableImagePlane(CA creator, int w, int h, Palette p, Integer oob) {
         _creator = creator;
         _i = new WritableImage(w, h);
         _r = _i.getPixelReader();
@@ -39,6 +41,14 @@ public class WritableImagePlane extends AbstractPlane {
         _width = w;
         _height = h;
         _p = p;
+        if(oob!=null) {
+            _wrap = false;
+            _oob = oob.intValue();
+        }
+        else {
+            _wrap = true;
+            _oob = 0;
+        }
         _colors = p.getColors();
         _pf = PixelFormat.createByteIndexedInstance(p.getColors());
     }
@@ -48,11 +58,11 @@ public class WritableImagePlane extends AbstractPlane {
     }
 
     public Plane copy() {
-        return new WritableImagePlane(_creator, _width, _height, _p);
+        return new WritableImagePlane(_creator, _width, _height, _p, _wrap?null:_oob);
     }
 
     @Override public Plane withDepth(int d) {
-        IntBlockPlane p = new IntBlockPlane(_creator, _width, _height, d, _p);
+        IntBlockPlane p = new IntBlockPlane(_creator, _width, _height, d, _p, _wrap?null:_oob);
         for(int i=0;i<_width;i++) {
             for(int j=0;j<_height;j++) {
                 p.setCell(i, j, 0, getCell(i, j));

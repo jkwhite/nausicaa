@@ -129,7 +129,7 @@ public class NViewer extends JFrame implements UIActions {
         Rule rule = rs.random(rand).next();
         ComputeMode cmode = ComputeMode.combined;
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
-        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre, weight, 0, cmode, new UpdateMode.SimpleSynchronous());
+        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre, weight, 0, cmode, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode());
         //org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.single.create(), rand, 0, w, h, d, pre);
 
         JPanel main = new JPanel(new BorderLayout());
@@ -998,62 +998,139 @@ public class NViewer extends JFrame implements UIActions {
 
         auto.addSeparator();
 
-        JMenu updateopt = new JMenu("Update mode");
-        final JCheckBoxMenuItem[] updatehack = new JCheckBoxMenuItem[3];
-        JCheckBoxMenuItem updsync = new JCheckBoxMenuItem(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                updatehack[0].setState(true);
-                updatehack[1].setState(false);
-                updatehack[2].setState(false);
-                _config.setVariable("updatemode", "sync");
-                setActiveCA(getActiveCA().updateMode(UpdateMode.create("sync", 0)));
-            }
-        });
-        updsync.setText("Synchronous");
-        updateopt.add(updsync);
+        {
+            JMenu updateopt = new JMenu("Update mode");
+            final JCheckBoxMenuItem[] updatehack = new JCheckBoxMenuItem[4];
+            JCheckBoxMenuItem updsync = new JCheckBoxMenuItem(new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    updatehack[0].setState(true);
+                    updatehack[1].setState(false);
+                    updatehack[2].setState(false);
+                    updatehack[3].setState(false);
+                    _config.setVariable("updatemode", "sync");
+                    setActiveCA(getActiveCA().updateMode(UpdateMode.create("sync", 0, 0)));
+                }
+            });
+            updsync.setText("Synchronous");
+            updateopt.add(updsync);
 
-        JCheckBoxMenuItem updasync = new JCheckBoxMenuItem(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                updatehack[0].setState(false);
-                updatehack[1].setState(true);
-                updatehack[2].setState(false);
-                _config.setVariable("updatemode", "async");
-                _a.chooseAsynchronousUpdate(NViewer.this);
-                //setActiveCA(getActiveCA().updateMode(UpdateMode.create("async 30")));
-            }
-        });
-        updasync.setText("Asynchronous ...");
-        updateopt.add(updasync);
+            JCheckBoxMenuItem updasync = new JCheckBoxMenuItem(new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    updatehack[0].setState(false);
+                    updatehack[1].setState(true);
+                    updatehack[2].setState(false);
+                    updatehack[3].setState(false);
+                    _config.setVariable("updatemode", "async");
+                    _a.chooseAsynchronousUpdate(NViewer.this);
+                }
+            });
+            updasync.setText("Asynchronous ...");
+            updateopt.add(updasync);
 
-        JCheckBoxMenuItem updasynclocal = new JCheckBoxMenuItem(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                updatehack[0].setState(false);
-                updatehack[1].setState(false);
-                updatehack[2].setState(true);
-                _config.setVariable("updatemode", "localasync");
-                _a.chooseAsynchronousLocalUpdate(NViewer.this);
-                //setActiveCA(getActiveCA().updateMode(UpdateMode.create("localasync 20")));
-            }
-        });
-        updasynclocal.setText("Local Asynchronous ...");
-        updateopt.add(updasynclocal);
+            JCheckBoxMenuItem updasynclocal = new JCheckBoxMenuItem(new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    updatehack[0].setState(false);
+                    updatehack[1].setState(false);
+                    updatehack[2].setState(true);
+                    updatehack[3].setState(false);
+                    _config.setVariable("updatemode", "localasync");
+                    _a.chooseAsynchronousLocalUpdate(NViewer.this);
+                }
+            });
+            updasynclocal.setText("Local Asynchronous ...");
+            updateopt.add(updasynclocal);
 
-        updatehack[0] = updsync;
-        updatehack[1] = updasync;
-        updatehack[2] = updasynclocal;
-        switch(_config.getVariable("updatemode","sync")) {
-            case "sync":
-                updatehack[0].setState(true);
-                break;
-            case "async":
-                updatehack[1].setState(true);
-                break;
-            case "localasync":
-                updatehack[2].setState(true);
-                break;
+            JCheckBoxMenuItem updenergyasync = new JCheckBoxMenuItem(new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    updatehack[0].setState(false);
+                    updatehack[1].setState(false);
+                    updatehack[2].setState(false);
+                    updatehack[3].setState(true);
+                    _config.setVariable("updatemode", "energyasync");
+                    _a.chooseAsynchronousEnergyUpdate(NViewer.this);
+                }
+            });
+            updenergyasync.setText("Energy Asynchronous ...");
+            updateopt.add(updenergyasync);
+
+            updatehack[0] = updsync;
+            updatehack[1] = updasync;
+            updatehack[2] = updasynclocal;
+            updatehack[3] = updenergyasync;
+            switch(_config.getVariable("updatemode","sync")) {
+                case "sync":
+                    updatehack[0].setState(true);
+                    break;
+                case "async":
+                    updatehack[1].setState(true);
+                    break;
+                case "localasync":
+                    updatehack[2].setState(true);
+                    break;
+                case "energyasync":
+                    updatehack[3].setState(true);
+                    break;
+            }
+            
+            auto.add(updateopt);
         }
-        
-        auto.add(updateopt);
+        {
+            JMenu edgeopt = new JMenu("Edge mode");
+            final JCheckBoxMenuItem[] edgehack = new JCheckBoxMenuItem[3];
+            JCheckBoxMenuItem edgtor = new JCheckBoxMenuItem(new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    edgehack[0].setState(true);
+                    edgehack[1].setState(false);
+                    edgehack[2].setState(false);
+                    _config.setVariable("edgemode", "toroidal");
+                    setActiveCA(getActiveCA().edgeMode(new EdgeMode(EdgeMode.Type.toroidal)));
+                }
+            });
+            edgtor.setText("Toroidal");
+            edgeopt.add(edgtor);
+
+            JCheckBoxMenuItem edgzero = new JCheckBoxMenuItem(new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    edgehack[0].setState(false);
+                    edgehack[1].setState(true);
+                    edgehack[2].setState(false);
+                    _config.setVariable("edgemode", "zero");
+                    setActiveCA(getActiveCA().edgeMode(new EdgeMode(EdgeMode.Type.zero)));
+                }
+            });
+            edgzero.setText("Zero");
+            edgeopt.add(edgzero);
+
+            JCheckBoxMenuItem edgconst = new JCheckBoxMenuItem(new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    edgehack[0].setState(false);
+                    edgehack[1].setState(false);
+                    edgehack[2].setState(true);
+                    _config.setVariable("edgemode", "constant");
+                    _a.chooseConstantEdgeMode(NViewer.this);
+                }
+            });
+            edgconst.setText("Constant ...");
+            edgeopt.add(edgconst);
+
+            edgehack[0] = edgtor;
+            edgehack[1] = edgzero;
+            edgehack[2] = edgconst;
+            switch(_config.getVariable("edgemode","toroidal")) {
+                case "toroidal":
+                    edgehack[0].setState(true);
+                    break;
+                case "zero":
+                    edgehack[1].setState(true);
+                    break;
+                case "constant":
+                    edgehack[2].setState(true);
+                    break;
+            }
+            
+            auto.add(edgeopt);
+        }
+
 
         bar.add(auto);
     }

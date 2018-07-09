@@ -17,7 +17,7 @@ public class RulePattern implements Pattern {
         _pool = pool;
         _r = r;
         _hr = hr;
-        Plane p = new BufferedImagePlane(null, r.width(), heightForArchetype(hr.archetype()));
+        Plane p = new BufferedImagePlane(null, r.width(), heightForArchetype(hr.archetype()), null);
         r.copy(p);
         _ps = hr.frameIterator(p, _pool, new GOptions(true, 1, 1, 1f));
         _cur = p;
@@ -36,7 +36,7 @@ public class RulePattern implements Pattern {
     }
 
     public Plane generate(final int height, final Palette palette) {
-        Plane p = new BufferedImagePlane(null, _r.width(), height, palette);
+        Plane p = new BufferedImagePlane(null, _r.width(), height, palette, null);
         _r.copy(p);
         _hr.generate(p, 1, height, _pool, false, false, null, new GOptions(false, 1, 0, 1f));
         return p;
