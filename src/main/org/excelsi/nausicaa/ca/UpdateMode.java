@@ -17,7 +17,7 @@ public interface UpdateMode {
         JsonObject o = (JsonObject) e;
         String type = Json.string(o, "type");
         float chance = Json.flot(o, "chance", 0);
-        int size = Json.integer(o, "size", 0);
+        int size = Json.integer(o, "size", 1);
         return create(type, chance, size);
     }
 

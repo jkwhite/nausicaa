@@ -166,7 +166,8 @@ public class Actions {
                         0,
                         ComputeMode.combined,
                         new UpdateMode.SimpleSynchronous(),
-                        EdgeMode.defaultMode());
+                        EdgeMode.defaultMode(),
+                        ExternalForce.nop());
                 v.setActiveCA(ca);
             }
         });
@@ -590,6 +591,42 @@ public class Actions {
                 config.setVariable("mutator_transition", tf.getText());
                 config.setVariable("mutator_symmetry", ""+as.isSelected());
                 config.notify("mutator");
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
+    public void chooseRandomExternalForce(final NViewer v) {
+        final JDialog d = new JDialog(v, "Random External Force");
+        final Config config = v.getConfig();
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(1,2));
+
+        top.add(new JLabel("Amount"));
+        final JTextField value = new JTextField();
+        value.setText(config.getVariable("externalforce_random_amount", "0.01"));
+        value.setColumns(10);
+        top.add(value);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                config.setVariable("externalforce_random_amount", value.getText());
+                v.setActiveCA(v.getActiveCA().externalForce(new ExternalForce.RandomExternalForce(Float.parseFloat(value.getText()))));
             }
         });
         bot.add(ne);

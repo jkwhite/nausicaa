@@ -23,8 +23,10 @@ public class Worker {
     private final boolean _useDepth;
     private final boolean _channels;
     private final UpdateMode _umode;
+    private final ExternalForce _ef;
+    private final Random _r;
 
-    public Worker(Pattern p, int x1, int y1, int x2, int y2, float weight, ComputeMode cmode, UpdateMode umode) {
+    public Worker(Pattern p, int x1, int y1, int x2, int y2, float weight, ComputeMode cmode, UpdateMode umode, ExternalForce ef, Random r) {
         _x1 = x1;
         _y1 = y1;
         _x2 = x2;
@@ -34,7 +36,6 @@ public class Worker {
         _oWeight = 1f - weight;
         _size = _wp.archetype().size();
         final int colors = _wp.archetype().colors();
-        //_prev = new int[(int)Math.pow(2*_size+1, _wp.archetype().dims())];
         _prev = new int[_wp.archetype().sourceLength()];
         _pattern = new int[_prev.length];
         _chanpattern = new int[4][_prev.length];
@@ -42,17 +43,14 @@ public class Worker {
         _moore = p.archetype().neighborhood()==Archetype.Neighborhood.moore;
         _channels = cmode==ComputeMode.channel;
         _umode = umode.simpleSynchronous() ? null:umode;
+        _ef = ef;
+        _r = r;
         //if(_channels) System.err.println("using by-channel compute mode");
 
         _pow = new int[_wp.archetype().sourceLength()];
         for(int i=0;i<_pow.length;i++) {
             _pow[_pow.length-1-i] = (int) Math.pow(colors, i);
-            //if(Rand.om.nextInt(100)<0) {
-                //_pow[_pow.length-1-i] = _pow[_pow.length-1-i] + (int) (Rand.om.nextGaussian()*_pow[_pow.length-1-i]);
-            //}
         }
-        //System.err.println(String.format("worker dims: %dx%d+%dx%d", _x1, _y1, _x2, _y2));
-        //System.err.println(String.format("prev array size: %d, pow array size: %d", _prev.length, _pow.length));
     }
 
     private void validate(Plane p) {
@@ -88,6 +86,7 @@ public class Worker {
                 }
             }
         }
+        _ef.apply(p2, _r);
         //System.err.println("-----");
     }
 
@@ -116,9 +115,6 @@ public class Worker {
         System.err.println(b);
     }
 
-    //private Random RAND = ThreadLocalRandom.current();
-    //private Random RAND = new Random();
-    //private Random RAND = new SecureRandom();
     public void frame(final Plane p1, final Plane p2) {
         if(_useDepth) {
             frame3d((IntBlockPlane)p1, (IntBlockPlane)p2);
@@ -158,6 +154,7 @@ public class Worker {
                 }
             }
         }
+        _ef.apply(p2, _r);
         //mutateRule();
         //System.err.println("set "+counts+" cells");
     }
@@ -174,11 +171,6 @@ public class Worker {
         int[] prev = new int[2*size+1];
         int[] pattern = new int[prev.length];
 
-        //int[] pow = new int[_wp.length()];
-        //for(int i=0;i<pow.length;i++) {
-            //pow[pow.length-1-i] = (int) Math.pow(colors, i);
-        //}
-
         //final Pattern p = createPattern(pool);
         //System.err.println("created pattern: "+p);
         for(int i=_y1;i<_y2;i++) {
@@ -188,9 +180,6 @@ public class Worker {
                 }
                 else {
                     c.getBlock(pattern, j-size, i-1, pattern.length, 1, 0);
-                    //for(int k=0;k<prev.length;k++) {
-                        //pattern[k] = (int) (prev[k]);
-                    //}
                     final int v = _wp.next(0, pattern);
                     final int ov = pattern[pattern.length/2];
                     final int nv = (int) ((_oWeight*ov)+(_weight*v));
@@ -200,6 +189,7 @@ public class Worker {
             }
             //mutateRule(p);
             _wp.tick();
+            _ef.apply(c, _r);
         }
     }
 

@@ -7,7 +7,6 @@ public interface Mutator {
     Rule mutate(Rule r) throws MutationFailedException;
     boolean supports(Rule r);
     IndexedRule mutateIndexedRule(IndexedRule r, MutationFactor f) throws MutationFailedException;
-    //Multirule mutate(Multirule r) throws MutationFailedException;
     void setRandom(java.util.Random r);
 
     static Mutator chain(final Mutator... chain) {

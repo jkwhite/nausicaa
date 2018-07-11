@@ -129,7 +129,7 @@ public class NViewer extends JFrame implements UIActions {
         Rule rule = rs.random(rand).next();
         ComputeMode cmode = ComputeMode.combined;
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
-        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre, weight, 0, cmode, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode());
+        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre, weight, 0, cmode, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop());
         //org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.single.create(), rand, 0, w, h, d, pre);
 
         JPanel main = new JPanel(new BorderLayout());
@@ -1129,6 +1129,44 @@ public class NViewer extends JFrame implements UIActions {
             }
             
             auto.add(edgeopt);
+        }
+        {
+            JMenu extopt = new JMenu("External Force");
+            final JCheckBoxMenuItem[] exthack = new JCheckBoxMenuItem[3];
+            JCheckBoxMenuItem extnop = new JCheckBoxMenuItem(new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    exthack[0].setState(true);
+                    exthack[1].setState(false);
+                    _config.setVariable("externalforcemode", "nop");
+                    setActiveCA(getActiveCA().externalForce(ExternalForce.nop()));
+                }
+            });
+            extnop.setText("None");
+            extopt.add(extnop);
+
+            JCheckBoxMenuItem extrand = new JCheckBoxMenuItem(new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    exthack[0].setState(false);
+                    exthack[1].setState(true);
+                    _config.setVariable("externalforcemode", "random");
+                    _a.chooseRandomExternalForce(NViewer.this);
+                }
+            });
+            extrand.setText("Random ...");
+            extopt.add(extrand);
+
+            exthack[0] = extnop;
+            exthack[1] = extrand;
+            switch(_config.getVariable("externalforcemode","nop")) {
+                case "nop":
+                    exthack[0].setState(true);
+                    break;
+                case "random":
+                    exthack[1].setState(true);
+                    break;
+            }
+            
+            auto.add(extopt);
         }
 
 
