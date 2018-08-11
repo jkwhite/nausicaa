@@ -10,7 +10,8 @@ public class Machine {
     private final Genome _g;
     private final Codon[] _prg;
     private final int[] _inst;
-    private final Tape _t;
+    private final IntTape _ti;
+    private final FloatTape _tf;
 
 
     public Machine(Archetype a, Datamap d, Genome g) {
@@ -19,30 +20,62 @@ public class Machine {
         _g = g;
         _prg = g.codons(new Implicate(a, d));
         _inst = new int[_prg.length];
-        _t = new Tape(32768);
+        if(a.isDiscrete()) {
+            _ti = new IntTape(32768);
+            _tf = null;
+        }
+        else {
+            _tf = new FloatTape(32768);
+            _ti = null;
+        }
     }
 
     public Machine copy(Implicate im) {
         return new Machine(_a, im.datamap(), _g);
     }
 
-    public int compute(final int[] p) {
-        _t.reset();
-        for(int i=0;i<_prg.length;i++) {
-            //long st = System.currentTimeMillis();
-            _prg[i].op(p, _t);
-            //long en = System.currentTimeMillis();
-            //if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
-            //_inst[i] += en-st;
-            if(_t.stopped()) break;
+    //public int compute(final int[] p) {
+    //}
+
+    public void compute(final IO io) {
+        if(io.v==Values.discrete) {
+            _ti.reset();
+            final int[] p = io.ii;
+            for(int i=0;i<_prg.length;i++) {
+                //long st = System.currentTimeMillis();
+                _prg[i].op(p, _ti);
+                //long en = System.currentTimeMillis();
+                //if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
+                //_inst[i] += en-st;
+                if(_ti.stopped()) break;
+            }
+            int res = _ti.pop();
+            //if(res<0) res=-res;
+            res = res % _a.colors();
+            if(res<0) {
+                res = _a.colors()+res;
+            }
+            io.io = res;
         }
-        int res = _t.pop();
-        //if(res<0) res=-res;
-        res = res % _a.colors();
-        if(res<0) {
-            res = _a.colors()+res;
+        else {
+            _tf.reset();
+            final float[] p = io.fi;
+            for(int i=0;i<_prg.length;i++) {
+                //long st = System.currentTimeMillis();
+                _prg[i].op(p, _tf);
+                //long en = System.currentTimeMillis();
+                //if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
+                //_inst[i] += en-st;
+                if(_tf.stopped()) break;
+            }
+            float res = _tf.pop();
+            //if(res<0) res=-res;
+            res = res % _a.colors();
+            if(res<0) {
+                res = _a.colors()+res;
+            }
+            io.fo = res;
         }
-        return (int) res;
     }
 
     //public Machine mutate(Archetype a, GenomeFactory gf, MutationFactor m) {

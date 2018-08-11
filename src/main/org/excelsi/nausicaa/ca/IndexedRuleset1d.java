@@ -71,7 +71,7 @@ public class IndexedRuleset1d extends AbstractIndexedRuleset {
     }
 
     @Override public IndexedRule custom(IndexedPattern.Transform transform) {
-        Thread.dumpStack();
+        //Thread.dumpStack();
         return new IndexedRule1d(Patterns.custom(archetype(), transform));
     }
 

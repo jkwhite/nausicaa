@@ -12,6 +12,8 @@ import com.google.gson.*;
 
 
 public final class Archetype {
+    public static final int COLORS_INFINITE = -1;
+
     public enum Neighborhood {
         vonneumann,
         moore;
@@ -31,6 +33,7 @@ public final class Archetype {
     private final int _size;
     private final int _colors;
     private final Neighborhood _neighborhood;
+    private final Values _values;
 
 
     public Archetype(int dims, int size, int colors) {
@@ -38,7 +41,11 @@ public final class Archetype {
     }
 
     public Archetype(int dims, int size, int colors, Neighborhood neighborhood) {
-        if(colors<2) {
+        this(dims, size, colors, neighborhood, Values.discrete);
+    }
+
+    public Archetype(int dims, int size, int colors, Neighborhood neighborhood, Values values) {
+        if(colors<2&&values!=Values.continuous) {
             throw new IllegalArgumentException("colors must be at least 2: "+colors);
         }
         if(dims==1 && neighborhood==Neighborhood.vonneumann) {
@@ -48,6 +55,7 @@ public final class Archetype {
         _size = size;
         _colors = colors;
         _neighborhood = neighborhood;
+        _values = values;
     }
 
     public int dims() {
@@ -64,6 +72,18 @@ public final class Archetype {
 
     public Neighborhood neighborhood() {
         return _neighborhood;
+    }
+
+    public Values values() {
+        return _values;
+    }
+
+    public boolean isDiscrete() {
+        return _values==Values.discrete;
+    }
+
+    public boolean isContinuous() {
+        return _values==Values.continuous;
     }
 
     public Archetype asDims(int dims) {
@@ -188,6 +208,7 @@ public final class Archetype {
         o.addProperty("size",_size);
         o.addProperty("colors",_colors);
         o.addProperty("neighborhood",_neighborhood.toString());
+        o.addProperty("values",_values.toString());
         return o;
     }
 
@@ -214,7 +235,8 @@ public final class Archetype {
             Json.integer(o, "dims", 2),
             Json.integer(o, "size", 1),
             Json.integer(o, "colors", 2),
-            Neighborhood.from(Json.string(o, "neighborhood", "moore"))
+            Neighborhood.from(Json.string(o, "neighborhood", "moore")),
+            Values.from(Json.string(o, "values", "discrete"))
         );
     }
 

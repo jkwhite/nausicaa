@@ -81,15 +81,19 @@ public final class CA {
     }
 
     public Plane createPlane(ExecutorService pool, GOptions opt) {
-        if(archetype().dims()==3) {
+        if(archetype().isContinuous()) {
+            Plane p = new FloatBlockPlane(this, getWidth(), getHeight(), getDepth(), _p, _emode.floatOobValue());
+            return populatePlane(p, pool, opt);
+        }
+        else if(archetype().dims()==3) {
             //BlockPlane p = new BlockPlane(this, getWidth(), getHeight(), getDepth(), _p, BlockPlane.Mode.argb);
-            Plane p = new IntBlockPlane(this, getWidth(), getHeight(), getDepth(), _p, _emode.oobValue());
+            Plane p = new IntBlockPlane(this, getWidth(), getHeight(), getDepth(), _p, _emode.intOobValue());
             p = populatePlane(p, pool, opt);
             return p;
         }
         else {
             if(true||_p.getColorCount()>=127) {
-                Plane p = new IntBlockPlane2d(this, getWidth(), getHeight(), 1, _p, _emode.oobValue());
+                Plane p = new IntBlockPlane2d(this, getWidth(), getHeight(), 1, _p, _emode.intOobValue());
                 p = populatePlane(p, pool, opt);
                 return p;
             }

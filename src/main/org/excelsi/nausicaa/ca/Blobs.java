@@ -7,7 +7,7 @@ import java.util.*;
 public class Blobs {
     public enum Mode { infinite, finite };
 
-    public List<Blob> blobs(final Plane p, final Mode mode) {
+    public List<Blob> blobs(final IntPlane p, final Mode mode) {
         if(mode==Mode.infinite) {
             throw new UnsupportedOperationException("not yet");
         }
@@ -46,7 +46,7 @@ public class Blobs {
 
     private final List<Point> _frontier = new ArrayList<>();
 
-    private Blob explore(final Plane p, final BitSet v, final Mode mode, int i, int j, int k) {
+    private Blob explore(final IntPlane p, final BitSet v, final Mode mode, int i, int j, int k) {
         final int c = p.getCell(i,j,k);
         final Blob b = new Blob(c);
         _frontier.add(new Point(i,j,k));
@@ -74,15 +74,15 @@ public class Blobs {
         return b;
     }
 
-    private static final boolean visited(Plane p, BitSet v, int i, int j, int k) {
+    private static final boolean visited(IntPlane p, BitSet v, int i, int j, int k) {
         return v.get(idx(p,i,j,k));
     }
 
-    private static final void markVisited(Plane p, BitSet v, int i, int j, int k) {
+    private static final void markVisited(IntPlane p, BitSet v, int i, int j, int k) {
         v.set(idx(p,i,j,k));
     }
 
-    private static int idx(Plane p, int x, int y, int z) {
+    private static int idx(IntPlane p, int x, int y, int z) {
         return x+p.getWidth()*y+p.getWidth()*p.getHeight()*z;
     }
 

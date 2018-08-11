@@ -9,28 +9,28 @@ import javafx.embed.swing.SwingFXUtils;
     
 
 
-public class IntBlockPlane extends AbstractIntPlane {
+public class FloatBlockPlane extends AbstractFloatPlane {
     private final CA _ca;
     private final int _w;
     private final int _h;
     private final int _d;
     private final int _hstride;
     private final int _dstride;
-    private final int[] _s;
+    private final float[] _s;
     private final Palette _p;
     private final BufferedImage _i;
     private final WritableRaster _r;
     private final boolean _wrap;
-    private final int _oob;
+    private final float _oob;
     private int _readDepthIdx;
     private int _writeDepthIdx;
 
 
-    public IntBlockPlane(CA ca, int w, int h, int d, Palette p, Integer oob) {
-        this(ca, w, h, d, p, oob, new int[w*h*d]);
+    public FloatBlockPlane(CA ca, int w, int h, int d, Palette p, Float oob) {
+        this(ca, w, h, d, p, oob, new float[w*h*d]);
     }
 
-    public IntBlockPlane(CA ca, int w, int h, int d, Palette p, Integer oob, int[] s) {
+    public FloatBlockPlane(CA ca, int w, int h, int d, Palette p, Float oob, float[] s) {
         _ca = ca;
         _w = w;
         _h = h;
@@ -43,7 +43,7 @@ public class IntBlockPlane extends AbstractIntPlane {
         _r = _i.getRaster();
         if(oob!=null) {
             _wrap = false;
-            _oob = oob.intValue();
+            _oob = oob.floatValue();
         }
         else {
             _wrap = true;
@@ -70,11 +70,11 @@ public class IntBlockPlane extends AbstractIntPlane {
     @Override public void init() {
     }
 
-    @Override public void setCell(int x, int y, int v) {
+    @Override public void setCell(int x, int y, float v) {
         setCell(x, y, _writeDepthIdx, v);
     }
 
-    public void setCell(int x, int y, int z, int v) {
+    public void setCell(int x, int y, int z, float v) {
         //try {
             //_s[x+_hstride*y+_dstride*z] = v;
             _s[normX(x)+_hstride*normY(y)+_dstride*normZ(z)] = v;
@@ -92,11 +92,11 @@ public class IntBlockPlane extends AbstractIntPlane {
         throw new UnsupportedOperationException();
     }
 
-    @Override public int getCell(int x, int y) {
+    @Override public float getCell(int x, int y) {
         return getCell(x, y, _readDepthIdx);
     }
 
-    public int getCell(int x, int y, int z) {
+    public float getCell(int x, int y, int z) {
         int nx = normX(x);
         int ny = normY(y);
         int nz = normZ(z);
@@ -116,16 +116,16 @@ public class IntBlockPlane extends AbstractIntPlane {
         //}
     }
 
-    @Override public int[] getRow(int[] into, int y, int offset) {
+    @Override public float[] getRow(float[] into, int y, int offset) {
         throw new UnsupportedOperationException();
     }
 
-    @Override public int[] getBlock(int[] into, int x, int y, int dx, int dy, int offset) {
+    @Override public float[] getBlock(float[] into, int x, int y, int dx, int dy, int offset) {
         //throw new UnsupportedOperationException();
         return getBlock(into, x, y, /*z*/ _readDepthIdx, dx, dy, /*dz*/ 1, offset);
     }
 
-    @Override public int[] getCardinal(int[] into, int x, int y, int dx, int dy, int offset) {
+    @Override public float[] getCardinal(float[] into, int x, int y, int dx, int dy, int offset) {
         into[offset++] = getCell(x+1,y,_readDepthIdx);
         into[offset++] = getCell(x,y-1,_readDepthIdx);
         into[offset++] = getCell(x,y,_readDepthIdx);
@@ -134,7 +134,7 @@ public class IntBlockPlane extends AbstractIntPlane {
         return into;
     }
 
-    @Override public int[] getCardinal(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
+    @Override public float[] getCardinal(float[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
         into[offset++] = getCell(x,y+1,z);
         into[offset++] = getCell(x,y-1,z);
         into[offset++] = getCell(x+1,y,z);
@@ -145,14 +145,14 @@ public class IntBlockPlane extends AbstractIntPlane {
         return into;
     }
 
-    public int[] getBlock(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
+    public float[] getBlock(float[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
         //System.err.println("x="+x+", y="+y+", z="+z+", dx="+dx+", dy="+dy+", dz="+dz);
         int idx=offset;
         for(int i=x;i<x+dx;i++) {
             for(int j=y;j<y+dy;j++) {
                 for(int k=z;k<z+dz;k++) {
                     //System.err.println(i+", "+j+", "+k+" @ "+idx);
-                    final int v = getCell(i,j,k);
+                    final float v = getCell(i,j,k);
                     //if(x==4&&y==2&&z==0) {
                         //if(v!=0) {
                             //System.err.println("got value "+v+" for ("+x+","+y+","+z+")");
@@ -188,7 +188,7 @@ public class IntBlockPlane extends AbstractIntPlane {
     }
     */
 
-    @Override public void setRow(int[] row, int y) {
+    @Override public void setRow(float[] row, int y) {
         throw new UnsupportedOperationException();
     }
 
@@ -200,6 +200,21 @@ public class IntBlockPlane extends AbstractIntPlane {
     private final Rendering DEFAULT_RENDERING = new Rendering();
     @Override public java.awt.Image toImage() {
         return toImage(DEFAULT_RENDERING);
+    }
+
+    private int computeColor(final float idx) {
+        final float ceil = (float)Math.ceil(idx);
+        final float floor = (float)Math.floor(idx);
+        final int p1 = _p.color((int)ceil);
+        final int p2 = _p.color((int)floor);
+        int c = Colors.avg(p1,p2,1f-(ceil-idx));
+        //System.err.println("to rgb color: "+c+" for p1="+p1+",p2="+p2+",idx="+idx);
+        return c;
+        //final int pc = _p.getColorCount();
+        //final int ac = _ca.archetype().colors();
+        //final float acp = idx/ac;
+        //final int pcp = (int)(pc*acp);
+        //return _p.color(pcp);
     }
 
     @Override public java.awt.Image toImage(Rendering rend) {
@@ -216,10 +231,12 @@ public class IntBlockPlane extends AbstractIntPlane {
                     rgb[2]=0;
                     int mx = 0;
                     if(_d==1) {
-                        int idx = getCell(i,j,0);
-                        _i.setRGB(i,j,_p.color(idx));
+                        float idx = getCell(i,j,0);
+                        _i.setRGB(i,j,computeColor(idx));
+                        //_i.setRGB(i,j,_p.color(idx));
                     }
                     else {
+                        /*
                         if(comp==Rendering.Composition.front||comp==Rendering.Composition.wavg) {
                             for(int k=0;k<_d;k++) {
                                 int idx = getCell(i,j,k);
@@ -265,6 +282,7 @@ public class IntBlockPlane extends AbstractIntPlane {
                             mx = _d;
                             _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
                         }
+                        */
                     }
                 }
             }
@@ -303,13 +321,13 @@ public class IntBlockPlane extends AbstractIntPlane {
     }
 
     @Override public Plane copy() {
-        int[] sc = new int[_s.length];
+        float[] sc = new float[_s.length];
         System.arraycopy(_s, 0, sc, 0, _s.length);
-        return new IntBlockPlane(_ca, _w, _h, _d, _p, oob(), sc);
+        return new FloatBlockPlane(_ca, _w, _h, _d, _p, oob(), sc);
     }
 
     @Override public Plane withDepth(int d) {
-        IntBlockPlane p = new IntBlockPlane(_ca, _w, _h, d, _p, oob());
+        FloatBlockPlane p = new FloatBlockPlane(_ca, _w, _h, d, _p, oob());
         int md = _d<d?_d:d;
         for(int i=0;i<_w;i++) {
             for(int j=0;j<_h;j++) {
@@ -322,13 +340,13 @@ public class IntBlockPlane extends AbstractIntPlane {
     }
 
     @Override public Plane scale(float scale) {
-        return new BufferedImagePlane((BufferedImage)toImage()).scale(scale);
-        //throw new UnsupportedOperationException();
+        //return new BufferedImagePlane((BufferedImage)toImage()).scale(scale);
+        throw new UnsupportedOperationException();
     }
 
     @Override public Plane scale(float scale, boolean antialias) {
-        return new BufferedImagePlane((BufferedImage)toImage()).scale(scale, antialias);
-        //throw new UnsupportedOperationException();
+        //return new BufferedImagePlane((BufferedImage)toImage()).scale(scale, antialias);
+        throw new UnsupportedOperationException();
     }
 
     @Override public void save(String filename) throws IOException {
@@ -370,11 +388,11 @@ public class IntBlockPlane extends AbstractIntPlane {
         //_lockOwner = -1;
     //}
 
-    protected int[] getBuffer() {
+    protected float[] getBuffer() {
         return _s;
     }
 
-    protected Integer oob() {
+    protected Float oob() {
         return _wrap?null:_oob;
     }
 

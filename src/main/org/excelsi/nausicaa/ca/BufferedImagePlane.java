@@ -17,7 +17,7 @@ import javafx.embed.swing.SwingFXUtils;
 import org.imgscalr.Scalr;
 
 
-public class BufferedImagePlane extends AbstractPlane implements java.io.Serializable {
+public class BufferedImagePlane extends AbstractIntPlane implements java.io.Serializable {
     private final CA _creator;
     private final Palette _palette;
     private final boolean _wrap;

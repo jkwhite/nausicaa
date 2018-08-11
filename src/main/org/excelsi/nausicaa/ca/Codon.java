@@ -5,7 +5,8 @@ import java.util.Random;
 
 
 public interface Codon {
-    void op(int[] p, Tape t);
+    void op(int[] p, IntTape t);
+    default void op(float[] p, FloatTape t) { }
     Codon copy();
     String code();
     boolean usesPattern();

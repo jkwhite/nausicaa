@@ -5,15 +5,17 @@ import java.util.List;
 
 
 public class Painter {
-    private final Plane _p;
+    private final Plane _plane;
+    private final Pen _p;
 
 
     public Painter(Plane p) {
-        _p = p;
+        _plane = p;
+        _p = p.pen();
     }
 
     public Plane p() {
-        return _p;
+        return _plane;
     }
 
     public Painter draw(int x, int y, String s) {

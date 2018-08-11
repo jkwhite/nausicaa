@@ -32,6 +32,9 @@ public class ComputedRuleReader {
         switch(type) {
             case "computed":
                 return ComputedRule2d.fromJson(e);
+            case "indexed2d":
+            case "indexed1d":
+                return AbstractIndexedRule.fromJson(e);
             default:
                 throw new IllegalArgumentException("unsupported type '"+type+"'");
         }

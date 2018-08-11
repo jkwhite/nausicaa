@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.ExecutorService;
+import com.google.gson.*;
 
 
 public abstract class AbstractIndexedRule extends AbstractRule implements IndexedRule {
@@ -51,7 +52,8 @@ public abstract class AbstractIndexedRule extends AbstractRule implements Indexe
         return cols;
     }
 
-    @Override public void copy(final Plane p) {
+    @Override public void copy(final Plane ip) {
+        final IntPlane p = (IntPlane) ip;
         _p.inspect((a,t)->{
             for(int i=0;i<t.length;i++) {
                 p.setCell(i, 0, t[i]);
@@ -84,6 +86,29 @@ public abstract class AbstractIndexedRule extends AbstractRule implements Indexe
 
     @Override public String toString() {
         return "IndexedRule1d::{pattern:"+_p+"}";
+    }
+
+    @Override public JsonElement toJson() {
+        final String enc = "base64gz/bytes";
+        JsonObject o = new JsonObject();
+        o.addProperty("type", "indexed"+_p.archetype().dims()+"d");
+        o.add("archetype", _p.archetype().toJson());
+        o.addProperty("encoding", enc);
+        o.addProperty("length", _p.length());
+        o.addProperty("target", _p.serialize(enc));
+        return o;
+    }
+
+    public static Rule fromJson(JsonElement e) {
+        JsonObject o = (JsonObject) e;
+        String type = Json.string(o, "type");
+        String enc = Json.string(o, "encoding");
+        String tgt = Json.string(o, "target");
+        int length = Json.integer(o, "length", 3);
+        Archetype a = Archetype.fromJson(o.get("archetype"));
+        IndexedPattern p = IndexedPattern.deserialize(enc, tgt, length, a);
+        return "indexed1d".equals(type)
+            ? new IndexedRule1d(p) : new IndexedRule2d(p);
     }
 
     protected final void mutateRule(final IndexedPattern p) {

@@ -34,6 +34,15 @@ public class RandomInitializer implements Initializer {
     }
 
     public void init(Plane plane, Rule rule, Random random) {
+        if(rule.archetype().isDiscrete()) {
+            initDisc((IntPlane)plane, rule, random);
+        }
+        else {
+            initCont((FloatPlane)plane, rule, random);
+        }
+    }
+
+    private void initDisc(IntPlane plane, Rule rule, Random random) {
         final Random r;
         if(_random!=null) {
             _random.setSeed(_seed);
@@ -70,12 +79,58 @@ public class RandomInitializer implements Initializer {
         }
     }
 
+    private void initCont(FloatPlane plane, Rule rule, Random random) {
+        final Random r;
+        if(_random!=null) {
+            _random.setSeed(_seed);
+            r = _random;
+        }
+        else {
+            r = random;
+        }
+        int colors = rule.archetype().colors();
+        switch(rule.dimensions()) {
+            case 1:
+                for(int x=0;x<plane.getWidth();x++) {
+                    plane.setCell(x, 0, computeFloatColor(r, colors));
+                }
+                break;
+            case 2:
+                for(int y=0;y<plane.getHeight();y++) {
+                    for(int x=0;x<plane.getWidth();x++) {
+                        plane.setCell(x, y, computeFloatColor(r, colors));
+                    }
+                }
+                break;
+            case 3:
+                for(int y=0;y<plane.getHeight();y++) {
+                    for(int x=0;x<plane.getWidth();x++) {
+                        for(int z=0;z<plane.getDepth();z++) {
+                            plane.setCell(x, y, z, computeFloatColor(r, colors));
+                        }
+                    }
+                }
+                break;
+            default:
+        }
+    }
+
     private int computeColor(Random random, int colors) {
         if(_params.zeroWeight>0f && random.nextInt(1000)<=1000f*_params.zeroWeight) {
             return 0;
         }
         else {
             return random.nextInt(colors);
+        }
+    }
+
+    private float computeFloatColor(Random random, int colors) {
+        if(_params.zeroWeight>0f && random.nextInt(1000)<=1000f*_params.zeroWeight) {
+            return 0;
+        }
+        else {
+            float v = ((float)(colors-1))*random.nextFloat();
+            return v;
         }
     }
 

@@ -97,6 +97,21 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
         return _p[ix].next(pattern, p2);
     }
 
+    @Override public float next(int pattern, float[] p2) {
+        if(_samples!=1) {
+            if(++_idx>=_samples) {
+                _idx = OFFSETS[_offsetIdx];
+                if(++_offsetIdx==OFFSETS.length) _offsetIdx = 0;
+            }
+        }
+        final int ix = _idx==1?1:0;
+        //++_all;
+        //_cnt+=ix;
+        //if(++_stats%100000==0) {
+        //}
+        return _p[ix].next(pattern, p2);
+    }
+
     @Override public String humanize() {
         return _s.humanize();
     }

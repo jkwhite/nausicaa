@@ -7,8 +7,8 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 
 
-public class WindowedPlane extends AbstractPlane {
-    private final Plane _p;
+public class WindowedPlane extends AbstractIntPlane {
+    private final IntPlane _p;
     private final int _x1;
     private final int _y1;
     private final int _x2;
@@ -16,7 +16,7 @@ public class WindowedPlane extends AbstractPlane {
 
 
     public WindowedPlane(final Plane p, final int x1, final int y1, final int x2, final int y2) {
-        _p = p;
+        _p = (IntPlane) p;
         _x1 = x1;
         _y1 = y1;
         _x2 = x2;

@@ -8,7 +8,7 @@ import java.util.*;
 import javafx.scene.image.WritableImage;
 
 
-public class BitSetBlockPlane extends AbstractPlane {
+public class BitSetBlockPlane extends AbstractIntPlane {
     private final CA _ca;
     private final int _w;
     private final int _h;

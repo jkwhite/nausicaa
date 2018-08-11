@@ -31,6 +31,15 @@ public class WordInitializer implements Initializer {
     }
 
     @Override public void init(Plane plane, Rule rule, Random random) {
+        if(rule.archetype().isDiscrete()) {
+            initDisc((IntPlane)plane, rule, random);
+        }
+        else {
+            throw new UnsupportedOperationException("CONTINUOUS");
+        }
+    }
+
+    private void initDisc(IntPlane plane, Rule rule, Random random) {
         String input = WORD;
         byte[] encodedInput = encodeWord(input);
         int idx = 0;
@@ -81,7 +90,8 @@ public class WordInitializer implements Initializer {
         return d.toString();
     }
 
-    public String formatString(Plane plane, final String input) {
+    public String formatString(Plane iplane, final String input) {
+        IntPlane plane = (IntPlane) iplane;
         final int[] row = new int[plane.getWidth()];
         final StringBuilder b = new StringBuilder();
         for(int i=0;i<plane.getHeight();i++) {

@@ -163,7 +163,7 @@ public class JfxCA extends Group {
             IntBlockPlane bp = (IntBlockPlane) p;
             List<Blobs.Blob> blobs = null;
             if(_render==Render.best) {
-                blobs = new Blobs().blobs(p, Blobs.Mode.finite);
+                blobs = new Blobs().blobs(bp, Blobs.Mode.finite);
                 if(blobs.size()<10000) {
                     _render = Render.blob_mesh;
                 }
@@ -183,24 +183,24 @@ public class JfxCA extends Group {
                     setBlocks(bp);
                     break;
                 case bounds:
-                    renderBounds(p);
+                    renderBounds(bp);
                     break;
                 case mesh:
-                    renderMesh(p, blobs);
+                    renderMesh(bp, blobs);
                     break;
                 case single_mesh:
-                    renderSingleMesh(p);
+                    renderSingleMesh(bp);
                     break;
                 case blob_mesh:
-                    renderBlobMesh(p, blobs);
+                    renderBlobMesh(bp, blobs);
                     break;
                 case cube_mesh:
-                    renderCubeMesh(p);
+                    renderCubeMesh(bp);
                     break;
             }
         }
         else {
-            Layer layer = new Layer(p, _scale);
+            Layer layer = new Layer((IntPlane)p, _scale);
             if(getChildren().size()>_depth) {
                 getChildren().remove(0);
                 retranslate();
@@ -212,7 +212,7 @@ public class JfxCA extends Group {
 
     private void renderBounds(Plane p) {
         clear();
-        final List<Blobs.Blob> blobs = new Blobs().blobs(p, Blobs.Mode.finite);
+        final List<Blobs.Blob> blobs = new Blobs().blobs((IntPlane)p, Blobs.Mode.finite);
         for(Blobs.Blob blob:blobs) {
             Box b = createBox(blob);
             b.setTranslateX(blob.x1*_scale);
@@ -225,7 +225,7 @@ public class JfxCA extends Group {
     private void renderMesh(Plane p, List<Blobs.Blob> blobs) {
         clear();
         if(blobs==null) {
-            blobs = new Blobs().blobs(p, Blobs.Mode.finite);
+            blobs = new Blobs().blobs((IntPlane)p, Blobs.Mode.finite);
         }
         int count = 0;
         System.err.println("creating "+blobs.size()+" blobs");
@@ -242,7 +242,7 @@ public class JfxCA extends Group {
         System.err.println("created "+blobs.size()+" blobs, "+count+" points");
     }
 
-    private void renderBlobMesh(Plane p, List<Blobs.Blob> blobs) {
+    private void renderBlobMesh(IntPlane p, List<Blobs.Blob> blobs) {
         clear();
         if(blobs==null) {
             blobs = new Blobs().blobs(p, Blobs.Mode.finite);
@@ -260,13 +260,13 @@ public class JfxCA extends Group {
         System.err.println("created "+blobs.size()+" blobs, "+count+" points");
     }
 
-    private void renderSingleMesh(Plane p) {
+    private void renderSingleMesh(IntPlane p) {
         clear();
         Group g = createMesh(p);
         getChildren().add(g);
     }
 
-    private void renderCubeMesh(Plane p) {
+    private void renderCubeMesh(IntPlane p) {
         clear();
         final Palette pal = p.creator().getPalette();
         for(int i=0;i<p.getWidth();i++) {
@@ -481,7 +481,7 @@ public class JfxCA extends Group {
         return m;
     }
 
-    private Group createMesh(Plane p) {
+    private Group createMesh(IntPlane p) {
         final Palette pal = p.creator().getPalette();
         List<Point3D> pnts = new LinkedList<>();
         for(int i=0;i<p.getWidth();i++) {
@@ -504,7 +504,7 @@ public class JfxCA extends Group {
         private final double _scale;
 
 
-        public Layer(Plane p, double scale) {
+        public Layer(IntPlane p, double scale) {
             _scale = scale;
             final int[] row = new int[p.getWidth()];
             for(int i=0;i<p.getHeight();i++) {

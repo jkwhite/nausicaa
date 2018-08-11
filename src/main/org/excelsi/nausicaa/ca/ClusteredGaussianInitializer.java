@@ -34,6 +34,15 @@ public class ClusteredGaussianInitializer implements Initializer {
     }
 
     public void init(Plane plane, Rule rule, Random random) {
+        if(rule.archetype().isDiscrete()) {
+            initDisc((IntPlane)plane, rule, random);
+        }
+        else {
+            throw new UnsupportedOperationException("CONTINUOUS");
+        }
+    }
+
+    private void initDisc(IntPlane plane, Rule rule, Random random) {
         final Random r;
         if(_random!=null) {
             _random.setSeed(_seed);

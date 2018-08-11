@@ -190,10 +190,12 @@ public class Stats implements Humanizable {
     }
 
     public static double similarity(Plane p1, Plane p2) {
-        return 1d-diff(p1, p2);
+        return 1d-diff((IntPlane)p1, (IntPlane)p2);
     }
 
-    public static double diff(Plane p1, Plane p2) {
+    public static double diff(Plane ip1, Plane ip2) {
+        IntPlane p1 = (IntPlane) ip1;
+        IntPlane p2 = (IntPlane) ip2;
         final int[] r1 = new int[p1.getWidth()];
         final int[] r2 = new int[p2.getWidth()];
         int diff = 0;
@@ -210,7 +212,8 @@ public class Stats implements Humanizable {
         return ((double)diff)/(p1.getHeight()*p1.getWidth());
     }
 
-    private Stats(final CA c, final Plane p) {
+    private Stats(final CA c, final Plane ip) {
+        IntPlane p = (IntPlane) ip;
         final Archetype a = c.getRule().archetype();
         final int[] histo = new int[a.colors()];
         final int[] maxruns = new int[a.colors()];

@@ -98,17 +98,17 @@ public class NViewer extends JFrame implements UIActions {
 
     public void init() {
         //final int w = 600, h = 600, d = 1;
-        final int w = 300, h = 300, d = 0, pre = 0;
+        //final int w = 300, h = 300, d = 1, pre = 0;
         final float weight = 1f;
         //final int w = 100, h = 100, d = 100, pre=0;
-        //final int w = 5, h = 5, d = 0, pre=0;
+        final int w = 5, h = 5, d = 1, pre=0;
         _config = new Config(w, h, d, weight);
         createMenu();
         setSize(_width, _height);
         int dims = 2;
         int size = 1;
         Random rand = new Random();
-        Palette pal = Palette.random(2, rand, true);
+        Palette pal = Palette.random(20, rand, true);
         //Palette pal = Palette.grey(colors);
         //Palette pal = Palette.rainbow(colors,true);
         //Palette pal = new RGBAPalette();
@@ -117,7 +117,7 @@ public class NViewer extends JFrame implements UIActions {
         int colors = pal.getColorCount();
         //int colors = 2;
         _timeline = new Timeline();
-        org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors);
+        org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors, Archetype.Neighborhood.moore, Values.continuous);
         org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
         org.excelsi.nausicaa.ca.Archetype a2 = new org.excelsi.nausicaa.ca.Archetype(2, size, colors);
         _random = rand;

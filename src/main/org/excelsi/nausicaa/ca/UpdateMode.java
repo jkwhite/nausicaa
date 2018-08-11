@@ -6,12 +6,16 @@ import java.util.concurrent.ThreadLocalRandom;
 import com.google.gson.*;
 
 
-public interface UpdateMode {
+public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
     boolean simpleSynchronous();
 
     boolean update(Plane p, int x, int y, int z);
 
     JsonElement toJson();
+
+    @Override default public UpdateMode plan(Archetype a) {
+        return this;
+    }
 
     public static UpdateMode fromJson(JsonElement e) {
         JsonObject o = (JsonObject) e;
@@ -101,7 +105,6 @@ public interface UpdateMode {
             final int cz = p.getDepth()/2;
             final int d = (x-cx)*(x-cx)+(y-cy)*(y-cy)+(z-cz)*(z-cz);
             final int md = p.getWidth()/2*p.getWidth()/2+p.getHeight()/2*p.getHeight()/2+p.getDepth()/2*p.getDepth()/2;
-            //final int cmod = _chance*_chance*(_chance>=0?1:-1);
             return _r.nextInt((int)(md*_chance))>=d;
         }
 
@@ -113,7 +116,7 @@ public interface UpdateMode {
         }
     }
 
-    public static final class EnergyAsynchronous implements UpdateMode {
+    public static class EnergyAsynchronous implements UpdateMode {
         private final Random _r;
         private final float _chance;
         private final int _size;
@@ -129,28 +132,43 @@ public interface UpdateMode {
             return false;
         }
 
-        @Override public boolean update(Plane p, int x, int y, int z) {
-            int c;
-            switch(_size) {
-                case 1:
-                    c = 1+p.getCell(x,y,z);
-                    break;
+        @Override public UpdateMode plan(final Archetype a) {
+            switch(a.values()) {
                 default:
-                    int m = 0;
-                    for(int i=x-_size;i<=x+_size;i++) {
-                        for(int j=y-_size;j<=y+_size;j++) {
-                            for(int k=z-_size;k<=z+_size;k++) {
-                                int t = p.getCell(i,j,k);
-                                if(t>m) m=t;
+                case discrete:
+                    return new EnergyAsynchronous(_r, _chance, _size) {
+                        @Override public boolean update(Plane p, int x, int y, int z) {
+                            final IntPlane qp = (IntPlane) p;
+                            int c;
+                            switch(_size) {
+                                case 1:
+                                    c = 1+qp.getCell(x,y,z);
+                                    break;
+                                default:
+                                    int m = 0;
+                                    for(int i=x-_size;i<=x+_size;i++) {
+                                        for(int j=y-_size;j<=y+_size;j++) {
+                                            for(int k=z-_size;k<=z+_size;k++) {
+                                                int t = qp.getCell(i,j,k);
+                                                if(t>m) m=t;
+                                            }
+                                        }
+                                    }
+                                    c = m;
+                                    break;
                             }
+                            int m = qp.creator().archetype().colors();
+                            float e = _chance*(float)c/(float)m;
+                            return _r.nextFloat()<=e;
                         }
-                    }
-                    c = m;
-                    break;
+                    };
+                case continuous:
+                    throw new UnsupportedOperationException("CONTINUOUS");
             }
-            int m = p.creator().archetype().colors();
-            float e = _chance*(float)c/(float)m;
-            return _r.nextFloat()<=e;
+        }
+
+        @Override public boolean update(Plane p, int x, int y, int z) {
+            throw new UnsupportedOperationException("requires plan");
         }
 
         @Override public JsonElement toJson() {

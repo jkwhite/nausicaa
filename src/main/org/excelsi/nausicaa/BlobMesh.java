@@ -34,7 +34,7 @@ public class BlobMesh extends Group {
     }
 
     private void buildMesh() {
-        final Plane p = new BitSetBlockPlane(null, _b.xExtent(), _b.yExtent(), _b.zExtent());
+        final IntPlane p = new BitSetBlockPlane(null, _b.xExtent(), _b.yExtent(), _b.zExtent());
         for(Point pnt:_b.points()) {
             p.setCell(pnt.x, pnt.y, pnt.z, 1);
         }
@@ -143,7 +143,7 @@ public class BlobMesh extends Group {
         { {0,0,1}, {1,0,1}, {1,1,1}, {0,1,1} }
     };
 
-    private void buildSurface(Plane p, List<Face> faces, Point pnt /*int i, int j, int k*/) {
+    private void buildSurface(IntPlane p, List<Face> faces, Point pnt /*int i, int j, int k*/) {
         for(int w=0;w<EXP.length;w++) {
             int di = pnt.x+EXP[w][0];
             int dj = pnt.y+EXP[w][1];

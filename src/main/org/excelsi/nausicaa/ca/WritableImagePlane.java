@@ -17,7 +17,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javax.imageio.ImageIO;
 
 
-public class WritableImagePlane extends AbstractPlane {
+public class WritableImagePlane extends AbstractIntPlane {
     private final CA _creator;
     private final WritableImage _i;
     private final PixelReader _r;

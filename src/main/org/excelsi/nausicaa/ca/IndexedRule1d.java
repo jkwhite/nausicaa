@@ -69,7 +69,8 @@ public class IndexedRule1d extends AbstractIndexedRule {
         return _origin;
     }
 
-    @Override public Plane generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, final GOptions opt) {
+    @Override public Plane generate(final Plane ic, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, final GOptions opt) {
+        final IntPlane c = (IntPlane) ic;
         final int w = c.getWidth();
         final int h = c.getHeight();
         final int size = pattern().archetype().size();
@@ -106,7 +107,7 @@ public class IndexedRule1d extends AbstractIndexedRule {
         generate(initial, 1, initial.getHeight(), pool, false, false, null, opt);
 
         return new Iterator<Plane>() {
-            Plane p1 = initial;
+            IntPlane p1 = (IntPlane) initial;
             final int[] cp = new int[p1.getWidth()];
             int crow = 0;
 
@@ -120,10 +121,7 @@ public class IndexedRule1d extends AbstractIndexedRule {
 
             @Override public Plane next() {
                 if(++crow==p1.getHeight()) {
-                    //final Plane p2 = p1.copy();
-                    //p2.setRow(p1.getRow(cp, p1.getHeight()-1, 0), 0);
                     p1.setRow(p1.getRow(cp, p1.getHeight()-1, 0), 0);
-                    //p1 = p2;
                     crow = 1;
                     generate(p1, 1, p1.getHeight(), pool, false, false, null, opt);
                 }
@@ -136,11 +134,5 @@ public class IndexedRule1d extends AbstractIndexedRule {
         StringBuilder b = new StringBuilder("1d / ");
         b.append(super.humanize());
         return b.toString();
-    }
-
-    @Override public JsonElement toJson() {
-        JsonObject o = new JsonObject();
-        o.addProperty("type", "indexed1d");
-        return o;
     }
 }

@@ -142,10 +142,19 @@ public class Patterns {
         //System.out.println("source");
         //print(o);
         //byte[] p = new byte[10];
-        for(int i=0;i<=2;i++) {
-            for(int j=0;j<=2;j++) {
-                set(p, 2-i, j, get(o, j, i));
+        if(p.length>5) {
+            for(int i=0;i<=2;i++) {
+                for(int j=0;j<=2;j++) {
+                    set(p, 2-i, j, get(o, j, i));
+                }
             }
+        }
+        else {
+            p[0] = o[1];
+            p[1] = o[4];
+            p[2] = o[2];
+            p[3] = o[0];
+            p[4] = o[3];
         }
         //System.out.println("dest");
         //print(p);

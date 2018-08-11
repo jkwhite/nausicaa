@@ -7,7 +7,7 @@ import java.io.*;
 import javafx.scene.image.WritableImage;
 
 
-public final class BlockPlane extends AbstractPlane {
+public final class BlockPlane extends AbstractIntPlane {
     public enum Mode { indexed, argb };
 
     private final CA _ca;

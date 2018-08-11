@@ -11,6 +11,15 @@ import com.google.gson.*;
 
 public class NeapolitanInitializer implements Initializer {
     public void init(Plane plane, Rule rule, Random random) {
+        if(rule.archetype().isDiscrete()) {
+            initDisc((IntPlane)plane, rule, random);
+        }
+        else {
+            throw new UnsupportedOperationException("CONTINUOUS");
+        }
+    }
+
+    private void initDisc(IntPlane plane, Rule rule, Random random) {
         int[] colors = rule.colors();
         switch(rule.dimensions()) {
             case 1:

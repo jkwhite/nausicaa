@@ -11,6 +11,7 @@ import java.util.Random;
 public final class ComputedPattern implements Pattern, Mutatable {
     private final Archetype _a;
     private final RuleLogic _logic;
+    private final IO _io;
 
 
     public ComputedPattern(Archetype a, RuleLogic logic) {
@@ -24,11 +25,17 @@ public final class ComputedPattern implements Pattern, Mutatable {
         // 7=>29000
         // -11833
         int csize = Math.max(5000, -11833*_a.size()+110000);
-        if(a.sourceLength()<9) {
-            _cache = new ShortPCache(csize, size);
+        _io = new IO(a.values());
+        if(a.isDiscrete()) {
+            if(a.sourceLength()<9) {
+                _cache = new ShortPCache(csize, size);
+            }
+            else {
+                _cache = new PCache(csize, size);
+            }
         }
         else {
-            _cache = new PCache(csize, size);
+            _cache = null;
         }
     }
 
@@ -196,6 +203,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
     private long _hits;
     private long _misses;
     private static final int[] ZEROS = new int[9];
+
     @Override public int next(int pattern, final int[] p2) {
         int r = _cache.find(p2);
         if(_cache.h) {
@@ -210,11 +218,21 @@ public final class ComputedPattern implements Pattern, Mutatable {
             return r;
         }
         _misses++;
-        r = _logic.next(p2);
+        _io.ii = p2;
+        _logic.next(_io);
+        r = _io.io;
         //if(_cache.lk!=0) {
             _cache.put(p2, r);
         //}
         //dumpres(p2, r);
+        return r;
+    }
+
+    @Override public float next(int pattern, final float[] p2) {
+        _io.fi = p2;
+        _logic.next(_io);
+        float r = _io.fo;
+        //System.err.println("computed next: "+r+" for "+p2[p2.length/2]);
         return r;
     }
 
@@ -247,7 +265,9 @@ public final class ComputedPattern implements Pattern, Mutatable {
                 System.err.println("PUTTING "+key+" => "+r);
             }
         }
-        int rp = _logic.next(p);
+        _io.ii = p;
+        _logic.next(_io);
+        int rp = _io.io;
         if(r!=rp) {
             System.err.println("!!!!!!!!! BUG!!!!!!!!!!"+key+"=> said: "+r+" real: "+rp);
             Thread.dumpStack();
@@ -266,7 +286,8 @@ public final class ComputedPattern implements Pattern, Mutatable {
     }
 
     public interface RuleLogic {
-        int next(int[] pattern);
+        //int next(int[] pattern);
+        void next(IO io);
         RuleLogic copy(Implicate im);
         default RuleLogic mutate(Implicate im, GenomeFactory gf, MutationFactor mf) {
             return this;
@@ -287,13 +308,14 @@ public final class ComputedPattern implements Pattern, Mutatable {
             _a = a;
         }
 
-        @Override public int next(int[] pattern) {
+        @Override public void next(IO io) {
             //System.err.print("pat: "+Patterns.formatPattern(pattern));
             //final byte b1 = _r.reduce(pattern);
             //System.err.print("\tred: "+(int)b1);
             //final byte b2 = _a.activate(b1);
             //System.err.println("\tact: "+(int)b2);
-            return _a.activate(_r.reduce(pattern));
+            //return _a.activate(_r.reduce(pattern));
+            io.io = _a.activate(_r.reduce(io.ii));
         }
 
         @Override public RARule copy(Implicate im) {
@@ -314,9 +336,9 @@ public final class ComputedPattern implements Pattern, Mutatable {
             _m = m;
         }
 
-        @Override public int next(int[] pattern) {
+        @Override public void next(IO io) {
             //if(++_c%1000000==0) _m.dump();
-            return _m.compute(pattern);
+            _m.compute(io);
         }
 
         @Override public RuleLogic copy(Implicate im) {

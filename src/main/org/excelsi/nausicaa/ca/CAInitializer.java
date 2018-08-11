@@ -34,8 +34,17 @@ public class CAInitializer implements Initializer {
     }
 
     @Override public void init(Plane plane, Rule rule, Random random) {
+        if(rule.archetype().isDiscrete()) {
+            initDisc((IntPlane)plane, rule, random);
+        }
+        else {
+            throw new UnsupportedOperationException("CONTINUOUS");
+        }
+    }
+
+    private void initDisc(IntPlane plane, Rule rule, Random random) {
         final CKey key = new CKey(plane.getWidth(), plane.getHeight(), plane.getDepth());
-        Plane p = _cache.get(key);
+        IntPlane p = (IntPlane)_cache.get(key);
         if(p==null) {
             switch(rule.archetype().dims()) {
                 case 1:
@@ -49,7 +58,7 @@ public class CAInitializer implements Initializer {
                 default:
                     throw new IllegalArgumentException("unsupported dimensionality "+rule.archetype().dims());
             }
-            p = _ca.createPlane();
+            p = (IntPlane) _ca.createPlane();
             _cache.put(key, p);
         }
         /*

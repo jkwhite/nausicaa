@@ -26,11 +26,10 @@ public class Actions {
     public void newCA(NViewer v) {
         final JDialog d = new JDialog(v, "New automata");
         final Config config = v.getConfig();
-        //v.pack();
-        //Things.centerWindow(v);
+
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(5,2));
+        JPanel top = new JPanel(new GridLayout(6,2));
 
         top.add(new JLabel("Dimensions"));
         final JTextField alpha = new JTextField();
@@ -43,6 +42,46 @@ public class Actions {
         siz.setText(config.getVariable("default_size", "1"));
         siz.setColumns(3);
         top.add(siz);
+
+        // Compute
+        final String[] comphack = new String[1];
+        top.add(new JLabel("Compute"));
+        ButtonGroup comp = new ButtonGroup();
+
+        AbstractAction comparr = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                comphack[0] = "array";
+            }
+        };
+        JRadioButton rcomparr = new JRadioButton(comparr);
+        rcomparr.setText("Full Target");
+        comp.add(rcomparr);
+
+        AbstractAction compspars = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                comphack[0] = "sparse";
+            }
+        };
+        JRadioButton rspars = new JRadioButton(compspars);
+        rspars.setText("Sparse Target");
+        comp.add(rspars);
+
+        AbstractAction compelf = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                comphack[0] = "machineelf";
+            }
+        };
+        JRadioButton relf = new JRadioButton(compelf);
+        relf.setText("Machine Elf");
+        comp.add(relf);
+
+        JPanel comps = new JPanel();
+        comps.add(rcomparr);
+        comps.add(rspars);
+        comps.add(relf);
+        relf.setSelected(true);
+        comphack[0] = "machineelf";
+        top.add(comps);
 
         // Neighborhood
         final Archetype.Neighborhood[] neihack = new Archetype.Neighborhood[1];
@@ -155,7 +194,17 @@ public class Actions {
                         break;
                 }
                 Archetype a = new Archetype(dims, size, pal.getColorCount(), neihack[0]);
-                Ruleset rs = new ComputedRuleset(a);
+                Ruleset rs;
+                switch(comphack[0]) {
+                    case "machineelf":
+                    default:
+                        rs = new ComputedRuleset(a);
+                        break;
+                    case "sparse":
+                    case "array":
+                        rs = dims==1?new IndexedRuleset1d(a):new IndexedRuleset2d(a);
+                        break;
+                }
                 Rule rule = rs.random(rand).next();
                 CA ca = new CA(rule, pal, v.getActiveCA().getInitializer(), rand, 0,
                         v.getConfig().getWidth(),
@@ -311,7 +360,7 @@ public class Actions {
 
     public void debug(NViewer v) {
         final Plane p = v.getPlaneDisplayProvider().getActivePlane();
-        final java.util.List<Blobs.Blob> blobs = new Blobs().blobs(p, Blobs.Mode.finite);
+        final java.util.List<Blobs.Blob> blobs = new Blobs().blobs((IntPlane)p, Blobs.Mode.finite);
         for(Blobs.Blob b:blobs) {
             System.err.println(b.toString());
         }

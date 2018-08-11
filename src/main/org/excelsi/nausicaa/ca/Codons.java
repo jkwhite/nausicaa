@@ -49,6 +49,7 @@ public class Codons {
     public static final String MIN_N = "jo";
     public static final String IF = "ra";
     public static final String MAX_N = "ri";
+    public static final String SIGMOID = "ru";
     public static final String SKIP = "ro";
     public static final String NON_ZERO = "zu";
     public static final String DATA = "da";
@@ -62,8 +63,8 @@ public class Codons {
     public static final String GT = "be";
     public static final String NEGATE = "bo";
     public static final String PUSH_CARDINAL = "pa";
-    public static final String EQUAL_A = "po";
     public static final String FILTER = "pi";
+    public static final String EQUAL_A = "po";
 
 
     public static Codon codon(final String s, final Implicate im) {
@@ -193,13 +194,15 @@ public class Codons {
                     return new Not();
                 case FILTER:
                     return new Filter(p);
+                case SIGMOID:
+                    return new Sigmoid();
                 default:
                     throw new IllegalStateException("unknown opcode '"+code+"'");
             }
         }
     }
 
-    public static final class Nonzero implements Codon, Tape.TapeOp, Unstable {
+    public static final class Nonzero implements Codon, IntTape.TapeOp, FloatTape.TapeOp, Unstable {
         private final int[] _t = new int[BUF_SIZE];
         private final int _c;
 
@@ -221,7 +224,7 @@ public class Codons {
 
         @Override public boolean reversible() { return false; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             if(_c==-1) {
                 t.selectIdxAll();
             }
@@ -232,6 +235,27 @@ public class Codons {
         }
 
         @Override public int op(int[] t, int st, int en, int[] p) {
+            int j=st-1;
+            for(int i=st;i<=en;i++) {
+                if(t[i]>0) {
+                    t[++j] = t[i];
+                    //System.err.println("i="+i+", ti="+t[i]+", j="+j);
+                }
+            }
+            return j;
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            if(_c==-1) {
+                t.selectIdxAll();
+            }
+            else {
+                t.selectIdx(_c);
+            }
+            t.apply(this, p);
+        }
+
+        @Override public float op(float[] t, int st, int en, float[] p) {
             int j=st-1;
             for(int i=st;i<=en;i++) {
                 if(t[i]>0) {
@@ -279,7 +303,7 @@ public class Codons {
 
         @Override public boolean reversible() { return false; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             //clear();
             int mx = 0;
             for(int i=0;i<p.length;i++) {
@@ -329,7 +353,7 @@ public class Codons {
 
         @Override public boolean reversible() { return false; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             for(int i=0;i<_h.length;i++) {
                 _h[i] = 0;
             }
@@ -344,7 +368,7 @@ public class Codons {
         }
     }
 
-    public static final class Sum implements Codon, Tape.TapeOp {
+    public static final class Sum implements Codon, IntTape.TapeOp, FloatTape.TapeOp {
         private final int[] _t = new int[BUF_SIZE];
 
         @Override public Codon copy() {
@@ -361,7 +385,7 @@ public class Codons {
 
         @Override public boolean reversible() { return true; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             t.selectAggAll();
             t.apply(this, p);
         }
@@ -373,9 +397,22 @@ public class Codons {
             }
             return s;
         }
+
+        @Override public void op(float[] p, FloatTape t) {
+            t.selectAggAll();
+            t.apply(this, p);
+        }
+
+        @Override public float op(float[] t, int st, int en, float[] p) {
+            float s = 0;
+            for(int i=st;i<=en;i++) {
+                s += t[i];
+            }
+            return s;
+        }
     }
 
-    public abstract static class NAggregate implements Codon, Tape.TapeOp {
+    public abstract static class NAggregate implements Codon, IntTape.TapeOp, FloatTape.TapeOp {
         private final String _n;
         protected final int _c;
         private final int[] _t = new int[BUF_SIZE];
@@ -395,7 +432,17 @@ public class Codons {
 
         @Override public boolean reversible() { return false; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
+            if(_c==-1) {
+                t.selectAggAll();
+            }
+            else {
+                t.selectAgg(_c);
+            }
+            t.apply(this, p);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
             if(_c==-1) {
                 t.selectAggAll();
             }
@@ -410,7 +457,7 @@ public class Codons {
         }
     }
 
-    public abstract static class NAggregateN implements Codon, Tape.TapeOp {
+    public abstract static class NAggregateN implements Codon, IntTape.TapeOp {
         private final String _n;
         private final int[] _t = new int[BUF_SIZE];
 
@@ -428,7 +475,7 @@ public class Codons {
 
         @Override public boolean reversible() { return false; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int n = t.pop();
             t.selectAgg(n);
             t.apply(this, p);
@@ -460,7 +507,7 @@ public class Codons {
 
         @Override public boolean reversible() { return true; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             t.skip(_c);
         }
 
@@ -492,7 +539,7 @@ public class Codons {
 
         @Override public boolean reversible() { return true; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int s = t.pop();
             t.skip(s);
         }
@@ -529,7 +576,7 @@ public class Codons {
 
         @Override public boolean reversible() { return false; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int pos = t.pos();
             if(pos>0) {
                 int idx = _c==-1?p.length/2:_c%p.length;
@@ -565,7 +612,7 @@ public class Codons {
 
         @Override public boolean reversible() { return true; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int v = t.pop();
             if(v==0) {
                 t.stop();
@@ -592,7 +639,7 @@ public class Codons {
 
         @Override public boolean reversible() { return true; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             t.push(p[p.length/2]);
             t.stop();
         }
@@ -617,7 +664,7 @@ public class Codons {
 
         @Override public boolean reversible() { return false; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             t.push(t.pos());
         }
 
@@ -651,7 +698,11 @@ public class Codons {
 
         @Override public boolean symmetric() { return false; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
+            t.push(p[_p]);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
             t.push(p[_p]);
         }
 
@@ -692,7 +743,7 @@ public class Codons {
 
         @Override public boolean symmetric() { return false; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             long s = t.pop();
             long s2 = s;
             if(s2>=p.length) {
@@ -730,7 +781,7 @@ public class Codons {
 
         @Override public boolean reversible() { return true; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             t.push(p[p.length/2]);
         }
 
@@ -760,8 +811,12 @@ public class Codons {
 
         @Override public boolean reversible() { return true; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             t.push(_p);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            t.push((float)_p);
         }
 
         @Override public String generate(Random r) {
@@ -795,14 +850,19 @@ public class Codons {
 
         @Override public boolean symmetric() { return false; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int mid = p.length/2;
-            //t.pushAll(p, mid);
-            //t.pushAll(p, mid, mid+1);
             int start = Math.abs(p[mid]%p.length);
-            //int c1 = start<mid?start-mid:p.length-start;
-            //t.pushAll(p, c1, start);
-            //int i2 = c1+start<mid?i1+1:mid;
+            int s = 0;
+            for(int i=start;s<p.length;s++) {
+                if(i!=mid) t.push(p[i]);
+                if(++i==p.length) i=0;
+            }
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            int mid = p.length/2;
+            int start = Math.abs((int)p[mid]%p.length);
             int s = 0;
             for(int i=start;s<p.length;s++) {
                 if(i!=mid) t.push(p[i]);
@@ -826,20 +886,22 @@ public class Codons {
 
         @Override public boolean symmetric() { return false; }
 
-        @Override public void op(int[] p, Tape t) {
-            //t.pushAll(p, p.length);
-
-            //int n = p[p.length/2]%p.length;
-            //if(n<0) n=-n;
-            //t.pushAll(p, p.length-n, n);
-            //t.pushAll(p, n);
+        @Override public void op(int[] p, IntTape t) {
             int n = p.length/2;
             int m = 0;
             m += t.pushAll(p, p.length-n-1, n+1);
             m += t.pushAll(p, n);
             t.push(p[n]);
             m += 1;
-            //System.err.println("pushed "+m+" on go");
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            int n = p.length/2;
+            int m = 0;
+            m += t.pushAll(p, p.length-n-1, n+1);
+            m += t.pushAll(p, n);
+            t.push(p[n]);
+            m += 1;
         }
     }
 
@@ -858,12 +920,27 @@ public class Codons {
 
         @Override public boolean symmetric() { return false; }
 
-        @Override public void op(int[] p, Tape t) {
-            //t.pushAll(p, p.length);
-            //int n = p[p.length/2]%p.length; //t.pop() % p.length;
-            //if(n<0) n=-n;
-            //t.pushAll(p, p.length-n, n);
-            //t.pushAll(p, n);
+        @Override public void op(int[] p, IntTape t) {
+            if(p.length==9) {
+                t.push(p[5]);
+                t.push(p[7]);
+                t.push(p[3]);
+                t.push(p[1]);
+            }
+            else if(p.length==5) {
+                t.push(p[0]);
+                t.push(p[3]);
+                t.push(p[4]);
+                t.push(p[1]);
+            }
+            else {
+                for(int i=1;i<p.length;i+=2) {
+                    t.push(p[i]);
+                }
+            }
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
             if(p.length==9) {
                 t.push(p[5]);
                 t.push(p[7]);
@@ -899,8 +976,15 @@ public class Codons {
 
         @Override public boolean symmetric() { return false; }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int n = t.pop() % p.length;
+            if(n<0) n=-n;
+            t.pushAll(p, p.length-n, n);
+            t.pushAll(p, n);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            int n = (int)t.pop() % p.length;
             if(n<0) n=-n;
             t.pushAll(p, p.length-n, n);
             t.pushAll(p, n);
@@ -920,10 +1004,18 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int up = t.pop();
             int low = t.pop();
             int mid = t.pop();
+            int in = (mid >= low && mid <= up)?1:0;
+            t.push(in);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float up = t.pop();
+            float low = t.pop();
+            float mid = t.pop();
             int in = (mid >= low && mid <= up)?1:0;
             t.push(in);
         }
@@ -942,10 +1034,18 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int up = t.pop();
             int low = t.pop();
             int mid = t.pop();
+            int in = (mid < low || mid > up)?1:0;
+            t.push(in);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float up = t.pop();
+            float low = t.pop();
+            float mid = t.pop();
             int in = (mid < low || mid > up)?1:0;
             t.push(in);
         }
@@ -964,11 +1064,19 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int up = t.pop();
             int low = t.pop();
             int mid = t.pop();
             int in = (mid >= low && mid <= up)?mid:0;
+            t.push(in);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float up = t.pop();
+            float low = t.pop();
+            float mid = t.pop();
+            float in = (mid >= low && mid <= up)?mid:0;
             t.push(in);
         }
     }
@@ -986,9 +1094,16 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int v1 = t.pop();
             int v2 = t.pop();
+            int eq = (v1==v2)?1:0;
+            t.push(eq);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float v1 = t.pop();
+            float v2 = t.pop();
             int eq = (v1==v2)?1:0;
             t.push(eq);
         }
@@ -1022,21 +1137,10 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             t.popAll(_s1, _c);
             t.popAll(_s2, _c);
-            //debug("comparing "+_c);
-            //for(int i=0;i<_c;i++) {
-                //debug("arr 0: "+i+":"+_s1[i]);
-                //debug("arr 0: "+i+":"+_s2[i]);
-            //}
             boolean e = Arrays.equals(_s1, _s2);
-            //if(e) {
-                //debug("############################# pushing "+e);
-            //}
-            //else {
-                //debug("pushing "+e);
-            //}
             t.push(e?1:0);
         }
     }
@@ -1056,7 +1160,7 @@ public class Codons {
             return true;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             t.push(_t);
         }
 
@@ -1078,15 +1182,22 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int v1 = t.pop();
             int v2 = t.pop();
             int eq = (v1!=v2)?1:0;
             t.push(eq);
         }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float v1 = t.pop();
+            float v2 = t.pop();
+            int eq = (v1!=v2)?1:0;
+            t.push(eq);
+        }
     }
 
-    public abstract static class Binary implements Codon, Tape.TapeOp {
+    public abstract static class Binary implements Codon, IntTape.TapeOp, FloatTape.TapeOp {
         private final String _code;
 
         public Binary(String code) {
@@ -1101,7 +1212,7 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             t.selectAgg(2);
             t.apply(this, p);
         }
@@ -1112,13 +1223,29 @@ public class Codons {
             return m;
         }
 
+        @Override public void op(float[] p, FloatTape t) {
+            t.selectAgg(2);
+            t.apply(this, p);
+        }
+
+        @Override public float op(float[] t, int s, int e, float[] p) {
+            float ts = s==e?t[s]:t[s];
+            float m = expr(t[e], ts);
+            return m;
+        }
+
         abstract int expr(int v1, int v2);
+
+        abstract float expr(float v1, float v2);
     }
 
     public static class Subtract extends Binary {
         public Subtract() { super(SUBTRACT); }
         @Override public Codon copy() { return new Subtract(); }
         @Override int expr(int v1, int v2) {
+            return v1-v2;
+        }
+        @Override float expr(float v1, float v2) {
             return v1-v2;
         }
     }
@@ -1129,12 +1256,18 @@ public class Codons {
         @Override int expr(int v1, int v2) {
             return v1*v2;
         }
+        @Override float expr(float v1, float v2) {
+            return v1*v2;
+        }
     }
 
     public static class Divide extends Binary {
         public Divide() { super(DIVIDE); }
         @Override public Codon copy() { return new Divide(); }
         @Override int expr(int v1, int v2) {
+            return v2==0?v1:v1/v2;
+        }
+        @Override float expr(float v1, float v2) {
             return v2==0?v1:v1/v2;
         }
     }
@@ -1145,6 +1278,9 @@ public class Codons {
         @Override int expr(int v1, int v2) {
             return v2==0?v1:v1%v2;
         }
+        @Override float expr(float v1, float v2) {
+            return v2==0?v1:v1%v2;
+        }
     }
 
     public static class Pow extends Binary {
@@ -1153,6 +1289,9 @@ public class Codons {
         @Override int expr(int v1, int v2) {
             int v = Maths.pow(v1,Math.max(0,Math.abs(v2)));
             return v;
+        }
+        @Override float expr(float v1, float v2) {
+            return (float)Math.pow(v1,v2);
         }
     }
 
@@ -1167,8 +1306,13 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int v = (int) Math.sqrt(Math.abs(t.pop()));
+            t.push(v);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float v = (float) Math.sqrt(Math.abs(t.pop()));
             t.push(v);
         }
     }
@@ -1184,8 +1328,13 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int v = (int) Math.cbrt(t.pop());
+            t.push(v);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float v = (float) Math.cbrt(t.pop());
             t.push(v);
         }
     }
@@ -1197,6 +1346,14 @@ public class Codons {
 
         @Override public int op(int[] vs, int m, int e, int[] p) {
             int s = vs[m];
+            for(int i=m+1;i<=e;i++) {
+                s += vs[i];
+            }
+            return s;
+        }
+
+        @Override public float op(float[] vs, int m, int e, float[] p) {
+            float s = vs[m];
             for(int i=m+1;i<=e;i++) {
                 s += vs[i];
             }
@@ -1228,8 +1385,17 @@ public class Codons {
         public Min() { super(MIN, -1); }
         public Min(int c) { super(MIN, c); }
         @Override public Codon copy() { return new Min(_c); }
+
         @Override public int op(int[] vs, int m, int e, int[] p) {
             int min = vs[m];
+            for(int i=m+1;i<=e;i++) {
+                if(vs[i]<min) min=vs[i];
+            }
+            return min;
+        }
+
+        @Override public float op(float[] vs, int m, int e, float[] p) {
+            float min = vs[m];
             for(int i=m+1;i<=e;i++) {
                 if(vs[i]<min) min=vs[i];
             }
@@ -1266,13 +1432,19 @@ public class Codons {
 
         @Override public int op(int[] vs, int m, int e, int[] p) {
             int max = vs[m];
-            //debug("max initial: "+max);
             for(int i=m+1;i<=e;i++) {
                 final int t = vs[i];
-                //debug("max next: "+t);
                 if(t>max) max=t;
             }
-            //debug("max final: "+max);
+            return max;
+        }
+
+        @Override public float op(float[] vs, int m, int e, float[] p) {
+            float max = vs[m];
+            for(int i=m+1;i<=e;i++) {
+                final float t = vs[i];
+                if(t>max) max=t;
+            }
             return max;
         }
 
@@ -1305,8 +1477,17 @@ public class Codons {
         public Avg() { super(AVG, -1); }
         public Avg(int c) { super(AVG, c); }
         @Override public Codon copy() { return new Avg(_c); }
+
         @Override public int op(int[] vs, int m, int e, int[] p) {
             int sum = vs[m];
+            for(int i=m+1;i<=e;i++) {
+                sum += vs[i];
+            }
+            return sum/(1+e-m);
+        }
+
+        @Override public float op(float[] vs, int m, int e, float[] p) {
+            float sum = vs[m];
             for(int i=m+1;i<=e;i++) {
                 sum += vs[i];
             }
@@ -1347,12 +1528,18 @@ public class Codons {
         @Override int expr(int v1, int v2) {
             return v1^v2;
         }
+        @Override float expr(float v1, float v2) {
+            return v1;
+        }
     }
 
     public static class GreaterThan extends Binary {
         public GreaterThan() { super(GT); }
         @Override public Codon copy() { return new GreaterThan(); }
         @Override int expr(int v1, int v2) {
+            return v1>v2?1:0;
+        }
+        @Override float expr(float v1, float v2) {
             return v1>v2?1:0;
         }
     }
@@ -1363,12 +1550,18 @@ public class Codons {
         @Override int expr(int v1, int v2) {
             return v1<v2?1:0;
         }
+        @Override float expr(float v1, float v2) {
+            return v1<v2?1:0;
+        }
     }
 
     public static final class Greater extends Binary {
         public Greater() { super(GREATER); }
         @Override public Codon copy() { return new Greater(); }
         @Override int expr(int v1, int v2) {
+            return v1>=v2?v1:0;
+        }
+        @Override float expr(float v1, float v2) {
             return v1>=v2?v1:0;
         }
     }
@@ -1379,6 +1572,9 @@ public class Codons {
         @Override int expr(int v1, int v2) {
             return v1<=v2?v1:0;
         }
+        @Override float expr(float v1, float v2) {
+            return v1<=v2?v1:0;
+        }
     }
 
     public static class And extends Binary {
@@ -1386,6 +1582,9 @@ public class Codons {
         @Override public Codon copy() { return new And(); }
         @Override int expr(int v1, int v2) {
             return v1&v2;
+        }
+        @Override float expr(float v1, float v2) {
+            return v1;
         }
     }
 
@@ -1395,6 +1594,9 @@ public class Codons {
         @Override int expr(int v1, int v2) {
             return v1|v2;
         }
+        @Override float expr(float v1, float v2) {
+            return v1;
+        }
     }
 
     public static class Rotright extends Binary {
@@ -1403,6 +1605,9 @@ public class Codons {
         @Override int expr(int v1, int v2) {
             return Integer.rotateRight(v1,v2);
         }
+        @Override float expr(float v1, float v2) {
+            return v1;
+        }
     }
 
     public static class Rotleft extends Binary {
@@ -1410,6 +1615,9 @@ public class Codons {
         @Override public Codon copy() { return new Rotleft(); }
         @Override int expr(int v1, int v2) {
             return Integer.rotateLeft(v1,v2);
+        }
+        @Override float expr(float v1, float v2) {
+            return v1;
         }
     }
 
@@ -1424,12 +1632,19 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int cond = t.pop();
             int fl = t.pop();
             int tr = t.pop();
             int res = cond!=0?tr:fl;
-            //if(true||cond!=0) debug("!!!!!!!! "+cond+" "+tr+" "+fl);
+            t.push(res);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float cond = t.pop();
+            float fl = t.pop();
+            float tr = t.pop();
+            float res = cond!=0?tr:fl;
             t.push(res);
         }
     }
@@ -1445,8 +1660,13 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int v = t.peek();
+            t.push(v);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float v = t.peek();
             t.push(v);
         }
     }
@@ -1462,8 +1682,13 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int v = t.pop();
+            t.push(-v);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float v = t.pop();
             t.push(-v);
         }
     }
@@ -1479,8 +1704,13 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int v = t.pop();
+            t.push(v==0?1:0);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float v = t.pop();
             t.push(v==0?1:0);
         }
     }
@@ -1502,7 +1732,7 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int v = t.pop();
             int r = _max-v;
             t.push(r);
@@ -1520,7 +1750,7 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int v = t.pop();
             int x = Maths.excl(v);
             t.push(x);
@@ -1545,7 +1775,7 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             final int v = t.pop();
             int m = 0;
             for(int i=0;i<_c;i++) {
@@ -1555,6 +1785,26 @@ public class Codons {
                 }
             }
             t.push(m);
+        }
+    }
+
+    public static class Sigmoid implements Codon {
+        @Override public Codon copy() { return new Sigmoid(); }
+
+        @Override public String code() {
+            return SIGMOID;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public void op(int[] p, IntTape t) {
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float v = 1f/(1f+(float)Math.exp(-t.pop()));
+            t.push(v);
         }
     }
 
@@ -1577,7 +1827,7 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             int dist = t.pop();
             int len = Math.min(Math.max(0,t.pop()), _v.length);
             //int ipeek = t.peek();
@@ -1619,7 +1869,7 @@ public class Codons {
             return false;
         }
 
-        @Override public void op(int[] p, Tape t) {
+        @Override public void op(int[] p, IntTape t) {
             for(int i=0;i<_s.length;i++) {
                 _s[i] = t.pop();
             }

@@ -9,28 +9,29 @@ import javafx.embed.swing.SwingFXUtils;
     
 
 
-public class IntBlockPlane extends AbstractIntPlane {
+public class DoubleBlockPlane /*extends AbstractPlane*/ {
+    /*
     private final CA _ca;
     private final int _w;
     private final int _h;
     private final int _d;
     private final int _hstride;
     private final int _dstride;
-    private final int[] _s;
+    private final double[] _s;
     private final Palette _p;
     private final BufferedImage _i;
     private final WritableRaster _r;
     private final boolean _wrap;
-    private final int _oob;
+    private final double _oob;
     private int _readDepthIdx;
     private int _writeDepthIdx;
 
 
-    public IntBlockPlane(CA ca, int w, int h, int d, Palette p, Integer oob) {
-        this(ca, w, h, d, p, oob, new int[w*h*d]);
+    public DoubleBlockPlane(CA ca, int w, int h, int d, Palette p, Double oob) {
+        this(ca, w, h, d, p, oob, new double[w*h*d]);
     }
 
-    public IntBlockPlane(CA ca, int w, int h, int d, Palette p, Integer oob, int[] s) {
+    public DoubleBlockPlane(CA ca, int w, int h, int d, Palette p, Double oob, double[] s) {
         _ca = ca;
         _w = w;
         _h = h;
@@ -43,7 +44,7 @@ public class IntBlockPlane extends AbstractIntPlane {
         _r = _i.getRaster();
         if(oob!=null) {
             _wrap = false;
-            _oob = oob.intValue();
+            _oob = oob.doubleValue();
         }
         else {
             _wrap = true;
@@ -75,17 +76,7 @@ public class IntBlockPlane extends AbstractIntPlane {
     }
 
     public void setCell(int x, int y, int z, int v) {
-        //try {
-            //_s[x+_hstride*y+_dstride*z] = v;
-            _s[normX(x)+_hstride*normY(y)+_dstride*normZ(z)] = v;
-            //if(_m==Mode.indexed && z==0) {
-                //_r.setSample(x,y,0,v);
-            //}
-        //}
-        //catch(ArrayIndexOutOfBoundsException e) {
-            //System.err.println("x="+x+", y="+y+", z="+z+", hstride="+_hstride+", dstride="+_dstride);
-            //throw new IllegalArgumentException(e);
-        //}
+        _s[normX(x)+_hstride*normY(y)+_dstride*normZ(z)] = v;
     }
 
     @Override public void setRGBCell(int x, int y, int rgb) {
@@ -122,7 +113,7 @@ public class IntBlockPlane extends AbstractIntPlane {
 
     @Override public int[] getBlock(int[] into, int x, int y, int dx, int dy, int offset) {
         //throw new UnsupportedOperationException();
-        return getBlock(into, x, y, /*z*/ _readDepthIdx, dx, dy, /*dz*/ 1, offset);
+        return getBlock(into, x, y, _readDepthIdx, dx, dy, 1, offset);
     }
 
     @Override public int[] getCardinal(int[] into, int x, int y, int dx, int dy, int offset) {
@@ -164,29 +155,6 @@ public class IntBlockPlane extends AbstractIntPlane {
         }
         return into;
     }
-
-    /*
-    public int[] getBlockNew(final int[] into, final int x, final int y, final int z, final int dx, final int dy, final int dz, final int offset) {
-        if(x<0||x+dx>=_w||y<0||y+dy>=_h||z<0||z+dz>=_d) {
-            getBlockOld(into, x, y, z, dx, dy, dz, offset);
-        }
-        else {
-            //System.err.println("x="+x+", y="+y+", z="+z+", dx="+dx+", dy="+dy+", dz="+dz);
-            int idx=offset;
-            for(int k=z;k<z+dz;k++) {
-                for(int j=y;j<y+dy;j++) {
-                    //for(int i=x;i<x+dx;i++) {
-                        //System.err.println(i+", "+j+", "+k+" @ "+idx);
-                        //into[idx++] = getCell(i,j,k);
-                    //}
-                    System.arraycopy(_s, x+_hstride*j+_dstride*k, into, idx, dx);
-                    idx+=dx;
-                }
-            }
-        }
-        return into;
-    }
-    */
 
     @Override public void setRow(int[] row, int y) {
         throw new UnsupportedOperationException();
@@ -380,42 +348,14 @@ public class IntBlockPlane extends AbstractIntPlane {
 
     private final int normX(int x) {
         return norm(x, _w);
-        /*
-        if(x<0) {
-            x = (_w+x)%_w;
-            //if(x<0) throw new IllegalArgumentException("neg x: "+x);
-        }
-        else if(x>=_w) {
-            x = x % _w;
-        }
-        return x;
-        */
     }
 
     private final int normY(int y) {
         return norm(y, _h);
-        /*
-        if(y<0) {
-            y = (_h+y)%_h;
-        }
-        else if(y>=_h) {
-            y = y % _h;
-        }
-        return y;
-        */
     }
 
     private final int normZ(int z) {
         return norm(z, _d);
-        /*
-        if(z<0) {
-            z = (_d+z)%_d;
-        }
-        else if(z>=_d) {
-            z = z % _d;
-        }
-        return z;
-        */
     }
 
     private static final int norm(int v, final int m) {
@@ -431,4 +371,5 @@ public class IntBlockPlane extends AbstractIntPlane {
         }
         return v;
     }
+    */
 }

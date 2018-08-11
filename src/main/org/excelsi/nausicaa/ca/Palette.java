@@ -38,7 +38,8 @@ public interface Palette {
     int[][] unpack();
 
     int[] unpack(int idx, int[] rgba);
-Palette replace(int index, int newColor);
+
+    Palette replace(int index, int newColor);
 
     IndexColorModel toColorModel();
 

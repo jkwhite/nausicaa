@@ -13,6 +13,7 @@ public final class IndexedPattern implements Pattern {
     private final long _id;
     private final int _length;
     private final byte[] _target;
+    private final int[] _pow;
 
 
     /**
@@ -27,6 +28,10 @@ public final class IndexedPattern implements Pattern {
         _id = id;
         _length = length;
         _target = target;
+        _pow = new int[a.sourceLength()];
+        for(int i=0;i<_pow.length;i++) {
+            _pow[_pow.length-1-i] = (int) Math.pow(a.colors(), i);
+        }
     }
 
     public long id() {
@@ -40,6 +45,14 @@ public final class IndexedPattern implements Pattern {
         return _target[pattern];
     }
 
+    @Override public int next(int pattern, int[] p2) {
+        int idx = 0;
+        for(int k=0;k<p2.length;k++) {
+            idx += p2[k] * _pow[k];
+        }
+        return next(idx, 0);
+    }
+
     @Override public void tick() {
     }
 
@@ -49,12 +62,6 @@ public final class IndexedPattern implements Pattern {
             p -= _target.length;
         }
         return _target[p];
-        //int b = (_target[pattern]+offset) % _a.colors();
-        //int b = (_target[pattern]+offset);
-        //if(b>=_a.colors()) {
-            //b = (_a.colors()-1);
-        //}
-        //return (byte) b;
     }
 
     public int length() {
@@ -98,6 +105,25 @@ public final class IndexedPattern implements Pattern {
 
     public String summarize() {
         return _a.toString();
+    }
+
+    public String serialize(String fmt) {
+        if("base64gz/bytes".equals(fmt)) {
+            return Base64.encodeObject(_target, Base64.GZIP | Base64.DONT_BREAK_LINES);
+        }
+        else {
+            throw new IllegalArgumentException("unknown format '"+fmt+"'");
+        }
+    }
+
+    public static IndexedPattern deserialize(String fmt, String tgt, int length, Archetype a) {
+        if("base64gz/bytes".equals(fmt)) {
+            byte[] target = (byte[]) Base64.decodeToObject(tgt);
+            return new IndexedPattern(a, 0, length, target);
+        }
+        else {
+            throw new IllegalArgumentException("unknown format '"+fmt+"'");
+        }
     }
 
     public void write(DataOutputStream dos) throws IOException {

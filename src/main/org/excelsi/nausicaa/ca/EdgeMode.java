@@ -10,25 +10,44 @@ public class EdgeMode {
     };
 
     private final Type _t;
-    private final int _constant;
+    private final int _iconstant;
+    private final float _fconstant;
 
 
     public EdgeMode(Type t) {
         _t = t;
-        _constant = 0;
+        _iconstant = 0;
+        _fconstant = 0;
     }
 
     public EdgeMode(Type t, int constant) {
         _t = t;
-        _constant = constant;
+        _iconstant = constant;
+        _fconstant = 0;
+    }
+
+    public EdgeMode(Type t, float constant) {
+        _t = t;
+        _iconstant = 0;
+        _fconstant = constant;
+    }
+
+    public EdgeMode(Type t, int iconstant, float fconstant) {
+        _t = t;
+        _iconstant = iconstant;
+        _fconstant = fconstant;
     }
 
     public Type type() {
         return _t;
     }
 
-    public int constant() {
-        return _constant;
+    public int intConstant() {
+        return _iconstant;
+    }
+
+    public float floatConstant() {
+        return _fconstant;
     }
 
     public Integer oobValue() {
@@ -39,7 +58,23 @@ public class EdgeMode {
             case zero:
                 return 0;
             case constant:
-                return _constant;
+                return _iconstant;
+        }
+    }
+
+    public Integer intOobValue() {
+        return oobValue();
+    }
+
+    public Float floatOobValue() {
+        switch(_t) {
+            case toroidal:
+            default:
+                return null;
+            case zero:
+                return 0f;
+            case constant:
+                return _fconstant;
         }
     }
 
@@ -47,7 +82,8 @@ public class EdgeMode {
         JsonObject o = new JsonObject();
         o.addProperty("type", _t.toString());
         if(_t==Type.constant) {
-            o.addProperty("constant", _constant);
+            o.addProperty("constant", _iconstant);
+            o.addProperty("floatConstant", _fconstant);
         }
         return o;
     }
@@ -62,7 +98,8 @@ public class EdgeMode {
                 return new EdgeMode(Type.zero);
             case "constant":
                 return new EdgeMode(Type.constant,
-                    Json.integer(o, "constant", 0));
+                    Json.integer(o, "constant", 0),
+                    Json.flot(o, "floatConstant", 0f));
         }
         throw new IllegalArgumentException("unknown type '"+t+"'");
     }

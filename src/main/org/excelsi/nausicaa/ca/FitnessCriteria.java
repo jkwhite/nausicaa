@@ -8,7 +8,7 @@ public final class FitnessCriteria {
     public static Fitness neverending() {
         return (a, ps)->{
             if(a.dims()==1) {
-                final Plane p = ps[0];
+                final IntPlane p = (IntPlane) ps[0];
                 if(p.getHeight()<2) {
                     return 0f;
                 }
@@ -43,7 +43,7 @@ public final class FitnessCriteria {
     public static Fitness repeatGreatest() {
         return (a, ps)->{
             if(a.dims()==1) {
-                final Plane p = ps[0];
+                final IntPlane p = (IntPlane) ps[0];
                 int[] row0 = new int[p.getWidth()];
                 p.getRow(row0, 0, 0);
                 int[] rowi = new int[p.getWidth()];
@@ -68,8 +68,8 @@ public final class FitnessCriteria {
     public static Fitness reverse(final int alen, final int length) {
         return (a, ps)->{
             if(a.dims()==1 || a.dims()==2) {
-                final Plane p = ps[0];
-                final Plane p2 = a.dims()==1?ps[0]:ps[ps.length-1];
+                final IntPlane p = (IntPlane) ps[0];
+                final IntPlane p2 = (IntPlane) (a.dims()==1?ps[0]:ps[ps.length-1]);
                 int[] row0 = new int[p.getWidth()];
                 //int[] row0 = target;
                 p.getRow(row0, 0, 0);
@@ -108,7 +108,7 @@ public final class FitnessCriteria {
     public static Fitness findTarget(final byte[] target) {
         return (a, ps)->{
             if(a.dims()==1) {
-                final Plane p = ps[0];
+                final IntPlane p = (IntPlane) ps[0];
                 //int[] row0 = new int[p.getWidth()];
                 //int[] row0 = target;
                 //p.getRow(row0, 0, 0);
@@ -131,7 +131,8 @@ public final class FitnessCriteria {
         };
     }
 
-    public static Fitness findTarget(final Plane target, final double[] weights) {
+    public static Fitness findTarget(final Plane itarget, final double[] weights) {
+        final IntPlane target = (IntPlane) itarget;
         final int[][] t = new int[target.getHeight()][target.getWidth()];
         final double maxMatches = target.getHeight() * target.getWidth();
         for(int i=0;i<t.length;i++) {
@@ -139,7 +140,7 @@ public final class FitnessCriteria {
         }
         return (a, ps)->{
             if(a.dims()==1||a.dims()==2) {
-                final Plane p = ps[ps.length-1];
+                final IntPlane p = (IntPlane) ps[ps.length-1];
                 final int[] row = new int[p.getWidth()];
                 double matches = 0;
                 for(int i=0;i<t.length;i++) {
@@ -166,7 +167,7 @@ public final class FitnessCriteria {
             final int[][] ccounts = new int[ps.length][a.colors()];
             final int[] row = new int[ps[0].getWidth()];
             for(int i=0;i<ps.length;i++) {
-                final Plane p = ps[i];
+                final IntPlane p = (IntPlane) ps[i];
                 for(int y=0;y<p.getHeight();y++) {
                     p.getRow(row, y, 0);
                     for(int j=0;j<row.length;j++) {
@@ -189,8 +190,8 @@ public final class FitnessCriteria {
 
     public static Fitness interesting() {
         return (a, ps)->{
-            final Plane p1 = ps[ps.length-3];
-            final Plane p2 = ps[ps.length-1];
+            final IntPlane p1 = (IntPlane) ps[ps.length-3];
+            final IntPlane p2 = (IntPlane) ps[ps.length-1];
             final Stats s1 = Stats.forPlane(p1);
             final Stats s2 = Stats.forPlane(p2);
             //System.err.println("p1: "+System.identityHashCode(p1)+", p2: "+System.identityHashCode(p2)+", s1: "+s1.humanize()+", s2: "+s2.humanize());
@@ -207,8 +208,8 @@ public final class FitnessCriteria {
 
     public static Fitness interesting2() {
         return (a, ps)->{
-            final Plane p1 = ps[ps.length-3];
-            final Plane p2 = ps[ps.length-2];
+            final IntPlane p1 = (IntPlane) ps[ps.length-3];
+            final IntPlane p2 = (IntPlane) ps[ps.length-2];
             final Stats s1 = Stats.forPlane(p1);
             final Stats s2 = Stats.forPlane(p2);
             final Multistats ms = s2.compareWith(s1);
@@ -224,8 +225,8 @@ public final class FitnessCriteria {
 
     public static Fitness interesting3(final double idealPm, final double idealNrsdev, final double idealNrmean) {
         return (a, ps)->{
-            final Plane p1 = ps[ps.length-3];
-            final Plane p2 = ps[ps.length-2];
+            final IntPlane p1 = (IntPlane) ps[ps.length-3];
+            final IntPlane p2 = (IntPlane) ps[ps.length-2];
             final Stats s1 = Stats.forPlane(p1);
             final Stats s2 = Stats.forPlane(p2);
             final Multistats ms = s2.compareWith(s1);

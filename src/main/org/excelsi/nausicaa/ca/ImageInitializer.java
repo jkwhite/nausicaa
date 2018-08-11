@@ -45,6 +45,15 @@ public class ImageInitializer implements Initializer {
     }
 
     @Override public void init(Plane plane, Rule rule, Random random) {
+        if(rule.archetype().isDiscrete()) {
+            initDisc((IntPlane)plane, rule, random);
+        }
+        else {
+            throw new UnsupportedOperationException("CONTINUOUS");
+        }
+    }
+
+    private void initDisc(IntPlane plane, Rule rule, Random random) {
         Palette p = plane.creator().getPalette();
         if(rule.archetype().dims()==1) {
             final int w = _image.getWidth();

@@ -46,6 +46,23 @@ public interface ExternalForce {
         }
 
         @Override public void apply(final Plane p, final Random r) {
+            switch(p.type()) {
+                case discrete:
+                default:
+                    applyDisc((IntPlane)p, r);
+                case continuous:
+                    throw new UnsupportedOperationException("CONTINUOUS");
+            }
+        }
+
+        @Override public JsonElement toJson() {
+            JsonObject o = new JsonObject();
+            o.addProperty("type", "random");
+            o.addProperty("amount", _amount);
+            return o;
+        }
+
+        private void applyDisc(final IntPlane p, final Random r) {
             final float max = p.getWidth()*p.getHeight()*Math.max(1f,p.getDepth());
             final int pnts = (int) (_amount*max);
             final int cols = p.creator().archetype().colors();
@@ -64,13 +81,6 @@ public interface ExternalForce {
                         r.nextInt(cols));
                 }
             }
-        }
-
-        @Override public JsonElement toJson() {
-            JsonObject o = new JsonObject();
-            o.addProperty("type", "random");
-            o.addProperty("amount", _amount);
-            return o;
         }
     }
 }
