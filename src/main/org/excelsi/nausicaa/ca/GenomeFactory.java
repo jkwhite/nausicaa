@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Iterator;
 import static org.excelsi.nausicaa.ca.WeightedFactory.Weight;
 import static org.excelsi.nausicaa.ca.WeightedFactory.weight;
 import static org.excelsi.nausicaa.ca.Codons.*;
@@ -71,10 +72,17 @@ public class GenomeFactory {
             weight(1, new Abort()),
             weight(1, new Pos()),
             weight(1, new Sigmoid()),
+            weight(1, new Cos()),
+            weight(1, new Sin()),
             weight(1, new Mod())
         ));
         if(a.colors()<1000000) {
             cs.add(weight(1,new Histo(1)));
+        }
+        for(Iterator<Weight<Codon>> it=cs.iterator();it.hasNext();) {
+            if(!it.next().e().supports(a.values())) {
+                it.remove();
+            }
         }
         return new WeightedFactory<Codon>(cs.toArray(new Weight[0]));
     }

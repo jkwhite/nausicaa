@@ -29,7 +29,7 @@ public class Actions {
 
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(6,2));
+        JPanel top = new JPanel(new GridLayout(7,2));
 
         top.add(new JLabel("Dimensions"));
         final JTextField alpha = new JTextField();
@@ -115,35 +115,56 @@ public class Actions {
 
         // Color kind
         final String[] colhack = new String[1];
-        final JComponent[] idxhack = new JComponent[2];
+        final JComponent[] idxhack = new JComponent[4];
         top.add(new JLabel("Kind"));
         ButtonGroup kind = new ButtonGroup();
+
+        AbstractAction real = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                colhack[0] = "real";
+                idxhack[0].setEnabled(true);
+                idxhack[1].setEnabled(true);
+                idxhack[2].setEnabled(true);
+                idxhack[3].setEnabled(true);
+            }
+        };
+        JRadioButton rreal = new JRadioButton(real);
+        rreal.setText("Real");
+        kind.add(rreal);
 
         AbstractAction rgb = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 colhack[0] = "rgb";
                 idxhack[0].setEnabled(false);
                 idxhack[1].setEnabled(false);
+                idxhack[2].setEnabled(false);
+                idxhack[3].setEnabled(false);
             }
         };
         JRadioButton rrgb = new JRadioButton(rgb);
         rrgb.setText("RGB");
         kind.add(rrgb);
+
         AbstractAction rgba = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 colhack[0] = "rgba";
                 idxhack[0].setEnabled(false);
                 idxhack[1].setEnabled(false);
+                idxhack[2].setEnabled(false);
+                idxhack[3].setEnabled(false);
             }
         };
         JRadioButton rrgba = new JRadioButton(rgb);
         rrgba.setText("RGBA");
         kind.add(rrgba);
+
         AbstractAction indexed = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 colhack[0] = "indexed";
                 idxhack[0].setEnabled(true);
                 idxhack[1].setEnabled(true);
+                idxhack[2].setEnabled(false);
+                idxhack[3].setEnabled(false);
             }
         };
         colhack[0] = "indexed";
@@ -151,19 +172,29 @@ public class Actions {
         rindexed.setText("Indexed");
         rindexed.setSelected(true);
         kind.add(rindexed);
+
         JPanel kinds = new JPanel();
         kinds.add(rindexed);
         kinds.add(rrgb);
         kinds.add(rrgba);
+        kinds.add(rreal);
         top.add(kinds);
 
-        idxhack[0] = new JLabel("Colors");
+        idxhack[0] = new JLabel("Value Colors");
         top.add(idxhack[0]);
         final JTextField mc = new JTextField();
         idxhack[1] = mc;
         mc.setText(config.getVariable("default_colors", "2"));
         mc.setColumns(3);
         top.add(mc);
+
+        idxhack[2] = new JLabel("Palette Colors");
+        top.add(idxhack[2]);
+        final JTextField pmc = new JTextField();
+        idxhack[3] = pmc;
+        pmc.setText(config.getVariable("default_palettecolors", "2"));
+        pmc.setColumns(3);
+        top.add(pmc);
 
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
@@ -175,25 +206,35 @@ public class Actions {
                 d.dispose();
                 Integer dims = Integer.parseInt(alpha.getText());
                 Integer colors = Integer.parseInt(mc.getText());
+                Integer pcolors = Integer.parseInt(pmc.getText());
                 Integer size = Integer.parseInt(siz.getText());
                 config.setVariable("default_dimensions", alpha.getText());
                 config.setVariable("default_colors", mc.getText());
+                config.setVariable("default_palettecolors", pmc.getText());
                 config.setVariable("default_size", siz.getText());
                 Random rand = new Random();
                 Palette pal;
+                boolean usePalColors;
                 switch(colhack[0]) {
                     case "rgb":
                         pal = new RGBPalette();
+                        usePalColors = true;
                         break;
                     case "rgba":
                         pal = new RGBAPalette();
+                        usePalColors = true;
+                        break;
+                    case "real":
+                        pal = Palette.random(pcolors, rand, true);
+                        usePalColors = false;
                         break;
                     case "indexed":
                     default:
                         pal = Palette.random(colors, rand, true);
+                        usePalColors = true;
                         break;
                 }
-                Archetype a = new Archetype(dims, size, pal.getColorCount(), neihack[0]);
+                Archetype a = new Archetype(dims, size, usePalColors?pal.getColorCount():colors, neihack[0], "real".equals(colhack[0])?Values.continuous:Values.discrete);
                 Ruleset rs;
                 switch(comphack[0]) {
                     case "machineelf":
@@ -1416,7 +1457,7 @@ public class Actions {
                 config.setVariable("customspectrum_density", ""+de);
                 config.setVariable("customspectrum_blackzero", ""+blz);
                 config.setVariable("customspectrum_invisible", ""+inv);
-                v.setActiveCA(v.getActiveCA().palette(Palette.randomCutRainbow(v.getRandom(), v.getActiveCA().archetype().colors(), de, blz, clrs, inv)));
+                v.setActiveCA(v.getActiveCA().palette(Palette.randomCutRainbow(v.getRandom(), v.getActiveCA().getPalette().getColorCount(), de, blz, clrs, inv)));
             }
         });
         bot.add(ne);

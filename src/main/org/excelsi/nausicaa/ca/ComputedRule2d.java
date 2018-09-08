@@ -146,8 +146,8 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                 final Plane frameP2 = p2;
                 //frameP2.lock(2);
                 if(opt.higherDim()>1) {
-                    ((IntBlockPlane)frameP1).setReadDepth(depthIdx++);
-                    ((IntBlockPlane)frameP2).setWriteDepth(depthIdx);
+                    ((Sliceable)frameP1).setReadDepth(depthIdx++);
+                    ((Sliceable)frameP2).setWriteDepth(depthIdx);
                 }
                 try {
                     frameP2.lockWrite();

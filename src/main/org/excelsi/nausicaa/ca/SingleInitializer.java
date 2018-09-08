@@ -34,7 +34,7 @@ public class SingleInitializer implements Initializer {
             initDisc((IntPlane)plane, rule, random);
         }
         else {
-            throw new UnsupportedOperationException("CONTINUOUS");
+            initCont((FloatPlane)plane, rule, random);
         }
     }
 
@@ -45,10 +45,6 @@ public class SingleInitializer implements Initializer {
                 for(int x=0;x<plane.getWidth();x++) {
                     plane.setCell(x, 0, 0);
                 }
-                //int cx = coordX(plane, _x);
-                //int sx = cx - _size/2;
-                //int ex = cx + _size/2;
-                //fill(plane, sx, ex, 0, 0, color(colors, random, _color));
                 plane.setCell(coordX(plane, _x), 0, color(colors, random, _color));
                 break;
             case 2:
@@ -68,6 +64,37 @@ public class SingleInitializer implements Initializer {
                     }
                 }
                 plane.setCell(coordX(plane, _x), coordY(plane, _y), coordZ(plane, _z), color(colors, random, _color));
+                break;
+            default:
+        }
+    }
+
+    private void initCont(FloatPlane plane, Rule rule, Random random) {
+        int colors = rule.archetype().colors();
+        switch(rule.dimensions()) {
+            case 1:
+                for(int x=0;x<plane.getWidth();x++) {
+                    plane.setCell(x, 0, 0);
+                }
+                plane.setCell(coordX(plane, _x), 0, colorFloat(colors, random, _color));
+                break;
+            case 2:
+                for(int y=0;y<plane.getHeight();y++) {
+                    for(int x=0;x<plane.getWidth();x++) {
+                        plane.setCell(x, y, 0);
+                    }
+                }
+                plane.setCell(coordX(plane, _x), coordY(plane, _y), colorFloat(colors, random, _color));
+                break;
+            case 3:
+                for(int y=0;y<plane.getHeight();y++) {
+                    for(int x=0;x<plane.getWidth();x++) {
+                        for(int z=0;z<plane.getDepth();z++) {
+                            plane.setCell(x, y, z, 0);
+                        }
+                    }
+                }
+                plane.setCell(coordX(plane, _x), coordY(plane, _y), coordZ(plane, _z), colorFloat(colors, random, _color));
                 break;
             default:
         }
@@ -107,6 +134,10 @@ public class SingleInitializer implements Initializer {
 
     private int coordZ(Plane p, int v) {
         return v==-1?p.getDepth()/2:v%p.getDepth();
+    }
+
+    private float colorFloat(int colors, Random r, int v) {
+        return v==-1?(((float)(colors-1))*r.nextFloat()):v%colors;
     }
 
     private int color(int colors, Random r, int v) {

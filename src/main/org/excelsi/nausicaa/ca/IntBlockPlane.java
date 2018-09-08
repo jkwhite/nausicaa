@@ -9,7 +9,7 @@ import javafx.embed.swing.SwingFXUtils;
     
 
 
-public class IntBlockPlane extends AbstractIntPlane {
+public class IntBlockPlane extends AbstractIntPlane implements Sliceable {
     private final CA _ca;
     private final int _w;
     private final int _h;
@@ -346,11 +346,11 @@ public class IntBlockPlane extends AbstractIntPlane {
     @Override public void tick() {
     }
 
-    public void setReadDepth(int idx) {
+    @Override public void setReadDepth(int idx) {
         _readDepthIdx = idx;
     }
 
-    public void setWriteDepth(int idx) {
+    @Override public void setWriteDepth(int idx) {
         _writeDepthIdx = idx;
     }
 //

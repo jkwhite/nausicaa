@@ -70,9 +70,9 @@ public class Machine {
             }
             float res = _tf.pop();
             //if(res<0) res=-res;
-            res = res % _a.colors();
+            res = res % (_a.colors()-1);
             if(res<0) {
-                res = _a.colors()+res;
+                res = _a.colors()+res-1;
             }
             io.fo = res;
         }

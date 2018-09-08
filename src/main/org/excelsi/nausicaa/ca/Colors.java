@@ -21,6 +21,14 @@ public final class Colors {
         return c;
     }
 
+    public static float bound(float c) {
+        return Math.min(1f,Math.max(0f,c));
+    }
+
+    public static int integer(float c) {
+        return (int) (c*255);
+    }
+
     public static int pack(int r, int g, int b) {
         return pack(r, g, b, 255);
     }
@@ -31,6 +39,23 @@ public final class Colors {
 
     public static int packBounded(int r, int g, int b, int a) {
         return bound(b)|(bound(g)<<8)|(bound(r)<<16)|(bound(a)<<24);
+    }
+
+    public static int pack(float r, float g, float b) {
+        return pack(r, g, b, 1f);
+    }
+
+    public static int pack(float r, float g, float b, float a) {
+        return integer(b)|(integer(g)<<8)|(integer(r)<<16)|(integer(a)<<24);
+    }
+
+    public static int packBounded(float r, float g, float b) {
+        return packBounded(r,g,b,1f);
+    }
+
+    public static int packBounded(float r, float g, float b, float a) {
+        //System.err.println("values: "+integer(bound(b))+","+integer(bound(g))+","+integer(bound(r))+","+integer(bound(a)));
+        return integer(bound(b))|(integer(bound(g))<<8)|(integer(bound(r))<<16)|(integer(bound(a))<<24);
     }
 
     public static int[] unpack(int c) {

@@ -228,7 +228,12 @@ public final class CA {
     }
 
     public CA mutate(Rule r, Random om) {
-        return new CA(r, _p.matchCapacity(r.colorCount(), om), _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _umode, _emode, _ef);
+        if(r instanceof IndexedRule) {
+            return new CA(r, _p.matchCapacity(r.colorCount(), om), _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _umode, _emode, _ef);
+        }
+        else {
+            return new CA(r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _umode, _emode, _ef);
+        }
     }
 
     public CA size(int w, int h) {

@@ -9,7 +9,7 @@ import javafx.embed.swing.SwingFXUtils;
     
 
 
-public class FloatBlockPlane extends AbstractFloatPlane {
+public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
     private final CA _ca;
     private final int _w;
     private final int _h;
@@ -192,7 +192,7 @@ public class FloatBlockPlane extends AbstractFloatPlane {
         throw new UnsupportedOperationException();
     }
 
-    private final int[] _rgb = new int[3];
+    private final float[] _rgb = new float[4];
     private final int[] _unpack = new int[4];
     private final boolean FIRST = true;
 
@@ -200,6 +200,19 @@ public class FloatBlockPlane extends AbstractFloatPlane {
     private final Rendering DEFAULT_RENDERING = new Rendering();
     @Override public java.awt.Image toImage() {
         return toImage(DEFAULT_RENDERING);
+    }
+
+    private int computeColor2(final float idx) {
+        if(_ca.archetype().colors()<_p.getColorCount()) {
+            final int pc = _p.getColorCount();
+            final int ac = _ca.archetype().colors();
+            final float acp = idx/ac;
+            final int pcp = (int)(pc*acp);
+            return _p.color(pcp);
+        }
+        else {
+            return computeColor(idx);
+        }
     }
 
     private int computeColor(final float idx) {
@@ -223,7 +236,7 @@ public class FloatBlockPlane extends AbstractFloatPlane {
             return _i;
         }
         else {
-            final int[] rgb = _rgb;
+            final float[] rgb = _rgb;
             for(int i=0;i<_w;i++) {
                 for(int j=0;j<_h;j++) {
                     rgb[0]=0;
@@ -232,10 +245,26 @@ public class FloatBlockPlane extends AbstractFloatPlane {
                     int mx = 0;
                     if(_d==1) {
                         float idx = getCell(i,j,0);
-                        _i.setRGB(i,j,computeColor(idx));
+                        _i.setRGB(i,j,computeColor2(idx));
                         //_i.setRGB(i,j,_p.color(idx));
                     }
                     else {
+                        if(comp==Rendering.Composition.channel) {
+                            final float max = creator().archetype().colors()-1f;
+                            if(_d==3) {
+                                rgb[0] = getCell(i,j,0);
+                                rgb[1] = getCell(i,j,1);
+                                rgb[2] = getCell(i,j,2);
+                                _i.setRGB(i,j,Colors.packBounded(rgb[0]/max,rgb[1]/max,rgb[2]/max));
+                            }
+                            else if(_d==4) {
+                                rgb[0] = getCell(i,j,0);
+                                rgb[1] = getCell(i,j,1);
+                                rgb[2] = getCell(i,j,2);
+                                rgb[3] = getCell(i,j,3);
+                                _i.setRGB(i,j,Colors.packBounded(rgb[0]/max,rgb[1]/max,rgb[2]/max,rgb[3]/max));
+                            }
+                        }
                         /*
                         if(comp==Rendering.Composition.front||comp==Rendering.Composition.wavg) {
                             for(int k=0;k<_d;k++) {
@@ -364,11 +393,11 @@ public class FloatBlockPlane extends AbstractFloatPlane {
     @Override public void tick() {
     }
 
-    public void setReadDepth(int idx) {
+    @Override public void setReadDepth(int idx) {
         _readDepthIdx = idx;
     }
 
-    public void setWriteDepth(int idx) {
+    @Override public void setWriteDepth(int idx) {
         _writeDepthIdx = idx;
     }
 //
