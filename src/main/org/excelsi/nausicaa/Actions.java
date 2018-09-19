@@ -441,51 +441,50 @@ public class Actions {
         final CA ca = v.getActiveCA();
         final Plane plane = v.getPlaneDisplayProvider().getActivePlane();
         final Plane nextPlane = ca.getRule().frameIterator(plane, Pools.adhoc(), new GOptions(false, 1, 1, 1f)).next();
-        final Stats stats = Stats.forPlane(plane);
-        final Stats nextStats = Stats.forPlane(nextPlane);
-        final Multistats ms = stats.compareWith(nextStats);
 
         Rule r = ca.getRule();
         final JFrame i = new JFrame("Info");
         InfoPanel p = new InfoPanel();
-        //p.addPair("Universe", chop(r.humanize(),80));
-        final String b64 = ca.toBase64();
-        p.addPair("Universe", chop(b64,80));
-        p.addPair("Text", createRuleText(b64));
-        String id = r.id();
-        if(id.length()<1000000) {
-            String frval;
-            try {
-                BigInteger rval = new BigInteger(r.id(), r.colorCount());
-                frval = rval.toString(10);
+        if(r instanceof IndexedRule) {
+            final String b64 = ca.toBase64();
+            p.addPair("Universe", chop(b64,80));
+            p.addPair("Text", createRuleText(b64));
+            String id = r.id();
+            if(id.length()<1000000) {
+                String frval;
+                try {
+                    BigInteger rval = new BigInteger(r.id(), r.colorCount());
+                    frval = rval.toString(10);
+                }
+                catch(Exception e) {
+                    e.printStackTrace();
+                    frval = "Error: "+r.id();
+                }
+                p.addPair("Rval ("+frval.length()+" digits)", createRuleText(frval));
             }
-            catch(Exception e) {
-                e.printStackTrace();
-                frval = "Error: "+r.id();
+            else {
+                p.addPair("Rval", id.length()+" digits elided");
             }
-            p.addPair("Rval ("+frval.length()+" digits)", createRuleText(frval));
+            if(b64.length()<100000) {
+                p.addPair("Incantation", createRuleText(ca.toIncantation()));
+            }
+            final Stats stats = Stats.forPlane(plane);
+            final Stats nextStats = Stats.forPlane(nextPlane);
+            final Multistats ms = stats.compareWith(nextStats);
+            p.addPair("Stats", createRuleText(ms.humanize(), false));
         }
-        else {
-            p.addPair("Rval", id.length()+" digits elided");
-        }
-        if(b64.length()<100000) {
-            p.addPair("Incantation", createRuleText(ca.toIncantation()));
+        else if(r instanceof ComputedRule2d) {
+            ComputedRule2d cr = (ComputedRule2d) r;
+            p.addPair("Dimensions", r.archetype().dims());
+            p.addPair("Colors", r.archetype().colors());
+            p.addPair("Neighborhood", r.archetype().neighborhood());
+            p.addPair("Size", r.archetype().size());
+            p.addPair("Values", r.archetype().values());
+            p.addPair("Genome", cr.prettyGenome());
+            p.addPair("Codons",
+                createText(new GenomeParser(r.archetype()).info(cr.archetype(), cr.genome()).toString(), 10, true));
         }
         p.addPair("Colors", createColorPanel(ca.getPalette()));
-        p.addPair("Stats", createRuleText(ms.humanize(), false));
-        /*
-        if(r instanceof Multirule) {
-            Rule[] chs = ((Multirule)r).rules();
-            if(chs.length>1) {
-                for(Rule ch:((Multirule)r).rules()) {
-                    p.addPair(" ", " ");
-                    p.addPair("  Rule", chop(ch.toString(),66));
-                    p.addPair("  Verse", createRuleText(ch.toIncantation()));
-                    p.addPair("  Colors", createColorPanel(ch.colors()));
-                }
-            }
-        }
-        */
         p.done();
         i.getContentPane().add(p);
         int shortcut = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -1843,6 +1842,16 @@ public class Actions {
         return (s.length()>max?s.substring(0,max)+"...":s)+" ("+s.length()+" characters)";
     }
 
+    private static JComponent createText(String str, int rows, boolean scroll) {
+        JTextArea a = new JTextArea(str, rows, 80);
+        a.setEditable(false);
+        a.setLineWrap(true);
+        a.setWrapStyleWord(false);
+        Font f = a.getFont();
+        //a.setFont(f.deriveFont(Font.ITALIC, f.getSize()-2));
+        return scroll ? new JScrollPane(a) : a;
+    }
+
     private static JComponent createRuleText(String str) {
         return createRuleText(str, true);
     }
@@ -1869,9 +1878,11 @@ public class Actions {
         JPanel colors = new JPanel();
         colors.setAlignmentY(0);
         colors.add(new JLabel(""+palette.getColorCount()+": "));
-        for(int col:palette.getColors()) {
-            colors.add(new CAEditor.Cell(col));
-            colors.add(new JLabel(Colors.toColorString(col)));
+        if(palette.getColorCount()<=100) {
+            for(int col:palette.getColors()) {
+                colors.add(new CAEditor.Cell(col));
+                colors.add(new JLabel(Colors.toColorString(col)));
+            }
         }
         return colors;
     }

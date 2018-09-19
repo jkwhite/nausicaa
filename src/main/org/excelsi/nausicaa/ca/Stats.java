@@ -100,7 +100,12 @@ public class Stats implements Humanizable {
     }
 
     public static Stats forPlane(final CA c, final Plane p) {
-        return new Stats(c, p);
+        if(p instanceof IntPlane) {
+            return new Stats(c, (IntPlane)p);
+        }
+        else {
+            throw new UnsupportedOperationException("FloatPlane");
+        }
     }
 
     public static double ideal(double i, double v) {
@@ -212,7 +217,7 @@ public class Stats implements Humanizable {
         return ((double)diff)/(p1.getHeight()*p1.getWidth());
     }
 
-    private Stats(final CA c, final Plane ip) {
+    private Stats(final CA c, final IntPlane ip) {
         IntPlane p = (IntPlane) ip;
         final Archetype a = c.getRule().archetype();
         final int[] histo = new int[a.colors()];

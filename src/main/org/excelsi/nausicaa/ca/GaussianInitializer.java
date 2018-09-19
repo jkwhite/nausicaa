@@ -34,15 +34,16 @@ public class GaussianInitializer implements Initializer {
     }
 
     public void init(Plane plane, Rule rule, Random random) {
-        if(rule.archetype().isDiscrete()) {
-            initDisc((IntPlane)plane, rule, random);
-        }
-        else {
-            throw new UnsupportedOperationException("CONTINUOUS");
-        }
+        initDisc(plane, rule, random, plane.pen());
+        //if(rule.archetype().isDiscrete()) {
+            //initDisc((IntPlane)plane, rule, random);
+        //}
+        //else {
+            //throw new UnsupportedOperationException("CONTINUOUS");
+        //}
     }
 
-    private void initDisc(IntPlane plane, Rule rule, Random random) {
+    private void initDisc(Plane plane, Rule rule, Random random, Pen pen) {
         final Random r;
         if(_random!=null) {
             _random.setSeed(_seed);
@@ -58,7 +59,7 @@ public class GaussianInitializer implements Initializer {
         final int[] max = new int[rule.dimensions()];
         switch(rule.dimensions()) {
             case 3:
-                max[2] = ((IntBlockPlane)plane).getDepth();
+                max[2] = plane.getDepth();
             case 2:
                 max[1] = plane.getHeight();
             case 1:
@@ -75,7 +76,7 @@ public class GaussianInitializer implements Initializer {
                     final int points1 = (int)(rad*_params.density);
                     for(int x=0;x<points1;x++) {
                         point(r, ctr, max, rad, pnt);
-                        plane.setCell(pnt[0], 0, colors[computeColor(r, colors.length)]);
+                        pen.setCell(pnt[0], 0, colors[computeColor(r, colors.length)]);
                     }
                     break;
                 case 2:
@@ -84,19 +85,18 @@ public class GaussianInitializer implements Initializer {
                     final int points2 = (int)(rad*rad*_params.density);
                     for(int j=0;j<points2;j++) {
                         point(r, ctr, max, rad, pnt);
-                        plane.setCell(pnt[0], pnt[1], colors[computeColor(r, colors.length)]);
+                        pen.setCell(pnt[0], pnt[1], colors[computeColor(r, colors.length)]);
                     }
                     break;
                 case 3:
-                    IntBlockPlane bp = (IntBlockPlane) plane;
-                    ctr[0] = r.nextInt(bp.getWidth());
-                    ctr[1] = r.nextInt(bp.getHeight());
-                    ctr[2] = r.nextInt(bp.getHeight());
+                    ctr[0] = r.nextInt(plane.getWidth());
+                    ctr[1] = r.nextInt(plane.getHeight());
+                    ctr[2] = r.nextInt(plane.getHeight());
                     final int points3 = (int)(rad*rad*rad*_params.density);
                     for(int j=0;j<points3;j++) {
                         point(r, ctr, max, rad, pnt);
                         //System.err.println("("+pnt[0]+","+pnt[1]+","+pnt[2]+")");
-                        bp.setCell(pnt[0], pnt[1], pnt[2], colors[computeColor(r, colors.length)]);
+                        pen.setCell(pnt[0], pnt[1], pnt[2], colors[computeColor(r, colors.length)]);
                     }
                     break;
                 default:

@@ -38,6 +38,30 @@ public class GenomeParser {
         }
     }
 
+    public Info info(final Archetype a, final String g) {
+        Pair<List<S>,Datamap> pa = parseS(g);
+        List<String> info = new ArrayList<>();
+        for(S s:pa.one) {
+            if(s.n==null) {
+                Codon[] cs = new Genome(s.g).codons(new Implicate(a, pa.two));
+                StringBuilder b = new StringBuilder();
+                for(Codon c:cs) {
+                    b.append(opName(c)).append('\n');
+                }
+                info.add(b.toString());
+            }
+        }
+        return new Info(info);
+    }
+
+    private static final String opName(Codon c) {
+        String n = c.getClass().getSimpleName();
+        if(n.indexOf('$')>0) {
+            n = n.substring(n.indexOf('$')+1);
+        }
+        return c.code()+"\t"+n;
+    }
+
     public void write(Rule r, PrintWriter w) {
     }
 
@@ -54,18 +78,7 @@ public class GenomeParser {
         throw new UnsupportedOperationException();
     }
 
-    private Rule parse2(final String g) {
-        class S {
-            public final int c;
-            public final String n;
-            public final String g;
-
-            public S(int c, String n, String g) {
-                this.c = c;
-                this.n = n;
-                this.g = g;
-            }
-        };
+    private Pair<List<S>,Datamap> parseS(final String g) {
         final String[] gs = g.replace('\n',',').split(",");
         //final S[] ps = new S[gs.length];
         final List<S> ps = new ArrayList<>();
@@ -87,13 +100,15 @@ public class GenomeParser {
                     ps.add(new S(0, n, grs));
                     dm.index(n, new Index(n, grs));
                 }
-                //ps[i] = new S(c, n, grs);
             }
-            //System.err.println("time: "+c+", rule: "+grs);
-            //s.s(c, new ComputedPattern(_a,
-                //new ComputedPattern.MachineElf(new Machine(_a, new Genome(grs, version)))));
         }
-
+        return new Pair(ps,dm);
+    }
+    
+    private Rule parse2(final String g) {
+        Pair<List<S>,Datamap> pa = parseS(g);
+        List<S> ps = pa.one;
+        Datamap dm = pa.two;
         SequencePattern.Sequence s = new SequencePattern.Sequence();
         for(S seq:ps) {
             if(seq.n==null) {
@@ -118,4 +133,38 @@ public class GenomeParser {
         public List<String> c;
         public Map<String,String> d;
     }
+
+    public static class Info {
+        private final List<String> _infos;
+
+
+        public Info(List<String> inf) {
+            _infos = inf;
+        }
+
+        @Override public String toString() {
+            StringBuilder b = new StringBuilder();
+            for(String s:_infos) {
+                b.append(s).append("-\n");
+            }
+            b.setLength(b.length()-2);
+            return b.toString().trim();
+        }
+    }
+
+    private static class S {
+        public final int c;
+        public final String n;
+        public final String g;
+
+        public S(int c, String n, String g) {
+            this.c = c;
+            this.n = n;
+            this.g = g;
+        }
+
+        @Override public String toString() {
+            return "{c:"+c+", n:"+n+", g:"+g+"}";
+        }
+    };
 }
