@@ -54,6 +54,7 @@ public class Codons {
     public static final String SKIP = "ro";
     public static final String NON_ZERO = "zu";
     public static final String DATA = "da";
+    public static final String TANH = "de";
     public static final String DUPLICATE = "do";
     public static final String EXCLAMATORY = "ha";
     public static final String HISTO = "hi";
@@ -202,6 +203,8 @@ public class Codons {
                     return new Cos();
                 case SIN:
                     return new Sin();
+                case TANH:
+                    return new Tanh();
                 default:
                     throw new IllegalStateException("unknown opcode '"+code+"'");
             }
@@ -1893,6 +1896,28 @@ public class Codons {
 
         @Override public void op(float[] p, FloatTape t) {
             float v = 1f/(1f+(float)Math.exp(-t.pop()));
+            t.push(v);
+        }
+    }
+
+    public static class Tanh implements Codon {
+        @Override public Codon copy() { return new Tanh(); }
+
+        @Override public String code() {
+            return TANH;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public boolean supports(Values v) { return v==Values.continuous; }
+
+        @Override public void op(int[] p, IntTape t) {
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float v = (float) Math.tanh(t.pop());
             t.push(v);
         }
     }
