@@ -26,7 +26,7 @@ public final class Colors {
     }
 
     public static int integer(float c) {
-        return (int) (c*255);
+        return (int) (c*255f);
     }
 
     public static int pack(int r, int g, int b) {
@@ -86,7 +86,9 @@ public final class Colors {
         //System.err.println("c10="+c10+",c11="+c11+",c12="+c12+"c13="+c13);
         //System.err.println("c20="+c20+",c21="+c21+",c22="+c22+"c23="+c23);
         //System.err.println("w1 ="+w1+", w2="+w2+", w3="+w3+" w4="+w4+",w="+w);
+
         return pack(w3,w2,w1,w4);
+        //return pack(w1,w2,w3,w4);
     }
 
     private static int wgt(final int c1, final int c2, final float zw) {
@@ -138,6 +140,10 @@ public final class Colors {
     public static String toColorString(int c) {
         int[] u = unpack(c);
         return "[R: "+u[2]+" G: "+u[1]+" B: "+u[0]+" A: "+u[3]+"]";
+    }
+
+    public static void dump(int rgb, String msg) {
+        System.err.println(msg+": "+toColorString(rgb));
     }
 
     public static int fromString(final String c) {

@@ -46,27 +46,26 @@ public class ImageInitializer implements Initializer {
 
     @Override public void init(Plane plane, Rule rule, Random random) {
         if(rule.archetype().isDiscrete()) {
-            initDisc((IntPlane)plane, rule, random);
+            initDisc(plane, plane.pen(), rule, random);
         }
         else {
-            throw new UnsupportedOperationException("CONTINUOUS");
+            initDisc(plane, plane.pen(), rule, random);
+            //throw new UnsupportedOperationException("CONTINUOUS");
         }
     }
 
-    private void initDisc(IntPlane plane, Rule rule, Random random) {
+    private void initDisc(Plane plane, Pen pen, Rule rule, Random random) {
         Palette p = plane.creator().getPalette();
         if(rule.archetype().dims()==1) {
             final int w = _image.getWidth();
             final int h = _image.getHeight();
             for(int i=0;i<plane.getWidth();i++) {
                 int v = _image.getRGB(i % w, 0);
-                plane.setRGBCell(i, 0, v);
+                pen.setRGBCell(i, 0, v);
             }
         }
         else {
-            //final BufferedImage image = _image.getScaledInstance(plane.getWidth(), plane.getHeight(), BufferedImage.SCALE_SMOOTH);
             if(_lastImage==null || _lastImage.getWidth()!=plane.getWidth() || _lastImage.getHeight()!=plane.getHeight()) {
-                //_lastImage = Scalr.resize(_image, Scalr.Method.ULTRA_QUALITY, plane.getWidth(), plane.getHeight(), Scalr.OP_ANTIALIAS /*, Scalr.OP_BRIGHTER*/);
                 if(_params.scale) {
                     _lastImage = Scalr.resize(_image, Scalr.Method.SPEED, plane.getWidth(), plane.getHeight() /*, Scalr.OP_ANTIALIAS , Scalr.OP_BRIGHTER*/);
                 }
@@ -80,7 +79,7 @@ public class ImageInitializer implements Initializer {
                 for(int j=0;j<plane.getHeight();j++) {
                     for(int i=0;i<plane.getWidth();i++) {
                         int v = _lastImage.getRGB(i % w, j % h);
-                        plane.setRGBCell(i, j, v);
+                        pen.setRGBCell(i, j, v);
                     }
                 }
             }
@@ -90,14 +89,19 @@ public class ImageInitializer implements Initializer {
                     for(int j=0;j<plane.getHeight();j++) {
                         for(int i=0;i<plane.getWidth();i++) {
                             int v = _lastImage.getRGB(i % w, j % h);
-                            if(colormap!=null) {
-                                Integer iv = colormap.get(v);
-                                if(iv==null) {
-                                    throw new IllegalStateException("colormap missing color "+v);
-                                }
-                                v = iv;
+                            if(plane instanceof FloatPlane && (plane.getDepth()==3 || plane.getDepth()==4)) {
+                                pen.setRGBCell(i, j, v);
                             }
-                            plane.setCell(i, j, v);
+                            else {
+                                if(colormap!=null) {
+                                    Integer iv = colormap.get(v);
+                                    if(iv==null) {
+                                        throw new IllegalStateException("colormap missing color "+v);
+                                    }
+                                    v = iv;
+                                }
+                                pen.setCell(i, j, v);
+                            }
                         }
                     }
                 }
@@ -107,15 +111,20 @@ public class ImageInitializer implements Initializer {
                     for(int j=0;j<_lastImage.getHeight();j++) {
                         for(int i=0;i<_lastImage.getWidth();i++) {
                             int v = _lastImage.getRGB(i, j);
-                            if(colormap!=null) {
-                                Integer iv = colormap.get(v);
-                                if(iv==null) {
-                                    throw new IllegalStateException("colormap missing color "+v);
-                                }
-                                v = iv;
+                            if(plane instanceof FloatPlane && (plane.getDepth()==3 || plane.getDepth()==4)) {
+                                pen.setRGBCell(i, j, v);
                             }
-                            if(i+xoff>=0 && j+yoff>=0 && i+xoff<plane.getWidth() && j+yoff<plane.getHeight()) {
-                                plane.setCell(i+xoff, j+yoff, v);
+                            else {
+                                if(colormap!=null) {
+                                    Integer iv = colormap.get(v);
+                                    if(iv==null) {
+                                        throw new IllegalStateException("colormap missing color "+v);
+                                    }
+                                    v = iv;
+                                }
+                                if(i+xoff>=0 && j+yoff>=0 && i+xoff<plane.getWidth() && j+yoff<plane.getHeight()) {
+                                    pen.setCell(i+xoff, j+yoff, v);
+                                }
                             }
                         }
                     }

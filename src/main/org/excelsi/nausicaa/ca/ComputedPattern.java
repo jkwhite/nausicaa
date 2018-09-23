@@ -36,7 +36,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
             _fcache = null;
         }
         else {
-            _fcache = new FPCache(50000, size);
+            _fcache = new FPCache(csize, size);
             _cache = null;
         }
     }

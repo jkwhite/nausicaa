@@ -51,7 +51,7 @@ public interface ExternalForce {
                 default:
                     applyDisc((IntPlane)p, r);
                 case continuous:
-                    throw new UnsupportedOperationException("CONTINUOUS");
+                    applyCont((FloatPlane)p, r);
             }
         }
 
@@ -79,6 +79,27 @@ public interface ExternalForce {
                         r.nextInt(p.getWidth()),
                         r.nextInt(p.getHeight()),
                         r.nextInt(cols));
+                }
+            }
+        }
+
+        private void applyCont(final FloatPlane p, final Random r) {
+            final float max = p.getWidth()*p.getHeight()*Math.max(1f,p.getDepth());
+            final int pnts = (int) (_amount*max);
+            final int cols = p.creator().archetype().colors();
+            for(int i=0;i<pnts;i++) {
+                if(p.getDepth()>0) {
+                    p.setCell(
+                        r.nextInt(p.getWidth()),
+                        r.nextInt(p.getHeight()),
+                        r.nextInt(p.getDepth()),
+                        r.nextFloat()*(cols-1));
+                }
+                else {
+                    p.setCell(
+                        r.nextInt(p.getWidth()),
+                        r.nextInt(p.getHeight()),
+                        r.nextFloat()*(cols-1));
                 }
             }
         }

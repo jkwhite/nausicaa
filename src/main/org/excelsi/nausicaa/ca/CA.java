@@ -370,16 +370,21 @@ public final class CA {
                 p = new RGBAPalette();
                 break;
             case "indexed":
+            case "continuous":
+            case "continuous-channels":
             default:
                 p = Palette.fromImage(i);
         }
+        Values v = "continuous".equals(paletteMode) || "continuous-channels".equals(paletteMode)
+            ? Values.continuous : Values.discrete;
         int w = i.getWidth();
         int h = i.getHeight();
-        int d = 0;
-        int colors = p.getColorCount();
+        int d = "continuous-channels".equals(paletteMode) ? 4 : 1;
+        int colors = v==Values.discrete ? p.getColorCount() : 2;
+        System.err.println("image with "+p.getColorCount()+" colors");
         int size = 1;
-        int dims = 2;
-        Archetype a = new Archetype(dims, size, colors);
+        int dims = "continuous-channels".equals(paletteMode) ? 3 : 2;
+        Archetype a = new Archetype(dims, size, colors, Archetype.Neighborhood.moore, v);
         Ruleset rs = new ComputedRuleset(a);
         Random rand = new Random();
         Rule rule = rs.random(rand).next();

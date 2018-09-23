@@ -250,6 +250,16 @@ public class NViewer extends JFrame implements UIActions {
                 _a.newCAImageIndexed(NViewer.this, _config);
             }
         };
+        AbstractAction newCAImageCont = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.newCAImageCont(NViewer.this, _config);
+            }
+        };
+        AbstractAction newCAImageContChan = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.newCAImageContChan(NViewer.this, _config);
+            }
+        };
         AbstractAction open = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _a.load(NViewer.this, _config);
@@ -293,6 +303,10 @@ public class NViewer extends JFrame implements UIActions {
         niimgrgba.setText("RGBA");
         JMenuItem niimgidx = newimg.add(newCAImageIndexed);
         niimgidx.setText("Indexed");
+        JMenuItem niimgcont = newimg.add(newCAImageCont);
+        niimgcont.setText("Continuous");
+        JMenuItem niimgcontchan = newimg.add(newCAImageContChan);
+        niimgcontchan.setText("Continuous Channels");
 
 
         JMenuItem oi = file.add(open);

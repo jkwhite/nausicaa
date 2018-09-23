@@ -284,6 +284,14 @@ public class Actions {
         newCAImage(v, config, "indexed");
     }
 
+    public void newCAImageCont(NViewer v, Config config) {
+        newCAImage(v, config, "continuous");
+    }
+
+    public void newCAImageContChan(NViewer v, Config config) {
+        newCAImage(v, config, "continuous-channels");
+    }
+
     private void newCAImage(NViewer v, Config config, String paletteMode) {
         JFileChooser f = new JFileChooser(config.getDir());
         f.setDialogTitle("New CA from image");

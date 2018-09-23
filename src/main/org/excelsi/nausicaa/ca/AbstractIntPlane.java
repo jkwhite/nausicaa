@@ -53,6 +53,10 @@ public abstract class AbstractIntPlane extends AbstractPlane implements IntPlane
             @Override public void setCell(int x, int y, int z, float v) {
                 AbstractIntPlane.this.setCell(x, y, z, (int) v);
             }
+
+            @Override public void setRGBCell(int x, int y, int v) {
+                AbstractIntPlane.this.setRGBCell(x, y, v);
+            }
         };
     }
 }

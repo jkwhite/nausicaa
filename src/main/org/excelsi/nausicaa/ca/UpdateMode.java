@@ -163,7 +163,32 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
                         }
                     };
                 case continuous:
-                    throw new UnsupportedOperationException("CONTINUOUS");
+                    return new EnergyAsynchronous(_r, _chance, _size) {
+                        @Override public boolean update(Plane p, int x, int y, int z) {
+                            final FloatPlane qp = (FloatPlane) p;
+                            float c;
+                            switch(_size) {
+                                case 1:
+                                    c = 1+qp.getCell(x,y,z);
+                                    break;
+                                default:
+                                    float m = 0;
+                                    for(int i=x-_size;i<=x+_size;i++) {
+                                        for(int j=y-_size;j<=y+_size;j++) {
+                                            for(int k=z-_size;k<=z+_size;k++) {
+                                                float t = qp.getCell(i,j,k);
+                                                if(t>m) m=t;
+                                            }
+                                        }
+                                    }
+                                    c = m;
+                                    break;
+                            }
+                            int m = qp.creator().archetype().colors();
+                            float e = _chance*(float)c/(float)m;
+                            return _r.nextFloat()<=e;
+                        }
+                    };
             }
         }
 
