@@ -363,7 +363,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         float r = _fcache.find(p2);
         if(_fcache.h) {
             _hits++;
-            if(_hits%10000000==0) {
+            if(_hits%1000000==0) {
                 System.err.println("hits: "+_hits+" misses: "+_misses+" ratio: "+(_hits/((float)_hits+_misses)));
                 //if(_hits%5000000==0) {
                     //_cache.dump();
