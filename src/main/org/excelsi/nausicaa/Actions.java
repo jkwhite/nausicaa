@@ -323,6 +323,7 @@ public class Actions {
                 config.setDir(f.getSelectedFile().getParent());
                 final CA ca = CA.fromFile(f.getSelectedFile().toString(), "text");
                 config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth());
+                config.setWeight(ca.getWeight());
                 v.setActiveCA(ca);
             }
             catch(IOException e) {

@@ -58,7 +58,7 @@ public class AbstractComputedRuleset implements Ruleset {
     @Override public Rule create(Object... args) {
         final String genome = args[0].toString();
         final GenomeParser gp = new GenomeParser(_a);
-        if(args[1] instanceof MutationFactor) {
+        if(args.length>1 && args[1] instanceof MutationFactor) {
             gp.mutationFactor((MutationFactor)args[1]);
         }
         return gp.parse(genome);

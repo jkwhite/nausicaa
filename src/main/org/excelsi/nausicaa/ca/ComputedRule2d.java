@@ -273,6 +273,9 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         o.addProperty("type","computed");
         o.add("archetype", archetype().toJson());
         o.addProperty("genome",genome());
+        if(_p instanceof SequencePattern) {
+            o.addProperty("transition", ((SequencePattern)_p).transition());
+        }
         return o;
     }
 
@@ -284,6 +287,15 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         JsonObject o = (JsonObject) e;
         Archetype a = Archetype.fromJson(o.get("archetype"));
         String genome = Json.string(o, "genome");
-        return new ComputedRuleset(a).create(genome);
+        MutationFactor mf = null;
+        if(o.has("transition")) {
+            mf = new MutationFactor().withTransition(Json.flot(o, "transition", 0.1f));
+        }
+        if(mf!=null) {
+            return new ComputedRuleset(a).create(genome, mf);
+        }
+        else {
+            return new ComputedRuleset(a).create(genome);
+        }
     }
 }

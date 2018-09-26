@@ -26,7 +26,8 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
 
 
     public SequencePattern(Sequence s) {
-        this(s, 0.5f);
+        this(s, 0.1f);
+        Thread.dumpStack();
     }
 
     public SequencePattern(Sequence s, float trans) {
@@ -41,6 +42,10 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
 
     @Override public Archetype archetype() {
         return _p[0].archetype();
+    }
+
+    public float transition() {
+        return _trans;
     }
 
     @Override public Mutatable mutate(MutationFactor m) {
@@ -66,6 +71,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
             _thresh = (int)(_trans*_s.peek());
             _samples = 1;
             _idx = 0;
+            System.err.println("t0 for transition "+_trans);
             //_idx = OFFSETS[t%OFFSETS.length];
             //_idx = R.nextInt(OFFSETS.length);
         }
@@ -169,7 +175,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                     _i = 0;
                 }
                 final SEntry s = _s.get(_i); 
-                //System.err.println("switch to pattern "+_i+": "+s.p);
+                System.err.println("switched to pattern "+_i+": "+s.p);
                 _t = s.t;
                 return 0;
             }

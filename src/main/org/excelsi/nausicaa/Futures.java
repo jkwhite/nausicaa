@@ -332,7 +332,8 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             int height = getCAHeight() > 60 ? getCAHeight()/3-10 : getCAHeight();
             int depth = _config.getDepth();
             int prelude = _config.getPrelude();
-            float weight = _config.getWeight();
+            //float weight = _config.getWeight();
+            float weight = _ca.getWeight();
             //WHAT
             _ca = _ca.size(width, height, depth, prelude).weight(weight);
             PlaneDisplay root = createPlaneDisplay(_ca);
