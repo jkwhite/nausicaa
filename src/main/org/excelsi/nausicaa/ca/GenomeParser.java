@@ -8,10 +8,16 @@ import org.yaml.snakeyaml.Yaml;
 
 public class GenomeParser {
     private final Archetype _a;
+    private MutationFactor _mf;
 
 
     public GenomeParser(Archetype a) {
         _a = a;
+    }
+
+    public GenomeParser mutationFactor(MutationFactor mf) {
+        _mf = mf;
+        return this;
     }
 
     public Rule parse(final String g) {
@@ -120,12 +126,12 @@ public class GenomeParser {
             }
         }
         SequencePattern sp;
-        //if(args.length>1 && args[1] instanceof MutationFactor) {
-            //sp = new SequencePattern(s, ((MutationFactor)args[1]).transition());
-        //}
-        //else {
+        if(_mf!=null) {
+            sp = new SequencePattern(s, _mf.transition());
+        }
+        else {
             sp = new SequencePattern(s);
-        //}
+        }
         return new ComputedRule2d(sp);
     }
 

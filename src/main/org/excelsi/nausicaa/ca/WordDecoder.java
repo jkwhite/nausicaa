@@ -12,7 +12,7 @@ public class WordDecoder implements Decoder<CharSequence> {
     @Override public CharSequence decode(Plane p) {
         StringBuilder b = new StringBuilder();
         int[] e = new int[p.getWidth()];
-        p.getRow(e, p.getHeight()-1, 0);
+        ((IntPlane)p).getRow(e, p.getHeight()-1, 0);
         for(int i=0;i<e.length;i++) {
             final char c = (char) e[i];
             final char d = (char) _alphabet.indexOf(c);

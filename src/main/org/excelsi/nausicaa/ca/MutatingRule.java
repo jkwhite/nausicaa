@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.Random;
+import com.google.gson.*;
 
 
 public class MutatingRule extends AbstractRule implements Mutatable, Genomic {
@@ -98,6 +99,10 @@ public class MutatingRule extends AbstractRule implements Mutatable, Genomic {
 
     @Override public Plane generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, GOptions opt) {
         return _rule.generate(c, start, end, pool, stopOnSame, overwrite, u, opt);
+    }
+
+    @Override public JsonElement toJson() {
+        throw new UnsupportedOperationException();
     }
 
     private void internalMutate(final Plane c, final ExecutorService pool, final GOptions opt) {

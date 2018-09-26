@@ -43,8 +43,10 @@ public class Codons {
     public static final String NOT_INTERSECT = "so";
     public static final String ABORT = "ga";
     public static final String AVG = "gi";
+    public static final String COUNT = "gu";
     public static final String PUSH_ALL_ROT = "ge";
     public static final String PUSH_ALL = "go";
+    public static final String JUMP = "ja";
     public static final String SKIP_N = "ji";
     public static final String MIN_N = "jo";
     public static final String IF = "ra";
@@ -52,6 +54,7 @@ public class Codons {
     public static final String SIGMOID = "ru";
     public static final String SIN = "re";
     public static final String SKIP = "ro";
+    public static final String HALT = "za";
     public static final String NON_ZERO = "zu";
     public static final String DATA = "da";
     public static final String TANH = "de";
@@ -205,6 +208,12 @@ public class Codons {
                     return new Sin();
                 case TANH:
                     return new Tanh();
+                case COUNT:
+                    return new Count();
+                case JUMP:
+                    return new Jump();
+                case HALT:
+                    return new Halt();
                 default:
                     throw new IllegalStateException("unknown opcode '"+code+"'");
             }
@@ -558,9 +567,16 @@ public class Codons {
 
         @Override public boolean reversible() { return true; }
 
+        @Override public boolean supports(Values v) { return true; }
+
         @Override public void op(int[] p, IntTape t) {
             int s = t.pop();
             t.skip(s);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float s = t.pop();
+            t.skip((int)Math.ceil(s));
         }
 
         @Override public String generate(Random r) {
@@ -631,6 +647,8 @@ public class Codons {
 
         @Override public boolean reversible() { return true; }
 
+        @Override public boolean supports(Values v) { return true; }
+
         @Override public void op(int[] p, IntTape t) {
             int v = t.pop();
             if(v==0) {
@@ -638,8 +656,45 @@ public class Codons {
             }
         }
 
+        @Override public void op(float[] p, FloatTape t) {
+            float v = t.pop();
+            if(v==0) {
+                t.stop();
+            }
+        }
+
         @Override public String generate(Random r) {
             return STOP;
+        }
+    }
+
+    public static class Halt implements Codon {
+        @Override public Codon copy() {
+            return new Halt();
+        }
+
+        @Override public String code() {
+            return HALT;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public boolean reversible() { return true; }
+
+        @Override public boolean supports(Values v) { return true; }
+
+        @Override public void op(int[] p, IntTape t) {
+            t.stop();
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            t.stop();
+        }
+
+        @Override public String generate(Random r) {
+            return HALT;
         }
     }
 
@@ -866,6 +921,10 @@ public class Codons {
                 //np = 0;
             //}
             return new Constant(np);
+        }
+
+        @Override public String toString() {
+            return "Constant"+_p;
         }
     }
 
@@ -1919,6 +1978,64 @@ public class Codons {
         @Override public void op(float[] p, FloatTape t) {
             float v = (float) Math.tanh(t.pop());
             t.push(v);
+        }
+    }
+
+    public static class Count implements Codon {
+        @Override public Codon copy() { return new Count(); }
+
+        @Override public String code() {
+            return COUNT;
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
+        @Override public boolean supports(Values v) { return true; }
+
+        @Override public void op(int[] p, IntTape t) {
+            int v = t.pop();
+            int c = 0;
+            for(int i=0;i<p.length;i++) {
+                if(p[i]==c) c++;
+            }
+            t.push(c);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float v = t.pop();
+            int c = 0;
+            for(int i=0;i<p.length;i++) {
+                if(p[i]==c) c++;
+            }
+            t.push(c);
+        }
+    }
+
+    public static class Jump implements Codon {
+        @Override public Codon copy() { return new Jump(); }
+
+        @Override public String code() {
+            return JUMP;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public boolean supports(Values v) { return true; }
+
+        @Override public void op(int[] p, IntTape t) {
+            int v = t.pop();
+            //System.err.println("set jump by "+v);
+            t.jump(Math.abs(v));
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float v = (float) Math.ceil(t.pop());
+            //System.err.println("set jump by "+v);
+            t.jump(Math.abs((int)v));
         }
     }
 

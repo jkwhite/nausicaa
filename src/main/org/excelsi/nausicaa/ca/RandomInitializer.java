@@ -116,7 +116,7 @@ public class RandomInitializer implements Initializer {
     }
 
     private int computeColor(Random random, int colors) {
-        if(_params.zeroWeight>0f && random.nextInt(1000)<=1000f*_params.zeroWeight) {
+        if(_params.zeroWeight>0f && random.nextInt(100000)<=100000f*_params.zeroWeight) {
             return 0;
         }
         else {
@@ -125,7 +125,7 @@ public class RandomInitializer implements Initializer {
     }
 
     private float computeFloatColor(Random random, int colors) {
-        if(_params.zeroWeight>0f && random.nextInt(1000)<=1000f*_params.zeroWeight) {
+        if(_params.zeroWeight>0f && random.nextInt(100000)<=100000f*_params.zeroWeight) {
             return 0;
         }
         else {

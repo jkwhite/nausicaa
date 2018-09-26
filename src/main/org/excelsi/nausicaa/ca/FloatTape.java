@@ -8,6 +8,7 @@ public final class FloatTape {
     private int _s = -1;
     private boolean _a;
     private boolean _stop;
+    private int _jump;
 
 
     public FloatTape(int len) {
@@ -170,6 +171,15 @@ public final class FloatTape {
 
     public boolean stopped() {
         return _stop;
+    }
+
+    public void jump(int j) {
+        _jump = j;
+    }
+
+    public int jumped() {
+        int j = _jump;
+        return j;
     }
 
     public void op(final TapeOp op, final float[] p) {

@@ -11,6 +11,7 @@ import java.util.concurrent.Future;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
+import com.google.gson.*;
 
 
 public class SequenceRule extends AbstractRule implements Mutatable, Genomic {
@@ -104,6 +105,10 @@ public class SequenceRule extends AbstractRule implements Mutatable, Genomic {
 
     @Override public Plane generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, GOptions opt) {
         return _rule.generate(c, start, end, pool, stopOnSame, overwrite, u, opt);
+    }
+
+    @Override public JsonElement toJson() {
+        throw new UnsupportedOperationException();
     }
 
     private void init(final Plane c, final ExecutorService pool, final GOptions opt) {

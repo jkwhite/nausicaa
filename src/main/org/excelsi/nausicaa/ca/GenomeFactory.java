@@ -75,6 +75,9 @@ public class GenomeFactory {
             weight(1, new Cos()),
             weight(1, new Sin()),
             weight(1, new Tanh()),
+            weight(1, new Count()),
+            weight(1, new Jump()),
+            weight(1, new Halt()),
             weight(1, new Mod())
         ));
         if(a.colors()<1000000) {
@@ -144,6 +147,9 @@ public class GenomeFactory {
             weight(1, new Not()),
             weight(1, new Sigmoid()),
             weight(1, new Tanh()),
+            weight(1, new Count()),
+            weight(1, new Jump()),
+            weight(1, new Halt()),
             weight(1, new Mod())
         ));
         if(a.colors()<1000000) {

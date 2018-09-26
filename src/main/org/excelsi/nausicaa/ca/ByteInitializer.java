@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Random;
+import com.google.gson.*;
 
 
 public class ByteInitializer implements Initializer {
@@ -20,10 +21,11 @@ public class ByteInitializer implements Initializer {
 
         int idx = 0;
         final int colors[] = rule.colors();
+        Pen pen = plane.pen();
         switch(rule.dimensions()) {
             case 1:
                 for(int i=0;i<plane.getWidth();i++) {
-                    plane.setCell(i, 0, encodedInput[idx]);
+                    pen.setCell(i, 0, encodedInput[idx]);
                     idx = (idx+1) % encodedInput.length;
                 }
                 break;
@@ -31,7 +33,7 @@ public class ByteInitializer implements Initializer {
             default:
                 for(int j=0;j<plane.getHeight();j++) {
                     for(int i=0;i<plane.getWidth();i++) {
-                        plane.setCell(i, j, encodedInput[idx]);
+                        pen.setCell(i, j, encodedInput[idx]);
                         idx = (idx+1) % encodedInput.length;
                     }
                 }
@@ -44,5 +46,11 @@ public class ByteInitializer implements Initializer {
 
     @Override public void write(PrintWriter w) {
         w.println("byte");
+    }
+
+    @Override public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        o.addProperty("type","byte");
+        return o;
     }
 }

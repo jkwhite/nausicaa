@@ -17,8 +17,12 @@ public final class ComputedPattern implements Pattern, Mutatable {
     public ComputedPattern(Archetype a, RuleLogic logic) {
         _a = a;
         _logic = logic;
-        _lastP = new int[(int)Math.pow(2*_a.size()+1, _a.dims())];
-        int size = (int)Math.pow(2*_a.size()+1, _a.dims());
+        int size = _a.sourceLength();
+        _lastP = new int[size];
+        //_lastP = new int[(int)Math.pow(2*_a.size()+1, _a.dims())];
+
+        //int size = (int)Math.pow(2*_a.size()+1, _a.dims());
+
         // based on 12g heap
         // 3375
         // 1=>100000
@@ -36,7 +40,12 @@ public final class ComputedPattern implements Pattern, Mutatable {
             _fcache = null;
         }
         else {
-            _fcache = new FPCache(csize, size);
+            if(a.sourceLength()<9) {
+                _fcache = new ShortFPCache(csize, size);
+            }
+            else {
+                _fcache = new FPCache(csize, size);
+            }
             _cache = null;
         }
     }
@@ -66,22 +75,8 @@ public final class ComputedPattern implements Pattern, Mutatable {
 
         protected int key(int[] p) {
             int k = (p[0]<<24^p[1]<<16^p[2]<<8);
-            //k = k^(p[7]<<24^p[8]); //<<16^p[9]<<8^p[10]^p[11]<<8^p[12]<<16^p[13]<<24);
             k = k % _p.length;
-            //if(k<0) k=-k;
-            //return k;
-            //int k = p[0];
-            //final int l = p.length;
-            //for(int i=1;i<l;i+=4) {
-                //k = 7*k + p[i];
-            //}
-            //int k = 7*p[0]+31*p[1]+113*p[2]+7*p[3]+31*p[4]+113*p[5]+11*p[6];
-            //k = k * 7*p[7]+31*p[8]+113*p[9]+7*p[10]+31*p[11]+113*p[12]+11*p[13];
-            //k = k * 7*p[14]+31*p[15]+113*p[16]+7*p[17]+31*p[18]+113*p[19]+11*p[20];
-            //k = k * 7*p[21]+31*p[22]+113*p[23]+7*p[24]+31*p[25]+113*p[26]+11*p[27];
             if(k<0) k=-k;
-            //k = k % _p.length;
-            //k = k % _csize;
             k = k % _csize;
             return k;
         }
@@ -288,7 +283,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
             System.err.println("total writes: "+w+" total buckets in use: "+b+" / "+_hot.length+" max: "+max+"("+mb+") min: "+min);
         }
 
-        private final int f(float f) {
+        protected static final int f(float f) {
             return Float.floatToIntBits(f);
         }
 
@@ -310,6 +305,23 @@ public final class ComputedPattern implements Pattern, Mutatable {
             if(k<0) k=-k;
             //k = k % _p.length;
             //k = k % _csize;
+            k = k % _csize;
+            return k;
+        }
+    }
+
+    static class ShortFPCache extends FPCache {
+        public ShortFPCache(int csize, int psize) {
+            super(csize, psize);
+        }
+
+        protected int key(float[] p) {
+            int k = (f(p[0])<<24^f(p[1])<<16^f(p[2])<<8^f(p[3])^f(p[4])<<8);
+            if(p.length>6) {
+                k = k^f(p[5])<<16^f(p[6])<<24;
+            }
+            k = k % _p.length;
+            if(k<0) k=-k;
             k = k % _csize;
             return k;
         }

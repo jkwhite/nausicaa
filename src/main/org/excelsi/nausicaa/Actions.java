@@ -447,8 +447,6 @@ public class Actions {
 
     public void info(NViewer v) {
         final CA ca = v.getActiveCA();
-        final Plane plane = v.getPlaneDisplayProvider().getActivePlane();
-        final Plane nextPlane = ca.getRule().frameIterator(plane, Pools.adhoc(), new GOptions(false, 1, 1, 1f)).next();
 
         Rule r = ca.getRule();
         final JFrame i = new JFrame("Info");
@@ -476,10 +474,14 @@ public class Actions {
             if(b64.length()<100000) {
                 p.addPair("Incantation", createRuleText(ca.toIncantation()));
             }
-            final Stats stats = Stats.forPlane(plane);
-            final Stats nextStats = Stats.forPlane(nextPlane);
-            final Multistats ms = stats.compareWith(nextStats);
-            p.addPair("Stats", createRuleText(ms.humanize(), false));
+            if(ca.archetype().dims()>1) {
+                final Plane plane = v.getPlaneDisplayProvider().getActivePlane();
+                final Plane nextPlane = ca.getRule().frameIterator(plane, Pools.adhoc(), new GOptions(false, 1, 1, 1f)).next();
+                final Stats stats = Stats.forPlane(plane);
+                final Stats nextStats = Stats.forPlane(nextPlane);
+                final Multistats ms = stats.compareWith(nextStats);
+                p.addPair("Stats", createRuleText(ms.humanize(), false));
+            }
         }
         else if(r instanceof ComputedRule2d) {
             ComputedRule2d cr = (ComputedRule2d) r;
@@ -942,7 +944,7 @@ public class Actions {
                 config.setVariable("single_z", cz.getText());
                 config.setVariable("single_size", sz.getText());
                 v.setInitializer(new SingleInitializer(
-                    Integer.parseInt(color.getText()),
+                    Float.parseFloat(color.getText()),
                     Integer.parseInt(cx.getText()),
                     Integer.parseInt(cy.getText()),
                     Integer.parseInt(cz.getText()),

@@ -13,7 +13,7 @@ public class SingleInitializer implements Initializer {
     private final int _x;
     private final int _y;
     private final int _z;
-    private final int _color;
+    private final float _color;
     private final int _size;
 
 
@@ -21,7 +21,7 @@ public class SingleInitializer implements Initializer {
         this(-1, -1, -1, 1, 1);
     }
 
-    public SingleInitializer(int color, int x, int y, int z, int size) {
+    public SingleInitializer(float color, int x, int y, int z, int size) {
         _color = color;
         _x = x;
         _y = y;
@@ -136,12 +136,12 @@ public class SingleInitializer implements Initializer {
         return v==-1?p.getDepth()/2:v%p.getDepth();
     }
 
-    private float colorFloat(int colors, Random r, int v) {
+    private float colorFloat(int colors, Random r, float v) {
         return v==-1?(((float)(colors-1))*r.nextFloat()):v%colors;
     }
 
-    private int color(int colors, Random r, int v) {
-        return v==-1?(1+r.nextInt(colors-1)):v%colors;
+    private int color(int colors, Random r, float v) {
+        return v==-1?(1+r.nextInt(colors-1)):((int)v)%colors;
     }
 
     public static SingleInitializer read(BufferedReader r, int version) throws IOException {
@@ -162,7 +162,7 @@ public class SingleInitializer implements Initializer {
     public static SingleInitializer fromJson(JsonElement e) {
         JsonObject o = (JsonObject) e;
         return new SingleInitializer(
-            Json.integer(o, "color", -1),
+            Json.flot(o, "color", -1),
             Json.integer(o, "x", -1),
             Json.integer(o, "y", -1),
             Json.integer(o, "z", -1),

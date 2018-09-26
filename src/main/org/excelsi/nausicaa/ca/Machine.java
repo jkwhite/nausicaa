@@ -48,6 +48,14 @@ public class Machine {
                 //if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
                 //_inst[i] += en-st;
                 if(_ti.stopped()) break;
+                if(_ti.jumped()!=0) {
+                    int j = _ti.jumped() % _prg.length;
+                    i += j;
+                    //System.err.println("jumped by "+j);
+                    //if(i<_prg.length-1) System.err.println("next inst: "+_prg[i+1]);
+                    //else System.err.println("end of the line");
+                    _ti.jump(0);
+                }
             }
             int res = _ti.pop();
             //if(res<0) res=-res;
@@ -67,6 +75,12 @@ public class Machine {
                 //if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
                 //_inst[i] += en-st;
                 if(_tf.stopped()) break;
+                if(_tf.jumped()!=0) {
+                    int j = _tf.jumped() % _prg.length;
+                    i += j;
+                    //System.err.println("jumped by "+j);
+                    _tf.jump(0);
+                }
             }
             float res = _tf.pop();
             //if(res<0) res=-res;
