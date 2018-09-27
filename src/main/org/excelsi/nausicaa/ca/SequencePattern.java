@@ -7,7 +7,7 @@ import java.util.Random;
 import java.util.SplittableRandom;
 
 
-public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic {
+public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic, Variables {
     private static final Random R = new Random();
     private static final int[] OFFSETS = new int[30059];
     static {
@@ -46,6 +46,10 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
 
     public float transition() {
         return _trans;
+    }
+
+    @Override public Float weight() {
+        return _s.weight();
     }
 
     @Override public Mutatable mutate(MutationFactor m) {
@@ -144,8 +148,8 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
         public Sequence() {
         }
 
-        public Sequence s(int t, ComputedPattern p) {
-            _s.add(new SEntry(t, p));
+        public Sequence s(int t, Float weight, ComputedPattern p) {
+            _s.add(new SEntry(t, weight, p));
             _t = _s.get(0).t;
             _i = 0;
             return this;
@@ -162,6 +166,10 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
 
         public ComputedPattern next() {
             return _s.get((_i+1)%_s.size()).p;
+        }
+
+        public Float weight() {
+            return _s.get(_i).weight;
         }
 
         public int peek() {
@@ -191,7 +199,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
             }
             List<SEntry> ns = new ArrayList<>();
             for(SEntry s:_s) {
-                ns.add(new SEntry(s.t, (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm))));
+                ns.add(new SEntry(s.t, s.weight, (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm))));
             }
             return new Sequence(ns, nd);
         }
@@ -221,20 +229,20 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                             //System.err.println("COPYING "+i);
                             np = (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm));
                         }
-                        ns.add(new SEntry(s.t, np));
+                        ns.add(new SEntry(s.t, s.weight, np));
                     }
                     break;
                 case "add":
                     final Archetype a = _s.get(0).p.archetype();
                     for(SEntry s:_s) {
-                        ns.add(new SEntry(s.t, (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm))));
+                        ns.add(new SEntry(s.t, s.weight, (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm))));
                     }
-                    ns.add(new SEntry(m.random().nextInt(70)+70, new ComputedPattern(a, ComputedPattern.random(a, dm, m.random()))));
+                    ns.add(new SEntry(m.random().nextInt(70)+70, 1f, new ComputedPattern(a, ComputedPattern.random(a, dm, m.random()))));
                     break;
                 case "add_data":
                     final Archetype ar = _s.get(0).p.archetype();
                     for(SEntry s:_s) {
-                        ns.add(new SEntry(s.t, (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm))));
+                        ns.add(new SEntry(s.t, s.weight, (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm))));
                     }
                     final String nm = Datamap.randomName(m.random());
                     final Index idx = new IndexGenerator().build(ar, m.random(), nm);
@@ -245,7 +253,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                     for(int i=0;i<_s.size();i++) {
                         if(i!=m.stage()) {
                             Archetype a2 = _s.get(i).p.archetype();
-                            ns.add(new SEntry(m.random().nextInt(70)+70, (ComputedPattern)_s.get(i).p.copy(new Implicate(a2, dm))));
+                            ns.add(new SEntry(m.random().nextInt(70)+70, _s.get(i).weight, (ComputedPattern)_s.get(i).p.copy(new Implicate(a2, dm))));
                         }
                     }
                     break;
@@ -269,7 +277,11 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
         @Override public String genome() {
             StringBuilder b = new StringBuilder();
             for(SEntry s:_s) {
-                b.append(s.t).append(":");
+                b.append(s.t);
+                if(s.weight!=null) {
+                    b.append("/").append(s.weight);
+                }
+                b.append(":");
                 b.append(s.p.toString()).append(",");
             }
             for(DEntry d:_d) {
@@ -287,7 +299,11 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
         @Override public String humanize() {
             StringBuilder b = new StringBuilder();
             for(SEntry s:_s) {
-                b.append(s.t).append(":");
+                b.append(s.t);
+                if(s.weight!=null) {
+                    b.append("/").append(s.weight);
+                }
+                b.append(":");
                 b.append(s.p.toString()).append(",");
             }
             b.setLength(b.length()-1);
@@ -297,10 +313,12 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
 
     private static class SEntry {
         public final int t;
+        public final Float weight;
         public final ComputedPattern p;
 
-        public SEntry(int t, ComputedPattern p) {
+        public SEntry(int t, Float weight, ComputedPattern p) {
             this.t = t;
+            this.weight = weight;
             this.p = p;
         }
     }

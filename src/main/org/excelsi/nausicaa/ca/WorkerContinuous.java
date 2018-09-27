@@ -13,27 +13,29 @@ public class WorkerContinuous implements Worker {
     private final int _y2;
     private final Pattern _wp;
     private final int _size;
+    private final Variables _vars;
     private final float[] _prev;
     private final float[] _pattern;
     private final float[][] _chanpattern;
     //private final int[] _pow;
-    private final float _weight;
-    private final float _oWeight;
     private final boolean _moore;
     private final boolean _useDepth;
     private final boolean _channels;
     private final UpdateMode _umode;
     private final ExternalForce _ef;
     private final Random _r;
+    private float _weight;
+    private float _oWeight;
 
-    public WorkerContinuous(Pattern p, int x1, int y1, int x2, int y2, float weight, ComputeMode cmode, UpdateMode umode, ExternalForce ef, Random r) {
+    public WorkerContinuous(Pattern p, int x1, int y1, int x2, int y2, Variables vars, ComputeMode cmode, UpdateMode umode, ExternalForce ef, Random r) {
         _x1 = x1;
         _y1 = y1;
         _x2 = x2;
         _y2 = y2;
         _wp = p;
-        _weight = weight;
-        _oWeight = 1f - weight;
+        _vars = vars;
+        //_weight = weight;
+        //_oWeight = 1f - weight;
         _size = _wp.archetype().size();
         final int colors = _wp.archetype().colors();
         _prev = new float[_wp.archetype().sourceLength()];
@@ -116,6 +118,8 @@ public class WorkerContinuous implements Worker {
     }
 
     public void frame(final Plane ip1, final Plane ip2) {
+        _weight = _vars.weight();
+        _oWeight = 1f - _weight;
         if(_useDepth) {
             frame3d((FloatBlockPlane)ip1, (FloatBlockPlane)ip2);
             return;
@@ -170,6 +174,8 @@ public class WorkerContinuous implements Worker {
         final int h = c.getHeight();
         final int size = _wp.archetype().size();
         final int colors = _wp.archetype().colors();
+        _weight = _vars.weight();
+        _oWeight = 1f - _weight;
 
         float[] prev = new float[2*size+1];
         float[] pattern = new float[prev.length];

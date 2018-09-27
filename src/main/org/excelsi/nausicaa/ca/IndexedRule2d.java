@@ -75,7 +75,9 @@ public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
         final Worker[] workers = new Worker[nworkers];
         final Pattern p = createPattern(pool);
         for(int i=0;i<workers.length;i++) {
-            workers[i] = Workers.create(p, 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block), opt.weight(), ComputeMode.combined, new UpdateMode.SimpleSynchronous(), c.creator().getExternalForce(), c.creator().getRandom());
+            workers[i] = Workers.create(p, 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block),
+                Variables.constant(opt.weight()),
+                ComputeMode.combined, new UpdateMode.SimpleSynchronous(), c.creator().getExternalForce(), c.creator().getRandom());
         }
         final Future[] futures = new Future[workers.length];
         return new Iterator<Plane>() {
@@ -130,7 +132,9 @@ public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
         Plane p2 = c.copy();
         Plane tmp;
         final Pattern p = createPattern(pool);
-        Worker w = Workers.create(p, 0, 0, c.getWidth(), c.getHeight(), opt.weight(), ComputeMode.combined, c.creator().getUpdateMode(), c.creator().getExternalForce(), c.creator().getRandom());
+        Worker w = Workers.create(p, 0, 0, c.getWidth(), c.getHeight(),
+            Variables.constant(opt.weight()), /*opt.weight(),*/
+            ComputeMode.combined, c.creator().getUpdateMode(), c.creator().getExternalForce(), c.creator().getRandom());
         for(int frames=start;frames<end;frames++) {
             //System.err.println("frame "+frames);
             w.frame(p1, p2);

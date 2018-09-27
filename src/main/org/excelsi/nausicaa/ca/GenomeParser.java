@@ -93,17 +93,28 @@ public class GenomeParser {
             final String gr = gs[i].trim();
             //String g = gr.trim();
             int c = 100;
+            Float w = null;
             String n = null;
             if(gr.indexOf(':')>=0) {
                 String[] cg = gr.split(":");
                 final String grs = cg[1];
-                if(Character.isDigit(cg[0].trim().charAt(0))) {
-                    c = Integer.parseInt(cg[0].trim());
-                    ps.add(new S(c, null, grs));
+                final String pref = cg[0].trim();
+                if(Character.isDigit(pref.charAt(0))) {
+                    int splk = pref.indexOf('/');
+                    if(splk>0) {
+                        c = Integer.parseInt(pref.substring(0, splk));
+                        w = Float.parseFloat(pref.substring(splk+1));
+                        System.err.println("C: "+c+", W: "+w);
+                    }
+                    else {
+                        c = Integer.parseInt(pref);
+                        w = null;
+                    }
+                    ps.add(new S(c, w, null, grs));
                 }
                 else if(cg[0].trim().startsWith("da")) {
                     n = cg[0].trim().substring("da".length());
-                    ps.add(new S(0, n, grs));
+                    ps.add(new S(0, null, n, grs));
                     dm.index(n, new Index(n, grs));
                 }
             }
@@ -118,7 +129,7 @@ public class GenomeParser {
         SequencePattern.Sequence s = new SequencePattern.Sequence();
         for(S seq:ps) {
             if(seq.n==null) {
-                s.s(seq.c, new ComputedPattern(_a,
+                s.s(seq.c, seq.weight, new ComputedPattern(_a,
                     new ComputedPattern.MachineElf(new Machine(_a, dm, new Genome(seq.g, 2)))));
             }
             else {
@@ -160,17 +171,19 @@ public class GenomeParser {
 
     private static class S {
         public final int c;
+        public final Float weight;
         public final String n;
         public final String g;
 
-        public S(int c, String n, String g) {
+        public S(int c, Float w, String n, String g) {
             this.c = c;
+            this.weight = w;
             this.n = n;
             this.g = g;
         }
 
         @Override public String toString() {
-            return "{c:"+c+", n:"+n+", g:"+g+"}";
+            return "{c:"+c+"weight:"+weight+", n:"+n+", g:"+g+"}";
         }
     };
 }

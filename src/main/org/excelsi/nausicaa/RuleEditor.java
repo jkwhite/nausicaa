@@ -65,7 +65,7 @@ public class RuleEditor extends JComponent implements TimelineListener {
                         public void run() {
                             String g = rule.getText();
                             //System.err.println("*** FACTOR: "+_f.transition());
-                            _ui.setActiveCA(current.mutate(_rule.origin().create(g, 2, _f), _ui.getActiveCA().getRandom()));
+                            _ui.setActiveCA(current.mutate(_rule.origin().create(g, _f), _ui.getActiveCA().getRandom()));
                             rule.setText(g);
                             rule.requestFocus();
                         }
