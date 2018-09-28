@@ -221,15 +221,19 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                     for(int i=0;i<_s.size();i++) {
                         final SEntry s = _s.get(i);
                         ComputedPattern np;
+                        Float nw = s.weight;
                         if(m.stage()==-1 || i==m.stage()) {
                             //System.err.println("MUTATING "+i);
                             np = (ComputedPattern)s.p.mutate(m);
+                            if(nw!=null) {
+                                nw = UpdateWeightTransform.mutateWeight(nw, m.random());
+                            }
                         }
                         else {
                             //System.err.println("COPYING "+i);
                             np = (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm));
                         }
-                        ns.add(new SEntry(s.t, s.weight, np));
+                        ns.add(new SEntry(s.t, nw, np));
                     }
                     break;
                 case "add":
