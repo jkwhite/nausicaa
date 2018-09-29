@@ -293,14 +293,14 @@ public class Actions {
     }
 
     private void newCAImage(NViewer v, Config config, String paletteMode) {
-        JFileChooser f = new JFileChooser(config.getDir());
+        JFileChooser f = new JFileChooser(config.getImgDir());
         f.setDialogTitle("New CA from image");
         f.setDialogType(f.OPEN_DIALOG);
         f.setMultiSelectionEnabled(false);
         int ret = f.showOpenDialog(v.getRoot());
         if(ret==f.APPROVE_OPTION) {
             try {
-                config.setDir(f.getSelectedFile().getParent());
+                config.setImgDir(f.getSelectedFile().getParent());
                 final CA ca = CA.fromImage(f.getSelectedFile().toString(), paletteMode);
                 config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth(), ca.getPrelude());
                 //config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth());
@@ -313,14 +313,14 @@ public class Actions {
     }
 
     public void load(NViewer v, Config config) {
-        JFileChooser f = new JFileChooser(config.getDir());
+        JFileChooser f = new JFileChooser(config.getSaveDir());
         f.setDialogTitle("Open automata");
         f.setDialogType(f.OPEN_DIALOG);
         f.setMultiSelectionEnabled(false);
         int ret = f.showOpenDialog(v.getRoot());
         if(ret==f.APPROVE_OPTION) {
             try {
-                config.setDir(f.getSelectedFile().getParent());
+                config.setSaveDir(f.getSelectedFile().getParent());
                 final CA ca = CA.fromFile(f.getSelectedFile().toString(), "text");
                 config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth());
                 config.setWeight(ca.getWeight());
@@ -333,7 +333,7 @@ public class Actions {
     }
 
     public void save(NViewer v, Config config) {
-        JFileChooser f = new JFileChooser(config.getDir());
+        JFileChooser f = new JFileChooser(config.getSaveDir());
         f.setDialogTitle("Save automata");
         f.setDialogType(f.SAVE_DIALOG);
         f.setMultiSelectionEnabled(false);
@@ -341,7 +341,7 @@ public class Actions {
         CA ca = v.getActiveCA();
         if(ret==f.APPROVE_OPTION) {
             try {
-                config.setDir(f.getSelectedFile().getParent());
+                config.setSaveDir(f.getSelectedFile().getParent());
                 ca.save(f.getSelectedFile().toString(), "text");
             }
             catch(IOException e) {
@@ -354,7 +354,7 @@ public class Actions {
     }
 
     public void exportImage(NViewer v, Config config) {
-        JFileChooser f = new JFileChooser(config.getDir());
+        JFileChooser f = new JFileChooser(config.getImgDir());
         f.setDialogTitle("Export image");
         f.setDialogType(f.SAVE_DIALOG);
         f.setMultiSelectionEnabled(false);
@@ -363,7 +363,7 @@ public class Actions {
         Plane plane = v.getPlaneDisplayProvider().getActivePlane();
         if(ret==f.APPROVE_OPTION) {
             try {
-                config.setDir(f.getSelectedFile().getParent());
+                config.setImgDir(f.getSelectedFile().getParent());
                 plane.save(f.getSelectedFile().toString());
             }
             catch(IOException e) {
@@ -373,15 +373,15 @@ public class Actions {
     }
 
     public void exportGenerated(NViewer v, Config config) {
-        JFileChooser f = new JFileChooser(config.getDir());
-        f.setDialogTitle("Export Generated CA");
+        JFileChooser f = new JFileChooser(config.getSaveDir());
+        f.setDialogTitle("Export Generated Data");
         f.setDialogType(f.SAVE_DIALOG);
         f.setMultiSelectionEnabled(false);
         int ret = f.showSaveDialog(v.getRoot());
         Plane plane = v.getPlaneDisplayProvider().getActivePlane();
         if(ret==f.APPROVE_OPTION) {
             try(PrintWriter w = new PrintWriter(new BufferedWriter(new FileWriter(f.getSelectedFile().toString())))) {
-                config.setDir(f.getSelectedFile().getParent());
+                config.setSaveDir(f.getSelectedFile().getParent());
                 plane.export(w);
             }
             catch(IOException e) {
@@ -390,6 +390,7 @@ public class Actions {
         }
     }
 
+    /*
     public void exportRule(NViewer v, Config config) {
         JFileChooser f = new JFileChooser(config.getDir());
         f.setDialogTitle("Export rule");
@@ -407,6 +408,7 @@ public class Actions {
             }
         }
     }
+    */
 
     public void debug(NViewer v) {
         final Plane p = v.getPlaneDisplayProvider().getActivePlane();
@@ -1233,14 +1235,14 @@ public class Actions {
 
         AbstractAction choosefile = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                final JFileChooser f = new JFileChooser(config.getDir());
+                final JFileChooser f = new JFileChooser(config.getImgDir());
                 f.setDialogTitle("Initial state image");
                 f.setDialogType(f.OPEN_DIALOG);
                 f.setMultiSelectionEnabled(false);
                 int ret = f.showOpenDialog(v);
                 if(ret==f.APPROVE_OPTION) {
                     File img = f.getSelectedFile();
-                    config.setDir(img.getParent());
+                    config.setImgDir(img.getParent());
                     filehack[0] = img.toString();
                     //BufferedImage initImage = ImageIO.read(img);
                     System.err.println("read image "+img);
@@ -1338,14 +1340,14 @@ public class Actions {
 
         AbstractAction choosefile = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                final JFileChooser f = new JFileChooser(config.getDir());
+                final JFileChooser f = new JFileChooser(config.getSaveDir());
                 f.setDialogTitle("Automata");
                 f.setDialogType(f.OPEN_DIALOG);
                 f.setMultiSelectionEnabled(false);
                 int ret = f.showOpenDialog(v);
                 if(ret==f.APPROVE_OPTION) {
                     File ca = f.getSelectedFile();
-                    config.setDir(ca.getParent());
+                    config.setSaveDir(ca.getParent());
                     filehack[0] = ca.toString();
                 }
             }
@@ -1394,14 +1396,14 @@ public class Actions {
     }
 
     public void imageSpectrum(final NViewer v, Config config) {
-        final JFileChooser f = new JFileChooser(config.getDir());
+        final JFileChooser f = new JFileChooser(config.getImgDir());
         f.setDialogTitle("Spectrum source image");
         f.setDialogType(f.OPEN_DIALOG);
         f.setMultiSelectionEnabled(false);
         int ret = f.showOpenDialog(v);
         if(ret==f.APPROVE_OPTION) {
             File img = f.getSelectedFile();
-            config.setDir(img.getParent());
+            config.setImgDir(img.getParent());
             try {
                 BufferedImage bi = ImageIO.read(img);
                 System.err.println("read image "+bi);
@@ -1805,6 +1807,8 @@ public class Actions {
             .withRandom(r)
             .withTransition(Float.parseFloat(config.getVariable("mutator_transition", "0.5")))
             .withSymmetry("true".equals(config.getVariable("mutator_symmetry", "false")))
+            .withUpdateWeight(config.getWeightVariations())
+            .withRule(config.getRuleVariations())
             .withValidator((a)->{
                 return a.colors()<mc;
             });

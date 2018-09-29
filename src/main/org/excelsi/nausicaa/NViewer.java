@@ -102,7 +102,8 @@ public class NViewer extends JFrame implements UIActions {
         final float weight = 1f;
         //final int w = 100, h = 100, d = 100, pre=0;
         final int w = 300, h = 300, d = 1, pre=0;
-        _config = new Config(w, h, d, weight);
+        //_config = new Config(w, h, d, weight);
+        _config = Config.load();
         createMenu();
         setSize(_width, _height);
         int dims = 2;
@@ -323,7 +324,6 @@ public class NViewer extends JFrame implements UIActions {
         expImg.setText("Export generated image ...");
         JMenuItem expGenerated = file.add(exportGenerated);
         expGenerated.setText("Export generated data ...");
-        //exp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));
         bar.add(file);
     }
 

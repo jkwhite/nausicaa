@@ -13,6 +13,8 @@ public final class MutationFactor {
     private int _stage;
     private float _transition;
     private boolean _symmetry;
+    private boolean _weight;
+    private boolean _rule;
     private Datamap _data;
 
 
@@ -88,8 +90,26 @@ public final class MutationFactor {
         return this;
     }
 
+    public MutationFactor withUpdateWeight(boolean w) {
+        _weight = w;
+        return this;
+    }
+
+    public MutationFactor withRule(boolean r) {
+        _rule = r;
+        return this;
+    }
+
     public boolean symmetry() {
         return _symmetry;
+    }
+
+    public boolean updateWeight() {
+        return _weight;
+    }
+
+    public boolean rule() {
+        return _rule;
     }
 
     public MutationFactor withDatamap(Datamap dm) {

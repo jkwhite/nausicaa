@@ -163,14 +163,14 @@ public class JCAGenerator extends JDialog {
         ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
-                final JFileChooser f = new JFileChooser(config.getDir());
+                final JFileChooser f = new JFileChooser(config.getGenDir());
                 f.setDialogTitle("Save generated automata");
                 f.setDialogType(f.SAVE_DIALOG);
                 f.setMultiSelectionEnabled(false);
                 int ret = f.showSaveDialog(root);
                 if(ret==f.APPROVE_OPTION) {
                     String _dir = f.getSelectedFile().getParentFile().toString();
-                    config.setDir(_dir);
+                    config.setGenDir(_dir);
                     final JDialog gene = new JDialog(root, "Generating");
                     JPanel main = new JPanel(new BorderLayout());
                     final JLabel task = new JLabel("Building automata");
