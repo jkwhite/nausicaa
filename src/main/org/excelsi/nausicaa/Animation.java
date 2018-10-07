@@ -18,6 +18,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
     private final Config _config;
     private final PlanescapeProvider _f;
     private final Timeline _timeline;
+    private final int _origSteps;
     private int _steps;
     private State _state = State.animate;
     private long _delay;
@@ -29,6 +30,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         _config = config;
         _f = f;
         _timeline = timeline;
+        _origSteps = steps;
         _steps = steps;
         _timeline.addTimelineListener(this);
         _config.addListener(this);
@@ -40,12 +42,15 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         switch(e.getType()) {
             case "tick":
                 _state = State.pause;
+                _steps = _origSteps;
                 break;
             case "futures":
                 _state = State.reinit;
+                _steps = _origSteps;
                 break;
             case "tock":
                 _state = State.reinit;
+                _steps = _origSteps;
                 break;
         }
     }
@@ -54,6 +59,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         if("animationDelay".equals(property)) {
             _delay = c.getAnimationDelay();
             _state = State.reinit;
+            _steps = _origSteps;
         }
     }
 
@@ -123,6 +129,15 @@ top:        while(_state==State.animate) {
                 long end = System.currentTimeMillis();
                 if(_steps>0&&--_steps==0) {
                     _state = State.die;
+                    try {
+                        render.shutdown();
+                        System.err.print("awaiting render... ");
+                        render.awaitTermination(5, TimeUnit.SECONDS);
+                        System.err.println("done");
+                    }
+                    catch(InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 }
                 long sleeps = start+_delay-end;
@@ -187,10 +202,16 @@ top:        while(_state==State.animate) {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     try {
-                        if(calling.isInterrupted() || _state!=State.animate) {
-                            return;
+                        //if(calling.isInterrupted() || _state!=State.animate) {
+                            //return;
+                        //}
+                        //_d.setPlane(frame);
+                        if(!calling.isInterrupted() && (_state==State.animate||_state==State.die)) {
+                            _d.setPlane(frame);
                         }
-                        _d.setPlane(frame);
+                        else {
+                            System.err.println("not rendering: int: "+calling.isInterrupted()+", st: "+_state);
+                        }
                     }
                     finally {
                         if(!_d.delegateUnlock()) {

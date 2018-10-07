@@ -78,6 +78,7 @@ public class GenomeFactory {
             weight(1, new Count()),
             weight(1, new Jump()),
             weight(1, new Halt()),
+            weight(1, new Convolve(a.sourceLength())),
             weight(1, new Mod())
         ));
         if(a.colors()<1000000) {
@@ -150,6 +151,7 @@ public class GenomeFactory {
             weight(1, new Count()),
             weight(1, new Jump()),
             weight(1, new Halt()),
+            weight(1, new Convolve(a.sourceLength())),
             weight(1, new Mod())
         ));
         if(a.colors()<1000000) {
@@ -163,7 +165,7 @@ public class GenomeFactory {
         final WeightedFactory<Codon> f = buildFactory(a);
         final StringBuilder b = new StringBuilder(Codons.PUSH_ALL+" ");
         //final StringBuilder b = new StringBuilder(Codons.HISTO+"-");
-        int len = 3+r.nextInt(6);
+        int len = 2+r.nextInt(12);
         for(int i=0;i<len;i++) {
             final Codon c = f.random(r);
             b.append(c.generate(r));

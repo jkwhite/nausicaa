@@ -93,7 +93,7 @@ public final class Genome {
             new Weight<>(20,
                 // remove
                 (cs)->{
-                    if(cs.size()>1) {
+                    if(cs.size()>2) {
                         int idx = r.nextInt(cs.size());
                         cs.remove(idx);
                     }

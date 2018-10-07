@@ -62,6 +62,7 @@ public class Codons {
     public static final String EXCLAMATORY = "ha";
     public static final String HISTO = "hi";
     public static final String SUPERSYMMETRY = "hu";
+    public static final String CONVOLVE = "he";
     public static final String DIVIDE = "ho";
     public static final String ROT_VEC_N = "ba";
     public static final String COS = "bi";
@@ -214,6 +215,8 @@ public class Codons {
                     return new Jump();
                 case HALT:
                     return new Halt();
+                case CONVOLVE:
+                    return new Convolve(im.archetype().sourceLength());
                 default:
                     throw new IllegalStateException("unknown opcode '"+code+"'");
             }
@@ -1629,6 +1632,43 @@ public class Codons {
                 nc = -1;
             }
             return new Avg(nc);
+        }
+    }
+
+    public static class Convolve extends NAggregate {
+        public Convolve(int c) { super(CONVOLVE, c); }
+        @Override public Codon copy() { return new Convolve(_c); }
+        @Override public boolean supports(Values v) { return true; }
+
+        @Override public int op(int[] vs, int m, int e, int[] p) {
+            int ac = 0;
+            switch(p.length) {
+                case 9:
+                    ac = vs[m+8]*p[0] + vs[m+7]*p[1] + vs[m+6]*p[2] + vs[m+5]*p[3] + vs[m+4]*p[4] + vs[m+3]*p[5]
+                        + vs[m+2]*p[6] + vs[m+1]*p[7] + vs[m]*p[8];
+                    break;
+                default:
+                    throw new IllegalArgumentException("unsupported pattern length "+p.length);
+            }
+            return ac;
+        }
+
+        @Override public float op(float[] vs, int m, int e, float[] p) {
+            //float min = vs[m];
+            //for(int i=m+1;i<=e;i++) {
+                //if(vs[i]<min) min=vs[i];
+            //}
+            //return min;
+            float ac = 0;
+            switch(p.length) {
+                case 9:
+                    ac = vs[m+8]*p[0] + vs[m+7]*p[1] + vs[m+6]*p[2] + vs[m+5]*p[3] + vs[m+4]*p[4] + vs[m+3]*p[5]
+                        + vs[m+2]*p[6] + vs[m+1]*p[7] + vs[m]*p[8];
+                    break;
+                default:
+                    throw new IllegalArgumentException("unsupported pattern length "+p.length);
+            }
+            return ac;
         }
     }
 

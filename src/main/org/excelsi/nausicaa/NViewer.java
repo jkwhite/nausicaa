@@ -660,9 +660,17 @@ public class NViewer extends JFrame implements UIActions {
         animate.setText("Animate");
         animate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, shortcut));
 
+        AbstractAction ant = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.chooseAnimFrames(NViewer.this, _timeline);
+            }
+        };
+        JMenuItem animatet = auto.add(ant);
+        animatet.setText("Animate for N steps ...");
+
         AbstractAction stp = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.animate(NViewer.this, _timeline, 2);
+                _a.animate(NViewer.this, _timeline, 1);
             }
         };
         JMenuItem stepone = auto.add(stp);

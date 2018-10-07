@@ -531,7 +531,7 @@ public class Actions {
 
     private Animation _a;
     public void animate(NViewer v, Timeline timeline, int frames) {
-        if(_a!=null) {
+        if(_a!=null&&_a.isAlive()) {
             _a.stopAnimation();
             _a = null;
         }
@@ -539,6 +539,42 @@ public class Actions {
             _a = new Animation(v.getConfig(), v.getPlanescapeProvider(), timeline, frames);
             _a.start();
         }
+    }
+
+    public void chooseAnimFrames(final NViewer v, final Timeline timeline) {
+        final JDialog d = new JDialog(v, "Animation configuration");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(1,2));
+
+        top.add(new JLabel("Number of frames"));
+        final JTextField fr = new JTextField();
+        fr.setText(v.getConfig().getVariable("animation_nframes", "100"));
+        fr.setColumns(5);
+        top.add(fr);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                int frames = Integer.parseInt(fr.getText());
+                v.getConfig().setVariable("animation_nframes", fr.getText());
+                animate(v, timeline, frames);
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
     }
 
     public void animateSpeedup(NViewer v) {

@@ -224,21 +224,41 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                         Float nw = s.weight;
                         if(m.stage()==-1 || i==m.stage()) {
                             //System.err.println("MUTATING "+i);
-                            boolean typ = m.random().nextBoolean();
-                            if((m.rule() && !m.updateWeight())
-                                || m.rule() && typ) {
-                                np = (ComputedPattern)s.p.mutate(m);
+                            boolean typ = false;
+                            if(m.rule() && m.updateWeight()) {
+                                typ = m.random().nextBoolean();
                             }
-                            else {
+                            else if(m.rule()) {
+                                typ = false;
+                            }
+                            else if(m.updateWeight()) {
+                                typ = true;
+                            }
+                            if(typ) {
                                 np = (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm));
-                            }
-                            if(m.updateWeight() && !m.rule()
-                                || m.updateWeight() && !typ) {
                                 if(nw==null) {
                                     nw = m.random().nextFloat();
                                 }
                                 nw = UpdateWeightTransform.mutateWeight(nw, m.random());
                             }
+                            else {
+                                np = (ComputedPattern)s.p.mutate(m);
+                                nw = s.weight;
+                            }
+                            //if((m.rule() && !m.updateWeight())
+                                //|| m.rule() && typ) {
+                                //np = (ComputedPattern)s.p.mutate(m);
+                            //}
+                            //else {
+                                //np = (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm));
+                            //}
+                            //if(m.updateWeight() && !m.rule()
+                                //|| m.updateWeight() && !typ) {
+                                //if(nw==null) {
+                                    //nw = m.random().nextFloat();
+                                //}
+                                //nw = UpdateWeightTransform.mutateWeight(nw, m.random());
+                            //}
                         }
                         else {
                             //System.err.println("COPYING "+i);

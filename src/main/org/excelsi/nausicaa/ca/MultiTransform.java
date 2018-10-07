@@ -61,11 +61,12 @@ public class MultiTransform implements Transform {
         int tries = 0;
         do {
             switch(_rand.nextInt(6)) {
-                case 2:
+                case 8:
                     if(_weightVariations) {
                         t = new UpdateWeightTransform(_rand);
                         break;
                     }
+                case 2:
                 case 1:
                     if(_hueVariations) {
                         t = new HueTransform(_rand);
@@ -73,7 +74,7 @@ public class MultiTransform implements Transform {
                     }
                 default:
                 case 0:
-                    if(_ruleVariations) {
+                    if(_ruleVariations||_weightVariations) {
                         t = new RuleTransform(_rand, createMutator(c), _factor);
                     }
                     break;
