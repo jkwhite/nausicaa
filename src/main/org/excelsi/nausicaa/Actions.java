@@ -302,9 +302,9 @@ public class Actions {
             try {
                 config.setImgDir(f.getSelectedFile().getParent());
                 final CA ca = CA.fromImage(f.getSelectedFile().toString(), paletteMode);
-                config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth(), ca.getPrelude());
                 //config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth());
                 v.setActiveCA(ca);
+                config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth(), ca.getPrelude());
             }
             catch(IOException e) {
                 showError(v, "Failed to load "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);

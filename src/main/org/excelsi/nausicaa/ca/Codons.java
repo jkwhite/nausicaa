@@ -1636,6 +1636,7 @@ public class Codons {
     }
 
     public static class Convolve extends NAggregate {
+        public Convolve() { super(CONVOLVE, -1); }
         public Convolve(int c) { super(CONVOLVE, c); }
         @Override public Codon copy() { return new Convolve(_c); }
         @Override public boolean supports(Values v) { return true; }
@@ -1648,17 +1649,17 @@ public class Codons {
                         + vs[m+2]*p[6] + vs[m+1]*p[7] + vs[m]*p[8];
                     break;
                 default:
-                    throw new IllegalArgumentException("unsupported pattern length "+p.length);
+                    int j=p.length-1;
+                    for(int i=m;i<=e;i++) {
+                        ac = ac + vs[i]*p[j];
+                        if(--j<0) j=p.length-1;
+                    }
+                    break;
             }
             return ac;
         }
 
         @Override public float op(float[] vs, int m, int e, float[] p) {
-            //float min = vs[m];
-            //for(int i=m+1;i<=e;i++) {
-                //if(vs[i]<min) min=vs[i];
-            //}
-            //return min;
             float ac = 0;
             switch(p.length) {
                 case 9:
@@ -1666,7 +1667,12 @@ public class Codons {
                         + vs[m+2]*p[6] + vs[m+1]*p[7] + vs[m]*p[8];
                     break;
                 default:
-                    throw new IllegalArgumentException("unsupported pattern length "+p.length);
+                    int j=p.length-1;
+                    for(int i=m;i<=e;i++) {
+                        ac = ac + vs[i]*p[j];
+                        if(--j<0) j=p.length-1;
+                    }
+                    break;
             }
             return ac;
         }

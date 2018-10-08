@@ -183,7 +183,9 @@ public final class Genome {
 
     private Genome replicate(final Implicate im, final WeightedFactory<Mutator> mutators, final MutationFactor mf) {
         final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(im)));
-        int max = 1+mf.random().nextInt(Math.max(1,cs.size()/3));
+        float mult = mf.alpha()/20f;
+        int max = (int) (mult*(1+mf.random().nextInt(Math.max(1,cs.size()/3))));
+        System.err.println("applying "+max+" mutators");
         for(int i=0;i<max;i++) {
             final Mutator m = mutators.random(mf.random());
             m.mutate(cs);
