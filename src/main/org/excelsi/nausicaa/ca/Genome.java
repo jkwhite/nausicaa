@@ -52,127 +52,23 @@ public final class Genome {
     }
 
     public Genome mutate(final Implicate im, final GenomeFactory gf, final MutationFactor m) {
-        final Random r = m.random();
-        final WeightedFactory<Mutator> mf = new WeightedFactory<>(
-            new Weight<>(5,
-                // jumble
-                (cs)->{
-                    Collections.shuffle(cs);
-                }),
-            new Weight<>(20,
-                // replace
-                (cs)->{
-                    int idx = r.nextInt(cs.size());
-                    cs.set(idx, gf.randomCodon(im, r));
-                }),
-            new Weight<>(30,
-                // swap
-                (cs)->{
-                    if(cs.size()>1) {
-                        int idx1 = r.nextInt(cs.size());
-                        boolean d = r.nextBoolean();
-                        int idx2 = d&&idx1<cs.size()-1?idx1+1:idx1>1?idx1-1:r.nextInt(cs.size());
-                        Codon c1 = cs.get(idx1);
-                        Codon c2 = cs.get(idx2);
-                        cs.set(idx1, c2);
-                        cs.set(idx2, c1);
-                    }
-                }),
-            new Weight<>(40,
-                // insert
-                (cs)->{
-                    int idx = r.nextInt(cs.size());
-                    cs.add(idx, gf.randomCodon(im, r));
-                }),
-            new Weight<>(20,
-                // duplicate
-                (cs)->{
-                    int idx = r.nextInt(cs.size());
-                    cs.add(idx, cs.get(idx).copy());
-                }),
-            new Weight<>(20,
-                // remove
-                (cs)->{
-                    if(cs.size()>2) {
-                        int idx = r.nextInt(cs.size());
-                        cs.remove(idx);
-                    }
-                }),
-            new Weight<>(10,
-                // decimate
-                (cs)->{
-                    boolean first = true;
-                    while(cs.size()>1 && (first || r.nextInt(3)==0)) {
-                        int idx = r.nextInt(cs.size());
-                        cs.remove(idx);
-                        first = false;
-                    }
-                }),
-            new Weight<>(5,
-                // repeat
-                (cs)->{
-                    int st = r.nextInt(cs.size());
-                    int en = st+r.nextInt(cs.size()-st);
-                    int o = en;
-                    for(int i=st;i<en;i++) {
-                        cs.add(o++, cs.get(i).copy());
-                    }
-                }),
-            new Weight<>(10,
-                // symmetry
-                (cs)->{
-                    symmetry(im.archetype(), cs);
-                    /*
-                    System.err.println("before sym: "+cs);
-                    for(int i=0;i<cs.size()&&cs.size()>1;i++) {
-                        Codon c = cs.get(i);
-                        if(!c.symmetric()) {
-                            cs.remove(i);
-                            i--;
-                        }
-                    }
-                    boolean pat = false;
-                    for(Codon c:cs) {
-                        if(c.usesPattern()) {
-                            pat = true;
-                            break;
-                        }
-                    }
-                    if(!pat) {
-                        cs.add(0, new Codons.Histo(a.colors()));
-                    }
-                    System.err.println("after sym: "+cs);
-                    */
-                }),
-            new Weight<>(40,
-                // add
-                (cs)->{
-                    cs.add(gf.randomCodon(im, r));
-                }),
-            new Weight<>(30,
-                // adjust
-                (cs)->{
-                    boolean any = true;
-                    boolean de = false;
-                    while(any && !de) {
-                        any = false;
-                        for(int i=0;i<cs.size();i++) {
-                            final Codon c = cs.get(i);
-                            if(c instanceof Unstable) {
-                                any = true;
-                                if(r.nextInt(3)==0) {
-                                    cs.set(i, ((Unstable)c).destabilize(r));
-                                    de = true;
-                                }
-                            }
-                        }
-                    }
-                })
+        final WeightedFactory<GenomeMutator> mf = new WeightedFactory<>(
+            new Weight<>(5,  GenomeMutators.jumble()),
+            new Weight<>(20, GenomeMutators.replace()),
+            new Weight<>(30, GenomeMutators.swap()),
+            new Weight<>(40, GenomeMutators.insert()),
+            new Weight<>(20, GenomeMutators.duplicate()),
+            new Weight<>(20, GenomeMutators.remove()),
+            new Weight<>(10, GenomeMutators.decimate()),
+            new Weight<>(5,  GenomeMutators.repeat()),
+            new Weight<>(10, GenomeMutators.symmetry()),
+            new Weight<>(40, GenomeMutators.add()),
+            new Weight<>(30, GenomeMutators.adjust())
         );
         int tries = 0;
         Genome child;
         do {
-            child = replicate(im, mf, m);
+            child = replicate(im, mf, gf, m);
             if(tries==999) {
                 System.err.println("failed to mutate "+this);
             }
@@ -181,14 +77,14 @@ public final class Genome {
         return child;
     }
 
-    private Genome replicate(final Implicate im, final WeightedFactory<Mutator> mutators, final MutationFactor mf) {
+    private Genome replicate(final Implicate im, final WeightedFactory<GenomeMutator> mutators, final GenomeFactory gf, final MutationFactor mf) {
         final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(im)));
         float mult = mf.alpha()/20f;
         int max = (int) (mult*(1+mf.random().nextInt(Math.max(1,cs.size()/3))));
         System.err.println("applying "+max+" mutators");
         for(int i=0;i<max;i++) {
-            final Mutator m = mutators.random(mf.random());
-            m.mutate(cs);
+            final GenomeMutator m = mf.genomeMutator()!=null?mf.genomeMutator():mutators.random(mf.random());
+            m.mutate(cs, im, gf, mf);
         }
         if(mf.symmetry()) {
             symmetry(im.archetype(), cs);
@@ -232,10 +128,10 @@ public final class Genome {
         return new Genome(b.toString());
     }
 
-    @FunctionalInterface
-    interface Mutator {
-        void mutate(LinkedList<Codon> cs);
-    }
+    //@FunctionalInterface
+    //interface Mutator {
+        //void mutate(LinkedList<Codon> cs);
+    //}
 
     private static void symmetry(final Archetype a, final List<Codon> cs) {
         //System.err.println("before sym: "+cs);

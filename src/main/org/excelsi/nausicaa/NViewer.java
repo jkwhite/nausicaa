@@ -1197,7 +1197,6 @@ public class NViewer extends JFrame implements UIActions {
 
     private void createMutateMenu(int shortcut, JMenuBar bar) {
         JMenu mutate = new JMenu("Mutate");
-        /*
         AbstractAction rep = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _a.repeatLastMutation(NViewer.this, _config, _random);
@@ -1208,6 +1207,7 @@ public class NViewer extends JFrame implements UIActions {
         _repeat.setEnabled(false);
         _repeat.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, shortcut));
 
+        /*
         AbstractAction rand = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _a.randomMutation(NViewer.this);
@@ -1216,8 +1216,10 @@ public class NViewer extends JFrame implements UIActions {
         final JMenuItem random = mutate.add(rand);
         random.setText("Random mutation");
         random.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcut));
+        */
         mutate.addSeparator();
 
+        /*
         for(final Mutator m:MutatorFactory.defaultMutators().getAll()) {
             AbstractAction mut = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
@@ -1236,6 +1238,28 @@ public class NViewer extends JFrame implements UIActions {
         }
         mutate.addSeparator();
         */
+        for(final java.lang.reflect.Method m:GenomeMutators.class.getDeclaredMethods()) {
+            final String mname = Character.toUpperCase(m.getName().charAt(0))+m.getName().substring(1);
+            if(!mname.startsWith("Lambda$")) {
+                AbstractAction mut = new AbstractAction() {
+                    public void actionPerformed(ActionEvent e) {
+                        _repeat.setEnabled(true);
+                        _repeat.setText("Repeat "+mname);
+                        try {
+                            //_a.mutate(NViewer.this, _config, _random, m);
+                            GenomeMutator gm = (GenomeMutator) m.invoke(null, new Object[0]);
+                            _a.mutate(NViewer.this, _config, _random, gm);
+                        }
+                        catch(Exception ex) {
+                            System.err.println(mname+" failed: "+ex.getMessage());
+                        }
+                    }
+                };
+                JMenuItem mutat = mutate.add(mut);
+                mutat.setText(mname);
+            }
+        }
+        mutate.addSeparator();
 
         JMenuItem addseg = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {

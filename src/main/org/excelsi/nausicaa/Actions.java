@@ -1787,7 +1787,7 @@ public class Actions {
         d.setVisible(true);
     }
 
-    private Mutator _lastMutator;
+    private GenomeMutator _lastMutator;
     public void repeatLastMutation(NViewer v, Config config, Random rand) {
         mutate(v, config, rand, _lastMutator);
     }
@@ -1825,6 +1825,15 @@ public class Actions {
     public void randomMutation(NViewer v) {
     }
 
+    public void mutate(NViewer v, Config config, Random rand, GenomeMutator m) {
+        final CA ca = v.getActiveCA();
+        v.setActiveCA(new RuleTransform(rand,
+            null,
+            createMutationFactor(config, rand).withGenomeMutator(m)
+            ).transform(ca));
+    }
+
+    /*
     public void mutate(NViewer v, Config config, Random rand, Mutator m) {
         _lastMutator = m;
         if(v.getConfig().getForceSymmetry()) {
@@ -1833,6 +1842,7 @@ public class Actions {
         final CA ca = v.getActiveCA();
         v.setActiveCA(new RuleTransform(rand, m, createMutationFactor(config, rand)).transform(ca));
     }
+    */
 
     public static MutationFactor createMutationFactor(Config config, Random r) {
         int mc = Integer.parseInt(config.getVariable("mutator_maxcolors", "9"));

@@ -16,6 +16,7 @@ public final class MutationFactor {
     private boolean _weight;
     private boolean _rule;
     private Datamap _data;
+    private GenomeMutator _gm;
 
 
     public MutationFactor() {
@@ -52,6 +53,10 @@ public final class MutationFactor {
 
     public Random random() {
         return _r;
+    }
+
+    public Random r() {
+        return random();
     }
 
     public MutationFactor withMode(String m) {
@@ -119,6 +124,15 @@ public final class MutationFactor {
 
     public Datamap datamap() {
         return _data;
+    }
+
+    public MutationFactor withGenomeMutator(GenomeMutator gm) {
+        _gm = gm;
+        return this;
+    }
+
+    public GenomeMutator genomeMutator() {
+        return _gm;
     }
 
     public String toString() {
