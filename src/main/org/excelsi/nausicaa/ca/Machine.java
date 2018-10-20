@@ -5,6 +5,7 @@ import java.util.Random;
 
 
 public class Machine {
+    private static final int TAPE_LENGTH = 65535*2;
     private final Archetype _a;
     private final Datamap _d;
     private final Genome _g;
@@ -12,6 +13,7 @@ public class Machine {
     private final int[] _inst;
     private final IntTape _ti;
     private final FloatTape _tf;
+    private long _e = 0;
 
 
     public Machine(Archetype a, Datamap d, Genome g) {
@@ -21,11 +23,11 @@ public class Machine {
         _prg = g.codons(new Implicate(a, d));
         _inst = new int[_prg.length];
         if(a.isDiscrete()) {
-            _ti = new IntTape(32768);
+            _ti = new IntTape(TAPE_LENGTH);
             _tf = null;
         }
         else {
-            _tf = new FloatTape(32768);
+            _tf = new FloatTape(TAPE_LENGTH);
             _ti = null;
         }
     }
@@ -64,6 +66,7 @@ public class Machine {
                 res = _a.colors()+res;
             }
             io.io = res;
+            if(_ti.pos()>0) _e += _ti.pos();
         }
         else {
             _tf.reset();
@@ -103,6 +106,10 @@ public class Machine {
             _prg[i].tick();
             //_inst[i] = 0;
         }
+        //if(_e>0) System.err.println("energy: "+_e);
+        _e = 0;
+        if(_ti!=null) _ti.reset();
+        if(_tf!=null) _tf.reset();
     }
 
     @Override public String toString() {

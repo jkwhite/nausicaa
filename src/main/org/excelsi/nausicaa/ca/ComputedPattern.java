@@ -9,6 +9,7 @@ import java.util.Random;
 
 
 public final class ComputedPattern implements Pattern, Mutatable {
+    private static final boolean ENABLE_CACHE = true;
     private final Archetype _a;
     private final RuleLogic _logic;
     private final IO _io;
@@ -30,22 +31,28 @@ public final class ComputedPattern implements Pattern, Mutatable {
         // -11833
         int csize = Math.max(5000, -11833*_a.size()+110000);
         _io = new IO(a.values());
-        if(a.isDiscrete()) {
-            if(a.sourceLength()<9) {
-                _cache = new ShortPCache(csize, size);
+        if(ENABLE_CACHE) {
+            if(a.isDiscrete()) {
+                if(a.sourceLength()<9) {
+                    _cache = new ShortPCache(csize, size);
+                }
+                else {
+                    _cache = new PCache(csize, size);
+                }
+                _fcache = null;
             }
             else {
-                _cache = new PCache(csize, size);
+                if(a.sourceLength()<9) {
+                    _fcache = new ShortFPCache(csize, size);
+                }
+                else {
+                    _fcache = new FPCache(csize, size);
+                }
+                _cache = null;
             }
-            _fcache = null;
         }
         else {
-            if(a.sourceLength()<9) {
-                _fcache = new ShortFPCache(csize, size);
-            }
-            else {
-                _fcache = new FPCache(csize, size);
-            }
+            _fcache = null;
             _cache = null;
         }
     }
@@ -336,47 +343,57 @@ public final class ComputedPattern implements Pattern, Mutatable {
     private static final int[] ZEROS = new int[9];
 
     @Override public int next(int pattern, final int[] p2) {
-        int r = _cache.find(p2);
-        if(_cache.h) {
-            _hits++;
-            //if(_hits%1000000==0) {
-                //System.err.println("hits: "+_hits+" misses: "+_misses+" ratio: "+(_hits/((float)_hits+_misses)));
-                //if(_hits%5000000==0) {
-                    //_cache.dump();
+        int r;
+        if(ENABLE_CACHE) {
+            r = _cache.find(p2);
+            if(_cache.h) {
+                _hits++;
+                //if(_hits%1000000==0) {
+                    //System.err.println("hits: "+_hits+" misses: "+_misses+" ratio: "+(_hits/((float)_hits+_misses)));
+                    //if(_hits%5000000==0) {
+                        //_cache.dump();
+                    //}
                 //}
-            //}
-            //dumpres(p2, r);
-            return r;
+                //dumpres(p2, r);
+                return r;
+            }
         }
         _misses++;
         _io.ii = p2;
         _logic.next(_io);
         r = _io.io;
         //if(_cache.lk!=0) {
+        if(ENABLE_CACHE) {
             _cache.put(p2, r);
+        }
         //}
         //dumpres(p2, r);
         return r;
     }
 
     @Override public float next(int pattern, final float[] p2) {
-        float r = _fcache.find(p2);
-        if(_fcache.h) {
-            _hits++;
-            if(_hits%1000000==0) {
-                System.err.println("hits: "+_hits+" misses: "+_misses+" ratio: "+(_hits/((float)_hits+_misses)));
-                //if(_hits%5000000==0) {
-                    //_cache.dump();
-                //}
+        float r;
+        if(ENABLE_CACHE) {
+            r = _fcache.find(p2);
+            if(_fcache.h) {
+                _hits++;
+                if(_hits%1000000==0) {
+                    System.err.println("hits: "+_hits+" misses: "+_misses+" ratio: "+(_hits/((float)_hits+_misses)));
+                    //if(_hits%5000000==0) {
+                        //_cache.dump();
+                    //}
+                }
+                //dumpres(p2, r);
+                return r;
             }
-            //dumpres(p2, r);
-            return r;
         }
         _misses++;
         _io.fi = p2;
         _logic.next(_io);
         r = _io.fo;
-        _fcache.put(p2, r);
+        if(ENABLE_CACHE) {
+            _fcache.put(p2, r);
+        }
         //System.err.println("computed next: "+r+" for "+p2[p2.length/2]);
         return r;
     }

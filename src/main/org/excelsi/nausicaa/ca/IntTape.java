@@ -3,6 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 public final class IntTape {
     //private int dump = 0;
+    private static final boolean WRAP = true;
     private final int[] _t;
     private int _i = -1;
     private int _s = -1;
@@ -94,9 +95,13 @@ public final class IntTape {
             //d("push %d", v);
             _t[++_i] = v;
         }
-        //else {
+        else {
+            if(WRAP) {
+                reset();
+                _t[++_i] = v;
+            }
             //d("push end");
-        //}
+        }
     }
 
     public int pop() {
@@ -124,7 +129,12 @@ public final class IntTape {
     public int pushAll(int[] v, int c) {
         int m = Math.min(v.length, c);
         if(_i+1+m>=_t.length) {
-            m = _t.length-(_i+1);
+            if(WRAP) {
+                reset();
+            }
+            else {
+                m = _t.length-(_i+1);
+            }
         }
         System.arraycopy(v, 0, _t, _i+1, m);
         _i+=m;
@@ -133,6 +143,14 @@ public final class IntTape {
 
     public int pushAll(int[] v, int c, int offset) {
         int m = Math.min(v.length-offset, c);
+        if(_i+1+m>=_t.length) {
+            if(WRAP) {
+                reset();
+            }
+            else {
+                m = _t.length-(_i+1);
+            }
+        }
         System.arraycopy(v, offset, _t, _i+1, m);
         _i+=m;
         return m;

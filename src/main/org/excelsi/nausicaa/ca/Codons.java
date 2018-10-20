@@ -785,11 +785,19 @@ public class Codons {
         @Override public boolean supports(Values v) { return true; }
 
         @Override public void op(int[] p, IntTape t) {
-            t.push(p[_p]);
+            int c = _p;
+            if(c>=p.length) {
+                c = c%p.length;
+            }
+            t.push(p[c]);
         }
 
         @Override public void op(float[] p, FloatTape t) {
-            t.push(p[_p]);
+            int c = _p;
+            if(c>=p.length) {
+                c = c%p.length;
+            }
+            t.push(p[c]);
         }
 
         @Override public String generate(Random r) {

@@ -177,6 +177,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
         }
 
         public int tick() {
+            pattern().tick();
             if(--_t==0) {
                 ++_i;
                 if(_i==_s.size()) {
