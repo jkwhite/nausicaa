@@ -11,12 +11,14 @@ import java.util.Random;
 public final class ComputedPattern implements Pattern, Mutatable {
     private static final boolean ENABLE_CACHE = true;
     private final Archetype _a;
+    //private final Language _lang;
     private final RuleLogic _logic;
     private final IO _io;
 
 
-    public ComputedPattern(Archetype a, RuleLogic logic) {
+    public ComputedPattern(Archetype a, /*Language lang,*/ RuleLogic logic) {
         _a = a;
+        //_lang = lang;
         _logic = logic;
         int size = _a.sourceLength();
         _lastP = new int[size];
@@ -57,8 +59,8 @@ public final class ComputedPattern implements Pattern, Mutatable {
         }
     }
 
-    public ComputedPattern copy(Implicate im) {
-        return new ComputedPattern(_a, _logic.copy(im));
+    public ComputedPattern copy(Datamap dm) {
+        return new ComputedPattern(_a, _logic.copy(dm));
     }
 
     @Override public Archetype archetype() {
@@ -444,13 +446,13 @@ public final class ComputedPattern implements Pattern, Mutatable {
 
     @Override public ComputedPattern mutate(MutationFactor m) {
         GenomeFactory gf = new GenomeFactory();
-        return new ComputedPattern(_a, _logic.mutate(new Implicate(_a, m.datamap()), gf, m));
+        return new ComputedPattern(_a, _logic.mutate(new Implicate(_a, m.datamap(), m.language()), gf, m));
     }
 
     public interface RuleLogic {
         //int next(int[] pattern);
         void next(IO io);
-        RuleLogic copy(Implicate im);
+        RuleLogic copy(Datamap dm);
         default RuleLogic mutate(Implicate im, GenomeFactory gf, MutationFactor mf) {
             return this;
         }
@@ -480,7 +482,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
             io.io = _a.activate(_r.reduce(io.ii));
         }
 
-        @Override public RARule copy(Implicate im) {
+        @Override public RARule copy(Datamap dm) {
             return new RARule(_n, _r.copy(), _a.copy());
         }
 
@@ -503,8 +505,8 @@ public final class ComputedPattern implements Pattern, Mutatable {
             _m.compute(io);
         }
 
-        @Override public RuleLogic copy(Implicate im) {
-            return new MachineElf(_m.copy(im));
+        @Override public RuleLogic copy(Datamap dm) {
+            return new MachineElf(_m.copy(dm));
         }
 
         @Override public MachineElf mutate(Implicate im, GenomeFactory gf, MutationFactor m) {
@@ -584,12 +586,15 @@ public final class ComputedPattern implements Pattern, Mutatable {
             });
     }
 
+    @Deprecated
     public static RuleLogic random(final Archetype a, final Datamap d, final Random r) {
-        //return new MachineElf(new Machine(new Genome("pO-s-c2-c3-i-pO-s8-c3-eq-p4-if")));
         GenomeFactory gf = new GenomeFactory();
-        return new MachineElf(new Machine(a, d, gf.generate(a, r)));
-        //return new MachineElf(new Machine(new Genome("pO-s-c2-c3-i-pO-s8-c3-eq-p3-if")));
-        //return new MachineElf(new Machine(new Genome("pO-s-c4-c7-i")));
+        return new MachineElf(new Machine(new Implicate(a, d, Languages.universal()), gf.generate(a, r)));
+    }
+
+    public static RuleLogic random(final Implicate i, final Random r) {
+        //GenomeFactory gf = new GenomeFactory();
+        return new MachineElf(new Machine(i, i.language().generate(i.archetype(), r)));
     }
 
     private static class HiddenLayerReducer implements Reducer {

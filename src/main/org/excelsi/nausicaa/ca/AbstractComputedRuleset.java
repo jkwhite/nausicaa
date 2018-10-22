@@ -9,10 +9,20 @@ import java.util.Random;
 
 public class AbstractComputedRuleset implements Ruleset {
     private final Archetype _a;
+    private final Language _lang;
 
 
-    public AbstractComputedRuleset(Archetype a) {
+    //public AbstractComputedRuleset(Archetype a) {
+        //this(a, Languages.universal());
+    //}
+
+    public AbstractComputedRuleset(Archetype a, Language lang) {
         _a = a;
+        _lang = lang;
+    }
+
+    public Language language() {
+        return _lang;
     }
 
     @Override public Iterator<Rule> iterator() {
@@ -30,26 +40,34 @@ public class AbstractComputedRuleset implements Ruleset {
             }
 
             @Override public Rule next() {
-                //return new ComputedRule2d(new ComputedPattern(_a, ComputedPattern.random(_a, r)));
-                //return new MutatingRule(new ComputedRule2d(new ComputedPattern(_a, ComputedPattern.random(_a, r))), r);
-                /*
-                return new SequenceRule(
-                    new SequenceRule.Sequence()
-                        .s(r.nextInt(40)+30, new ComputedRule2d(new ComputedPattern(_a, ComputedPattern.random(_a, r))))
-                        .s(r.nextInt(40)+30, new ComputedRule2d(new ComputedPattern(_a, ComputedPattern.random(_a, r))))
-                        .s(r.nextInt(40)+30, new ComputedRule2d(new ComputedPattern(_a, ComputedPattern.random(_a, r))))
-                    );
-                */
                 return new ComputedRule2d(
                     new SequencePattern(
                         new SequencePattern.Sequence()
-                            .s(r.nextInt(70)+70, null, new ComputedPattern(_a, ComputedPattern.random(_a, new Datamap(), r)))
-                            //.s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
-                            //.s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
-                            //.s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
-                            //.s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
-                            //.s(r.nextInt(70)+70, new ComputedPattern(_a, ComputedPattern.random(_a, r)))
-                        )
+                            .s(r.nextInt(70)+70, null, new ComputedPattern(_a, /*Languages.universal(),*/ ComputedPattern.random(new Implicate(_a, new Datamap(), _lang), r)))
+                        ),
+                    AbstractComputedRuleset.this
+                    );
+            }
+        };
+    }
+
+    @Override public Iterator<Rule> random(final Random r, final Implicate i) {
+        return new Iterator<Rule>() {
+            @Override public boolean hasNext() {
+                return true;
+            }
+
+            @Override public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override public Rule next() {
+                return new ComputedRule2d(
+                    new SequencePattern(
+                        new SequencePattern.Sequence()
+                            .s(r.nextInt(70)+70, null, new ComputedPattern(_a, /*i.language(),*/ ComputedPattern.random(i, r)))
+                        ),
+                    AbstractComputedRuleset.this
                     );
             }
         };
@@ -57,46 +75,11 @@ public class AbstractComputedRuleset implements Ruleset {
 
     @Override public Rule create(Object... args) {
         final String genome = args[0].toString();
-        final GenomeParser gp = new GenomeParser(_a);
+        final GenomeParser gp = new GenomeParser(_a, _lang);
         if(args.length>1 && args[1] instanceof MutationFactor) {
             gp.mutationFactor((MutationFactor)args[1]);
         }
         return gp.parse(genome);
-        /*
-        if(genome.charAt(0)=='@') {
-            return new GenomeParser(_a).parse(genome);
-        }
-        final int version = args.length>1?((Integer)args[1]).intValue():2;
-        if(version<3) {
-            final String[] gs = args[0].toString().replace('\n',',').split(",");
-            SequencePattern.Sequence s = new SequencePattern.Sequence();
-            for(final String gr:gs) {
-                String g = gr.trim();
-                int c = 100;
-                if(g.indexOf(':')>=0) {
-                    String[] cg = g.split(":");
-                    c = Integer.parseInt(cg[0].trim());
-                    g = cg[1];
-                }
-                //g = g.replace(' ','-');
-                //System.err.println("time: "+c+", rule: "+g);
-                s.s(c, new ComputedPattern(_a,
-                    new ComputedPattern.MachineElf(new Machine(_a, new Genome(g, version)))));
-            }
-
-            SequencePattern sp;
-            if(args.length>1 && args[1] instanceof MutationFactor) {
-                sp = new SequencePattern(s, ((MutationFactor)args[1]).transition());
-            }
-            else {
-                sp = new SequencePattern(s);
-            }
-            return new ComputedRule2d(sp);
-        }
-        else {
-            throw new IllegalStateException("bad genome: "+genome);
-        }
-        */
     }
 
     @Override public Ruleset derive(int[] colors, int len) {

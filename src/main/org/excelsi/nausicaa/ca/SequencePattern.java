@@ -200,7 +200,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
             }
             List<SEntry> ns = new ArrayList<>();
             for(SEntry s:_s) {
-                ns.add(new SEntry(s.t, s.weight, (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm))));
+                ns.add(new SEntry(s.t, s.weight, (ComputedPattern)s.p.copy(dm)));
             }
             return new Sequence(ns, nd);
         }
@@ -236,7 +236,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                                 typ = true;
                             }
                             if(typ) {
-                                np = (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm));
+                                np = (ComputedPattern)s.p.copy(dm);
                                 if(nw==null) {
                                     nw = m.random().nextFloat();
                                 }
@@ -246,24 +246,10 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                                 np = (ComputedPattern)s.p.mutate(m);
                                 nw = s.weight;
                             }
-                            //if((m.rule() && !m.updateWeight())
-                                //|| m.rule() && typ) {
-                                //np = (ComputedPattern)s.p.mutate(m);
-                            //}
-                            //else {
-                                //np = (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm));
-                            //}
-                            //if(m.updateWeight() && !m.rule()
-                                //|| m.updateWeight() && !typ) {
-                                //if(nw==null) {
-                                    //nw = m.random().nextFloat();
-                                //}
-                                //nw = UpdateWeightTransform.mutateWeight(nw, m.random());
-                            //}
                         }
                         else {
                             //System.err.println("COPYING "+i);
-                            np = (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm));
+                            np = (ComputedPattern)s.p.copy(dm);
                         }
                         ns.add(new SEntry(s.t, nw, np));
                     }
@@ -271,14 +257,14 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                 case "add":
                     final Archetype a = _s.get(0).p.archetype();
                     for(SEntry s:_s) {
-                        ns.add(new SEntry(s.t, s.weight, (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm))));
+                        ns.add(new SEntry(s.t, s.weight, (ComputedPattern)s.p.copy(dm)));
                     }
                     ns.add(new SEntry(m.random().nextInt(70)+70, 1f, new ComputedPattern(a, ComputedPattern.random(a, dm, m.random()))));
                     break;
                 case "add_data":
                     final Archetype ar = _s.get(0).p.archetype();
                     for(SEntry s:_s) {
-                        ns.add(new SEntry(s.t, s.weight, (ComputedPattern)s.p.copy(new Implicate(s.p.archetype(), dm))));
+                        ns.add(new SEntry(s.t, s.weight, (ComputedPattern)s.p.copy(dm)));
                     }
                     final String nm = Datamap.randomName(m.random());
                     final Index idx = new IndexGenerator().build(ar, m.random(), nm);
@@ -289,7 +275,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                     for(int i=0;i<_s.size();i++) {
                         if(i!=m.stage()) {
                             Archetype a2 = _s.get(i).p.archetype();
-                            ns.add(new SEntry(m.random().nextInt(70)+70, _s.get(i).weight, (ComputedPattern)_s.get(i).p.copy(new Implicate(a2, dm))));
+                            ns.add(new SEntry(m.random().nextInt(70)+70, _s.get(i).weight, (ComputedPattern)_s.get(i).p.copy(dm)));
                         }
                     }
                     break;

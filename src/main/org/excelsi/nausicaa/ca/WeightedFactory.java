@@ -18,6 +18,10 @@ public class WeightedFactory<E> {
         _sumWeight = sum;
     }
 
+    public Weight<E>[] all() {
+        return _mutators;
+    }
+
     public E random(final Random rand) {
         E m = null;
         int tries = 0;

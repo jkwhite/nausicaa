@@ -48,7 +48,7 @@ public final class Genome {
             }
         }
         //System.err.println("prune final codons: "+cs);
-        return fromCodons(cs);
+        return fromCodons(cs, im.language());
     }
 
     public Genome mutate(final Implicate im, final GenomeFactory gf, final MutationFactor m) {
@@ -92,11 +92,12 @@ public final class Genome {
         StringBuilder b = new StringBuilder();
         for(Codon c:cs) {
             b.append(c.code());
-            b.append("-");
+            //b.append("-");
+            b.append(" ");
         }
         b.setLength(b.length()-1);
         try {
-            return fromCodons(cs).prune(im);
+            return fromCodons(cs, im.language()); //.prune(im);
         }
         catch(Exception e) {
             throw new IllegalStateException("illegal genome '"+b+"': "+e, e);
@@ -118,10 +119,10 @@ public final class Genome {
         return ((Genome)o).c().equals(c());
     }
 
-    private static Genome fromCodons(List<Codon> cs) {
+    private static Genome fromCodons(List<Codon> cs, Language lang) {
         StringBuilder b = new StringBuilder();
         for(Codon c:cs) {
-            b.append(c.code());
+            b.append(lang.word(c.code()));
             b.append(" ");
         }
         b.setLength(b.length()-1);

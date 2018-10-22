@@ -8,6 +8,7 @@ public class Machine {
     private static final int TAPE_LENGTH = 65535*2;
     private final Archetype _a;
     private final Datamap _d;
+    private final Language _lang;
     private final Genome _g;
     private final Codon[] _prg;
     private final int[] _inst;
@@ -16,13 +17,14 @@ public class Machine {
     private long _e = 0;
 
 
-    public Machine(Archetype a, Datamap d, Genome g) {
-        _a = a;
-        _d = d;
+    public Machine(Implicate im, Genome g) {
+        _a = im.archetype();
+        _d = im.datamap();
+        _lang = im.language();
         _g = g;
-        _prg = g.codons(new Implicate(a, d));
+        _prg = g.codons(im);
         _inst = new int[_prg.length];
-        if(a.isDiscrete()) {
+        if(_a.isDiscrete()) {
             _ti = new IntTape(TAPE_LENGTH);
             _tf = null;
         }
@@ -32,8 +34,8 @@ public class Machine {
         }
     }
 
-    public Machine copy(Implicate im) {
-        return new Machine(_a, im.datamap(), _g);
+    public Machine copy(Datamap dm) {
+        return new Machine(new Implicate(_a, dm, _lang), _g);
     }
 
     //public int compute(final int[] p) {
@@ -98,7 +100,7 @@ public class Machine {
     //public Machine mutate(Archetype a, GenomeFactory gf, MutationFactor m) {
     public Machine mutate(Implicate im, GenomeFactory gf, MutationFactor m) {
         //return new Machine(_a, _d, _g.mutate(new Implicate(_a, _d), gf, m));
-        return new Machine(_a, im.datamap(), _g.mutate(im, gf, m));
+        return new Machine(im, _g.mutate(im, gf, m));
     }
 
     public void tick() {

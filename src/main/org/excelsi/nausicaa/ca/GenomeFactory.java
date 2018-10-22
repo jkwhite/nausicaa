@@ -57,7 +57,7 @@ public class GenomeFactory {
             weight(2, new PushA()),
             weight(2, new PushARot()),
             weight(2, new Push(-1, a.sourceLength())),
-            weight(2, new Constant(-1)),
+            weight(2, new Constant(-1, -1)),
             weight(1, new Duplicate()),
             weight(1, new Exclamatory()),
             weight(1, new Supersymmetry(a.colors()-1)),
@@ -131,7 +131,7 @@ public class GenomeFactory {
             //weight(2, new PushA()),
             //weight(2, new PushARot()),
             //weight(2, new Push(-1, a.sourceLength())),
-            weight(2, new Constant(-1)),
+            weight(2, new Constant(-1, -1)),
             weight(1, new Duplicate()),
             weight(1, new Exclamatory()),
             weight(1, new Supersymmetry(a.colors()-1)),
@@ -160,6 +160,14 @@ public class GenomeFactory {
         return new WeightedFactory<Codon>(cs.toArray(new Weight[0]));
     }
 
+    public List<String> allCodons(final Archetype a) {
+        WeightedFactory<Codon> f = buildFactory(a);
+        List<String> cs = new ArrayList<>();
+        for(Weight<Codon> wc:f.all()) {
+            cs.add(wc.e().code());
+        }
+        return cs;
+    }
 
     public Genome generate(final Archetype a, final Random r) {
         final WeightedFactory<Codon> f = buildFactory(a);
@@ -176,6 +184,11 @@ public class GenomeFactory {
     }
 
     public Codon randomCodon(final Implicate im, final Random r) {
-        return Codons.codon(buildFactory(im.archetype()).random(r).generate(r), im);
+        if(im.language()!=null) {
+            return Codons.codon(im.language().randomCodon(r), im);
+        }
+        else {
+            return Codons.codon(buildFactory(im.archetype()).random(r).generate(r), im);
+        }
     }
 }

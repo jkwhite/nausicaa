@@ -239,7 +239,7 @@ public class Actions {
                 switch(comphack[0]) {
                     case "machineelf":
                     default:
-                        rs = new ComputedRuleset(a);
+                        rs = new ComputedRuleset(a, Languages.simpleSymmetry());
                         break;
                     case "sparse":
                     case "array":
@@ -495,7 +495,7 @@ public class Actions {
             p.addPair("Values", r.archetype().values());
             p.addPair("Genome", cr.prettyGenome());
             p.addPair("Codons",
-                createText(new GenomeParser(r.archetype()).info(cr.archetype(), cr.genome()).toString(), 10, true));
+                createText(new GenomeParser(r.archetype(), ((ComputedRuleset)r.origin()).language()).info(cr.archetype(), cr.genome()).toString(), 10, true));
         }
         p.addPair("Colors", createColorPanel(ca.getPalette()));
         p.done();
@@ -1855,6 +1855,7 @@ public class Actions {
             .withSymmetry("true".equals(config.getVariable("mutator_symmetry", "false")))
             .withUpdateWeight(config.getWeightVariations())
             .withRule(config.getRuleVariations())
+            .withLanguage(Languages.simpleSymmetry())
             .withValidator((a)->{
                 return a.colors()<mc;
             });

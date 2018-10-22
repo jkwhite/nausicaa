@@ -18,4 +18,7 @@ public interface Codon {
     }
     default void tick() {
     }
+    default Codon chain(Codon c) {
+        return new Codons.Chain(this, c);
+    }
 }

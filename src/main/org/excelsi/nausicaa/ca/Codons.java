@@ -75,14 +75,40 @@ public class Codons {
 
 
     public static Codon codon(final String s, final Implicate im) {
+        Language lang = im.language();
+        if(lang==null) {
+            lang = Languages.universal();
+        }
+        String[] phon = lang.phonemes(s);
+        if(phon.length==1) {
+            return universalCodon(phon[0], im);
+        }
+        else {
+            Codon[] cs = new Codon[phon.length];
+            for(int i=0;i<phon.length;i++) {
+                cs[i] = universalCodon(phon[i], im);
+            }
+            return new Chain(cs);
+        }
+    }
+
+    public static Codon universalCodon(final String s, final Implicate im) {
         //System.err.println("op '"+s+"'");
         int i=0;
         for(;i<s.length()&&Character.isAlphabetic(s.charAt(i));i++);
         final String code = s.substring(0,i);
         //System.err.println("code '"+code+"'");
-        int p=-1;
+        Integer p=-1;
+        Float pf=-1f;
         if(i<s.length()) {
-            p = Integer.parseInt(s.substring(i));
+            if(s.substring(i).indexOf('.')>-1) {
+                pf = Float.parseFloat(s.substring(i));
+                p = pf.intValue();
+            }
+            else {
+                p = Integer.parseInt(s.substring(i));
+                pf = p.floatValue();
+            }
         }
         //System.err.println("arg '"+p+"'");
         if(code.startsWith(DATA)) {
@@ -118,7 +144,7 @@ public class Codons {
                 case INTERSECT_S:
                     return new IntersectsSelf();
                 case CONS:
-                    return new Constant(p);
+                    return new Constant(p,pf);
                 case EQUAL:
                     return new Equals();
                 case EQUAL_A:
@@ -892,17 +918,19 @@ public class Codons {
 
     public static final class Constant implements Codon, Unstable {
         private final int _p;
+        private final float _pf;
 
-        public Constant(int p) {
+        public Constant(int p, float pf) {
             _p = p;
+            _pf = pf;
         }
 
         @Override public Codon copy() {
-            return new Constant(_p);
+            return new Constant(_p, _pf);
         }
 
         @Override public String code() {
-            return CONS+_p;
+            return CONS+_pf;
         }
 
         @Override public boolean usesPattern() {
@@ -918,24 +946,23 @@ public class Codons {
         }
 
         @Override public void op(float[] p, FloatTape t) {
-            t.push((float)_p);
+            t.push(_pf);
         }
 
         @Override public String generate(Random r) {
+            //return CONS+(_p==-1?r.nextInt(27):_p);
             return CONS+(_p==-1?r.nextInt(27):_p);
         }
 
         @Override public Codon destabilize(Random r) {
             int v = Math.max(1,_p/3);
             int np = _p+((1+r.nextInt(v))*(r.nextBoolean()?1:-1));
-            //if(np<0) {
-                //np = 0;
-            //}
-            return new Constant(np);
+            float npf = _p+((1+r.nextFloat()*v)*(r.nextBoolean()?1f:-1f));
+            return new Constant((int)npf, npf);
         }
 
         @Override public String toString() {
-            return "Constant"+_p;
+            return "Constant"+_pf;
         }
     }
 
@@ -2204,6 +2231,70 @@ public class Codons {
             if(r!=-1) {
                 t.push(r);
             }
+        }
+    }
+
+    public static class Chain implements Codon {
+        private final Codon[] _cs;
+        private final boolean _usesPattern;
+
+        public Chain(Codon... cs) {
+            _cs = cs;
+            boolean up = false;
+            for(Codon c:cs) {
+                if(c.usesPattern()) {
+                    up = true;
+                    break;
+                }
+            }
+            _usesPattern = up;
+        }
+
+        @Override public Codon copy() { return new Chain(_cs); }
+
+        @Override public String code() {
+            StringBuilder b = new StringBuilder(12);
+            for(Codon c:_cs) {
+                b.append(c.code()).append('+');
+            }
+            b.setLength(b.length()-1);
+            return b.toString();
+        }
+
+        @Override public boolean usesPattern() {
+            return _usesPattern;
+        }
+
+        @Override public void op(int[] p, IntTape t) {
+            for(int i=0;i<_cs.length;i++) {
+                _cs[i].op(p, t);
+            }
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            for(int i=0;i<_cs.length;i++) {
+                _cs[i].op(p, t);
+            }
+        }
+
+        @Override public Codon chain(Codon c) {
+            Codon[] cs = new Codon[1+_cs.length];
+            System.arraycopy(_cs, 0, cs, 0, _cs.length);
+            cs[cs.length-1] = c;
+            return new Codons.Chain(cs);
+        }
+
+        @Override public String toString() {
+            StringBuilder b = new StringBuilder();
+            for(Codon c:_cs) {
+                b.append(c.toString()).append('+');
+            }
+            b.setLength(b.length()-1);
+            return b.toString();
+        }
+
+        public Codon[] childs() {
+            return _cs;
         }
     }
 }

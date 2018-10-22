@@ -31,6 +31,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         //super(p, hyper);
         super(1,1);
         _p = p;
+        System.err.println("################# ORIGIN: "+origin);
         _origin = origin!=null?origin:new ComputedRuleset(p.archetype());
         _meta = null;
     }

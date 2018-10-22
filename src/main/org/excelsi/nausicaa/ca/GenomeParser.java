@@ -8,11 +8,13 @@ import org.yaml.snakeyaml.Yaml;
 
 public class GenomeParser {
     private final Archetype _a;
+    private final Language _lang;
     private MutationFactor _mf;
 
 
-    public GenomeParser(Archetype a) {
+    public GenomeParser(Archetype a, Language lang) {
         _a = a;
+        _lang = lang;
     }
 
     public GenomeParser mutationFactor(MutationFactor mf) {
@@ -49,15 +51,22 @@ public class GenomeParser {
         List<String> info = new ArrayList<>();
         for(S s:pa.one) {
             if(s.n==null) {
-                Codon[] cs = new Genome(s.g).codons(new Implicate(a, pa.two));
+                Codon[] cs = new Genome(s.g).codons(new Implicate(a, pa.two, _lang));
                 StringBuilder b = new StringBuilder();
-                for(Codon c:cs) {
-                    b.append(opName(c)).append('\n');
-                }
+                codonInfo(b, cs, "");
                 info.add(b.toString());
             }
         }
         return new Info(info);
+    }
+
+    private static final void codonInfo(StringBuilder b, Codon[] cs, String indent) {
+        for(Codon c:cs) {
+            b.append(indent).append(opName(c)).append('\n');
+            if(c instanceof Codons.Chain) {
+                codonInfo(b, ((Codons.Chain)c).childs(), indent+"\t");
+            }
+        }
     }
 
     private static final String opName(Codon c) {
@@ -130,7 +139,7 @@ public class GenomeParser {
         for(S seq:ps) {
             if(seq.n==null) {
                 s.s(seq.c, seq.weight, new ComputedPattern(_a,
-                    new ComputedPattern.MachineElf(new Machine(_a, dm, new Genome(seq.g, 2)))));
+                    new ComputedPattern.MachineElf(new Machine(new Implicate(_a, dm, _lang), new Genome(seq.g, 2)))));
             }
             else {
                 s.d(seq.n, dm.find(seq.n));

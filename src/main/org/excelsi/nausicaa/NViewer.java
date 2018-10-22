@@ -125,9 +125,11 @@ public class NViewer extends JFrame implements UIActions {
         //Ruleset rs = new IndexedRuleset1d(a);
         //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset2d(a2));
         //Ruleset rs = new IndexedRuleset2d(a);
-        Ruleset rs = new ComputedRuleset(a);
+        //Language lang = Languages.universal();
+        Language lang = Languages.simpleSymmetry();
+        Ruleset rs = new ComputedRuleset(a, lang);
         //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset1d(a1));
-        Rule rule = rs.random(rand).next();
+        Rule rule = rs.random(rand, new Implicate(a, new Datamap(), lang)).next();
         ComputeMode cmode = ComputeMode.combined;
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
         org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre, weight, 0, cmode, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop());

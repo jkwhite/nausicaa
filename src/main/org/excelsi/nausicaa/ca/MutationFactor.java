@@ -17,6 +17,7 @@ public final class MutationFactor {
     private boolean _rule;
     private Datamap _data;
     private GenomeMutator _gm;
+    private Language _lang;
 
 
     public MutationFactor() {
@@ -105,6 +106,11 @@ public final class MutationFactor {
         return this;
     }
 
+    public MutationFactor withLanguage(Language l) {
+        _lang = l;
+        return this;
+    }
+
     public boolean symmetry() {
         return _symmetry;
     }
@@ -115,6 +121,10 @@ public final class MutationFactor {
 
     public boolean rule() {
         return _rule;
+    }
+
+    public Language language() {
+        return _lang;
     }
 
     public MutationFactor withDatamap(Datamap dm) {
