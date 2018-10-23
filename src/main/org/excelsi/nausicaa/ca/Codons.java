@@ -156,7 +156,7 @@ public class Codons {
                 case SUBTRACT:
                     return new Subtract();
                 case MULTIPLY:
-                    return new Multiply();
+                    return p==-1?new Multiply():new Muln(p);
                 case DIVIDE:
                     return new Divide();
                 case POW:
@@ -930,7 +930,7 @@ public class Codons {
         }
 
         @Override public String code() {
-            return CONS+_pf;
+            return _pf==_p?(CONS+_p):(CONS+_pf);
         }
 
         @Override public boolean usesPattern() {
@@ -1533,6 +1533,38 @@ public class Codons {
         }
     }
 
+    public static class Muln extends NAggregate implements Unstable {
+        public Muln() { super(MULTIPLY, -1); }
+        public Muln(int c) { super(MULTIPLY, c); }
+        @Override public Codon copy() { return new Sumn(_c); }
+
+        @Override public boolean supports(Values v) { return true; }
+
+        @Override public int op(int[] vs, int m, int e, int[] p) {
+            int s = vs[m];
+            for(int i=m+1;i<=e;i++) {
+                s *= vs[i];
+            }
+            return s;
+        }
+
+        @Override public float op(float[] vs, int m, int e, float[] p) {
+            float s = vs[m];
+            for(int i=m+1;i<=e;i++) {
+                s *= vs[i];
+            }
+            return s;
+        }
+
+        @Override public Codon destabilize(Random r) {
+            int nc = _c+(r.nextInt(5)-2);
+            if(nc<=0) {
+                nc = -1;
+            }
+            return new Muln(nc);
+        }
+    }
+
     public static class SumnN extends NAggregateN {
         public SumnN() { super(SUM_N); }
         @Override public Codon copy() { return new SumnN(); }
@@ -1672,8 +1704,8 @@ public class Codons {
 
     public static class Convolve extends NAggregate {
         public Convolve() { super(CONVOLVE, -1); }
-        public Convolve(int c) { super(CONVOLVE, c); }
-        @Override public Codon copy() { return new Convolve(_c); }
+        public Convolve(int c) { super(CONVOLVE, -1); }
+        @Override public Codon copy() { return new Convolve(); }
         @Override public boolean supports(Values v) { return true; }
 
         @Override public int op(int[] vs, int m, int e, int[] p) {
@@ -1998,7 +2030,7 @@ public class Codons {
         @Override public Codon copy() { return new Filter(_c); }
 
         @Override public String code() {
-            return FILTER;
+            return FILTER+_c;
         }
 
         @Override public boolean usesPattern() {

@@ -84,7 +84,9 @@ public final class Genome {
         System.err.println("applying "+max+" mutators");
         for(int i=0;i<max;i++) {
             final GenomeMutator m = mf.genomeMutator()!=null?mf.genomeMutator():mutators.random(mf.random());
+            System.err.println("premutate "+m+": "+cs);
             m.mutate(cs, im, gf, mf);
+            System.err.println("posmutate "+m+": "+cs);
         }
         if(mf.symmetry()) {
             symmetry(im.archetype(), cs);
@@ -97,7 +99,7 @@ public final class Genome {
         }
         b.setLength(b.length()-1);
         try {
-            return fromCodons(cs, im.language()); //.prune(im);
+            return fromCodons(cs, im.language()).prune(im);
         }
         catch(Exception e) {
             throw new IllegalStateException("illegal genome '"+b+"': "+e, e);

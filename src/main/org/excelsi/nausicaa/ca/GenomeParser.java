@@ -22,7 +22,7 @@ public class GenomeParser {
         return this;
     }
 
-    public Rule parse(final String g) {
+    public Rule parse(final String g, final Ruleset origin) {
         StringBuilder vs = new StringBuilder();
         final int version;
         int i=1;
@@ -36,10 +36,10 @@ public class GenomeParser {
             version = 2;
         }
         if(version==3) {
-            return parse3(g.substring(i));
+            return parse3(g.substring(i), origin);
         }
         else if(version<3) {
-            return parse2(g);
+            return parse2(g, origin);
         }
         else {
             throw new IllegalArgumentException("unsupported version "+version);
@@ -80,7 +80,7 @@ public class GenomeParser {
     public void write(Rule r, PrintWriter w) {
     }
 
-    private Rule parse3(final String g) {
+    private Rule parse3(final String g, final Ruleset origin) {
         final String pre = "--- !!org.excelsi.nausicaa.ca.GenomeParser$Data\n"+g;
 
         Data d = null;
@@ -131,7 +131,7 @@ public class GenomeParser {
         return new Pair(ps,dm);
     }
     
-    private Rule parse2(final String g) {
+    private Rule parse2(final String g, final Ruleset origin) {
         Pair<List<S>,Datamap> pa = parseS(g);
         List<S> ps = pa.one;
         Datamap dm = pa.two;
@@ -152,7 +152,7 @@ public class GenomeParser {
         else {
             sp = new SequencePattern(s);
         }
-        return new ComputedRule2d(sp);
+        return new ComputedRule2d(sp, origin);
     }
 
     public static final class Data {

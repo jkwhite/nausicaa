@@ -20,6 +20,10 @@ public class Languages {
 
     public static Language simpleSymmetry() {
         return new Language()
+            .add("life", "ki","mi", "a2", "a3", "u", "ki", "mi8", "a3", "ma", "ya", "ra")
+            .add("edg1","a0","a1","a0","a1","a-4","a1","a0","a1","a0","he")
+            .add("bri","a0","a1","a0","ki","a1","pi8","a2","ma","ra","a2","a0","ya","ma","ra","a2","ya","ma","ra")
+            .add("wire","a2","ya","mu","ja","a0","za","a2","za","a3","za","a1","a3","a2","a1","a1","gu","u","ra")
             .add("if", "ra")
             .add("mod", "mo")
             .add("max", "ta")

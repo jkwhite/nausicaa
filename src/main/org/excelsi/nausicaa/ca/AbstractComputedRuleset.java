@@ -74,12 +74,13 @@ public class AbstractComputedRuleset implements Ruleset {
     }
 
     @Override public Rule create(Object... args) {
+        System.err.println("################ CREATING WITH LANG: "+_lang);
         final String genome = args[0].toString();
         final GenomeParser gp = new GenomeParser(_a, _lang);
         if(args.length>1 && args[1] instanceof MutationFactor) {
             gp.mutationFactor((MutationFactor)args[1]);
         }
-        return gp.parse(genome);
+        return gp.parse(genome, this);
     }
 
     @Override public Ruleset derive(int[] colors, int len) {
