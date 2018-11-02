@@ -22,6 +22,11 @@ public class GenomeParser {
         return this;
     }
 
+    public static GenomeParser forRule(Rule r) {
+        return new GenomeParser(r.archetype(),
+            ((AbstractComputedRuleset)r.origin()).language());
+    }
+
     public Rule parse(final String g, final Ruleset origin) {
         StringBuilder vs = new StringBuilder();
         final int version;
@@ -48,16 +53,48 @@ public class GenomeParser {
 
     public Info info(final Archetype a, final String g) {
         Pair<List<S>,Datamap> pa = parseS(g);
-        List<String> info = new ArrayList<>();
+        List<SeqInfo> info = new ArrayList<>();
         for(S s:pa.one) {
             if(s.n==null) {
                 Codon[] cs = new Genome(s.g).codons(new Implicate(a, pa.two, _lang));
                 StringBuilder b = new StringBuilder();
                 codonInfo(b, cs, "");
-                info.add(b.toString());
+                info.add(new SeqInfo(cs, b.toString()));
             }
         }
         return new Info(info);
+    }
+
+    public Rule toUniversal(final Rule r) {
+        String g = ((Genomic)r).genome();
+        Pair<List<S>,Datamap> pa = parseS(g);
+        List<S> ps = pa.one;
+        Datamap dm = pa.two;
+        SequencePattern.Sequence s = new SequencePattern.Sequence();
+        Language universal = Languages.universal();
+        for(S seq:ps) {
+            if(seq.n==null) {
+                Codon[] cs = new Genome(seq.g).codons(new Implicate(_a, pa.two, _lang));
+                StringBuilder tr = new StringBuilder();
+                for(Codon c:cs) {
+                    tr.append(c.code()).append(" ");
+                }
+                s.s(seq.c, seq.weight, new ComputedPattern(_a,
+                    new ComputedPattern.MachineElf(new Machine(new Implicate(_a, dm, universal), new Genome(tr.toString().trim().replace('+',' '), 2)))));
+            }
+            else {
+                s.d(seq.n, dm.find(seq.n));
+            }
+        }
+        SequencePattern sp;
+        if(_mf!=null) {
+            sp = new SequencePattern(s, _mf.transition());
+        }
+        else {
+            sp = new SequencePattern(s);
+        }
+        ComputedRuleset rs = new ComputedRuleset(_a, universal);
+        return new ComputedRule2d(sp, rs);
     }
 
     private static final void codonInfo(StringBuilder b, Codon[] cs, String indent) {
@@ -161,20 +198,34 @@ public class GenomeParser {
     }
 
     public static class Info {
-        private final List<String> _infos;
+        private final List<SeqInfo> _infos;
 
 
-        public Info(List<String> inf) {
+        public Info(List<SeqInfo> inf) {
             _infos = inf;
         }
 
         @Override public String toString() {
             StringBuilder b = new StringBuilder();
-            for(String s:_infos) {
-                b.append(s).append("-\n");
+            for(SeqInfo s:_infos) {
+                b.append(s.info).append("-\n");
             }
             b.setLength(b.length()-2);
             return b.toString().trim();
+        }
+    }
+
+    public static class SeqInfo {
+        public final Codon[] codons;
+        public final String info;
+
+        public SeqInfo(Codon[] cs, String info) {
+            this.codons = cs;
+            this.info = info;
+        }
+
+        @Override public String toString() {
+            return info;
         }
     }
 

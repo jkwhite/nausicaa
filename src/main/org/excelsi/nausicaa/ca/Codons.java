@@ -1678,6 +1678,7 @@ public class Codons {
         @Override public boolean supports(Values v) { return true; }
 
         @Override public int op(int[] vs, int m, int e, int[] p) {
+            if(1+e-m==0) return 0;
             int sum = vs[m];
             for(int i=m+1;i<=e;i++) {
                 sum += vs[i];
@@ -1686,6 +1687,7 @@ public class Codons {
         }
 
         @Override public float op(float[] vs, int m, int e, float[] p) {
+            if(1+e-m==0) return 0f;
             float sum = vs[m];
             for(int i=m+1;i<=e;i++) {
                 sum += vs[i];
@@ -2266,7 +2268,7 @@ public class Codons {
         }
     }
 
-    public static class Chain implements Codon {
+    public static final class Chain implements Codon {
         private final Codon[] _cs;
         private final boolean _usesPattern;
 

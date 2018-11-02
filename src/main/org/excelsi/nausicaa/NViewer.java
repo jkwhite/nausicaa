@@ -1192,6 +1192,17 @@ public class NViewer extends JFrame implements UIActions {
             
             auto.add(extopt);
         }
+        {
+            auto.addSeparator();
+
+            AbstractAction touni = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    Actions.translateToUniversal(NViewer.this);
+                }
+            };
+            JMenuItem univer = auto.add(touni);
+            univer.setText("Translate to Universal");
+        }
 
 
         bar.add(auto);

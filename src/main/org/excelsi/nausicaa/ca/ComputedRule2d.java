@@ -266,7 +266,11 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
     }
 
     @Override public Mutatable mutate(MutationFactor m) {
-        return derive((Pattern)((Mutatable)_p).mutate(m));
+        return derive(
+            (Pattern)
+                ((Mutatable)_p).mutate(
+                    m.withLanguage(((AbstractComputedRuleset)_origin).language())
+                    ));
     }
 
     @Override public String humanize() {
@@ -299,6 +303,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         if(_p instanceof SequencePattern) {
             o.addProperty("transition", ((SequencePattern)_p).transition());
         }
+        o.add("language", ((AbstractComputedRuleset)_origin).language().toJson());
         return o;
     }
 
@@ -314,11 +319,18 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         if(o.has("transition")) {
             mf = new MutationFactor().withTransition(Json.flot(o, "transition", 0.1f));
         }
-        if(mf!=null) {
-            return new ComputedRuleset(a).create(genome, mf);
+        Language lang;
+        if(o.has("language")) {
+            lang = Language.fromJson(o.get("language"));
         }
         else {
-            return new ComputedRuleset(a).create(genome);
+            lang = Languages.universal();
+        }
+        if(mf!=null) {
+            return new ComputedRuleset(a, lang).create(genome, mf);
+        }
+        else {
+            return new ComputedRuleset(a, lang).create(genome);
         }
     }
 }

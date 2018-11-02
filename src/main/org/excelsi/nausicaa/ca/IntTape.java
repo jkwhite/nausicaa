@@ -74,6 +74,11 @@ public final class IntTape {
             //System.err.println(", v="+v);
             if(_a) {
                 _i = _s;
+                if(_i<0) {
+                    //System.err.println("******* BUG LOC0: "+_i+", op: "+op);
+                    //Thread.dumpStack();
+                    _i = 0;
+                }
                 _t[_i] = v;
             }
             else {
@@ -82,7 +87,8 @@ public final class IntTape {
                 }
                 else {
                     _s = -1;
-                    throw new IllegalArgumentException("v "+v+" not in ("+_s+","+_i+")");
+                    //throw new IllegalArgumentException("v "+v+" not in ("+_s+","+_i+")");
+                    //System.err.println("***** BUG LOC1: v "+v+" not in ("+_s+","+_i+")");
                 }
             }
             _s = -1;

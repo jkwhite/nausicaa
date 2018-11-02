@@ -29,7 +29,7 @@ public class Actions {
 
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(7,2));
+        JPanel top = new JPanel(new GridLayout(8,2));
 
         top.add(new JLabel("Dimensions"));
         final JTextField alpha = new JTextField();
@@ -82,6 +82,11 @@ public class Actions {
         relf.setSelected(true);
         comphack[0] = "machineelf";
         top.add(comps);
+
+        top.add(new JLabel("Language"));
+        final JComboBox lang = new JComboBox(new String[]{"Universal", "Symmetric2d"});
+        lang.setSelectedItem(config.getVariable("default_language", "Universal"));
+        top.add(lang);
 
         // Neighborhood
         final Archetype.Neighborhood[] neihack = new Archetype.Neighborhood[1];
@@ -167,11 +172,26 @@ public class Actions {
                 idxhack[3].setEnabled(false);
             }
         };
-        colhack[0] = "indexed";
         JRadioButton rindexed = new JRadioButton(indexed);
         rindexed.setText("Indexed");
         rindexed.setSelected(true);
         kind.add(rindexed);
+
+        colhack[0] = config.getVariable("default_kind", "indexed");
+        switch(colhack[0]) {
+            case "indexed":
+                rindexed.setSelected(true);
+                break;
+            case "real":
+                rreal.setSelected(true);
+                break;
+            case "rgb":
+                rrgb.setSelected(true);
+                break;
+            case "rgba":
+                rrgba.setSelected(true);
+                break;
+        }
 
         JPanel kinds = new JPanel();
         kinds.add(rindexed);
@@ -208,10 +228,13 @@ public class Actions {
                 Integer colors = Integer.parseInt(mc.getText());
                 Integer pcolors = Integer.parseInt(pmc.getText());
                 Integer size = Integer.parseInt(siz.getText());
+                String lng = lang.getSelectedItem().toString();
                 config.setVariable("default_dimensions", alpha.getText());
                 config.setVariable("default_colors", mc.getText());
                 config.setVariable("default_palettecolors", pmc.getText());
                 config.setVariable("default_size", siz.getText());
+                config.setVariable("default_kind", colhack[0]);
+                config.setVariable("default_language", lng);
                 Random rand = new Random();
                 Palette pal;
                 boolean usePalColors;
@@ -239,7 +262,7 @@ public class Actions {
                 switch(comphack[0]) {
                     case "machineelf":
                     default:
-                        rs = new ComputedRuleset(a, Languages.simpleSymmetry());
+                        rs = new ComputedRuleset(a, Languages.named(lng));
                         break;
                     case "sparse":
                     case "array":
@@ -493,6 +516,7 @@ public class Actions {
             p.addPair("Neighborhood", r.archetype().neighborhood());
             p.addPair("Size", r.archetype().size());
             p.addPair("Values", r.archetype().values());
+            p.addPair("Language", ((AbstractComputedRuleset)cr.origin()).language().name());
             p.addPair("Genome", cr.prettyGenome());
             p.addPair("Codons",
                 createText(new GenomeParser(r.archetype(), ((ComputedRuleset)r.origin()).language()).info(cr.archetype(), cr.genome()).toString(), 10, true));
@@ -1843,6 +1867,14 @@ public class Actions {
         v.setActiveCA(new RuleTransform(rand, m, createMutationFactor(config, rand)).transform(ca));
     }
     */
+
+    public static void translateToUniversal(NViewer v) {
+        CA ca = v.getActiveCA();
+        Rule r = ca.getRule();
+        Rule uni = GenomeParser.forRule(r).toUniversal(r);
+        ca = ca.mutate(uni, null);
+        v.setActiveCA(ca);
+    }
 
     public static MutationFactor createMutationFactor(Config config, Random r) {
         int mc = Integer.parseInt(config.getVariable("mutator_maxcolors", "9"));

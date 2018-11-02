@@ -164,7 +164,8 @@ public class GenomeFactory {
         WeightedFactory<Codon> f = buildFactory(a);
         List<String> cs = new ArrayList<>();
         for(Weight<Codon> wc:f.all()) {
-            cs.add(wc.e().code());
+            //cs.add(wc.e().code());
+            cs.add(wc.e().generate(Rand.om));
         }
         return cs;
     }
