@@ -118,7 +118,7 @@ public class NViewer extends JFrame implements UIActions {
         int colors = pal.getColorCount();
         //int colors = 2;
         _timeline = new Timeline();
-        org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors, Archetype.Neighborhood.moore, Values.continuous);
+        org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors, Archetype.Neighborhood.moore, Values.discrete);
         org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
         org.excelsi.nausicaa.ca.Archetype a2 = new org.excelsi.nausicaa.ca.Archetype(2, size, colors);
         _random = rand;
@@ -126,7 +126,7 @@ public class NViewer extends JFrame implements UIActions {
         //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset2d(a2));
         //Ruleset rs = new IndexedRuleset2d(a);
         //Language lang = Languages.universal();
-        Language lang = Languages.simpleSymmetry();
+        Language lang = Languages.universal();
         Ruleset rs = new ComputedRuleset(a, lang);
         //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset1d(a1));
         Rule rule = rs.random(rand, new Implicate(a, new Datamap(), lang)).next();

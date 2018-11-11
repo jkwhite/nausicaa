@@ -41,6 +41,7 @@ public class Machine {
     //public int compute(final int[] p) {
     //}
 
+    // WEIGHT IS ALPHA
     public void compute(final IO io) {
         if(io.v==Values.discrete) {
             _ti.reset();

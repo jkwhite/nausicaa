@@ -84,7 +84,7 @@ public class Actions {
         top.add(comps);
 
         top.add(new JLabel("Language"));
-        final JComboBox lang = new JComboBox(new String[]{"Universal", "Symmetric2d"});
+        final JComboBox lang = new JComboBox(Languages.catalog());
         lang.setSelectedItem(config.getVariable("default_language", "Universal"));
         top.add(lang);
 
