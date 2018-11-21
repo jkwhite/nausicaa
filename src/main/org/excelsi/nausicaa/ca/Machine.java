@@ -55,6 +55,7 @@ public class Machine {
                 if(_ti.stopped()) break;
                 if(_ti.jumped()!=0) {
                     int j = _ti.jumped() % _prg.length;
+                    if(j<0) throw new IllegalStateException("negative jump: "+j);
                     i += j;
                     //System.err.println("jumped by "+j);
                     //if(i<_prg.length-1) System.err.println("next inst: "+_prg[i+1]);
@@ -83,6 +84,7 @@ public class Machine {
                 if(_tf.stopped()) break;
                 if(_tf.jumped()!=0) {
                     int j = _tf.jumped() % _prg.length;
+                    if(j<0) throw new IllegalStateException("negative jump: "+j);
                     i += j;
                     //System.err.println("jumped by "+j);
                     _tf.jump(0);

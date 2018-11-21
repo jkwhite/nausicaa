@@ -104,8 +104,31 @@ public class NViewer extends JFrame implements UIActions {
         final int w = 300, h = 300, d = 1, pre=0;
         //_config = new Config(w, h, d, weight);
         _config = Config.load();
+        _timeline = new Timeline();
         createMenu();
         setSize(_width, _height);
+        int dims = 2;
+        int size = 1;
+        Random rand = new Random();
+        _random = rand;
+        CA ca = initCA();
+
+        JPanel main = new JPanel(new BorderLayout());
+
+        Futures f = new Futures(_config, _timeline, ca, new Random());
+        _futures = f;
+        main.add(f, BorderLayout.CENTER);
+        getContentPane().add(main);
+        //d.setCA(ca);
+    }
+
+    private CA initCA() {
+        //final int w = 600, h = 600, d = 1;
+        //final int w = 300, h = 300, d = 1, pre = 0;
+        final float weight = 1f;
+        //final int w = 100, h = 100, d = 100, pre=0;
+        final int w = 300, h = 300, d = 1, pre=0;
+        //_config = new Config(w, h, d, weight);
         int dims = 2;
         int size = 1;
         Random rand = new Random();
@@ -117,11 +140,9 @@ public class NViewer extends JFrame implements UIActions {
         //int colors = 1000;
         int colors = pal.getColorCount();
         //int colors = 2;
-        _timeline = new Timeline();
         org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors, Archetype.Neighborhood.moore, Values.discrete);
         org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
         org.excelsi.nausicaa.ca.Archetype a2 = new org.excelsi.nausicaa.ca.Archetype(2, size, colors);
-        _random = rand;
         //Ruleset rs = new IndexedRuleset1d(a);
         //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset2d(a2));
         //Ruleset rs = new IndexedRuleset2d(a);
@@ -132,16 +153,24 @@ public class NViewer extends JFrame implements UIActions {
         Rule rule = rs.random(rand, new Implicate(a, new Datamap(), lang)).next();
         ComputeMode cmode = ComputeMode.combined;
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
-        org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.random.create(), rand, 0, w, h, d, pre, weight, 0, cmode, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop());
-        //org.excelsi.nausicaa.ca.CA ca = new org.excelsi.nausicaa.ca.CA(rule, pal, Initializers.single.create(), rand, 0, w, h, d, pre);
-
-        JPanel main = new JPanel(new BorderLayout());
-
-        Futures f = new Futures(_config, _timeline, ca, new Random());
-        _futures = f;
-        main.add(f, BorderLayout.CENTER);
-        getContentPane().add(main);
-        //d.setCA(ca);
+        CA ca = new org.excelsi.nausicaa.ca.CA(
+                rule,
+                pal,
+                Initializers.random.create(),
+                rand,
+                0,
+                w,
+                h,
+                d,
+                pre,
+                weight,
+                0,
+                cmode,
+                new UpdateMode.SimpleSynchronous(),
+                EdgeMode.defaultMode(),
+                ExternalForce.nop(),
+                null);
+        return ca;
     }
 
     public static JFrame root() {
@@ -1298,21 +1327,23 @@ public class NViewer extends JFrame implements UIActions {
         mutate.add(remseg);
         remseg.setText("Remove active rule stage");
 
-        final JCheckBoxMenuItem[] mhack = new JCheckBoxMenuItem[4];
-        /*
-        JCheckBoxMenuItem forceSym = new JCheckBoxMenuItem(new AbstractAction() {
+        mutate.addSeparator();
+        JMenuItem pushmeta = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _config.setForceSymmetry(!_config.getForceSymmetry());
-                mhack[0].setState(!mhack[0].getState());
-                mhack[0].setSelected(!mhack[0].getState());
+                _a.pushMeta(NViewer.this, _config);
             }
         });
-        mutate.add(forceSym);
-        mhack[0] = forceSym;
-        forceSym.setText("Force symmetry");
-        forceSym.setState(_config.getForceSymmetry());
-        forceSym.setSelected(_config.getForceSymmetry());
-        */
+        mutate.add(pushmeta);
+        pushmeta.setText("Push Meta");
+        JMenuItem popmeta = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.popMeta(NViewer.this, _config);
+            }
+        });
+        mutate.add(popmeta);
+        popmeta.setText("Pop Meta");
+
+        final JCheckBoxMenuItem[] mhack = new JCheckBoxMenuItem[4];
 
         mutate.addSeparator();
         JCheckBoxMenuItem incHueVariations = new JCheckBoxMenuItem(new AbstractAction() {
@@ -1415,7 +1446,7 @@ public class NViewer extends JFrame implements UIActions {
         render.add(rgbopt);
 
         JMenu compopt = new JMenu("Composition mode");
-        final JCheckBoxMenuItem[] comphack = new JCheckBoxMenuItem[6];
+        final JCheckBoxMenuItem[] comphack = new JCheckBoxMenuItem[7];
 
         JCheckBoxMenuItem compfirst = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -1425,6 +1456,7 @@ public class NViewer extends JFrame implements UIActions {
                 comphack[3].setState(false);
                 comphack[4].setState(false);
                 comphack[5].setState(false);
+                comphack[6].setState(false);
                 _config.setVariable("composite_mode", "front");
             }
         });
@@ -1439,6 +1471,7 @@ public class NViewer extends JFrame implements UIActions {
                 comphack[3].setState(false);
                 comphack[4].setState(false);
                 comphack[5].setState(false);
+                comphack[6].setState(false);
                 _config.setVariable("composite_mode", "back");
             }
         });
@@ -1453,6 +1486,7 @@ public class NViewer extends JFrame implements UIActions {
                 comphack[3].setState(false);
                 comphack[4].setState(false);
                 comphack[5].setState(false);
+                comphack[6].setState(false);
                 _config.setVariable("composite_mode", "wavg");
             }
         });
@@ -1467,6 +1501,7 @@ public class NViewer extends JFrame implements UIActions {
                 comphack[3].setState(true);
                 comphack[4].setState(false);
                 comphack[5].setState(false);
+                comphack[6].setState(false);
                 _config.setVariable("composite_mode", "revwavg");
             }
         });
@@ -1481,6 +1516,7 @@ public class NViewer extends JFrame implements UIActions {
                 comphack[3].setState(false);
                 comphack[4].setState(true);
                 comphack[5].setState(false);
+                comphack[6].setState(false);
                 _config.setVariable("composite_mode", "avg");
             }
         });
@@ -1495,11 +1531,27 @@ public class NViewer extends JFrame implements UIActions {
                 comphack[3].setState(false);
                 comphack[4].setState(false);
                 comphack[5].setState(true);
+                comphack[6].setState(false);
                 _config.setVariable("composite_mode", "channel");
             }
         });
         compchan.setText("Channel");
         compopt.add(compchan);
+
+        JCheckBoxMenuItem compmul = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                comphack[0].setState(false);
+                comphack[1].setState(false);
+                comphack[2].setState(false);
+                comphack[3].setState(false);
+                comphack[4].setState(false);
+                comphack[5].setState(false);
+                comphack[6].setState(true);
+                _config.setVariable("composite_mode", "multiply");
+            }
+        });
+        compmul.setText("Multiply");
+        compopt.add(compmul);
 
         comphack[0] = compfirst;
         comphack[1] = complast;
@@ -1507,6 +1559,7 @@ public class NViewer extends JFrame implements UIActions {
         comphack[3] = compravg;
         comphack[4] = comppavg;
         comphack[5] = compchan;
+        comphack[6] = compmul;
 
         comphack[0].setState(true);
 

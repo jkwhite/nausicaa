@@ -280,7 +280,8 @@ public class Actions {
                         ComputeMode.combined,
                         new UpdateMode.SimpleSynchronous(),
                         EdgeMode.defaultMode(),
-                        ExternalForce.nop());
+                        ExternalForce.nop(),
+                        null);
                 v.setActiveCA(ca);
             }
         });
@@ -296,26 +297,26 @@ public class Actions {
     }
 
     public void newCAImageRGB(NViewer v, Config config) {
-        newCAImage(v, config, "rgb");
+        newCAImage(v, config, "rgb", config.getVariable("default_language", "Universal"));
     }
 
     public void newCAImageRGBA(NViewer v, Config config) {
-        newCAImage(v, config, "rgba");
+        newCAImage(v, config, "rgba", config.getVariable("default_language", "Universal"));
     }
 
     public void newCAImageIndexed(NViewer v, Config config) {
-        newCAImage(v, config, "indexed");
+        newCAImage(v, config, "indexed", config.getVariable("default_language", "Universal"));
     }
 
     public void newCAImageCont(NViewer v, Config config) {
-        newCAImage(v, config, "continuous");
+        newCAImage(v, config, "continuous", config.getVariable("default_language", "Universal"));
     }
 
     public void newCAImageContChan(NViewer v, Config config) {
-        newCAImage(v, config, "continuous-channels");
+        newCAImage(v, config, "continuous-channels", config.getVariable("default_language", "Universal"));
     }
 
-    private void newCAImage(NViewer v, Config config, String paletteMode) {
+    private void newCAImage(NViewer v, Config config, String paletteMode, String lang) {
         JFileChooser f = new JFileChooser(config.getImgDir());
         f.setDialogTitle("New CA from image");
         f.setDialogType(f.OPEN_DIALOG);
@@ -324,7 +325,7 @@ public class Actions {
         if(ret==f.APPROVE_OPTION) {
             try {
                 config.setImgDir(f.getSelectedFile().getParent());
-                final CA ca = CA.fromImage(f.getSelectedFile().toString(), paletteMode);
+                final CA ca = CA.fromImage(f.getSelectedFile().toString(), paletteMode, lang);
                 //config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth());
                 v.setActiveCA(ca);
                 config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth(), ca.getPrelude());
@@ -1843,6 +1844,23 @@ public class Actions {
             v.setActiveCA(ca.mutate((Rule)((Mutatable)r).mutate(createMutationFactor(config, rand).withMode("remove")), rand));
             int stage = Integer.parseInt(config.getVariable("mutator_stage", "0"));
             config.setVariable("mutator_stage", ""+(stage-1));
+        }
+    }
+
+    public void pushMeta(final NViewer v, Config config) {
+        CA ca = v.getActiveCA();
+        Rule nr = ca.getRule().origin().random(v.getRandom()).next();
+        CA nca = ca.mutate(nr, new Random()).meta(ca);
+        v.setActiveCA(nca);
+    }
+
+    public void popMeta(final NViewer v, Config config) {
+        CA ca = v.getActiveCA();
+        if(ca.getMeta()!=null) {
+            v.setActiveCA(ca.getMeta());
+        }
+        else {
+            System.err.println("**** already at root ****");
         }
     }
 

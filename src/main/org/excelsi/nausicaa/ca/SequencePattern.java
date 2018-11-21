@@ -27,7 +27,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
 
     public SequencePattern(Sequence s) {
         this(s, 0.1f);
-        Thread.dumpStack();
+        //Thread.dumpStack();
     }
 
     public SequencePattern(Sequence s, float trans) {

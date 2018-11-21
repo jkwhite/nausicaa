@@ -1,13 +1,17 @@
-- operate directly on rgba channel values
+- DONE operate directly on rgba channel values
 - stack of 2d with each rule separate, composited in 2d from 3d
 - allow a reduced color spectrum for rendering
 - minimum threshold for non-invisible cells for rendering
 - plot along 1d/2d/3d based on parameterized rules e.g. fractal plane
-- 1d rules are broken
-- allow update weight to vary by multisequence
-- asynchronous updates
-- json format
-- abort codon
+- DONE 1d rules are broken
+- DONE allow update weight to vary by multisequence
+- DONE asynchronous updates
+- DONE json format
+- DONE abort codon
 - randomness
-- border modes
-- 
+- DONE border modes
+
+composition:
+by weight: Variables.weightVaries()
+by update chance: 
+by color: 

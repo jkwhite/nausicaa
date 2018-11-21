@@ -290,11 +290,9 @@ public class IntBlockPlane extends AbstractIntPlane implements Sliceable {
 
     @Override public javafx.scene.image.Image toJfxImage() {
         return SwingFXUtils.toFXImage(toBufferedImage(), null);
-        //throw new UnsupportedOperationException();
     }
 
     @Override public javafx.scene.image.Image toJfxImage(WritableImage jfxImage) {
-        //throw new UnsupportedOperationException();
         return SwingFXUtils.toFXImage(toBufferedImage(), jfxImage);
     }
 
@@ -323,12 +321,10 @@ public class IntBlockPlane extends AbstractIntPlane implements Sliceable {
 
     @Override public Plane scale(float scale) {
         return new BufferedImagePlane((BufferedImage)toImage()).scale(scale);
-        //throw new UnsupportedOperationException();
     }
 
     @Override public Plane scale(float scale, boolean antialias) {
         return new BufferedImagePlane((BufferedImage)toImage()).scale(scale, antialias);
-        //throw new UnsupportedOperationException();
     }
 
     @Override public void save(String filename) throws IOException {
