@@ -3,7 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 public class Rendering {
     public enum Composition {
-        front, back, wavg, revwavg, channel, avg, multiply;
+        front, back, wavg, revwavg, channel, avg, multiply, difference;
 
         public static Composition from(String s) {
             switch(s) {
@@ -21,6 +21,8 @@ public class Rendering {
                     return channel;
                 case "multiply":
                     return multiply;
+                case "difference":
+                    return difference;
             }
             throw new IllegalArgumentException("no such comp '"+s+"'");
         }

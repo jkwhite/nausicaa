@@ -78,6 +78,10 @@ public class JfxWorld implements PlanescapeProvider, Planescape {
         return _jfxCa.getRule();
     }
 
+    @Override public Rule compileRule() {
+        return _jfxCa.compileRule();
+    }
+
     @Override public boolean delegateUnlock() {
         return true;
     }

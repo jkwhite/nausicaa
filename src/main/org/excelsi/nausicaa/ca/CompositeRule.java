@@ -103,6 +103,40 @@ public class CompositeRule implements Rule {
     }
 
     @Override public Iterator<Plane> frameIterator(Plane initial, ExecutorService pool, GOptions opt) {
-        throw new UnsupportedOperationException();
+        CompositeIntPlane p1 = (CompositeIntPlane) initial;
+        final IntPlane[] ps1 = p1.planes();
+
+        final IntPlane[] ps2 = new IntPlane[ps1.length];
+        final CompositeIntPlane p2 = new CompositeIntPlane(ps2);
+
+        final Iterator[] its = new Iterator[ps1.length];
+        for(int i=0;i<its.length;i++) {
+            its[i] = _rs[i].frameIterator(ps1[i], pool, opt);
+        }
+
+        return new Iterator<Plane>() {
+            CompositeIntPlane pread = p1; // reading plane
+            CompositeIntPlane pwrite = p2; // writing plane
+            boolean first = true;
+            @Override public boolean hasNext() { return true; }
+            @Override public void remove() { }
+            @Override public Plane next() {
+                pwrite.lockWrite();
+                //IntPlane[] pr = p.planes();
+                for(int i=_rs.length-1;i>=0;i--) {
+                    //System.err.println("compositing at depth "+i);
+                    IntPlane n = (IntPlane) its[i].next();
+                    if(first) {
+                        ps2[i] = n;
+                    }
+                }
+                pwrite.unlockWrite();
+                first = false;
+                CompositeIntPlane tmp = pread;
+                pread = pwrite;
+                pwrite = tmp;
+                return pread;
+            }
+        };
     }
 }

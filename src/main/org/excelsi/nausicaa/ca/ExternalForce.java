@@ -50,8 +50,10 @@ public interface ExternalForce {
                 case discrete:
                 default:
                     applyDisc((IntPlane)p, r);
+                    break;
                 case continuous:
                     applyCont((FloatPlane)p, r);
+                    break;
             }
         }
 
@@ -64,21 +66,24 @@ public interface ExternalForce {
 
         private void applyDisc(final IntPlane p, final Random r) {
             final float max = p.getWidth()*p.getHeight()*Math.max(1f,p.getDepth());
-            final int pnts = (int) (_amount*max);
-            final int cols = p.creator().archetype().colors();
-            for(int i=0;i<pnts;i++) {
-                if(p.getDepth()>0) {
-                    p.setCell(
-                        r.nextInt(p.getWidth()),
-                        r.nextInt(p.getHeight()),
-                        r.nextInt(p.getDepth()),
-                        r.nextInt(cols));
-                }
-                else {
-                    p.setCell(
-                        r.nextInt(p.getWidth()),
-                        r.nextInt(p.getHeight()),
-                        r.nextInt(cols));
+            //final int pnts = (int) (_amount*max);
+            if(Math.abs(r.nextFloat())<_amount) {
+                final int pnts = 1;
+                final int cols = p.creator().archetype().colors();
+                for(int i=0;i<pnts;i++) {
+                    if(p.getDepth()>0) {
+                        p.setCell(
+                            r.nextInt(p.getWidth()),
+                            r.nextInt(p.getHeight()),
+                            r.nextInt(p.getDepth()),
+                            r.nextInt(cols));
+                    }
+                    else {
+                        p.setCell(
+                            r.nextInt(p.getWidth()),
+                            r.nextInt(p.getHeight()),
+                            r.nextInt(cols));
+                    }
                 }
             }
         }

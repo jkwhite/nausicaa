@@ -172,7 +172,7 @@ top:        while(_state==State.animate) {
                 p = d.getPlane();
             }
             _parallel = parallel;
-            _frames = d.getRule().frameIterator(p, pool,
+            _frames = d.compileRule().frameIterator(p, pool,
                 new GOptions(true, _parallel, 0, weight)
                     .computeMode(ComputeMode.from(_config.<String>getVariable("rgb_computemode","combined")))
                 );

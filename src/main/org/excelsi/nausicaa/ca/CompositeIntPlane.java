@@ -10,16 +10,20 @@ import javafx.embed.swing.SwingFXUtils;
 
 public class CompositeIntPlane extends AbstractIntPlane implements Sliceable {
     private final IntPlane[] _ps;
-    private final BufferedImage _i;
-    private final WritableRaster _r;
+    private BufferedImage _i;
+    private WritableRaster _r;
     private int _readDepthIdx;
     private int _writeDepthIdx;
 
 
     public CompositeIntPlane(IntPlane[] ps) {
         _ps = ps;
-        _i = new BufferedImage(ps[0].getWidth(), ps[0].getHeight(), BufferedImage.TYPE_INT_ARGB);
-        _r = _i.getRaster();
+        //_i = new BufferedImage(ps[0].getWidth(), ps[0].getHeight(), BufferedImage.TYPE_INT_ARGB);
+        //_r = _i.getRaster();
+    }
+
+    public IntPlane[] planes() {
+        return _ps;
     }
 
     @Override public void setReadDepth(int idx) {
@@ -90,6 +94,10 @@ public class CompositeIntPlane extends AbstractIntPlane implements Sliceable {
     private final int[] _rgb = new int[3];
     private final int[] _unpack = new int[4];
     @Override public java.awt.Image toImage(Rendering rend) {
+        if(_i==null) {
+            _i = new BufferedImage(_ps[0].getWidth(), _ps[0].getHeight(), BufferedImage.TYPE_INT_ARGB);
+            _r = _i.getRaster();
+        }
         final Rendering.Composition comp = rend.composition();
         final int[] rgb = _rgb;
         for(int i=0;i<getWidth();i++) {
@@ -134,7 +142,7 @@ public class CompositeIntPlane extends AbstractIntPlane implements Sliceable {
                         mx = 1;
                         _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
                     }
-                    else { //if(comp==Rendering.Composition.avg) {
+                    else if(comp==Rendering.Composition.multiply||comp==Rendering.Composition.avg||comp==Rendering.Composition.difference) {
                         for(int k=0;k<_ps.length;k++) {
                             int idx = _ps[k].getCell(i,j);
                             final int[] u = _ps[k].creator().getPalette().unpack(idx, _unpack);
@@ -158,13 +166,31 @@ public class CompositeIntPlane extends AbstractIntPlane implements Sliceable {
                                         rgb[2] = u[2];
                                     }
                                     break;
+                                case difference:
+                                    if(k!=0) {
+                                        rgb[0] += (int)Math.abs(rgb[0] - u[0]);
+                                        rgb[1] += (int)Math.abs(rgb[1] - u[1]);
+                                        rgb[2] += (int)Math.abs(rgb[2] - u[2]);
+                                    }
+                                    else {
+                                        rgb[0] = u[0];
+                                        rgb[1] = u[1];
+                                        rgb[2] = u[2];
+                                    }
+                                    break;
                             }
                             //if(u[0]>0) System.err.println("k: "+k+", u: "+u[0]+","+u[1]+","+u[2]+", mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
                             mx += (_ps.length-k);
                             //if(rend.composition()==Rendering.Composition.back&&(u[0]>0||u[1]>0||u[2]>0)) break;
                         }
                         mx = _ps.length;
-                        if(comp!=Rendering.Composition.avg) {
+                        if(comp==Rendering.Composition.multiply) {
+                            _i.setRGB(i,j,Colors.pack(rgb[2]/(255*(mx-1)), rgb[1]/(255*(mx-1)), rgb[0]/(255*(mx-1))));
+                        }
+                        else if(comp==Rendering.Composition.difference) {
+                            _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
+                        }
+                        else {
                             _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
                         }
                     }

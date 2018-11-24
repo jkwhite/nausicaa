@@ -416,6 +416,10 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         return _ca.getRule();
     }
 
+    public Rule compileRule() {
+        return _ca.compileRule();
+    }
+
     public void reroll(final Initializer init) {
         generate(init, true);
     }

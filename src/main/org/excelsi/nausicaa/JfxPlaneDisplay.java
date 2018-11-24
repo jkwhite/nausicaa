@@ -316,6 +316,10 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         return _c.getRule();
     }
 
+    public Rule compileRule() {
+        return _c.compileRule();
+    }
+
     public long getRuleSeed() {
         return _c.getRule().hashCode();
     }

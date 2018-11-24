@@ -8,5 +8,6 @@ public interface Planescape {
     Plane getPlane();
     void setPlane(Plane p);
     Rule getRule();
+    Rule compileRule();
     boolean delegateUnlock();
 }

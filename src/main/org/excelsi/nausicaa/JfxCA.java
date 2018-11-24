@@ -100,6 +100,10 @@ public class JfxCA extends Group {
         return _ca.getRule();
     }
 
+    public Rule compileRule() {
+        return _ca.compileRule();
+    }
+
     public Plane getLastPlane() {
         return _lastPlane;
     }
