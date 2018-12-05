@@ -403,6 +403,10 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         return _scale;
     }
 
+    @Override public Rendering getRendering() {
+        return new Rendering();
+    }
+
     public int getCAWidth() {
         return _w;
     }

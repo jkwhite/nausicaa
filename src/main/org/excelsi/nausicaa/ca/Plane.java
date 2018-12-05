@@ -35,8 +35,9 @@ public interface Plane {
     void unlockWrite();
     JsonElement toJson();
     void export(PrintWriter w) throws IOException;
-    void save(String file) throws IOException;
+    void save(String file, Rendering r) throws IOException;
     byte next(int pattern);
     void tick();
     Pen pen();
+    Probe probe();
 }

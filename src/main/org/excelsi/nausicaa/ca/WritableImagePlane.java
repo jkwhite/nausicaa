@@ -262,7 +262,7 @@ public class WritableImagePlane extends AbstractIntPlane {
         _w.setPixels(0, y, row.length, 1, _pf, _lastRow, 0, getWidth());
     }
 
-    @Override public void save(String filename) throws IOException {
+    @Override public void save(String filename, Rendering r) throws IOException {
         ImageIO.write(SwingFXUtils.fromFXImage(_i, null), "png", new File(filename));
     }
 

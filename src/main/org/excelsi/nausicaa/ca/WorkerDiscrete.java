@@ -33,8 +33,6 @@ public class WorkerDiscrete implements Worker {
         _x2 = x2;
         _y2 = y2;
         _wp = p;
-        //_weight = weight;
-        //_oWeight = 1f - weight;
         _vars = vars;
         _size = _wp.archetype().size();
         final int colors = _wp.archetype().colors();
@@ -100,6 +98,8 @@ public class WorkerDiscrete implements Worker {
     }
 
     private final int next(final int[] pattern) {
+        //float weight, oweight;
+
         final int v = _wp.next(0, pattern);
         final int ov = pattern[pattern.length/2];
         final int nv = (int) ((_oWeight*ov)+(_weight*v));
@@ -116,8 +116,8 @@ public class WorkerDiscrete implements Worker {
     }
 
     public void frame(final Plane ip1, final Plane ip2) {
-        _weight = _vars.weight();
-        _oWeight = 1f - _weight;
+        //_weight = _vars.weight();
+        //_oWeight = 1f - _weight;
         if(_useDepth) {
             frame3d((IntBlockPlane)ip1, (IntBlockPlane)ip2);
             return;
@@ -136,7 +136,15 @@ public class WorkerDiscrete implements Worker {
         for(int i=_y1;i<_y2;i++) {
             for(int j=_x1;j<_x2;j++) {
                 //if(RAND.nextInt(1000)>=100) {
-                final int self = i*j;
+                //final int self = i*j;
+                if(!_vars.weightVaries()) {
+                    _weight = _vars.weight();
+                }
+                else {
+                    _weight = _vars.weight(ip1, j, i, 0);
+                    //System.err.println("got w for "+j+","+i+":"+_weight);
+                }
+                _oWeight = 1f - _weight;
                 //if(RAND.nextInt(mx)>=self) {
                 if(_umode!=null&&!_umode.update(p1, j, i, 0)) {
                     p2.setCell(j,i,p1.getCell(j,i));

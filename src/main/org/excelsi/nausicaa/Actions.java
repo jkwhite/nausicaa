@@ -388,7 +388,7 @@ public class Actions {
         if(ret==f.APPROVE_OPTION) {
             try {
                 config.setImgDir(f.getSelectedFile().getParent());
-                plane.save(f.getSelectedFile().toString());
+                plane.save(f.getSelectedFile().toString(), v.getPlaneDisplayProvider().getActivePlaneDisplay().getRendering());
             }
             catch(IOException e) {
                 showError(v, "Failed to save "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);
@@ -415,8 +415,7 @@ public class Actions {
     }
 
     /*
-    public void exportRule(NViewer v, Config config) {
-        JFileChooser f = new JFileChooser(config.getDir());
+    public void exportRule(NViewer v, Config config) { JFileChooser f = new JFileChooser(config.getDir());
         f.setDialogTitle("Export rule");
         f.setDialogType(f.SAVE_DIALOG);
         f.setMultiSelectionEnabled(false);
@@ -1861,6 +1860,22 @@ public class Actions {
         }
         else {
             System.err.println("**** already at root ****");
+        }
+    }
+
+    public void rotateMeta(final NViewer v, Config config) {
+        CA ca = v.getActiveCA();
+        CA root = ca.getMeta();
+        if(root==null) {
+            System.err.println("**** there is only one ****");
+        }
+        else {
+            CA nca = root;
+            while(root.getMeta()!=null) {
+                root = root.getMeta();
+            }
+            nca = nca.meta(ca.meta(null));
+            v.setActiveCA(nca);
         }
     }
 

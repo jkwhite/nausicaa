@@ -131,8 +131,8 @@ public class WindowedPlane extends AbstractIntPlane {
         return new WindowedPlane(_p.scale(scale, antialias), _x1, _y1, _x2, _y2);
     }
 
-    @Override public void save(String file) throws IOException {
-        _p.save(file);
+    @Override public void save(String file, Rendering r) throws IOException {
+        _p.save(file, r);
     }
 
     @Override public Plane subplane(int x1, int y1, int x2, int y2) {

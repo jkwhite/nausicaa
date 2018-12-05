@@ -597,7 +597,8 @@ public final class CA {
         Rule r = ComputedRuleReader.fromJson(o.get("rule"));
         Palette p = Palette.fromJson(o.get("palette"));
         ExternalForce ef = o.has("external_force") ? ExternalForce.fromJson(o.get("external_force")) : ExternalForce.nop();
-        return new CA(r, p, i, new Random(), seed, w, h, d, pre, weight, coda, cmode, umode, emode, ef, null);
+        CA meta = o.has("meta") ? fromJson(o.get("meta")):null;
+        return new CA(r, p, i, new Random(), seed, w, h, d, pre, weight, coda, cmode, umode, emode, ef, meta);
     }
 
     private static CA fromLegacyTextFile(String filename) throws IOException {
@@ -738,6 +739,9 @@ public final class CA {
         o.add("initializer", _i.toJson());
         o.add("rule", _r.toJson());
         o.add("palette", _p.toJson());
+        if(_meta!=null) {
+            o.add("meta", _meta.toJson());
+        }
         return o;
     }
 

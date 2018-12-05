@@ -3,12 +3,14 @@ package org.excelsi.nausicaa.ca;
 
 public class Rendering {
     public enum Composition {
-        front, back, wavg, revwavg, channel, avg, multiply, difference;
+        front, truefront, back, wavg, revwavg, channel, avg, multiply, difference;
 
         public static Composition from(String s) {
             switch(s) {
                 case "front":
                     return front;
+                case "truefront":
+                    return truefront;
                 case "back":
                     return back;
                 case "wavg":

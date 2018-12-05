@@ -59,4 +59,23 @@ public abstract class AbstractIntPlane extends AbstractPlane implements IntPlane
             }
         };
     }
+
+    private Probe _probe;
+    @Override public Probe probe() {
+        if(_probe==null) {
+            _probe = new Probe() {
+                final int max = creator().archetype().colors();
+
+                @Override public float probe(int x, int y, int z) {
+                    return AbstractIntPlane.this.getCell(x,y,z);
+                }
+
+                @Override public float probeNorm(int x, int y, int z) {
+                    int val = AbstractIntPlane.this.getCell(x,y,z);
+                    return (float)val/(float)max;
+                }
+            };
+        }
+        return _probe;
+    }
 }

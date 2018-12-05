@@ -268,7 +268,7 @@ public class BufferedImagePlane extends AbstractIntPlane implements java.io.Seri
         return _r.getSample(x, y, 0);
     }
 
-    @Override public void save(String filename) throws IOException {
+    @Override public void save(String filename, Rendering r) throws IOException {
         Pipeline.write(_i, filename);
     }
 

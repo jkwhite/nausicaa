@@ -84,9 +84,9 @@ public final class Genome {
         System.err.println("applying "+max+" mutators");
         for(int i=0;i<max;i++) {
             final GenomeMutator m = mf.genomeMutator()!=null?mf.genomeMutator():mutators.random(mf.random());
-            System.err.println("premutate "+m+": "+cs);
+            //System.err.println("premutate "+m+": "+cs);
             m.mutate(cs, im, gf, mf);
-            System.err.println("posmutate "+m+": "+cs);
+            //System.err.println("posmutate "+m+": "+cs);
         }
         if(mf.symmetry()) {
             symmetry(im.archetype(), cs);

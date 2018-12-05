@@ -1342,6 +1342,13 @@ public class NViewer extends JFrame implements UIActions {
         });
         mutate.add(popmeta);
         popmeta.setText("Pop Meta");
+        JMenuItem rotmeta = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.rotateMeta(NViewer.this, _config);
+            }
+        });
+        mutate.add(rotmeta);
+        rotmeta.setText("Rotate Meta");
 
         final JCheckBoxMenuItem[] mhack = new JCheckBoxMenuItem[4];
 
@@ -1446,7 +1453,7 @@ public class NViewer extends JFrame implements UIActions {
         render.add(rgbopt);
 
         JMenu compopt = new JMenu("Composition mode");
-        final JCheckBoxMenuItem[] comphack = new JCheckBoxMenuItem[8];
+        final JCheckBoxMenuItem[] comphack = new JCheckBoxMenuItem[9];
 
         JCheckBoxMenuItem compfirst = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -1458,6 +1465,7 @@ public class NViewer extends JFrame implements UIActions {
                 comphack[5].setState(false);
                 comphack[6].setState(false);
                 comphack[7].setState(false);
+                comphack[8].setState(false);
                 _config.setVariable("composite_mode", "front");
             }
         });
@@ -1474,6 +1482,7 @@ public class NViewer extends JFrame implements UIActions {
                 comphack[5].setState(false);
                 comphack[6].setState(false);
                 comphack[7].setState(false);
+                comphack[8].setState(false);
                 _config.setVariable("composite_mode", "back");
             }
         });
@@ -1490,6 +1499,7 @@ public class NViewer extends JFrame implements UIActions {
                 comphack[5].setState(false);
                 comphack[6].setState(false);
                 comphack[7].setState(false);
+                comphack[8].setState(false);
                 _config.setVariable("composite_mode", "wavg");
             }
         });
@@ -1506,6 +1516,7 @@ public class NViewer extends JFrame implements UIActions {
                 comphack[5].setState(false);
                 comphack[6].setState(false);
                 comphack[7].setState(false);
+                comphack[8].setState(false);
                 _config.setVariable("composite_mode", "revwavg");
             }
         });
@@ -1522,6 +1533,7 @@ public class NViewer extends JFrame implements UIActions {
                 comphack[5].setState(false);
                 comphack[6].setState(false);
                 comphack[7].setState(false);
+                comphack[8].setState(false);
                 _config.setVariable("composite_mode", "avg");
             }
         });
@@ -1538,6 +1550,7 @@ public class NViewer extends JFrame implements UIActions {
                 comphack[5].setState(true);
                 comphack[6].setState(false);
                 comphack[7].setState(false);
+                comphack[8].setState(false);
                 _config.setVariable("composite_mode", "channel");
             }
         });
@@ -1554,6 +1567,7 @@ public class NViewer extends JFrame implements UIActions {
                 comphack[5].setState(false);
                 comphack[6].setState(true);
                 comphack[7].setState(false);
+                comphack[8].setState(false);
                 _config.setVariable("composite_mode", "multiply");
             }
         });
@@ -1570,11 +1584,29 @@ public class NViewer extends JFrame implements UIActions {
                 comphack[5].setState(false);
                 comphack[6].setState(false);
                 comphack[7].setState(true);
+                comphack[8].setState(false);
                 _config.setVariable("composite_mode", "difference");
             }
         });
         compdiff.setText("Difference");
         compopt.add(compdiff);
+
+        JCheckBoxMenuItem comptf = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                comphack[0].setState(false);
+                comphack[1].setState(false);
+                comphack[2].setState(false);
+                comphack[3].setState(false);
+                comphack[4].setState(false);
+                comphack[5].setState(false);
+                comphack[6].setState(false);
+                comphack[7].setState(false);
+                comphack[8].setState(true);
+                _config.setVariable("composite_mode", "truefront");
+            }
+        });
+        comptf.setText("True Nearest");
+        compopt.add(comptf);
 
         comphack[0] = compfirst;
         comphack[1] = complast;
@@ -1584,6 +1616,7 @@ public class NViewer extends JFrame implements UIActions {
         comphack[5] = compchan;
         comphack[6] = compmul;
         comphack[7] = compdiff;
+        comphack[8] = comptf;
 
         comphack[0].setState(true);
 

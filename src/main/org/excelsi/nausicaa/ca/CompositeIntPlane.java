@@ -112,7 +112,7 @@ public class CompositeIntPlane extends AbstractIntPlane implements Sliceable {
                     _i.setRGB(i,j,_p.color(idx));
                 }
                 else { */
-                    if(comp==Rendering.Composition.front||comp==Rendering.Composition.wavg) {
+                    if(comp==Rendering.Composition.front||comp==Rendering.Composition.truefront||comp==Rendering.Composition.wavg) {
                         for(int k=0;k<_ps.length;k++) {
                             int idx = _ps[k].getCell(i,j);
                             final int[] u = _ps[k].creator().getPalette().unpack(idx, _unpack);
@@ -122,7 +122,7 @@ public class CompositeIntPlane extends AbstractIntPlane implements Sliceable {
                             rgb[2] += (int)(mult*u[2]);
                             //if(u[0]>0) System.err.println("k: "+k+", u: "+u[0]+","+u[1]+","+u[2]+", mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
                             mx += (_ps.length-k);
-                            if(rend.composition()==Rendering.Composition.front&&(u[0]>0||u[1]>0||u[2]>0)) break;
+                            if(comp==Rendering.Composition.truefront||comp==Rendering.Composition.front&&(u[0]>0||u[1]>0||u[2]>0)) break;
                         }
                         mx = 1;
                         _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
@@ -194,10 +194,44 @@ public class CompositeIntPlane extends AbstractIntPlane implements Sliceable {
                             _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
                         }
                     }
+                    else if(comp==Rendering.Composition.channel) {
+                        if(_ps.length==4) {
+                            _i.setRGB(i,j,Colors.pack(
+                                        extractColor(3,i,j),
+                                        extractColor(2,i,j),
+                                        extractColor(1,i,j),
+                                        extractColor(0,i,j)));
+                        }
+                        else if(_ps.length==3) {
+                            _i.setRGB(i,j,Colors.pack(
+                                        extractColor(2,i,j),
+                                        extractColor(1,i,j),
+                                        extractColor(0,i,j)));
+                        }
+                        else if(_ps.length==2) {
+                            _i.setRGB(i,j,Colors.pack(
+                                        extractColor(1,i,j),
+                                        extractColor(0,i,j),
+                                        0));
+                        }
+                        else if(_ps.length==1) {
+                            _i.setRGB(i,j,Colors.pack(
+                                        extractColor(0,i,j),
+                                        0,
+                                        0));
+                        }
+                    }
                 //}
             }
         }
         return _i;
+    }
+
+    private int extractColor(int p, int i, int j) {
+        final int c = _ps[p].getCell(i,j);
+        final int mc = _ps[p].creator().archetype().colors();
+        final float r = (float)c/(float)mc;
+        return (int) (r*255f);
     }
 
     @Override public java.awt.Image toImage(int width, int height) {
@@ -248,8 +282,8 @@ public class CompositeIntPlane extends AbstractIntPlane implements Sliceable {
         return new BufferedImagePlane((BufferedImage)toImage()).scale(scale, antialias);
     }
 
-    @Override public void save(String filename) throws IOException {
-        Pipeline.write(toBufferedImage(), filename);
+    @Override public void save(String filename, Rendering r) throws IOException {
+        Pipeline.write(toBufferedImage(r), filename);
     }
 
     @Override public Plane subplane(int x1, int y1, int x2, int y2) {

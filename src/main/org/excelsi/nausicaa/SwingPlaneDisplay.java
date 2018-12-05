@@ -312,6 +312,10 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         return _scale;
     }
 
+    @Override public Rendering getRendering() {
+        return _rend;
+    }
+
     public int getCAWidth() {
         return _w;
     }

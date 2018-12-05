@@ -282,7 +282,7 @@ public class BitSetBlockPlane extends AbstractIntPlane {
         throw new UnsupportedOperationException();
     }
 
-    @Override public void save(String filename) throws IOException {
+    @Override public void save(String filename, Rendering r) throws IOException {
         Pipeline.write(toBufferedImage(), filename);
     }
 

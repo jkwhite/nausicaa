@@ -327,8 +327,8 @@ public class IntBlockPlane extends AbstractIntPlane implements Sliceable {
         return new BufferedImagePlane((BufferedImage)toImage()).scale(scale, antialias);
     }
 
-    @Override public void save(String filename) throws IOException {
-        Pipeline.write(toBufferedImage(), filename);
+    @Override public void save(String filename, Rendering r) throws IOException {
+        Pipeline.write(toBufferedImage(r), filename);
     }
 
     @Override public Plane subplane(int x1, int y1, int x2, int y2) {

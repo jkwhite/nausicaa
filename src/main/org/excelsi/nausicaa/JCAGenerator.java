@@ -26,6 +26,8 @@ public class JCAGenerator extends JDialog {
         final String _skipframes = config.<String>getVariable("generatorSkipframes", "0");
         final String initFramerate = config.<String>getVariable("generateFramerate", "15");
         final float frameWeight = config.getFloatVariable("weight", 1f);
+        final Rendering rend = new Rendering()
+            .composition(Rendering.Composition.from(config.getVariable("composite_mode","front")));
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         GridLayout gl = null;
@@ -222,7 +224,7 @@ public class JCAGenerator extends JDialog {
                                             }
                                         });
                                         hack[0].setEnabled(false);
-                                        plane.save(selfile);
+                                        plane.save(selfile, rend);
                                     }
                                 }
                                 else {

@@ -115,15 +115,18 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         };
         for(int i=0;i<workers.length;i++) {
             patterns[i] = createPattern(pool);
-            final Variables pvars;
+            Variables pvars;
             if(patterns[i] instanceof Variables) {
                 pvars = Variables.cascade((Variables)patterns[i], vars);
             }
             else {
                 pvars = vars;
             }
+            if(opt.variables()!=null) {
+                pvars = Variables.cascade(opt.variables(), pvars);
+            }
             workers[i] = Workers.create(patterns[i], 0, i*block, c.getWidth(), Math.min(c.getHeight(), (i+1)*block),
-                pvars, /*c.creator().getWeight(),*/
+                pvars,
                 c.creator().getComputeMode(), c.creator().getUpdateMode(), c.creator().getExternalForce(), c.creator().getRandom());
         }
         final Future[] futures = new Future[workers.length];

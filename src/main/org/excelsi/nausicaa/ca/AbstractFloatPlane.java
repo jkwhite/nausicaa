@@ -79,4 +79,23 @@ public abstract class AbstractFloatPlane extends AbstractPlane implements FloatP
             }
         };
     }
+
+    private Probe _probe;
+    @Override public Probe probe() {
+        if(_probe==null) {
+            _probe = new Probe() {
+                final float max = creator().archetype().colors();
+
+                @Override public float probe(int x, int y, int z) {
+                    return AbstractFloatPlane.this.getCell(x,y,z);
+                }
+
+                @Override public float probeNorm(int x, int y, int z) {
+                    float val = AbstractFloatPlane.this.getCell(x,y,z);
+                    return val/max;
+                }
+            };
+        }
+        return _probe;
+    }
 }

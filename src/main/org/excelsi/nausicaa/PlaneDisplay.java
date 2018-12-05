@@ -17,6 +17,7 @@ public abstract class PlaneDisplay extends JComponent implements Planescape {
     @Override abstract public void setPlane(Plane plane);
     abstract public void setScale(float scale);
     abstract public float getScale();
+    abstract public Rendering getRendering();
     abstract public int getCAWidth();
     abstract public int getCAHeight();
     abstract public void setCAWidth(int w);

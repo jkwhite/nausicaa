@@ -119,6 +119,10 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         return getDisplays()[_show?4:0].getPlane();
     }
 
+    @Override public PlaneDisplay getActivePlaneDisplay() {
+        return getDisplays()[_show?4:0];
+    }
+
     public void setViewType(ViewType viewType) {
         if(viewType!=_viewType) {
             _viewType = viewType;
