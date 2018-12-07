@@ -43,6 +43,7 @@ public class WorkerDiscrete implements Worker {
         _moore = p.archetype().neighborhood()==Archetype.Neighborhood.moore;
         _channels = cmode==ComputeMode.channel;
         _umode = umode.simpleSynchronous() ? null:umode.plan(_wp.archetype());
+        System.err.println("********** umode: "+_umode);
         _ef = ef;
         _r = r;
 
@@ -65,7 +66,7 @@ public class WorkerDiscrete implements Worker {
         for(int i=_y1;i<_y2;i++) {
             for(int j=_x1;j<_x2;j++) {
                 for(int k=0;k<p1.getDepth();k++) {
-                    if(_umode!=null&&!_umode.update(p1, j, i, k)) {
+                    if(_umode!=null&&!_umode.update(p1, j, i, k, _vars)) {
                         p2.setCell(j,i,k,p1.getCell(j,i,k));
                     }
                     else {
@@ -146,7 +147,8 @@ public class WorkerDiscrete implements Worker {
                 }
                 _oWeight = 1f - _weight;
                 //if(RAND.nextInt(mx)>=self) {
-                if(_umode!=null&&!_umode.update(p1, j, i, 0)) {
+                //if(_umode!=null) System.err.println("umode: "+_umode);
+                if(_umode!=null&&!_umode.update(p1, j, i, 0, _vars)) {
                     p2.setCell(j,i,p1.getCell(j,i));
                 }
                 else {
@@ -190,7 +192,7 @@ public class WorkerDiscrete implements Worker {
         //System.err.println("created pattern: "+p);
         for(int i=_y1;i<_y2;i++) {
             for(int j=0;j<w;j++) {
-                if(_umode!=null&&!_umode.update(c, j, 0, 0)) {
+                if(_umode!=null&&!_umode.update(c, j, 0, 0, _vars)) {
                     c.setCell(j,i,c.getCell(j,i-1));
                 }
                 else {

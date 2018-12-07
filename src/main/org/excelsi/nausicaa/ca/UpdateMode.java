@@ -9,7 +9,7 @@ import com.google.gson.*;
 public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
     boolean simpleSynchronous();
 
-    boolean update(Plane p, int x, int y, int z);
+    boolean update(Plane p, int x, int y, int z, Variables vars);
 
     JsonElement toJson();
 
@@ -32,6 +32,8 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
                 return new SimpleSynchronous();
             case "async":
                 return new SimpleAsynchronous(r, chance);
+            case "variable":
+                return new VariableAsynchronous(chance);
             case "localasync":
                 return new LocalAsynchronous(r, chance, new int[0]);
             case "energy":
@@ -46,7 +48,7 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
             return true;
         }
 
-        @Override public boolean update(Plane p, int x, int y, int z) {
+        @Override public boolean update(Plane p, int x, int y, int z, Variables vars) {
             return true;
         }
 
@@ -71,13 +73,39 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
             return false;
         }
 
-        @Override public boolean update(Plane p, int x, int y, int z) {
+        @Override public boolean update(Plane p, int x, int y, int z, Variables vars) {
             return _r.nextFloat()<_chance;
         }
 
         @Override public JsonElement toJson() {
             JsonObject o = new JsonObject();
             o.addProperty("type","async");
+            o.addProperty("chance",_chance);
+            return o;
+        }
+    }
+
+    public static final class VariableAsynchronous implements UpdateMode {
+        private final float _chance;
+
+
+        public VariableAsynchronous(float chance) {
+            _chance = chance;
+        }
+
+        @Override public boolean simpleSynchronous() {
+            return false;
+        }
+
+        @Override public boolean update(Plane p, int x, int y, int z, Variables vars) {
+            boolean u = vars.update(p, x, y, z, _chance);
+            //System.err.println("upd: "+u+", vars: "+vars);
+            return u;
+        }
+
+        @Override public JsonElement toJson() {
+            JsonObject o = new JsonObject();
+            o.addProperty("type","variable");
             o.addProperty("chance",_chance);
             return o;
         }
@@ -99,7 +127,7 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
             return false;
         }
 
-        @Override public boolean update(Plane p, int x, int y, int z) {
+        @Override public boolean update(Plane p, int x, int y, int z, Variables vars) {
             final int cx = p.getWidth()/2;
             final int cy = p.getHeight()/2;
             final int cz = p.getDepth()/2;
@@ -137,7 +165,7 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
                 default:
                 case discrete:
                     return new EnergyAsynchronous(_r, _chance, _size) {
-                        @Override public boolean update(Plane p, int x, int y, int z) {
+                        @Override public boolean update(Plane p, int x, int y, int z, Variables vars) {
                             final IntPlane qp = (IntPlane) p;
                             int c;
                             switch(_size) {
@@ -164,7 +192,7 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
                     };
                 case continuous:
                     return new EnergyAsynchronous(_r, _chance, _size) {
-                        @Override public boolean update(Plane p, int x, int y, int z) {
+                        @Override public boolean update(Plane p, int x, int y, int z, Variables vars) {
                             final FloatPlane qp = (FloatPlane) p;
                             float c;
                             switch(_size) {
@@ -192,7 +220,7 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
             }
         }
 
-        @Override public boolean update(Plane p, int x, int y, int z) {
+        @Override public boolean update(Plane p, int x, int y, int z, Variables vars) {
             throw new UnsupportedOperationException("requires plan");
         }
 

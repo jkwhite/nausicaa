@@ -175,5 +175,10 @@ public class CompositeRule implements Rule {
         @Override public Float weight(Plane p, int x, int y, int z) {
             return _ps[_s][_i].probe().probeNorm(x,y,z);
         }
+
+        @Override public boolean update(Plane p, int x, int y, int z, float chance) {
+            //System.err.println("varp: "+x+","+y+","+z+":"+chance);
+            return _ps[_s][_i].probe().probeNorm(x,y,z)<chance;
+        }
     }
 }

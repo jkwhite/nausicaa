@@ -5,6 +5,7 @@ public interface Variables {
     Float weight();
     default boolean weightVaries() { return false; }
     default Float weight(Plane p, int x, int y, int z) { return weight(); }
+    default boolean update(Plane p, int x, int y, int z, float chance) { return true; }
 
     public static Variables constant(final Float weight) {
         return new Variables() {
@@ -46,6 +47,10 @@ public interface Variables {
                     }
                 }
                 return 1f;
+            }
+
+            @Override public boolean update(Plane p, int x, int y, int z, float chance) {
+                return vars[0].update(p, x, y, z, chance);
             }
         };
     }

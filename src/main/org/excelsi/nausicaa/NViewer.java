@@ -1053,13 +1053,14 @@ public class NViewer extends JFrame implements UIActions {
 
         {
             JMenu updateopt = new JMenu("Update mode");
-            final JCheckBoxMenuItem[] updatehack = new JCheckBoxMenuItem[4];
+            final JCheckBoxMenuItem[] updatehack = new JCheckBoxMenuItem[5];
             JCheckBoxMenuItem updsync = new JCheckBoxMenuItem(new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     updatehack[0].setState(true);
                     updatehack[1].setState(false);
                     updatehack[2].setState(false);
                     updatehack[3].setState(false);
+                    updatehack[4].setState(false);
                     _config.setVariable("updatemode", "sync");
                     setActiveCA(getActiveCA().updateMode(UpdateMode.create("sync", 0, 0)));
                 }
@@ -1073,6 +1074,7 @@ public class NViewer extends JFrame implements UIActions {
                     updatehack[1].setState(true);
                     updatehack[2].setState(false);
                     updatehack[3].setState(false);
+                    updatehack[4].setState(false);
                     _config.setVariable("updatemode", "async");
                     _a.chooseAsynchronousUpdate(NViewer.this);
                 }
@@ -1086,6 +1088,7 @@ public class NViewer extends JFrame implements UIActions {
                     updatehack[1].setState(false);
                     updatehack[2].setState(true);
                     updatehack[3].setState(false);
+                    updatehack[4].setState(false);
                     _config.setVariable("updatemode", "localasync");
                     _a.chooseAsynchronousLocalUpdate(NViewer.this);
                 }
@@ -1099,6 +1102,7 @@ public class NViewer extends JFrame implements UIActions {
                     updatehack[1].setState(false);
                     updatehack[2].setState(false);
                     updatehack[3].setState(true);
+                    updatehack[4].setState(false);
                     _config.setVariable("updatemode", "energyasync");
                     _a.chooseAsynchronousEnergyUpdate(NViewer.this);
                 }
@@ -1106,10 +1110,25 @@ public class NViewer extends JFrame implements UIActions {
             updenergyasync.setText("Energy Asynchronous ...");
             updateopt.add(updenergyasync);
 
+            JCheckBoxMenuItem updvars = new JCheckBoxMenuItem(new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    updatehack[0].setState(false);
+                    updatehack[1].setState(false);
+                    updatehack[2].setState(false);
+                    updatehack[3].setState(false);
+                    updatehack[4].setState(true);
+                    _config.setVariable("updatemode", "variable");
+                    _a.chooseVariableUpdate(NViewer.this);
+                }
+            });
+            updvars.setText("Variable ...");
+            updateopt.add(updvars);
+
             updatehack[0] = updsync;
             updatehack[1] = updasync;
             updatehack[2] = updasynclocal;
             updatehack[3] = updenergyasync;
+            updatehack[4] = updvars;
             switch(_config.getVariable("updatemode","sync")) {
                 case "sync":
                     updatehack[0].setState(true);
@@ -1122,6 +1141,9 @@ public class NViewer extends JFrame implements UIActions {
                     break;
                 case "energyasync":
                     updatehack[3].setState(true);
+                    break;
+                case "variable":
+                    updatehack[4].setState(true);
                     break;
             }
             

@@ -20,7 +20,10 @@ public class RuleTransform implements Transform {
         return "Rule";
     }
 
-    public CA transform(final CA c) throws MutationFailedException {
+    public CA transform(CA c) throws MutationFailedException {
+        if(_f.meta() && c.getMeta()!=null) {
+            c = c.meta(transform(c.getMeta()));
+        }
         Rule root = c.getRule();
         //Rule m = root.origin().random(c.getRandom()).next();
         if(root instanceof IndexedRule) {

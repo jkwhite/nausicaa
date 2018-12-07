@@ -708,7 +708,7 @@ public class Actions {
         final JDialog d = new JDialog(v, "Mutation parameters");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(5,2));
+        JPanel top = new JPanel(new GridLayout(6,2));
 
         top.add(new JLabel("Alpha"));
         final JTextField alpha = new JTextField();
@@ -739,6 +739,11 @@ public class Actions {
         as.setSelected("true".equals(config.getVariable("mutator_symmetry", "false")));
         top.add(as);
 
+        top.add(new JLabel("Recurse to meta"));
+        final JCheckBox meta = new JCheckBox();
+        meta.setSelected("true".equals(config.getVariable("mutator_meta", "false")));
+        top.add(meta);
+
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
         JButton ne = new JButton("Ok");
@@ -752,6 +757,7 @@ public class Actions {
                 config.setVariable("mutator_stage", ms.getText());
                 config.setVariable("mutator_transition", tf.getText());
                 config.setVariable("mutator_symmetry", ""+as.isSelected());
+                config.setVariable("mutator_meta", ""+meta.isSelected());
                 config.notify("mutator");
             }
         });
@@ -908,6 +914,42 @@ public class Actions {
                 d.dispose();
                 config.setVariable("asynchronous_chance", chance.getText());
                 v.setActiveCA(v.getActiveCA().updateMode(UpdateMode.create("async", Float.parseFloat(chance.getText()), 0)));
+            }
+        });
+        bot.add(ne);
+
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
+    public void chooseVariableUpdate(final NViewer v) {
+        final JDialog d = new JDialog(v, "Variable Update");
+        final Config config = v.getConfig();
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(1,2));
+
+        top.add(new JLabel("Chance"));
+        final JTextField chance = new JTextField();
+        chance.setText(config.getVariable("variable_chance", "0.5"));
+        chance.setColumns(10);
+        top.add(chance);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                config.setVariable("variable_chance", chance.getText());
+                v.setActiveCA(v.getActiveCA().updateMode(UpdateMode.create("variable", Float.parseFloat(chance.getText()), 0)));
             }
         });
         bot.add(ne);
@@ -1918,6 +1960,7 @@ public class Actions {
             .withRandom(r)
             .withTransition(Float.parseFloat(config.getVariable("mutator_transition", "0.5")))
             .withSymmetry("true".equals(config.getVariable("mutator_symmetry", "false")))
+            .withMeta("true".equals(config.getVariable("mutator_meta", "false")))
             .withUpdateWeight(config.getWeightVariations())
             .withRule(config.getRuleVariations())
             .withLanguage(Languages.simpleSymmetry())

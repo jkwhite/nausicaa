@@ -15,6 +15,7 @@ public final class MutationFactor {
     private boolean _symmetry;
     private boolean _weight;
     private boolean _rule;
+    private boolean _meta;
     private Datamap _data;
     private GenomeMutator _gm;
     private Language _lang;
@@ -106,6 +107,11 @@ public final class MutationFactor {
         return this;
     }
 
+    public MutationFactor withMeta(boolean m) {
+        _meta = m;
+        return this;
+    }
+
     public MutationFactor withLanguage(Language l) {
         _lang = l;
         return this;
@@ -121,6 +127,10 @@ public final class MutationFactor {
 
     public boolean rule() {
         return _rule;
+    }
+
+    public boolean meta() {
+        return _meta;
     }
 
     public Language language() {
