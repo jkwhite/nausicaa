@@ -11,6 +11,7 @@ public interface UIActions {
     Config getConfig();
     CA getActiveCA();
     void setActiveCA(CA c);
+    void branch(CA c);
     PlaneDisplayProvider getPlaneDisplayProvider();
     PlanescapeProvider getPlanescapeProvider();
 }

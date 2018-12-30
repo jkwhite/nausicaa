@@ -14,6 +14,7 @@ public class NViewer extends JFrame implements UIActions {
     private static int _height;
     private static JFrame _root;
     private JMenuItem _repeat;
+    private JTabbedPane _tabs;
     private Actions _a = new Actions();
     private static NViewer _instance;
     private Initializers _init = Initializers.random;
@@ -67,15 +68,23 @@ public class NViewer extends JFrame implements UIActions {
 
     @Override
     public CA getActiveCA() {
-        return _futures.getCA();
+        return futures().getCA();
     }
 
     @Override public void setActiveCA(CA ca) {
-        _futures.setCA(ca);
+        futures().setCA(ca);
+    }
+
+    @Override public void branch(CA c) {
+        String name = ""+(1+_tabs.getTabCount());
+        Futures f = new Futures(_config, _timeline, c, new Random(), name);
+        JPanel main = new JPanel(new BorderLayout());
+        main.add(f, BorderLayout.CENTER);
+        _tabs.addTab(name, main);
     }
 
     public void pickRandom() {
-        _futures.pickRandom();
+        futures().pickRandom();
     }
 
     public void setInitializer(Initializer initializer) {
@@ -85,11 +94,11 @@ public class NViewer extends JFrame implements UIActions {
 
     @Override
     public PlaneDisplayProvider getPlaneDisplayProvider() {
-        return _futures;
+        return futures();
     }
 
     @Override public PlanescapeProvider getPlanescapeProvider() {
-        return _futures;
+        return futures();
     }
 
     @Override public Frame getRoot() {
@@ -115,11 +124,20 @@ public class NViewer extends JFrame implements UIActions {
 
         JPanel main = new JPanel(new BorderLayout());
 
-        Futures f = new Futures(_config, _timeline, ca, new Random());
+        Futures f = new Futures(_config, _timeline, ca, new Random(), "1");
         _futures = f;
         main.add(f, BorderLayout.CENTER);
-        getContentPane().add(main);
-        //d.setCA(ca);
+
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.addTab("1", main);
+        getContentPane().add(tabs);
+        _tabs = tabs;
+
+        //getContentPane().add(main);
+    }
+
+    private Futures futures() {
+        return (Futures) ((JPanel)_tabs.getSelectedComponent()).getComponent(0);
     }
 
     private CA initCA() {
@@ -304,7 +322,8 @@ public class NViewer extends JFrame implements UIActions {
         };
         AbstractAction close = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.close(NViewer.this);
+                //_a.close(NViewer.this);
+                closeFutures();
             }
         };
         AbstractAction exportImg = new AbstractAction() {
@@ -1697,7 +1716,7 @@ public class NViewer extends JFrame implements UIActions {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         //_a.generate();
-                        _futures.setShow(nval);
+                        futures().setShow(nval);
                         //_futures.revalidate();
                     }
                 });
@@ -1729,7 +1748,33 @@ public class NViewer extends JFrame implements UIActions {
         formed.setText("Show rule editor");
         window.add(formed);
 
+        window.addSeparator();
+
+        final JMenuItem conso = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.openConsole(NViewer.this, _config);
+            }
+        });
+        conso.setText("Open console ...");
+        window.add(conso);
+
+        //final JMenuItem closef = new JMenuItem(new AbstractAction() {
+            //public void actionPerformed(ActionEvent e) {
+                //closeFutures();
+            //}
+        //});
+        //closef.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));
+        //closef.setText("Close current futures");
+        //window.add(closef);
+
         bar.add(window);
+    }
+
+    private void closeFutures() {
+        //System.err.println("TABS: "+_tabs.getTabCount()+", SEL: "+_tabs.getSelectedIndex());
+        if(_tabs.getTabCount()>1) {
+            _tabs.removeTabAt(_tabs.getSelectedIndex());
+        }
     }
 
     private void togglePaletteEditor() {

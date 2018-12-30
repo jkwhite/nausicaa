@@ -49,7 +49,7 @@ ca = { dims, rule, pal=null, init=null, prelude=0, weight=1f ->
 }
 
 load = { f ->
-    CA.fromFile(f)
+    CA.fromFile(f, 'text')
 }
 
 org.excelsi.nausicaa.ca.Ruleset.metaClass.random = {
@@ -97,6 +97,28 @@ org.excelsi.nausicaa.ca.CA.metaClass.stats = { depth=1 ->
     def p = c.createPlane()
     def np = c.rule.frameIterator(p, Pools.adhoc(), false).next()
     def ms = Stats.forPlane(p).compareWith(Stats.forPlane(np))
+}
+
+org.excelsi.nausicaa.ca.Plane.metaClass.save = { filename ->
+    def p = delegate.toBufferedImage();
+    Pipeline.write(p, filename);
+}
+
+org.excelsi.nausicaa.ca.CA.metaClass.mutateGenome = { genome ->
+    def f = new MutationFactor()
+    delegate.mutate(delegate.getRule().origin().create(genome, f), delegate.getRandom())
+}
+
+org.excelsi.nausicaa.ca.CA.metaClass.frame = { int nFrames ->
+    def pool = Executors.newFixedThreadPool(4);
+    def it = delegate.getRule().frameIterator(delegate.createPlane(), pool, new GOptions());
+
+    def fr = it.next();
+    for(int i=1;i<nFrames;i++) {
+        fr = it.next();
+    }
+    pool.shutdown();
+    fr
 }
 
 org.excelsi.nausicaa.ca.CA.metaClass.generate = { fileTemplate, nFrames, scale ->

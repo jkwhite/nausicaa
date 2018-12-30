@@ -239,6 +239,16 @@ public class Config {
         }
     }
 
+    public boolean getBooleanVariable(String name, boolean dvalue) {
+        Object v = (Object) _variables.get(name);
+        if(v!=null) {
+            return "true".equals(v.toString());
+        }
+        else {
+            return dvalue;
+        }
+    }
+
     public void notify(final String p) {
         for(ConfigListener l:new ArrayList<>(_listeners)) {
             l.configChanged(this, p);

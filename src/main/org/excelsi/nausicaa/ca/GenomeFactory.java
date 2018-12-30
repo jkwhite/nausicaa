@@ -166,6 +166,8 @@ public class GenomeFactory {
         for(Weight<Codon> wc:f.all()) {
             //cs.add(wc.e().code());
             cs.add(wc.e().generate(Rand.om));
+            cs.add(wc.e().generate(Rand.om));
+            cs.add(wc.e().generate(Rand.om));
         }
         return cs;
     }
@@ -186,7 +188,7 @@ public class GenomeFactory {
 
     public Codon randomCodon(final Implicate im, final Random r) {
         if(im.language()!=null) {
-            return Codons.codon(im.language().randomCodon(r), im);
+            return Codons.codon(im.language().randomCodon(im.archetype(), r), im);
         }
         else {
             return Codons.codon(buildFactory(im.archetype()).random(r).generate(r), im);

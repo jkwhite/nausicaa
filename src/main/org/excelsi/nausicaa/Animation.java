@@ -133,7 +133,7 @@ top:        while(_state==State.animate) {
                         render.shutdown();
                         System.err.print("awaiting render... ");
                         render.awaitTermination(5, TimeUnit.SECONDS);
-                        System.err.println("done");
+                        //System.err.println("done");
                     }
                     catch(InterruptedException e) {
                         e.printStackTrace();
@@ -186,7 +186,7 @@ top:        while(_state==State.animate) {
         public void step() {
             //System.err.print(".");
             if(!_frames.hasNext()) {
-                System.err.println("done");
+                //System.err.println("done");
                 return;
             }
             final Plane frame = _frames.next();
@@ -195,7 +195,7 @@ top:        while(_state==State.animate) {
                 if(!_d.delegateUnlock()) {
                     frame.unlockRead();
                 }
-                System.err.println("interrupted done");
+                //System.err.println("interrupted done");
                 return;
             }
             final Thread calling = Thread.currentThread();

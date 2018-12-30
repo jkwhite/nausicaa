@@ -2,6 +2,7 @@ package org.excelsi.nausicaa.ca;
 
 
 import java.util.*;
+import com.google.gson.*;
 
 
 public class Languages {
@@ -32,13 +33,7 @@ public class Languages {
     }
 
     public static Language universal() {
-        Archetype a = new Archetype(2, 1, 2);
-        List<String> cs = new GenomeFactory().allCodons(a);
-        Language lang = new Language("Universal");
-        for(String c:cs) {
-            lang.add(c, c);
-        }
-        return lang;
+        return new Universal();
     }
 
     public static Language simpleSymmetry() {
@@ -128,5 +123,39 @@ public class Languages {
 
     private static String[] s(String p) {
         return p.split(" ");
+    }
+
+    public static class Universal extends Language {
+        public Universal() {
+            super("Universal");
+        }
+
+        public String[] phonemes(String word) {
+            return new String[]{word};
+        }
+
+        public String word(String phonemes) {
+            return phonemes;
+        }
+
+        public String expand(String word) {
+            return word;
+        }
+
+        public Genome generate(final Archetype a, final Random r) {
+            GenomeFactory f = new GenomeFactory();
+            return f.generate(a, r);
+        }
+
+        public String randomCodon(Archetype a, Random r) {
+            GenomeFactory f = new GenomeFactory();
+            return f.randomCodon(new Implicate(a, null, null), r).code();
+        }
+
+        public JsonElement toJson() {
+            JsonObject o = new JsonObject();
+            o.addProperty("name", "Universal");
+            return o;
+        }
     }
 }

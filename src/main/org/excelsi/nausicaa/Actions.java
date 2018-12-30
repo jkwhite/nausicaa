@@ -471,6 +471,36 @@ public class Actions {
         }
     }
 
+    private final String CONSOLE_PROGRAM = System.getProperty("app.root")+"/bin/nausicaa";
+    public void openConsole(NViewer v, Config c) {
+        final CA ca = v.getActiveCA();
+        File f = null;
+        try {
+            f = File.createTempFile("ca_", ".ca");
+            ca.save(f.toString(), "text");
+            final ProcessBuilder b = new ProcessBuilder(CONSOLE_PROGRAM, "-cli" /*, f.toString()*/);
+            b.redirectError(ProcessBuilder.Redirect.INHERIT);
+            b.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            final Process p = b.start();
+            final File doomed = f;
+            final Thread t = new Thread("Watch-"+f) {
+                public void run() {
+                    try {
+                        p.waitFor();
+                    }
+                    catch(InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    doomed.delete();
+                }
+            };
+            t.start();
+        }
+        catch(IOException e) {
+            showError(v, "Failed to save: "+e.getClass().getName()+": "+e.getMessage(), e);
+        }
+    }
+
     public void info(NViewer v) {
         final CA ca = v.getActiveCA();
 
@@ -708,7 +738,7 @@ public class Actions {
         final JDialog d = new JDialog(v, "Mutation parameters");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(6,2));
+        JPanel top = new JPanel(new GridLayout(7,2));
 
         top.add(new JLabel("Alpha"));
         final JTextField alpha = new JTextField();
@@ -744,6 +774,11 @@ public class Actions {
         meta.setSelected("true".equals(config.getVariable("mutator_meta", "false")));
         top.add(meta);
 
+        top.add(new JLabel("Never repeat"));
+        final JCheckBox rp = new JCheckBox();
+        rp.setSelected("true".equals(config.getVariable("mutator_neverrepeat", "false")));
+        top.add(rp);
+
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
         JButton ne = new JButton("Ok");
@@ -758,6 +793,7 @@ public class Actions {
                 config.setVariable("mutator_transition", tf.getText());
                 config.setVariable("mutator_symmetry", ""+as.isSelected());
                 config.setVariable("mutator_meta", ""+meta.isSelected());
+                config.setVariable("mutator_neverrepeat", ""+rp.isSelected());
                 config.notify("mutator");
             }
         });
