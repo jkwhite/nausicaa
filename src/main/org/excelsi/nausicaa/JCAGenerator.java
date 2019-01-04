@@ -17,7 +17,7 @@ import org.excelsi.nausicaa.ca.*;
 public class JCAGenerator extends JDialog {
     public JCAGenerator(final JFrame root, final CA ca, final Config config) {
         super(root, "Generate automata to disk");
-        final Rule rule = ca.getRule();
+        final Rule rule = ca.compileRule();
         final JDialog d = this;
         final String _lastWidth = config.<String>getVariable("generatorWidth", "1920");
         final String _lastHeight = config.<String>getVariable("generatorHeight", "1080");
@@ -250,7 +250,7 @@ public class JCAGenerator extends JDialog {
                                     if(createGif) {
                                         Plane plane = c.createPlane();
                                         ExecutorService pool = Executors.newFixedThreadPool(1);
-                                        Iterator<Plane> cas = c.getRule().frameIterator(plane, pool, new GOptions(true, 1, 1, frameWeight));
+                                        Iterator<Plane> cas = c.compileRule().frameIterator(plane, pool, new GOptions(true, 1, 1, frameWeight));
                                         AnimatedGifEncoder age = new AnimatedGifEncoder();
                                         age.start(selfile.endsWith(".gif")?selfile:(selfile+".gif"));
                                         age.setRepeat(0);
@@ -304,7 +304,7 @@ public class JCAGenerator extends JDialog {
                                         ExecutorService pool = Executors.newFixedThreadPool(ccores);
                                         if(scale==1f) {
                                             System.err.println("skip scaling");
-                                            c.getRule()
+                                            c.compileRule()
                                                 .stream(c.createPlane(), pool, new GOptions(true, ccores, 1, frameWeight))
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))
@@ -316,7 +316,7 @@ public class JCAGenerator extends JDialog {
                                         }
                                         else {
                                             System.err.println("scaling");
-                                            c.getRule()
+                                            c.compileRule()
                                                 .stream(c.createPlane(), pool, new GOptions(true, ccores, 1, frameWeight))
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))

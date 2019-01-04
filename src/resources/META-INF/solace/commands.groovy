@@ -110,8 +110,8 @@ org.excelsi.nausicaa.ca.CA.metaClass.mutateGenome = { genome ->
 }
 
 org.excelsi.nausicaa.ca.CA.metaClass.frame = { int nFrames ->
-    def pool = Executors.newFixedThreadPool(4);
-    def it = delegate.getRule().frameIterator(delegate.createPlane(), pool, new GOptions());
+    def pool = Executors.newFixedThreadPool(6);
+    def it = delegate.getRule().frameIterator(delegate.createPlane(), pool, new GOptions(true, 7, 0, 1f));
 
     def fr = it.next();
     for(int i=1;i<nFrames;i++) {
