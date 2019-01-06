@@ -8,8 +8,9 @@
 - DONE asynchronous updates
 - DONE json format
 - DONE abort codon
-- randomness
+- DONE randomness
 - DONE border modes
+- spectrum editor
 
 composition:
 by weight: Variables.weightVaries()

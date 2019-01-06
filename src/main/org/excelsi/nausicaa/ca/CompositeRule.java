@@ -92,7 +92,7 @@ public class CompositeRule implements Rule {
     }
 
     @Override public Plane generate(Plane c, int start, int end, ExecutorService pool, boolean stopOnSame, boolean overwrite, Updater u, GOptions opt) {
-        CompositeIntPlane p = (CompositeIntPlane) c;
+        Sliceable p = (Sliceable) c;
         for(int i=_rs.length-1;i>=0;i--) {
             System.err.println("compositing at depth "+i);
             p.setReadDepth(i);
@@ -103,11 +103,13 @@ public class CompositeRule implements Rule {
     }
 
     @Override public Iterator<Plane> frameIterator(Plane initial, ExecutorService pool, GOptions opt) {
-        CompositeIntPlane p1 = (CompositeIntPlane) initial;
-        final IntPlane[] ps1 = p1.planes();
+        CompositePlane p1 = (CompositePlane) initial;
+        final Plane[] ps1 = p1.planes();
 
-        final IntPlane[] ps2 = new IntPlane[ps1.length];
-        final CompositeIntPlane p2 = new CompositeIntPlane(ps2);
+        //final IntPlane[] ps2 = new IntPlane[ps1.length];
+        //final CompositeIntPlane p2 = new CompositeIntPlane(ps2);
+        final CompositePlane p2 = p1.emptyCopy();
+        final Plane[] ps2 = p2.planes();
 
         final DepthVariables dv = new DepthVariables(ps1, ps2, false);
 
@@ -118,8 +120,8 @@ public class CompositeRule implements Rule {
         }
 
         return new Iterator<Plane>() {
-            CompositeIntPlane pread = p1; // reading plane
-            CompositeIntPlane pwrite = p2; // writing plane
+            CompositePlane pread = p1; // reading plane
+            CompositePlane pwrite = p2; // writing plane
             boolean first = true;
             int stack = 0;
             @Override public boolean hasNext() { return true; }
@@ -130,7 +132,7 @@ public class CompositeRule implements Rule {
                 for(int i=_rs.length-1;i>=0;i--) {
                     dv.setIndex(i+1);
                     //System.err.println("compositing at depth "+i);
-                    IntPlane n = (IntPlane) its[i].next();
+                    Plane n = (Plane) its[i].next();
                     if(first) {
                         ps2[i] = n;
                     }
@@ -139,7 +141,7 @@ public class CompositeRule implements Rule {
                 first = false;
                 stack = (stack==0?1:0);
                 dv.setStack(stack);
-                CompositeIntPlane tmp = pread;
+                CompositePlane tmp = pread;
                 pread = pwrite;
                 pwrite = tmp;
                 return pread;
@@ -148,20 +150,17 @@ public class CompositeRule implements Rule {
     }
 
     private static class DepthVariables implements Variables {
-        private final IntPlane[][] _ps;
-        //private final IntPlane[] _ps2;
+        private final Plane[][] _ps;
         private final boolean _wrap;
 
         private int _i;
         private int _s;
 
 
-        public DepthVariables(IntPlane[] ps1, IntPlane[] ps2, boolean wrap) {
-            _ps = new IntPlane[2][];
+        public DepthVariables(Plane[] ps1, Plane[] ps2, boolean wrap) {
+            _ps = new Plane[2][];
             _ps[0] = ps1;
             _ps[1] = ps2;
-            //_ps1 = ps1;
-            //_ps2 = ps2;
             _wrap = wrap;
         }
 
@@ -177,8 +176,9 @@ public class CompositeRule implements Rule {
         }
 
         @Override public boolean update(Plane p, int x, int y, int z, float chance) {
-            //System.err.println("varp: "+x+","+y+","+z+":"+chance);
-            return _ps[_s][_i].probe().probeNorm(x,y,z)<chance;
+            float v = _ps[_s][_i].probe().probeNorm(x,y,z);
+            //System.err.println("varp: "+x+","+y+","+z+":"+chance+", "+v);
+            return v>=chance;
         }
     }
 }

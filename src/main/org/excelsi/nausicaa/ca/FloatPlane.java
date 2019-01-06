@@ -12,4 +12,5 @@ public interface FloatPlane extends Plane {
     float[] getCardinal(float[] into, int x, int y, int dx, int dy, int offset);
     float[] getCardinal(float[] into, int x, int y, int z, int dx, int dy, int dz, int offset);
     void setRow(float[] row, int y);
+    int computeRgbColor(float idx);
 }

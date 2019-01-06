@@ -203,7 +203,11 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
         return toImage(DEFAULT_RENDERING);
     }
 
-    private int computeColor2(final float idx) {
+    @Override public int computeRgbColor(float idx) {
+        return computeColor2(idx);
+    }
+
+    public int computeColor2(final float idx) {
         if(_ca.archetype().colors()<_p.getColorCount()) {
             final int pc = _p.getColorCount();
             final int ac = _ca.archetype().colors();

@@ -87,8 +87,13 @@ public final class CA {
 
     public Plane createPlane(ExecutorService pool, GOptions opt) {
         if(archetype().isContinuous()) {
-            Plane p = new FloatBlockPlane(this, getWidth(), getHeight(), getDepth(), _p, _emode.floatOobValue());
-            return populatePlane(p, pool, opt);
+            if(_meta!=null) {
+                return createMetaPlane(pool, opt);
+            }
+            else {
+                Plane p = new FloatBlockPlane(this, getWidth(), getHeight(), getDepth(), _p, _emode.floatOobValue());
+                return populatePlane(p, pool, opt);
+            }
         }
         else if(archetype().dims()==3) {
             //BlockPlane p = new BlockPlane(this, getWidth(), getHeight(), getDepth(), _p, BlockPlane.Mode.argb);
@@ -129,12 +134,24 @@ public final class CA {
     private Plane createMetaPlane(ExecutorService pool, GOptions opt) {
         List<CA> chain = buildCAChain();
         System.err.println("creating meta plane over chain "+chain);
-        IntPlane[] ps = new IntPlane[chain.size()];
+        Plane[] ps = new Plane[chain.size()];
         for(int i=0;i<ps.length;i++) {
             CA ca = chain.get(i);
-            ps[i] = new IntBlockPlane2d(ca, ca.getWidth(), ca.getHeight(), 1 /*ca.getDepth()*/, ca.getPalette(), ca.getEdgeMode().intOobValue());
+            if(ca.archetype().isContinuous()) {
+                ps[i] = new FloatBlockPlane(ca, ca.getWidth(), ca.getHeight(), 1 /*ca.getDepth()*/, ca.getPalette(), ca.getEdgeMode().floatOobValue());
+            }
+            else {
+                ps[i] = new IntBlockPlane2d(ca, ca.getWidth(), ca.getHeight(), 1 /*ca.getDepth()*/, ca.getPalette(), ca.getEdgeMode().intOobValue());
+            }
         }
-        CompositeIntPlane p = new CompositeIntPlane(ps);
+        CompositePlane p;
+        if(archetype().isContinuous()) {
+            p = new CompositeFloatPlane(ps);
+        }
+        else {
+            p = new CompositeIntPlane(ps);
+        }
+        //CompositeIntPlane p = new CompositeIntPlane(ps);
         for(int i=0;i<ps.length;i++) {
             p.setReadDepth(i);
             p.setWriteDepth(i);
