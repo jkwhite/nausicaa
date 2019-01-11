@@ -33,6 +33,11 @@ public class ClusteredGaussianInitializer implements Initializer {
         _params = params;
     }
 
+    @Override public String humanize() {
+        return "ClusteredGaussian (zeroWeight="+_params.zeroWeight+", maxPoints="+_params.maxPoints
+            +", maxRadius="+_params.maxRadius+", density="+_params.density+")";
+    }
+
     public void init(Plane plane, Rule rule, Random random) {
         initDisc(plane, rule, random, plane.pen());
         //if(rule.archetype().isDiscrete()) {

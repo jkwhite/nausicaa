@@ -44,6 +44,10 @@ public class ImageInitializer implements Initializer {
         _params = params;
     }
 
+    @Override public String humanize() {
+        return "Image (uri="+_url+")";
+    }
+
     @Override public void init(Plane plane, Rule rule, Random random) {
         if(rule.archetype().isDiscrete()) {
             initDisc(plane, plane.pen(), rule, random);

@@ -5,7 +5,7 @@ import java.util.Random;
 import com.google.gson.*;
 
 
-public interface ExternalForce {
+public interface ExternalForce extends Humanizable {
     void apply(Plane p, Random r);
     JsonElement toJson();
 
@@ -27,6 +27,10 @@ public interface ExternalForce {
     }
 
     public static class NopExternalForce implements ExternalForce {
+        @Override public String humanize() {
+            return "None";
+        }
+
         @Override public void apply(final Plane p, final Random r) {
         }
 
@@ -43,6 +47,10 @@ public interface ExternalForce {
 
         public RandomExternalForce(float amount) {
             _amount = amount;
+        }
+
+        @Override public String humanize() {
+            return "Random ("+_amount+")";
         }
 
         @Override public void apply(final Plane p, final Random r) {

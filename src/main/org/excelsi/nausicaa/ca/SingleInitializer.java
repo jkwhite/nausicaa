@@ -29,6 +29,10 @@ public class SingleInitializer implements Initializer {
         _size = size;
     }
 
+    @Override public String humanize() {
+        return "Fixed (color="+_color+", x="+_x+", y="+_y+", z="+_z+")";
+    }
+
     public void init(Plane plane, Rule rule, Random random) {
         if(rule.archetype().isDiscrete()) {
             initDisc((IntPlane)plane, rule, random);

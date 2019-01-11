@@ -79,10 +79,21 @@ public class GenomeFactory {
             weight(1, new Jump()),
             weight(1, new Halt()),
             weight(1, new Convolve(a.sourceLength())),
+            weight(1, new Codons.Rand()),
             weight(1, new Mod())
         ));
-        if(a.colors()<1000000) {
-            cs.add(weight(1,new Histo(1)));
+        //if(a.colors()<1000000) {
+            //cs.add(weight(1,new Histo(1)));
+        //}
+        if(a.isContinuous()) {
+            cs.add(weight(1,new HistoTroveFloat()));
+            cs.add(weight(1,new MostFloat()));
+            cs.add(weight(1,new LeastFloat()));
+        }
+        else {
+            cs.add(weight(1,new HistoTroveInt()));
+            cs.add(weight(1,new MostInt()));
+            cs.add(weight(1,new LeastInt()));
         }
         for(Iterator<Weight<Codon>> it=cs.iterator();it.hasNext();) {
             if(!it.next().e().supports(a.values())) {

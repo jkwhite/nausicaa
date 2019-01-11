@@ -4,7 +4,7 @@ package org.excelsi.nausicaa.ca;
 import com.google.gson.*;
 
 
-public class EdgeMode {
+public class EdgeMode implements Humanizable {
     public enum Type {
         toroidal, zero, constant
     };
@@ -36,6 +36,19 @@ public class EdgeMode {
         _t = t;
         _iconstant = iconstant;
         _fconstant = fconstant;
+    }
+
+    @Override public String humanize() {
+        switch(_t) {
+            case toroidal:
+                return "Toroidal";
+            case zero:
+                return "Zero";
+            case constant:
+                return "Constant ("+_iconstant+", "+_fconstant+")";
+            default:
+                return "???";
+        }
     }
 
     public Type type() {

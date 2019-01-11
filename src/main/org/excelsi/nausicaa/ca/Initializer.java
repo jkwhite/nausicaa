@@ -9,7 +9,7 @@ import java.io.IOException;
 import com.google.gson.JsonElement;
 
 
-public interface Initializer {
+public interface Initializer extends Humanizable {
     void init(Plane plane, Rule rule, Random random);
     void write(DataOutputStream dos) throws IOException;
     void write(PrintWriter w);

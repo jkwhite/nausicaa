@@ -13,6 +13,7 @@ public interface Codon {
     boolean usesPattern();
     default boolean reversible() { return true; }
     default boolean symmetric() { return true; }
+    default boolean deterministic() { return true; }
     default String generate(Random r) {
         return code();
     }

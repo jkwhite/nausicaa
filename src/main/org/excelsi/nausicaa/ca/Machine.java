@@ -34,6 +34,15 @@ public class Machine {
         }
     }
 
+    public boolean isDeterministic() {
+        for(Codon c:_prg) {
+            if(!c.deterministic()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public Machine copy(Datamap dm) {
         return new Machine(new Implicate(_a, dm, _lang), _g);
     }
@@ -55,7 +64,7 @@ public class Machine {
                 if(_ti.stopped()) break;
                 if(_ti.jumped()!=0) {
                     int j = _ti.jumped() % _prg.length;
-                    if(j<0) throw new IllegalStateException("negative jump: "+j);
+                    if(j<0) j=0; //throw new IllegalStateException("negative jump: "+j);
                     i += j;
                     //System.err.println("jumped by "+j);
                     //if(i<_prg.length-1) System.err.println("next inst: "+_prg[i+1]);
@@ -84,7 +93,7 @@ public class Machine {
                 if(_tf.stopped()) break;
                 if(_tf.jumped()!=0) {
                     int j = _tf.jumped() % _prg.length;
-                    if(j<0) throw new IllegalStateException("negative jump: "+j);
+                    if(j<0) j=0; //throw new IllegalStateException("negative jump: "+j);
                     i += j;
                     //System.err.println("jumped by "+j);
                     _tf.jump(0);

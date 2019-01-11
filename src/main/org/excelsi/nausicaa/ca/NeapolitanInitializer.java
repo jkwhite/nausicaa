@@ -10,6 +10,8 @@ import com.google.gson.*;
 
 
 public class NeapolitanInitializer implements Initializer {
+    @Override public String humanize() { return "Neapolitan"; }
+
     public void init(Plane plane, Rule rule, Random random) {
         if(rule.archetype().isDiscrete()) {
             initDisc((IntPlane)plane, rule, random);

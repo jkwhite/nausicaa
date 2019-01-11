@@ -33,7 +33,8 @@ public final class ComputedPattern implements Pattern, Mutatable {
         // -11833
         int csize = Math.max(5000, -11833*_a.size()+110000);
         _io = new IO(a.values());
-        if(ENABLE_CACHE) {
+        System.err.println("deterministic machine: "+logic.isDeterministic());
+        if(ENABLE_CACHE && logic.isDeterministic()) {
             if(a.isDiscrete()) {
                 if(a.sourceLength()<9) {
                     _cache = new ShortPCache(csize, size);
@@ -346,7 +347,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
 
     @Override public int next(int pattern, final int[] p2) {
         int r;
-        if(ENABLE_CACHE) {
+        if(ENABLE_CACHE && _cache!=null) {
             r = _cache.find(p2);
             if(_cache.h) {
                 _hits++;
@@ -365,7 +366,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         _logic.next(_io);
         r = _io.io;
         //if(_cache.lk!=0) {
-        if(ENABLE_CACHE) {
+        if(ENABLE_CACHE && _cache!=null) {
             _cache.put(p2, r);
         }
         //}
@@ -375,7 +376,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
 
     @Override public float next(int pattern, final float[] p2) {
         float r;
-        if(ENABLE_CACHE) {
+        if(ENABLE_CACHE && _fcache!=null) {
             r = _fcache.find(p2);
             if(_fcache.h) {
                 _hits++;
@@ -393,7 +394,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         _io.fi = p2;
         _logic.next(_io);
         r = _io.fo;
-        if(ENABLE_CACHE) {
+        if(ENABLE_CACHE && _fcache!=null) {
             _fcache.put(p2, r);
         }
         //System.err.println("computed next: "+r+" for "+p2[p2.length/2]);
@@ -456,8 +457,8 @@ public final class ComputedPattern implements Pattern, Mutatable {
         default RuleLogic mutate(Implicate im, GenomeFactory gf, MutationFactor mf) {
             return this;
         }
-        default void tick() {
-        }
+        default void tick() { }
+        default boolean isDeterministic() { return true; }
     }
 
     public static class RARule implements RuleLogic {
@@ -498,6 +499,10 @@ public final class ComputedPattern implements Pattern, Mutatable {
 
         public MachineElf(Machine m) {
             _m = m;
+        }
+
+        @Override public boolean isDeterministic() {
+            return _m.isDeterministic();
         }
 
         @Override public void next(IO io) {

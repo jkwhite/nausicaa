@@ -33,6 +33,10 @@ public class RandomInitializer implements Initializer {
         _params = params;
     }
 
+    @Override public String humanize() {
+        return "Random (zeroWeight="+_params.zeroWeight+")";
+    }
+
     public void init(Plane plane, Rule rule, Random random) {
         if(rule.archetype().isDiscrete()) {
             initDisc((IntPlane)plane, rule, random);

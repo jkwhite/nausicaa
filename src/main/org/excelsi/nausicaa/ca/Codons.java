@@ -3,6 +3,10 @@ package org.excelsi.nausicaa.ca;
 
 import java.util.Random;
 import java.util.Arrays;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TFloatIntHashMap;
+import gnu.trove.procedure.TIntIntProcedure;
+import gnu.trove.procedure.TFloatIntProcedure;
 
 
 public class Codons {
@@ -56,6 +60,7 @@ public class Codons {
     public static final String SKIP = "ro";
     public static final String HALT = "za";
     public static final String NON_ZERO = "zu";
+    public static final String RAND = "ze";
     public static final String DATA = "da";
     public static final String TANH = "de";
     public static final String DUPLICATE = "do";
@@ -72,6 +77,8 @@ public class Codons {
     public static final String PUSH_CARDINAL = "pa";
     public static final String FILTER = "pi";
     public static final String EQUAL_A = "po";
+    public static final String MOST = "wa";
+    public static final String LEAST = "wo";
 
 
     public static Codon codon(final String s, final Implicate im) {
@@ -192,7 +199,18 @@ public class Codons {
                 case TIME:
                     return new Time();
                 case HISTO:
-                    return new Histo(im.archetype().colors());
+                    //return new Histo(im.archetype().colors());
+                    return im.archetype().isContinuous()
+                        ? new HistoTroveFloat()
+                        : new HistoTroveInt();
+                case MOST:
+                    return im.archetype().isContinuous()
+                        ? new MostFloat()
+                        : new MostInt();
+                case LEAST:
+                    return im.archetype().isContinuous()
+                        ? new LeastFloat()
+                        : new LeastInt();
                 case DUPLICATE:
                     return new Duplicate();
                 case EXCLAMATORY:
@@ -243,6 +261,8 @@ public class Codons {
                     return new Halt();
                 case CONVOLVE:
                     return new Convolve(im.archetype().sourceLength());
+                case RAND:
+                    return new Rand();
                 default:
                     throw new IllegalStateException("unknown opcode '"+code+"'");
             }
@@ -325,6 +345,270 @@ public class Codons {
                     nc = -1;
                 }
                 return new Nonzero(nc);
+            }
+        }
+    }
+
+    public static final class MostInt implements Codon {
+        private final TIntIntHashMap _m;
+        private final TIntIntProcedure _proc = new TIntIntProcedure() {
+            @Override public boolean execute(int k, int v) {
+                if(v>_mostValue) {
+                    _mostKey = k;
+                    _mostValue = v;
+                }
+                return true;
+            }
+        };
+        private int _mostKey;
+        private int _mostValue;
+
+        public MostInt() {
+            _m = new TIntIntHashMap();
+        }
+
+        @Override public Codon copy() {
+            return new MostInt();
+        }
+
+        @Override public String code() {
+            return MOST;
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
+        @Override public boolean supports(Values v) { return v==Values.discrete; }
+
+        @Override public boolean reversible() { return false; }
+
+        @Override public void op(int[] p, IntTape t) {
+            _m.clear();
+            _mostKey = -1;
+            _mostValue = -1;
+            for(int i=0;i<p.length;i++) {
+                _m.adjustOrPutValue(p[i], 1, 1);
+            }
+            _m.forEachEntry(_proc);
+            t.push(_mostKey);
+        }
+    }
+
+    public static final class MostFloat implements Codon {
+        private final TFloatIntHashMap _m;
+        private final TFloatIntProcedure _proc = new TFloatIntProcedure() {
+            @Override public boolean execute(float k, int v) {
+                if(v>_mostValue) {
+                    _mostKey = k;
+                    _mostValue = v;
+                }
+                return true;
+            }
+        };
+        private float _mostKey;
+        private int _mostValue;
+
+        public MostFloat() {
+            _m = new TFloatIntHashMap();
+        }
+
+        @Override public Codon copy() {
+            return new MostFloat();
+        }
+
+        @Override public String code() {
+            return MOST;
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
+        @Override public void op(int[] p, IntTape t) {
+            throw new IllegalStateException("float most on int tape");
+        }
+
+        @Override public boolean supports(Values v) { return v==Values.continuous; }
+
+        @Override public boolean reversible() { return false; }
+
+        @Override public void op(float[] p, FloatTape t) {
+            _m.clear();
+            _mostKey = -1;
+            _mostValue = -1;
+            for(int i=0;i<p.length;i++) {
+                _m.adjustOrPutValue(p[i], 1, 1);
+            }
+            _m.forEachEntry(_proc);
+            t.push(_mostKey);
+        }
+    }
+
+    public static final class LeastInt implements Codon {
+        private final TIntIntHashMap _m;
+        private final TIntIntProcedure _proc = new TIntIntProcedure() {
+            @Override public boolean execute(int k, int v) {
+                if(v<_leastValue) {
+                    _leastKey = k;
+                    _leastValue = v;
+                }
+                return true;
+            }
+        };
+        private int _leastKey;
+        private int _leastValue;
+
+        public LeastInt() {
+            _m = new TIntIntHashMap();
+        }
+
+        @Override public Codon copy() {
+            return new LeastInt();
+        }
+
+        @Override public String code() {
+            return LEAST;
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
+        @Override public boolean supports(Values v) { return v==Values.discrete; }
+
+        @Override public boolean reversible() { return false; }
+
+        @Override public void op(int[] p, IntTape t) {
+            _m.clear();
+            _leastKey = -1;
+            _leastValue = Integer.MAX_VALUE;
+            for(int i=0;i<p.length;i++) {
+                _m.adjustOrPutValue(p[i], 1, 1);
+            }
+            _m.forEachEntry(_proc);
+            t.push(_leastKey);
+        }
+    }
+
+    public static final class LeastFloat implements Codon {
+        private final TFloatIntHashMap _m;
+        private final TFloatIntProcedure _proc = new TFloatIntProcedure() {
+            @Override public boolean execute(float k, int v) {
+                if(v<_leastValue) {
+                    _leastKey = k;
+                    _leastValue = v;
+                }
+                return true;
+            }
+        };
+        private float _leastKey;
+        private int _leastValue;
+
+        public LeastFloat() {
+            _m = new TFloatIntHashMap();
+        }
+
+        @Override public Codon copy() {
+            return new LeastFloat();
+        }
+
+        @Override public String code() {
+            return LEAST;
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
+        @Override public void op(int[] p, IntTape t) {
+            throw new IllegalStateException("float least on int tape");
+        }
+
+        @Override public boolean supports(Values v) { return v==Values.continuous; }
+
+        @Override public boolean reversible() { return false; }
+
+        @Override public void op(float[] p, FloatTape t) {
+            _m.clear();
+            _leastKey = -1;
+            _leastValue = Integer.MAX_VALUE;
+            for(int i=0;i<p.length;i++) {
+                _m.adjustOrPutValue(p[i], 1, 1);
+            }
+            _m.forEachEntry(_proc);
+            t.push(_leastKey);
+        }
+    }
+
+    public static final class HistoTroveInt implements Codon {
+        private final TIntIntHashMap _m;
+
+        public HistoTroveInt() {
+            _m = new TIntIntHashMap();
+        }
+
+        @Override public Codon copy() {
+            return new HistoTroveInt();
+        }
+
+        @Override public String code() {
+            return HISTO;
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
+        @Override public boolean supports(Values v) { return v==Values.discrete; }
+
+        @Override public boolean reversible() { return false; }
+
+        @Override public void op(int[] p, IntTape t) {
+            _m.clear();
+            for(int i=0;i<p.length;i++) {
+                _m.adjustOrPutValue(p[i], 1, 1);
+            }
+            for(int i=0;i<p.length;i++) {
+                t.push(_m.get(p[i]));
+            }
+        }
+    }
+
+    public static final class HistoTroveFloat implements Codon {
+        private final TFloatIntHashMap _m;
+
+        public HistoTroveFloat() {
+            _m = new TFloatIntHashMap();
+        }
+
+        @Override public Codon copy() {
+            return new HistoTroveFloat();
+        }
+
+        @Override public String code() {
+            return HISTO;
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
+        @Override public boolean supports(Values v) { return v==Values.continuous; }
+
+        @Override public boolean reversible() { return false; }
+
+        @Override public void op(int[] p, IntTape t) {
+            throw new IllegalStateException("float histo on int tape");
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            _m.clear();
+            for(int i=0;i<p.length;i++) {
+                _m.adjustOrPutValue(p[i], 1, 1);
+            }
+            for(int i=0;i<p.length;i++) {
+                t.push(_m.get(p[i]));
             }
         }
     }
@@ -2154,6 +2438,44 @@ public class Codons {
         }
     }
 
+    public static class Rand implements Codon {
+        private static final Random R = new Random();
+
+        @Override public Codon copy() { return new Rand(); }
+
+        @Override public String code() {
+            return RAND;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public boolean supports(Values v) { return true; }
+
+        @Override public boolean deterministic() { return false; }
+
+        @Override public void op(int[] p, IntTape t) {
+            int m = 1;
+            int v = t.pop();
+            if(v<0) {
+                v=-v;
+                m=-1;
+            }
+            if(v==0) {
+                t.push(0);
+            }
+            else {
+                t.push(m*R.nextInt(v));
+            }
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+            float v = t.pop();
+            t.push(v*R.nextFloat());
+        }
+    }
+
     public static class Cos implements Codon {
         @Override public Codon copy() { return new Cos(); }
 
@@ -2271,17 +2593,22 @@ public class Codons {
     public static final class Chain implements Codon {
         private final Codon[] _cs;
         private final boolean _usesPattern;
+        private final boolean _deterministic;
 
         public Chain(Codon... cs) {
             _cs = cs;
             boolean up = false;
+            boolean det = true;
             for(Codon c:cs) {
                 if(c.usesPattern()) {
                     up = true;
-                    break;
+                }
+                if(!c.deterministic()) {
+                    det = false;
                 }
             }
             _usesPattern = up;
+            _deterministic = det;
         }
 
         @Override public Codon copy() { return new Chain(_cs); }
@@ -2297,6 +2624,10 @@ public class Codons {
 
         @Override public boolean usesPattern() {
             return _usesPattern;
+        }
+
+        @Override public boolean deterministic() {
+            return _deterministic;
         }
 
         @Override public void op(int[] p, IntTape t) {

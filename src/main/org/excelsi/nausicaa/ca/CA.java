@@ -233,16 +233,6 @@ public final class CA {
     private Plane createWritableImagePlane(ExecutorService pool, GOptions opt) {
         WritableImagePlane p = new WritableImagePlane(this, _w, _h, _p, _emode.oobValue());
         populatePlane(p, pool, opt);
-        /*
-        _rand.setSeed(_seed);
-        _i.init(p, _r, _rand);
-        if(_r instanceof Multirule1D) {
-            ((Multirule1D)_r).generate2(p, 1, _h, false, true, null);
-        }
-        else {
-            _r.generate(p, 1, _h, POOL, false, true, null);
-        }
-        */
         return p;
     }
 

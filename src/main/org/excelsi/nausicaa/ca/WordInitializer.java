@@ -30,6 +30,10 @@ public class WordInitializer implements Initializer {
         _input = input;
     }
 
+    @Override public String humanize() {
+        return "Word";
+    }
+
     @Override public void init(Plane plane, Rule rule, Random random) {
         if(rule.archetype().isDiscrete()) {
             initDisc((IntPlane)plane, rule, random);

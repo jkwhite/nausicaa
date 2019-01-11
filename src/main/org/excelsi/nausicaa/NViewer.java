@@ -1391,7 +1391,7 @@ public class NViewer extends JFrame implements UIActions {
         mutate.add(rotmeta);
         rotmeta.setText("Rotate Meta");
 
-        final JCheckBoxMenuItem[] mhack = new JCheckBoxMenuItem[4];
+        final JCheckBoxMenuItem[] mhack = new JCheckBoxMenuItem[5];
 
         mutate.addSeparator();
         JCheckBoxMenuItem incHueVariations = new JCheckBoxMenuItem(new AbstractAction() {
@@ -1432,6 +1432,19 @@ public class NViewer extends JFrame implements UIActions {
         incRuleVariations.setText("Rule variations");
         incRuleVariations.setState(_config.getRuleVariations());
         incRuleVariations.setSelected(_config.getRuleVariations());
+
+        JCheckBoxMenuItem incParamVariations = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _config.setParamVariations(!_config.getParamVariations());
+                mhack[4].setState(!mhack[4].getState());
+                mhack[4].setSelected(!mhack[4].getState());
+            }
+        });
+        mutate.add(incParamVariations);
+        mhack[4] = incParamVariations;
+        incParamVariations.setText("Parameter variations");
+        incParamVariations.setState(_config.getParamVariations());
+        incParamVariations.setSelected(_config.getParamVariations());
 
         JMenuItem mparams = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {

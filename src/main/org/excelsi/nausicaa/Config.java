@@ -25,6 +25,7 @@ public class Config {
     private boolean _ruleVariations = true;
     private boolean _hueVariations = false;
     private boolean _weightVariations = true;
+    private boolean _paramVariations = true;
     private final Map<String,Object> _variables = new HashMap<>();
     private String _saveDir = System.getProperty("user.home");
     private String _imgDir = System.getProperty("user.home");
@@ -173,6 +174,15 @@ public class Config {
         return _weightVariations;
     }
 
+    public void setParamVariations(boolean paramVariations) {
+        _paramVariations = paramVariations;
+        notify("paramVariations");
+    }
+
+    public boolean getParamVariations() {
+        return _paramVariations;
+    }
+
     public void setSaveDir(String dir) {
         _saveDir = dir;
         notify("saveDir");
@@ -269,6 +279,7 @@ public class Config {
         o.addProperty("ruleVariations", _ruleVariations);
         o.addProperty("hueVariations", _hueVariations);
         o.addProperty("weightVariations", _weightVariations);
+        o.addProperty("paramVariations", _paramVariations);
         o.addProperty("saveDir", _saveDir);
         o.addProperty("imgDir", _imgDir);
         o.addProperty("genDir", _genDir);
@@ -315,6 +326,7 @@ public class Config {
             c._ruleVariations = Json.bool(o, "ruleVariations", true);
             c._hueVariations = Json.bool(o, "hueVariations", true);
             c._weightVariations = Json.bool(o, "weightVariations", true);
+            c._paramVariations = Json.bool(o, "paramVariations", true);
             c._saveDir = Json.string(o, "saveDir", c._saveDir);
             c._imgDir = Json.string(o, "imgDir", c._imgDir);
             c._genDir = Json.string(o, "genDir", c._genDir);

@@ -10,7 +10,7 @@ uses:
     - graph-0.1.jar
     - jgraph-5.1-jkw.jar
     - jgraphaddons-1.0.jar
-    - trove-2.0.4.jar
+    - trove-3.0.3.jar
     - Jama-1.0.2.jar
     - rlyehian-1.0.jar
     - jyaml-1.3.jar

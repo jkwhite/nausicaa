@@ -33,6 +33,10 @@ public class CAInitializer implements Initializer {
             .prelude(_iterations);
     }
 
+    @Override public String humanize() {
+        return "CA (uri="+_url+", iterations="+_iterations+")";
+    }
+
     @Override public void init(Plane plane, Rule rule, Random random) {
         if(rule.archetype().isDiscrete()) {
             initDisc((IntPlane)plane, rule, random);

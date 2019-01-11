@@ -28,6 +28,10 @@ public class CustomInitializer implements Initializer {
         return _text;
     }
 
+    @Override public String humanize() {
+        return "Custom";
+    }
+
     public void init(Plane plane, Rule rule, Random random) {
         Binding b = new Binding();
         GroovyShell interpreter = new GroovyShell(b);

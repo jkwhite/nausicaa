@@ -546,6 +546,10 @@ public class Actions {
             p.addPair("Neighborhood", r.archetype().neighborhood());
             p.addPair("Size", r.archetype().size());
             p.addPair("Values", r.archetype().values());
+            p.addPair("Initializer", ca.getInitializer().humanize());
+            p.addPair("Update", ca.getUpdateMode().humanize());
+            p.addPair("Edge", ca.getEdgeMode().humanize());
+            p.addPair("External Force", ca.getExternalForce().humanize());
             p.addPair("Language", ((AbstractComputedRuleset)cr.origin()).language().name());
             p.addPair("Genome", cr.prettyGenome());
             p.addPair("Codons",

@@ -6,8 +6,10 @@ import java.util.concurrent.ThreadLocalRandom;
 import com.google.gson.*;
 
 
-public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
+public interface UpdateMode extends Plannable<UpdateMode,Archetype>, Humanizable {
     boolean simpleSynchronous();
+
+    String name();
 
     boolean update(Plane p, int x, int y, int z, Variables vars);
 
@@ -23,6 +25,11 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
         float chance = Json.flot(o, "chance", 0);
         int size = Json.integer(o, "size", 1);
         return create(type, chance, size);
+    }
+
+    public static UpdateMode createRandom(Random r) {
+        final String[] types = {"sync","async","variable","localasync","energy"};
+        return create(types[r.nextInt(5)], r.nextFloat(), 1);
     }
 
     public static UpdateMode create(String type, float chance, int size) {
@@ -44,6 +51,12 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
     }
 
     public static final class SimpleSynchronous implements UpdateMode {
+        @Override public String name() { return "Synchronous"; }
+
+        @Override public String humanize() {
+            return name();
+        }
+
         @Override public boolean simpleSynchronous() {
             return true;
         }
@@ -69,6 +82,12 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
             _chance = chance;
         }
 
+        @Override public String name() { return "Asynchronous"; }
+
+        @Override public String humanize() {
+            return name()+" ("+_chance+")";
+        }
+
         @Override public boolean simpleSynchronous() {
             return false;
         }
@@ -91,6 +110,12 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
 
         public VariableAsynchronous(float chance) {
             _chance = chance;
+        }
+
+        @Override public String name() { return "Variable Async"; }
+
+        @Override public String humanize() {
+            return name()+" ("+_chance+")";
         }
 
         @Override public boolean simpleSynchronous() {
@@ -121,6 +146,12 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
             _r = r;
             _chance = chance;
             _center = center;
+        }
+
+        @Override public String name() { return "Local Async"; }
+
+        @Override public String humanize() {
+            return name()+" ("+_chance+")";
         }
 
         @Override public boolean simpleSynchronous() {
@@ -154,6 +185,12 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype> {
             _r = r;
             _chance = chance;
             _size = size;
+        }
+
+        @Override public String name() { return "Energy Async"; }
+
+        @Override public String humanize() {
+            return name()+" ("+_chance+", "+_size+")";
         }
 
         @Override public boolean simpleSynchronous() {

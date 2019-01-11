@@ -11,6 +11,7 @@ public class MultiTransform implements Transform {
     private boolean _ruleVariations;
     private boolean _hueVariations;
     private boolean _weightVariations;
+    private boolean _paramVariations;
 
 
     public MultiTransform(Random rand, MutationFactor f) {
@@ -42,6 +43,11 @@ public class MultiTransform implements Transform {
         return this;
     }
 
+    public MultiTransform paramVariations(boolean v) {
+        _paramVariations = v;
+        return this;
+    }
+
     public CA transform(CA c) {
         for(int i=0;i<4;i++) {
             try {
@@ -64,6 +70,11 @@ public class MultiTransform implements Transform {
                 case 8:
                     if(_weightVariations) {
                         t = new UpdateWeightTransform(_rand);
+                        break;
+                    }
+                case 3:
+                    if(_paramVariations) {
+                        t = new ParameterTransform(_rand, _factor);
                         break;
                     }
                 case 2:
