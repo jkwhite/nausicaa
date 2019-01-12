@@ -71,6 +71,13 @@ public class WorkerContinuous implements Worker {
                         p2.setCell(j,i,k,p1.getCell(j,i,k));
                     }
                     else {
+                        if(!_vars.weightVaries()) {
+                            _weight = _vars.weight();
+                        }
+                        else {
+                            _weight = _vars.weight(p1, j, i, 0);
+                        }
+                        _oWeight = 1f - _weight;
                         if(_moore) {
                             p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
                         }
@@ -145,6 +152,13 @@ public class WorkerContinuous implements Worker {
                 }
                 else {
                     counts++;
+                    if(!_vars.weightVaries()) {
+                        _weight = _vars.weight();
+                    }
+                    else {
+                        _weight = _vars.weight(p1, j, i, 0);
+                    }
+                    _oWeight = 1f - _weight;
                     if(_moore) {
                         p1.getBlock(_pattern, j-_size, i-_size, /*dx*/ d, /*dy*/ d, 0);
                     }

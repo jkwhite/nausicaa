@@ -204,13 +204,9 @@ public class Codons {
                         ? new HistoTroveFloat()
                         : new HistoTroveInt();
                 case MOST:
-                    return im.archetype().isContinuous()
-                        ? new MostFloat()
-                        : new MostInt();
+                    return new Most(p);
                 case LEAST:
-                    return im.archetype().isContinuous()
-                        ? new LeastFloat()
-                        : new LeastInt();
+                    return new Least(p);
                 case DUPLICATE:
                     return new Duplicate();
                 case EXCLAMATORY:
@@ -349,195 +345,125 @@ public class Codons {
         }
     }
 
-    public static final class MostInt implements Codon {
-        private final TIntIntHashMap _m;
-        private final TIntIntProcedure _proc = new TIntIntProcedure() {
-            @Override public boolean execute(int k, int v) {
-                if(v>_mostValue) {
-                    _mostKey = k;
-                    _mostValue = v;
-                }
-                return true;
-            }
-        };
-        private int _mostKey;
-        private int _mostValue;
-
-        public MostInt() {
-            _m = new TIntIntHashMap();
-        }
-
-        @Override public Codon copy() {
-            return new MostInt();
-        }
-
-        @Override public String code() {
-            return MOST;
-        }
-
-        @Override public boolean usesPattern() {
-            return true;
-        }
-
-        @Override public boolean supports(Values v) { return v==Values.discrete; }
-
-        @Override public boolean reversible() { return false; }
-
-        @Override public void op(int[] p, IntTape t) {
-            _m.clear();
-            _mostKey = -1;
-            _mostValue = -1;
-            for(int i=0;i<p.length;i++) {
-                _m.adjustOrPutValue(p[i], 1, 1);
-            }
-            _m.forEachEntry(_proc);
-            t.push(_mostKey);
-        }
-    }
-
-    public static final class MostFloat implements Codon {
-        private final TFloatIntHashMap _m;
-        private final TFloatIntProcedure _proc = new TFloatIntProcedure() {
+    public static final class Most extends NAggregate {
+        private final TFloatIntHashMap _mf;
+        private final TIntIntHashMap _mi;
+        private final TFloatIntProcedure _procf = new TFloatIntProcedure() {
             @Override public boolean execute(float k, int v) {
-                if(v>_mostValue) {
-                    _mostKey = k;
-                    _mostValue = v;
+                if(v>_mostValueF) {
+                    _mostKeyF = k;
+                    _mostValueF = v;
                 }
                 return true;
             }
         };
-        private float _mostKey;
-        private int _mostValue;
-
-        public MostFloat() {
-            _m = new TFloatIntHashMap();
-        }
-
-        @Override public Codon copy() {
-            return new MostFloat();
-        }
-
-        @Override public String code() {
-            return MOST;
-        }
-
-        @Override public boolean usesPattern() {
-            return true;
-        }
-
-        @Override public void op(int[] p, IntTape t) {
-            throw new IllegalStateException("float most on int tape");
-        }
-
-        @Override public boolean supports(Values v) { return v==Values.continuous; }
-
-        @Override public boolean reversible() { return false; }
-
-        @Override public void op(float[] p, FloatTape t) {
-            _m.clear();
-            _mostKey = -1;
-            _mostValue = -1;
-            for(int i=0;i<p.length;i++) {
-                _m.adjustOrPutValue(p[i], 1, 1);
-            }
-            _m.forEachEntry(_proc);
-            t.push(_mostKey);
-        }
-    }
-
-    public static final class LeastInt implements Codon {
-        private final TIntIntHashMap _m;
-        private final TIntIntProcedure _proc = new TIntIntProcedure() {
+        private final TIntIntProcedure _proci = new TIntIntProcedure() {
             @Override public boolean execute(int k, int v) {
-                if(v<_leastValue) {
-                    _leastKey = k;
-                    _leastValue = v;
+                if(v>_mostValueI) {
+                    _mostKeyI = k;
+                    _mostValueI = v;
                 }
                 return true;
             }
         };
-        private int _leastKey;
-        private int _leastValue;
+        private float _mostKeyF;
+        private int _mostValueF;
+        private int _mostKeyI;
+        private int _mostValueI;
 
-        public LeastInt() {
-            _m = new TIntIntHashMap();
+        public Most(int c) {
+            super(MOST, c);
+            _mf = new TFloatIntHashMap();
+            _mi = new TIntIntHashMap();
         }
 
         @Override public Codon copy() {
-            return new LeastInt();
+            return new Most(_c);
         }
 
-        @Override public String code() {
-            return LEAST;
-        }
+        @Override public boolean supports(Values v) { return true; }
 
-        @Override public boolean usesPattern() {
-            return true;
-        }
-
-        @Override public boolean supports(Values v) { return v==Values.discrete; }
-
-        @Override public boolean reversible() { return false; }
-
-        @Override public void op(int[] p, IntTape t) {
-            _m.clear();
-            _leastKey = -1;
-            _leastValue = Integer.MAX_VALUE;
-            for(int i=0;i<p.length;i++) {
-                _m.adjustOrPutValue(p[i], 1, 1);
+        @Override public float op(float[] t, int s, int e, float[] p) {
+            _mf.clear();
+            _mostKeyF = -1;
+            _mostValueF = -1;
+            for(int i=s;i<=e;i++) {
+                _mf.adjustOrPutValue(t[i], 1, 1);
             }
-            _m.forEachEntry(_proc);
-            t.push(_leastKey);
+            _mf.forEachEntry(_procf);
+            return _mostKeyF;
+        }
+
+        @Override public int op(int[] t, int s, int e, int[] p) {
+            _mi.clear();
+            _mostKeyI = -1;
+            _mostValueI = -1;
+            for(int i=s;i<=e;i++) {
+                _mi.adjustOrPutValue(t[i], 1, 1);
+            }
+            _mi.forEachEntry(_proci);
+            return _mostKeyI;
         }
     }
 
-    public static final class LeastFloat implements Codon {
-        private final TFloatIntHashMap _m;
-        private final TFloatIntProcedure _proc = new TFloatIntProcedure() {
+    public static final class Least extends NAggregate {
+        private final TFloatIntHashMap _mf;
+        private final TIntIntHashMap _mi;
+        private final TFloatIntProcedure _procf = new TFloatIntProcedure() {
             @Override public boolean execute(float k, int v) {
-                if(v<_leastValue) {
-                    _leastKey = k;
-                    _leastValue = v;
+                if(v<_leastValueF) {
+                    _leastKeyF = k;
+                    _leastValueF = v;
                 }
                 return true;
             }
         };
-        private float _leastKey;
-        private int _leastValue;
+        private final TIntIntProcedure _proci = new TIntIntProcedure() {
+            @Override public boolean execute(int k, int v) {
+                if(v<_leastValueF) {
+                    _leastKeyI = k;
+                    _leastValueI = v;
+                }
+                return true;
+            }
+        };
+        private float _leastKeyF;
+        private int _leastValueF;
+        private int _leastKeyI;
+        private int _leastValueI;
 
-        public LeastFloat() {
-            _m = new TFloatIntHashMap();
+        public Least(int c) {
+            super(LEAST, c);
+            _mf = new TFloatIntHashMap();
+            _mi = new TIntIntHashMap();
         }
 
         @Override public Codon copy() {
-            return new LeastFloat();
+            return new Least(_c);
         }
 
-        @Override public String code() {
-            return LEAST;
-        }
+        @Override public boolean supports(Values v) { return true; }
 
-        @Override public boolean usesPattern() {
-            return true;
-        }
-
-        @Override public void op(int[] p, IntTape t) {
-            throw new IllegalStateException("float least on int tape");
-        }
-
-        @Override public boolean supports(Values v) { return v==Values.continuous; }
-
-        @Override public boolean reversible() { return false; }
-
-        @Override public void op(float[] p, FloatTape t) {
-            _m.clear();
-            _leastKey = -1;
-            _leastValue = Integer.MAX_VALUE;
-            for(int i=0;i<p.length;i++) {
-                _m.adjustOrPutValue(p[i], 1, 1);
+        @Override public int op(int[] t, int s, int e, int[] p) {
+            _mi.clear();
+            _leastKeyI = -1;
+            _leastValueI = Integer.MAX_VALUE;
+            for(int i=s;i<=e;i++) {
+                _mi.adjustOrPutValue(t[i], 1, 1);
             }
-            _m.forEachEntry(_proc);
-            t.push(_leastKey);
+            _mi.forEachEntry(_proci);
+            return _leastKeyI;
+        }
+
+        @Override public float op(float[] t, int s, int e, float[] p) {
+            _mf.clear();
+            _leastKeyF = -1;
+            _leastValueF = Integer.MAX_VALUE;
+            for(int i=s;i<=e;i++) {
+                _mf.adjustOrPutValue(t[i], 1, 1);
+            }
+            _mf.forEachEntry(_procf);
+            return _leastKeyF;
         }
     }
 
@@ -750,7 +676,7 @@ public class Codons {
     public abstract static class NAggregate implements Codon, IntTape.TapeOp, FloatTape.TapeOp {
         private final String _n;
         protected final int _c;
-        private final int[] _t = new int[BUF_SIZE];
+        //private final int[] _t = new int[BUF_SIZE];
 
         public NAggregate(String n, int c) {
             _n = n;
@@ -794,7 +720,7 @@ public class Codons {
 
     public abstract static class NAggregateN implements Codon, IntTape.TapeOp {
         private final String _n;
-        private final int[] _t = new int[BUF_SIZE];
+        //private final int[] _t = new int[BUF_SIZE];
 
         public NAggregateN(String n) {
             _n = n;

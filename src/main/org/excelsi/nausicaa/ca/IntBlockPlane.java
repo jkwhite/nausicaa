@@ -217,6 +217,7 @@ public class IntBlockPlane extends AbstractIntPlane implements Sliceable {
                     int mx = 0;
                     if(_d==1) {
                         int idx = getCell(i,j,0);
+                        //System.err.println("setting "+i+","+j+" "+idx+" => "+_p.color(idx));
                         _i.setRGB(i,j,_p.color(idx));
                     }
                     else {
