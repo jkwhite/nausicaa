@@ -117,7 +117,10 @@ public class IntBlockPlane extends AbstractIntPlane implements Sliceable {
     }
 
     @Override public int[] getRow(int[] into, int y, int offset) {
-        throw new UnsupportedOperationException();
+        for(int i=0;i<_w;i++) {
+            into[offset++] = getCell(i, y, _readDepthIdx);
+        }
+        return into;
     }
 
     @Override public int[] getBlock(int[] into, int x, int y, int dx, int dy, int offset) {

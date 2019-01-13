@@ -11,14 +11,12 @@ import java.util.Random;
 public final class ComputedPattern implements Pattern, Mutatable {
     private static final boolean ENABLE_CACHE = true;
     private final Archetype _a;
-    //private final Language _lang;
     private final RuleLogic _logic;
     private final IO _io;
 
 
-    public ComputedPattern(Archetype a, /*Language lang,*/ RuleLogic logic) {
+    public ComputedPattern(Archetype a, RuleLogic logic) {
         _a = a;
-        //_lang = lang;
         _logic = logic;
         int size = _a.sourceLength();
         _lastP = new int[size];

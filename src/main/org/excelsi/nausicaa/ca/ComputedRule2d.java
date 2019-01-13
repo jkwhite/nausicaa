@@ -310,6 +310,10 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         return o;
     }
 
+    public final Pattern createPattern() {
+        return _p.copy();
+    }
+
     protected final Pattern createPattern(final ExecutorService pool) {
         return _p.copy();
     }

@@ -40,7 +40,8 @@ public final class Genome {
         final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(im)));
         //System.err.println("prune init codons: "+cs);
         while(cs.size()>1) {
-            if(!cs.get(0).usesPattern()) {
+            //if(!cs.get(0).usesPattern()) {
+            if(cs.get(0).usesTape()) {
                 cs.remove(0);
             }
             else {

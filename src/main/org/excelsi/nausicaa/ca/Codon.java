@@ -11,6 +11,7 @@ public interface Codon {
     Codon copy();
     String code();
     boolean usesPattern();
+    default boolean usesTape() { return false; }
     default boolean reversible() { return true; }
     default boolean symmetric() { return true; }
     default boolean deterministic() { return true; }

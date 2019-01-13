@@ -1,6 +1,7 @@
 package org.excelsi.nausicaa.ca;
 
 
+import java.util.Arrays;
 import java.util.Random;
 
 
@@ -14,14 +15,20 @@ public class Machine {
     private final int[] _inst;
     private final IntTape _ti;
     private final FloatTape _tf;
+    private final boolean _trace;
     private long _e = 0;
 
 
     public Machine(Implicate im, Genome g) {
+        this(im, g, false);
+    }
+
+    public Machine(Implicate im, Genome g, boolean trace) {
         _a = im.archetype();
         _d = im.datamap();
         _lang = im.language();
         _g = g;
+        _trace = trace;
         _prg = g.codons(im);
         _inst = new int[_prg.length];
         if(_a.isDiscrete()) {
@@ -32,6 +39,7 @@ public class Machine {
             _tf = new FloatTape(TAPE_LENGTH);
             _ti = null;
         }
+        if(_trace) System.err.println("Machine: "+Arrays.toString(_prg));
     }
 
     public boolean isDeterministic() {
@@ -44,7 +52,7 @@ public class Machine {
     }
 
     public Machine copy(Datamap dm) {
-        return new Machine(new Implicate(_a, dm, _lang), _g);
+        return new Machine(new Implicate(_a, dm, _lang), _g, _trace);
     }
 
     //public int compute(final int[] p) {
@@ -86,6 +94,10 @@ public class Machine {
             final float[] p = io.fi;
             for(int i=0;i<_prg.length;i++) {
                 //long st = System.currentTimeMillis();
+                if(_trace) {
+                    System.err.println("Tape: "+_tf);
+                    System.err.println("Codon: "+_prg[i]);
+                }
                 _prg[i].op(p, _tf);
                 //long en = System.currentTimeMillis();
                 //if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
@@ -99,12 +111,19 @@ public class Machine {
                     _tf.jump(0);
                 }
             }
+            if(_trace) System.err.println("Final Tape: "+_tf);
             float res = _tf.pop();
-            //if(res<0) res=-res;
+            if(res<0) res = -res;
+            if(res>_a.colors()-1f) {
+                res = res % (_a.colors()-1);
+            }
+            /*
             res = res % (_a.colors()-1);
             if(res<0) {
                 res = _a.colors()+res-1;
             }
+            */
+            if(_trace) System.err.println("Final: "+res);
             io.fo = res;
         }
     }

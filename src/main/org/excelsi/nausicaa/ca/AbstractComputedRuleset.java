@@ -43,7 +43,9 @@ public class AbstractComputedRuleset implements Ruleset {
                 return new ComputedRule2d(
                     new SequencePattern(
                         new SequencePattern.Sequence()
-                            .s(r.nextInt(70)+70, null, new ComputedPattern(_a, /*Languages.universal(),*/ ComputedPattern.random(new Implicate(_a, new Datamap(), _lang), r)))
+                            .s(r.nextInt(70)+70, null, new ComputedPattern(
+                                    _a,
+                                    ComputedPattern.random(new Implicate(_a, new Datamap(), _lang), r)))
                         ),
                     AbstractComputedRuleset.this
                     );

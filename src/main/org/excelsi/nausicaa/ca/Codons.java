@@ -691,6 +691,8 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public boolean reversible() { return false; }
 
         @Override public void op(int[] p, IntTape t) {
@@ -733,6 +735,8 @@ public class Codons {
         @Override public boolean usesPattern() {
             return false;
         }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public boolean reversible() { return false; }
 
@@ -803,6 +807,8 @@ public class Codons {
         @Override public boolean usesPattern() {
             return false;
         }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public boolean reversible() { return true; }
 
@@ -883,6 +889,8 @@ public class Codons {
         @Override public boolean usesPattern() {
             return false;
         }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public boolean reversible() { return true; }
 
@@ -1069,6 +1077,8 @@ public class Codons {
             return true;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public boolean reversible() { return true; }
 
         @Override public boolean symmetric() { return false; }
@@ -1143,9 +1153,7 @@ public class Codons {
             return _pf==_p?(CONS+_p):(CONS+_pf);
         }
 
-        @Override public boolean usesPattern() {
-            return true;
-        }
+        @Override public boolean usesPattern() { return false; }
 
         @Override public boolean reversible() { return true; }
 
@@ -1319,9 +1327,9 @@ public class Codons {
             return PUSH_ALL_ROT;
         }
 
-        @Override public boolean usesPattern() {
-            return true;
-        }
+        @Override public boolean usesPattern() { return true; }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public boolean symmetric() { return false; }
 
@@ -1355,6 +1363,8 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public boolean supports(Values v) { return true; }
 
         @Override public void op(int[] p, IntTape t) {
@@ -1386,6 +1396,8 @@ public class Codons {
         @Override public boolean usesPattern() {
             return false;
         }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public boolean supports(Values v) { return true; }
 
@@ -1419,6 +1431,8 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public boolean supports(Values v) { return true; }
 
         @Override public void op(int[] p, IntTape t) {
@@ -1450,6 +1464,8 @@ public class Codons {
         @Override public boolean usesPattern() {
             return false;
         }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public boolean supports(Values v) { return true; }
 
@@ -1495,6 +1511,8 @@ public class Codons {
         @Override public boolean usesPattern() {
             return false;
         }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public boolean supports(Values v) { return true; }
 
@@ -1543,6 +1561,8 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public boolean supports(Values v) { return true; }
 
         @Override public void op(int[] p, IntTape t) {
@@ -1574,6 +1594,8 @@ public class Codons {
         @Override public boolean usesPattern() {
             return false;
         }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public void op(int[] p, IntTape t) {
             t.selectAgg(2);
@@ -1674,6 +1696,8 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public boolean supports(Values v) { return true; }
 
         @Override public void op(int[] p, IntTape t) {
@@ -1697,6 +1721,8 @@ public class Codons {
         @Override public boolean usesPattern() {
             return false;
         }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public boolean supports(Values v) { return true; }
 
@@ -2090,6 +2116,8 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public boolean supports(Values v) { return true; }
 
         @Override public void op(int[] p, IntTape t) {
@@ -2144,6 +2172,8 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public boolean supports(Values v) { return true; }
 
         @Override public void op(int[] p, IntTape t) {
@@ -2167,6 +2197,8 @@ public class Codons {
         @Override public boolean usesPattern() {
             return false;
         }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public boolean supports(Values v) { return true; }
 
@@ -2224,6 +2256,8 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public void op(int[] p, IntTape t) {
             int v = t.pop();
             int x = Maths.excl(v);
@@ -2249,6 +2283,8 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public void op(int[] p, IntTape t) {
             final int v = t.pop();
             int m = 0;
@@ -2273,6 +2309,8 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public boolean supports(Values v) { return v==Values.continuous; }
 
         @Override public void op(int[] p, IntTape t) {
@@ -2295,6 +2333,8 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public boolean supports(Values v) { return v==Values.continuous; }
 
         @Override public void op(int[] p, IntTape t) {
@@ -2316,6 +2356,8 @@ public class Codons {
         @Override public boolean usesPattern() {
             return true;
         }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public boolean supports(Values v) { return true; }
 
@@ -2349,6 +2391,8 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public boolean supports(Values v) { return true; }
 
         @Override public void op(int[] p, IntTape t) {
@@ -2376,6 +2420,8 @@ public class Codons {
         @Override public boolean usesPattern() {
             return false;
         }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public boolean supports(Values v) { return true; }
 
@@ -2413,6 +2459,8 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public boolean supports(Values v) { return v==Values.continuous; }
 
         @Override public void op(int[] p, IntTape t) {
@@ -2433,6 +2481,8 @@ public class Codons {
         @Override public boolean usesPattern() {
             return false;
         }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public boolean supports(Values v) { return v==Values.continuous; }
 
@@ -2462,6 +2512,8 @@ public class Codons {
         @Override public boolean usesPattern() {
             return false;
         }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public void op(int[] p, IntTape t) {
             int dist = t.pop();
@@ -2505,6 +2557,8 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() { return true; }
+
         @Override public void op(int[] p, IntTape t) {
             for(int i=0;i<_s.length;i++) {
                 _s[i] = t.pop();
@@ -2519,21 +2573,27 @@ public class Codons {
     public static final class Chain implements Codon {
         private final Codon[] _cs;
         private final boolean _usesPattern;
+        private final boolean _usesTape;
         private final boolean _deterministic;
 
         public Chain(Codon... cs) {
             _cs = cs;
             boolean up = false;
+            boolean ut = false;
             boolean det = true;
             for(Codon c:cs) {
                 if(c.usesPattern()) {
                     up = true;
+                }
+                if(c.usesTape()) {
+                    ut = true;
                 }
                 if(!c.deterministic()) {
                     det = false;
                 }
             }
             _usesPattern = up;
+            _usesTape = ut;
             _deterministic = det;
         }
 
@@ -2548,13 +2608,11 @@ public class Codons {
             return b.toString();
         }
 
-        @Override public boolean usesPattern() {
-            return _usesPattern;
-        }
+        @Override public boolean usesPattern() { return _usesPattern; }
 
-        @Override public boolean deterministic() {
-            return _deterministic;
-        }
+        @Override public boolean usesTape() { return _usesTape; }
+
+        @Override public boolean deterministic() { return _deterministic; }
 
         @Override public void op(int[] p, IntTape t) {
             for(int i=0;i<_cs.length;i++) {

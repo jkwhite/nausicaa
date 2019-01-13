@@ -80,7 +80,7 @@ public class GenomeParser {
                     tr.append(c.code()).append(" ");
                 }
                 s.s(seq.c, seq.weight, new ComputedPattern(_a,
-                    new ComputedPattern.MachineElf(new Machine(new Implicate(_a, dm, universal), new Genome(tr.toString().trim().replace('+',' '), 2)))));
+                    new ComputedPattern.MachineElf(new Machine(new Implicate(_a, dm, universal), new Genome(tr.toString().trim().replace('+',' '), 2), _mf.trace()))));
             }
             else {
                 s.d(seq.n, dm.find(seq.n));
@@ -176,7 +176,7 @@ public class GenomeParser {
         for(S seq:ps) {
             if(seq.n==null) {
                 s.s(seq.c, seq.weight, new ComputedPattern(_a,
-                    new ComputedPattern.MachineElf(new Machine(new Implicate(_a, dm, _lang), new Genome(seq.g, 2)))));
+                    new ComputedPattern.MachineElf(new Machine(new Implicate(_a, dm, _lang), new Genome(seq.g, 2), _mf.trace()))));
             }
             else {
                 s.d(seq.n, dm.find(seq.n));

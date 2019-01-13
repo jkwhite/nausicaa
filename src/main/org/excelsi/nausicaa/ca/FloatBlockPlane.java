@@ -117,7 +117,10 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
     }
 
     @Override public float[] getRow(float[] into, int y, int offset) {
-        throw new UnsupportedOperationException();
+        for(int i=0;i<_w;i++) {
+            into[offset++] = getCell(i, y, _readDepthIdx);
+        }
+        return into;
     }
 
     @Override public float[] getBlock(float[] into, int x, int y, int dx, int dy, int offset) {

@@ -1992,6 +1992,10 @@ public class Actions {
     }
 
     public static MutationFactor createMutationFactor(Config config, Random r) {
+        return createMutationFactor(config, r, false);
+    }
+
+    public static MutationFactor createMutationFactor(Config config, Random r, boolean trace) {
         int mc = Integer.parseInt(config.getVariable("mutator_maxcolors", "9"));
         final String stage = config.getVariable("mutator_stage", "0");
         MutationFactor mf = MutationFactor.defaultFactor()
@@ -2004,6 +2008,7 @@ public class Actions {
             .withUpdateWeight(config.getWeightVariations())
             .withRule(config.getRuleVariations())
             .withLanguage(Languages.simpleSymmetry())
+            .withTrace(trace)
             .withValidator((a)->{
                 return a.colors()<mc;
             });

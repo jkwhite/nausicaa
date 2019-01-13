@@ -7,7 +7,9 @@ import java.util.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.*;
 import org.excelsi.nausicaa.ca.Colors;
+import org.excelsi.nausicaa.ca.Pattern;
 import org.excelsi.nausicaa.ca.Rule;
+import org.excelsi.nausicaa.ca.ComputedRule2d;
 import org.excelsi.nausicaa.ca.CA;
 import org.excelsi.nausicaa.ca.IndexedRule;
 import org.excelsi.nausicaa.ca.Palette;
@@ -47,7 +49,12 @@ public class RuleEditor extends JComponent implements TimelineListener {
 
         final CA current = _ui.getActiveCA();
         _rule = current.getRule();
-        JPanel scr = new JPanel(new FlowLayout());
+        //JPanel scr = new JPanel(new FlowLayout());
+        JPanel scr = new JPanel();
+        BoxLayout bl = new BoxLayout(scr, BoxLayout.Y_AXIS);
+        scr.setLayout(bl);
+
+        scr.add(new JLabel("Genome"));
 
         //final JTextField rule = new JTextField(50);
         final JTextArea rule = new JTextArea(5,80);
@@ -55,6 +62,24 @@ public class RuleEditor extends JComponent implements TimelineListener {
             rule.setText(((Genomic)_rule).prettyGenome());
         }
         scr.add(new JScrollPane(rule));
+        scr.add(new JLabel("Test Pattern"));
+        final JTextArea pat = new JTextArea(3,80);
+        scr.add(pat);
+        JButton testp = new JButton(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                MutationFactor mf = Actions.createMutationFactor(_ui.getConfig(), new Random(), true);
+                String[] ptext = pat.getText().replace("\n", " ").split(" ");
+                Pattern p = ((ComputedRule2d)_rule.origin().create(rule.getText(), mf)).createPattern();
+                float[] ps = new float[ptext.length];
+                for(int i=0;i<ptext.length;i++) {
+                    ps[i] = Float.parseFloat(ptext[i]);
+                }
+                float next = p.next(0, ps);
+                System.err.println("Next: "+next);
+            }
+        });
+        testp.setText("Test");
+        scr.add(testp);
         rule.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 if(e.getModifiers()!=0) {
@@ -104,7 +129,7 @@ public class RuleEditor extends JComponent implements TimelineListener {
         validate();
         if(getParent()!=null) {
             Dimension dim = getParent().getPreferredSize();
-            _root.setSize(16+dim.width, 24+dim.height);
+            _root.setSize(16+dim.width, 4*24+dim.height);
         }
     }
 }
