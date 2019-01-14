@@ -290,6 +290,10 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         return _p instanceof Genomic ? ((Genomic)_p).genome() : _p.toString();
     }
 
+    @Override public Varmap vars() {
+        return _p instanceof Genomic ? ((Genomic)_p).vars() : new Varmap();
+    }
+
     @Override public String prettyGenome() {
         return genome().replace(',','\n');
     }

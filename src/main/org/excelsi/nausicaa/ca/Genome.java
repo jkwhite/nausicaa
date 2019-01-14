@@ -13,24 +13,30 @@ import static org.excelsi.nausicaa.ca.WeightedFactory.Weight;
 public final class Genome {
     private final String _c;
     private final int _v;
+    private final String[] _params;
 
 
     public Genome(String c) {
-        this(c, 2);
+        this(c, 2, new String[0]);
     }
 
     public Genome(String c, int version) {
+        this(c, version, new String[0]);
+    }
+
+    public Genome(String c, int version, String[] params) {
         if("".equals(c)) {
             throw new IllegalArgumentException("illegal genome '"+c+"'");
         }
         _c = c;
         _v = version;
+        _params = params;
     }
 
     public Codon[] codons(Implicate i) {
         final List<Codon> ops = new ArrayList<>();
         final String sep = _v==1?"-":" ";
-        for(final String op:_c.split(sep)) {
+        for(final String op:replaceParams(_c, i).split(sep)) {
             ops.add(Codons.codon(op, i));
         }
         return ops.toArray(new Codon[0]);
@@ -78,6 +84,15 @@ public final class Genome {
         return child;
     }
 
+    private String replaceParams(String g, Implicate i) {
+        final String P_START = "{";
+        final String P_END = "}";
+        for(String p:_params) {
+            g = g.replaceAll(P_START+p+P_END, i.vars().get(p));
+        }
+        return g;
+    }
+
     private Genome replicate(final Implicate im, final WeightedFactory<GenomeMutator> mutators, final GenomeFactory gf, final MutationFactor mf) {
         final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(im)));
         float mult = mf.alpha()/20f;
@@ -109,6 +124,10 @@ public final class Genome {
 
     public String c() {
         return _c;
+    }
+
+    public String[] vars() {
+        return _params;
     }
 
     @Override public String toString() {

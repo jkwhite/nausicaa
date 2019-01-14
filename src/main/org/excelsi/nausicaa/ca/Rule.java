@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 
-public interface Rule extends java.io.Serializable, Humanizable {
+public interface Rule extends java.io.Serializable, Humanizable, Parameterized {
     Archetype archetype();
     Ruleset origin();
     IndexedRule getHyperrule();
@@ -35,6 +35,8 @@ public interface Rule extends java.io.Serializable, Humanizable {
         Iterable<Plane> it = ()->frameIterator(initial, pool, opt);
         return StreamSupport.stream(it.spliterator(), false);
     }
+
+    default Varmap vars() { return new Varmap(); }
 
     interface Updater {
         void update(Rule r, int start, int current, int end);

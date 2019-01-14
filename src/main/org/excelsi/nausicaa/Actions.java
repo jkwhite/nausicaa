@@ -281,6 +281,7 @@ public class Actions {
                         new UpdateMode.SimpleSynchronous(),
                         EdgeMode.defaultMode(),
                         ExternalForce.nop(),
+                        new Varmap(),
                         null);
                 v.setActiveCA(ca);
             }
@@ -1865,25 +1866,46 @@ public class Actions {
         ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
-                //di.setCASize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
-                //config.setVariable("weight", Float.parseFloat(updateWeight.getText()));
                 config.setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(depth.getText()), Integer.parseInt(prelude.getText()), Float.parseFloat(updateWeight.getText()));
-                //generate(di);
             }
         });
         bot.add(ne);
-        /*
-        de.addActionListener(new AbstractAction() {
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
+    public void configureVariables(NViewer v) {
+        final Config config = v.getConfig();
+        final JDialog d = new JDialog(v, "Variables");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(/*new GridLayout(1,1)*/);
+
+        final VarPanel vp = new VarPanel(v.getActiveCA().getVars());
+        top.add(vp);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                width.setText(""+(_width-32));
-                height.setText(""+(_height-96));
-                //d.dispose();
-                //di.setCASize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
-                //generate(di);
+                d.dispose();
+                vp.commit();
             }
         });
-        bot.add(de);
-        */
+        de.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+            }
+        });
+        bot.add(ne);
         p.add(bot, BorderLayout.SOUTH);
         d.getContentPane().add(p);
         Dimension dim = p.getPreferredSize();

@@ -77,6 +77,10 @@ public final class Index implements Genomic, Mutatable {
         return new Index(_name, new String(g));
     }
 
+    @Override public Varmap vars() {
+        return new Varmap();
+    }
+
     public int size() {
         return _size;
     }

@@ -171,6 +171,7 @@ public class NViewer extends JFrame implements UIActions {
         Rule rule = rs.random(rand, new Implicate(a, new Datamap(), lang)).next();
         ComputeMode cmode = ComputeMode.combined;
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
+        Varmap vm = new Varmap();
         CA ca = new org.excelsi.nausicaa.ca.CA(
                 rule,
                 pal,
@@ -187,6 +188,7 @@ public class NViewer extends JFrame implements UIActions {
                 new UpdateMode.SimpleSynchronous(),
                 EdgeMode.defaultMode(),
                 ExternalForce.nop(),
+                vm,
                 null);
         return ca;
     }
@@ -1067,6 +1069,15 @@ public class NViewer extends JFrame implements UIActions {
         JMenuItem siz = auto.add(size);
         siz.setText("Configure parameters ...");
         siz.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcut));
+
+        AbstractAction vars = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.configureVariables(NViewer.this);
+            }
+        };
+        JMenuItem vrs = auto.add(vars);
+        vrs.setText("Variables ...");
+        vrs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, shortcut | InputEvent.SHIFT_DOWN_MASK));
 
         auto.addSeparator();
 

@@ -97,6 +97,10 @@ public class GenomeParser {
         return new ComputedRule2d(sp, rs);
     }
 
+    public static Varmap createVarmap(final String g) {
+        return new Varmap(parseParams(g));
+    }
+
     private static final void codonInfo(StringBuilder b, Codon[] cs, String indent) {
         for(Codon c:cs) {
             b.append(indent).append(opName(c)).append('\n');
@@ -156,16 +160,42 @@ public class GenomeParser {
                         c = Integer.parseInt(pref);
                         w = null;
                     }
-                    ps.add(new S(c, w, null, grs));
+                    String[] params = parseParams(grs);
+                    ps.add(new S(c, w, null, grs, params));
                 }
                 else if(cg[0].trim().startsWith("da")) {
                     n = cg[0].trim().substring("da".length());
-                    ps.add(new S(0, null, n, grs));
+                    ps.add(new S(0, null, n, grs, null));
                     dm.index(n, new Index(n, grs));
                 }
             }
         }
         return new Pair(ps,dm);
+    }
+
+    private static String[] parseParams(String g) {
+        final String P_START = Varmap.P_START;
+        final String P_END = Varmap.P_END;
+        Set<String> ps = new HashSet<>();
+        int idx = 0;
+        while(idx>=0 && idx<g.length()) {
+            int nidx = g.indexOf(P_START, idx);
+            if(nidx>=idx) {
+                int end = g.indexOf(P_END, nidx);
+                if(end>nidx) {
+                    String param = g.substring(nidx+1, end);
+                    ps.add(param);
+                    idx = end+1;
+                }
+                else {
+                    idx = -1;
+                }
+            }
+            else {
+                idx = -1;
+            }
+        }
+        return ps.toArray(new String[0]);
     }
     
     private Rule parse2(final String g, final Ruleset origin) {
@@ -234,12 +264,14 @@ public class GenomeParser {
         public final Float weight;
         public final String n;
         public final String g;
+        public final String[] params;
 
-        public S(int c, Float w, String n, String g) {
+        public S(int c, Float w, String n, String g, String[] params) {
             this.c = c;
             this.weight = w;
             this.n = n;
             this.g = g;
+            this.params = params;
         }
 
         @Override public String toString() {

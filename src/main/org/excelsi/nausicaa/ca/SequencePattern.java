@@ -134,6 +134,10 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
         return _s.prettyGenome();
     }
 
+    @Override public Varmap vars() {
+        return _s.vars();
+    }
+
     @Override public String toString() {
         return _s.humanize();
     }
@@ -316,6 +320,10 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
 
         @Override public String prettyGenome() {
             return genome();
+        }
+
+        @Override public Varmap vars() {
+            return GenomeParser.createVarmap(genome());
         }
 
         @Override public String humanize() {

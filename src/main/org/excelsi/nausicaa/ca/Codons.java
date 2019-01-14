@@ -82,6 +82,9 @@ public class Codons {
 
 
     public static Codon codon(final String s, final Implicate im) {
+        if(Varmap.containsVar(s)) {
+            return new Placeholder(s);
+        }
         Language lang = im.language();
         if(lang==null) {
             lang = Languages.universal();
@@ -2533,6 +2536,25 @@ public class Codons {
                 //System.err.println("i: p:"+ipeek+", d:"+dist+", l:"+len+", a:"+Arrays.toString(_v));
                 //System.err.println("o: p:"+opeek+", d:"+dist+", l:"+len+", a:"+Arrays.toString(_vt));
             //}
+        }
+    }
+
+    public static class Placeholder implements Codon {
+        private final String _name;
+
+        public Placeholder(String name) {
+            _name = name;
+        }
+
+        @Override public Codon copy() { return new Placeholder(_name); }
+
+        @Override public String code() { return _name; }
+
+        @Override public boolean usesPattern() { return false; }
+
+        @Override public boolean usesTape() { return false; }
+
+        @Override public void op(int[] p, IntTape t) {
         }
     }
 

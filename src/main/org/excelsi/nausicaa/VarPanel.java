@@ -5,23 +5,28 @@ import javax.swing.*;
 import java.awt.GridLayout;
 import java.util.*;
 
-
-public class InfoPanel extends JPanel {
-    private java.util.List<JComponent[]> _pairs = new ArrayList<JComponent[]>();
+import org.excelsi.nausicaa.ca.*;
 
 
-    public InfoPanel() {
+public class VarPanel extends JPanel {
+    private final java.util.List<JComponent[]> _pairs = new ArrayList<JComponent[]>();
+    private final Map<String,JTextField> _vals = new HashMap<>();
+    private final Varmap _v;
+
+
+    public VarPanel(Varmap v) {
+        System.err.println("*** showing vars: "+v);
+        for(String n:v.names()) {
+            addPair(n, v.get(n));
+        }
+        done();
+        _v = v;
     }
 
-    public InfoPanel addPair(String label, Object value) {
-        JComponent val = null;
-        if(value instanceof JComponent) {
-            val = (JComponent) value;
-        }
-        else {
-            val = new JLabel(value.toString());
-        }
+    public VarPanel addPair(String label, String value) {
+        JTextField val = new JTextField(value, 10);
         _pairs.add(new JComponent[]{new JLabel(label), val});
+        _vals.put(label, val);
         return this;
     }
 
@@ -51,5 +56,11 @@ public class InfoPanel extends JPanel {
             vGroup.addGroup(vgr1);
         }
         g.setVerticalGroup(vGroup);
+    }
+
+    public void commit() {
+        for(Map.Entry<String,JTextField> e:_vals.entrySet()) {
+            _v.put(e.getKey(), e.getValue().getText());
+        }
     }
 }
