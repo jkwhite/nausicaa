@@ -98,7 +98,9 @@ public class GenomeParser {
     }
 
     public static Varmap createVarmap(final String g) {
-        return new Varmap(parseParams(g));
+        Varmap m = new Varmap(parseParams(g));
+        //System.err.println("created varmap: "+m);
+        return m;
     }
 
     private static final void codonInfo(StringBuilder b, Codon[] cs, String indent) {
@@ -195,6 +197,7 @@ public class GenomeParser {
                 idx = -1;
             }
         }
+        //System.err.println("! params for '"+g+"': "+ps);
         return ps.toArray(new String[0]);
     }
     
@@ -206,7 +209,7 @@ public class GenomeParser {
         for(S seq:ps) {
             if(seq.n==null) {
                 s.s(seq.c, seq.weight, new ComputedPattern(_a,
-                    new ComputedPattern.MachineElf(new Machine(new Implicate(_a, dm, _lang), new Genome(seq.g, 2), _mf.trace()))));
+                    new ComputedPattern.MachineElf(new Machine(new Implicate(_a, dm, _lang, _mf.vars()), new Genome(seq.g, 2), _mf.trace()))));
             }
             else {
                 s.d(seq.n, dm.find(seq.n));

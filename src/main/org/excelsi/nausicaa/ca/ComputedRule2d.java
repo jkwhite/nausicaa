@@ -291,6 +291,8 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
     }
 
     @Override public Varmap vars() {
+        //System.err.println("is_gen: "+(_p instanceof Genomic));
+        //System.err.println("** pat: "+_p);
         return _p instanceof Genomic ? ((Genomic)_p).vars() : new Varmap();
     }
 

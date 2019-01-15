@@ -85,10 +85,15 @@ public final class Genome {
     }
 
     private String replaceParams(String g, Implicate i) {
-        final String P_START = "{";
-        final String P_END = "}";
-        for(String p:_params) {
-            g = g.replaceAll(P_START+p+P_END, i.vars().get(p));
+        final String P_START = Varmap.P_START;
+        final String P_END = Varmap.P_END;
+        System.err.println("** replaceParams vars: "+i.vars());
+        Thread.dumpStack();
+        for(String p:GenomeParser.createVarmap(g).names()) {
+            String v = i.vars().get(p);
+            if(!"".equals(v)) {
+                g = g.replaceAll("\\"+P_START+p+"\\"+P_END, v);
+            }
         }
         return g;
     }

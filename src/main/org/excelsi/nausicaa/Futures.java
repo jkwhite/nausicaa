@@ -235,14 +235,14 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         });
     }
 
-    private MutationFactor createMutationFactor() {
+    private MutationFactor createMutationFactor(CA ca) {
         //return MutationFactor.defaultFactor().withAlpha(Integer.parseInt(_config.getVariable("mutator_alpha", "20")));
-        MutationFactor mf = Actions.createMutationFactor(_config, _random);
+        MutationFactor mf = Actions.createMutationFactor(ca, _config, _random);
         return mf;
     }
 
     public CA mutate(CA ca) {
-        final CA res = new MultiTransform(_random, createMutationFactor(), _config.getForceSymmetry()?new Symmetry(true):null)
+        final CA res = new MultiTransform(_random, createMutationFactor(ca), _config.getForceSymmetry()?new Symmetry(true):null)
             .ruleVariations(_config.getRuleVariations())
             .hueVariations(_config.getHueVariations())
             .weightVariations(_config.getWeightVariations())

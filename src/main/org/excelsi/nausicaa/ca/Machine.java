@@ -10,6 +10,7 @@ public class Machine {
     private final Archetype _a;
     private final Datamap _d;
     private final Language _lang;
+    private final Varmap _vars;
     private final Genome _g;
     private final Codon[] _prg;
     private final int[] _inst;
@@ -27,6 +28,7 @@ public class Machine {
         _a = im.archetype();
         _d = im.datamap();
         _lang = im.language();
+        _vars = im.vars();
         _g = g;
         _trace = trace;
         _prg = g.codons(im);
@@ -52,7 +54,7 @@ public class Machine {
     }
 
     public Machine copy(Datamap dm) {
-        return new Machine(new Implicate(_a, dm, _lang), _g, _trace);
+        return new Machine(new Implicate(_a, dm, _lang, _vars), _g, _trace);
     }
 
     //public int compute(final int[] p) {

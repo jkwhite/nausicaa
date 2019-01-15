@@ -22,6 +22,9 @@ public class Varmap {
 
     public Varmap(String[] names) {
         _names = new HashSet<>(Arrays.asList(names));
+        for(String n:names) {
+            _vars.put(n, null);
+        }
     }
 
     public String[] names() {

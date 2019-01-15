@@ -1897,7 +1897,14 @@ public class Actions {
         ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
-                vp.commit();
+                Varmap vn = vp.commit();
+                CA ca = v.getActiveCA().vars(vn);
+                Rule r = ca.getRule();
+                if(r instanceof Genomic) {
+                    ca = ca.mutate(r.origin().create(((Genomic)r).genome(),
+                        createMutationFactor(ca, config, v.getRandom())), ca.getRandom());
+                }
+                v.setActiveCA(ca);
             }
         });
         de.addActionListener(new AbstractAction() {
@@ -1924,7 +1931,7 @@ public class Actions {
         final CA ca = v.getActiveCA();
         final Rule r = ca.getRule();
         if(r instanceof Mutatable) {
-            v.setActiveCA(ca.mutate((Rule)((Mutatable)r).mutate(createMutationFactor(config, rand).withMode("add")), rand));
+            v.setActiveCA(ca.mutate((Rule)((Mutatable)r).mutate(createMutationFactor(ca, config, rand).withMode("add")), rand));
             int nstage = 1+Integer.parseInt(config.getVariable("mutator_stage", "0"));
             config.setVariable("mutator_stage", ""+nstage);
         }
@@ -1934,7 +1941,7 @@ public class Actions {
         final CA ca = v.getActiveCA();
         final Rule r = ca.getRule();
         if(r instanceof Mutatable) {
-            v.setActiveCA(ca.mutate((Rule)((Mutatable)r).mutate(createMutationFactor(config, rand).withMode("add_data")), rand));
+            v.setActiveCA(ca.mutate((Rule)((Mutatable)r).mutate(createMutationFactor(ca, config, rand).withMode("add_data")), rand));
             int nstage = 1+Integer.parseInt(config.getVariable("mutator_stage", "0"));
             config.setVariable("mutator_stage", ""+nstage);
         }
@@ -1944,7 +1951,7 @@ public class Actions {
         final CA ca = v.getActiveCA();
         final Rule r = ca.getRule();
         if(r instanceof Mutatable) {
-            v.setActiveCA(ca.mutate((Rule)((Mutatable)r).mutate(createMutationFactor(config, rand).withMode("remove")), rand));
+            v.setActiveCA(ca.mutate((Rule)((Mutatable)r).mutate(createMutationFactor(ca, config, rand).withMode("remove")), rand));
             int stage = Integer.parseInt(config.getVariable("mutator_stage", "0"));
             config.setVariable("mutator_stage", ""+(stage-1));
         }
@@ -1990,20 +1997,10 @@ public class Actions {
         final CA ca = v.getActiveCA();
         v.setActiveCA(new RuleTransform(rand,
             null,
-            createMutationFactor(config, rand).withGenomeMutator(m)
+            createMutationFactor(ca, config, rand)
+                .withGenomeMutator(m)
             ).transform(ca));
     }
-
-    /*
-    public void mutate(NViewer v, Config config, Random rand, Mutator m) {
-        _lastMutator = m;
-        if(v.getConfig().getForceSymmetry()) {
-            m = Mutator.chain(m, new Symmetry());
-        }
-        final CA ca = v.getActiveCA();
-        v.setActiveCA(new RuleTransform(rand, m, createMutationFactor(config, rand)).transform(ca));
-    }
-    */
 
     public static void translateToUniversal(NViewer v) {
         CA ca = v.getActiveCA();
@@ -2013,11 +2010,11 @@ public class Actions {
         v.setActiveCA(ca);
     }
 
-    public static MutationFactor createMutationFactor(Config config, Random r) {
-        return createMutationFactor(config, r, false);
+    public static MutationFactor createMutationFactor(CA ca, Config config, Random r) {
+        return createMutationFactor(ca, config, r, false);
     }
 
-    public static MutationFactor createMutationFactor(Config config, Random r, boolean trace) {
+    public static MutationFactor createMutationFactor(CA ca, Config config, Random r, boolean trace) {
         int mc = Integer.parseInt(config.getVariable("mutator_maxcolors", "9"));
         final String stage = config.getVariable("mutator_stage", "0");
         MutationFactor mf = MutationFactor.defaultFactor()
@@ -2029,7 +2026,8 @@ public class Actions {
             .withMeta("true".equals(config.getVariable("mutator_meta", "false")))
             .withUpdateWeight(config.getWeightVariations())
             .withRule(config.getRuleVariations())
-            .withLanguage(Languages.simpleSymmetry())
+            .withLanguage(Languages.universal())
+            .withVars(ca.getVars())
             .withTrace(trace)
             .withValidator((a)->{
                 return a.colors()<mc;

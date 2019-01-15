@@ -13,6 +13,7 @@ public class Implicate {
 
     public Implicate(Archetype a, Datamap d, Language lang) {
         this(a, d, lang, new Varmap());
+        //Thread.dumpStack();
     }
 
     public Implicate(Archetype a, Datamap d, Language lang, Varmap vars) {

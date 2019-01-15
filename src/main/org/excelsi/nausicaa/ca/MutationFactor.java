@@ -17,6 +17,7 @@ public final class MutationFactor {
     private boolean _rule;
     private boolean _meta;
     private Datamap _data;
+    private Varmap _vars;
     private GenomeMutator _gm;
     private Language _lang;
     private boolean _trace;
@@ -154,6 +155,15 @@ public final class MutationFactor {
 
     public Datamap datamap() {
         return _data;
+    }
+
+    public MutationFactor withVars(Varmap m) {
+        _vars = m;
+        return this;
+    }
+
+    public Varmap vars() {
+        return _vars;
     }
 
     public MutationFactor withGenomeMutator(GenomeMutator gm) {

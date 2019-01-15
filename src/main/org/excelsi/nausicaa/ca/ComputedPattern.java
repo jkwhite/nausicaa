@@ -445,7 +445,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
 
     @Override public ComputedPattern mutate(MutationFactor m) {
         GenomeFactory gf = new GenomeFactory();
-        return new ComputedPattern(_a, _logic.mutate(new Implicate(_a, m.datamap(), m.language()), gf, m));
+        return new ComputedPattern(_a, _logic.mutate(new Implicate(_a, m.datamap(), m.language(), m.vars()), gf, m));
     }
 
     public interface RuleLogic {

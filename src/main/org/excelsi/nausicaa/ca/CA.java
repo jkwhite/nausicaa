@@ -76,10 +76,11 @@ public final class CA {
         _emode = emode;
         _ef = ef;
         _meta = meta;
-        System.err.println("rule vars: "+r.vars());
-        System.err.println("inherit vars: "+vars);
+        //System.err.println("rule: "+r);
+        //System.err.println("rule vars: "+r.vars());
+        //System.err.println("inherit vars: "+vars);
         _vars = r.vars().merge(vars);
-        System.err.println("vars: "+_vars);
+        //System.err.println("vars: "+_vars);
     }
 
     public Archetype archetype() {

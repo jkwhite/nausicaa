@@ -67,7 +67,7 @@ public class RuleEditor extends JComponent implements TimelineListener {
         scr.add(pat);
         JButton testp = new JButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                MutationFactor mf = Actions.createMutationFactor(_ui.getConfig(), new Random(), true);
+                MutationFactor mf = Actions.createMutationFactor(current, _ui.getConfig(), new Random(), true);
                 String[] ptext = pat.getText().replace("\n", " ").split(" ");
                 Pattern p = ((ComputedRule2d)_rule.origin().create(rule.getText(), mf)).createPattern();
                 float[] ps = new float[ptext.length];

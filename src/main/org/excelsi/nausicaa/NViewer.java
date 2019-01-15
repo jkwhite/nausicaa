@@ -1859,7 +1859,7 @@ public class NViewer extends JFrame implements UIActions {
         else {
             _reditor = new JFrame("Rule Editor");
             _ruleEditor = new RuleEditor(_reditor, this, _timeline,
-                Actions.createMutationFactor(_config, _random));
+                Actions.createMutationFactor(getActiveCA(), _config, _random));
             _reditor.getContentPane().add(_ruleEditor);
             _reditor.pack();
             Dimension dim = _reditor.getContentPane().getPreferredSize();

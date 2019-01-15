@@ -323,7 +323,9 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
         }
 
         @Override public Varmap vars() {
-            return GenomeParser.createVarmap(genome());
+            Varmap m = GenomeParser.createVarmap(genome());
+            //System.err.println("## seq varmap: "+m+" for "+genome());
+            return m;
         }
 
         @Override public String humanize() {

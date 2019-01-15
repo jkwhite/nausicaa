@@ -58,9 +58,11 @@ public class VarPanel extends JPanel {
         g.setVerticalGroup(vGroup);
     }
 
-    public void commit() {
+    public Varmap commit() {
+        Varmap c = new Varmap();
         for(Map.Entry<String,JTextField> e:_vals.entrySet()) {
-            _v.put(e.getKey(), e.getValue().getText());
+            c.put(e.getKey(), e.getValue().getText());
         }
+        return c;
     }
 }
