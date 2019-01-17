@@ -87,8 +87,8 @@ public final class Genome {
     private String replaceParams(String g, Implicate i) {
         final String P_START = Varmap.P_START;
         final String P_END = Varmap.P_END;
-        System.err.println("** replaceParams vars: "+i.vars());
-        Thread.dumpStack();
+        //System.err.println("** replaceParams vars: "+i.vars());
+        //Thread.dumpStack();
         for(String p:GenomeParser.createVarmap(g).names()) {
             String v = i.vars().get(p);
             if(!"".equals(v)) {

@@ -6,6 +6,9 @@ import java.util.Random;
 
 public interface Codon {
     void op(int[] p, IntTape t);
+    default void op(int[] p, IntTape t, Pattern.Ctx ctx) {
+        op(p, t);
+    }
     default void op(float[] p, FloatTape t) { }
     default boolean supports(Values v) { return v==Values.discrete; }
     Codon copy();

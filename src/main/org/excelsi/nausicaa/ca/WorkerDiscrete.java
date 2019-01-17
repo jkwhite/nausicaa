@@ -24,6 +24,7 @@ public class WorkerDiscrete implements Worker {
     private final UpdateMode _umode;
     private final ExternalForce _ef;
     private final Random _r;
+    private final Pattern.Ctx _pctx;
     private float _weight;
     private float _oWeight;
 
@@ -43,9 +44,11 @@ public class WorkerDiscrete implements Worker {
         _moore = p.archetype().neighborhood()==Archetype.Neighborhood.moore;
         _channels = cmode==ComputeMode.channel;
         _umode = umode.simpleSynchronous() ? null:umode.plan(_wp.archetype());
-        System.err.println("********** umode: "+_umode);
+        //System.err.println("********** umode: "+_umode);
         _ef = ef;
         _r = r;
+        _pctx = new Pattern.Ctx();
+        _pctx.c = new int[3];
 
         _pow = new int[_wp.archetype().sourceLength()];
         for(int i=0;i<_pow.length;i++) {
@@ -64,12 +67,15 @@ public class WorkerDiscrete implements Worker {
     public void frame3d(final IntBlockPlane p1, final IntBlockPlane p2) {
         final int d = _size*2+1;
         for(int i=_y1;i<_y2;i++) {
+            _pctx.c[1] = i-p1.getHeight()/2;
             for(int j=_x1;j<_x2;j++) {
+                _pctx.c[0] = j-p1.getWidth()/2;
                 for(int k=0;k<p1.getDepth();k++) {
                     if(_umode!=null&&!_umode.update(p1, j, i, k, _vars)) {
                         p2.setCell(j,i,k,p1.getCell(j,i,k));
                     }
                     else {
+                        _pctx.c[2] = k-p1.getDepth()/2;
                         if(!_vars.weightVaries()) {
                             _weight = _vars.weight();
                         }
@@ -108,7 +114,7 @@ public class WorkerDiscrete implements Worker {
     private final int next(final int[] pattern) {
         //float weight, oweight;
 
-        final int v = _wp.next(0, pattern);
+        final int v = _wp.next(0, pattern, _pctx);
         final int ov = pattern[pattern.length/2];
         final int nv = (int) ((_oWeight*ov)+(_weight*v));
         return nv;
@@ -142,6 +148,7 @@ public class WorkerDiscrete implements Worker {
         final int d = _size*2+1;
         final int mx = (_y2-_y1)*(_x2-_x1);
         for(int i=_y1;i<_y2;i++) {
+            _pctx.c[1] = i-p1.getHeight()/2;
             for(int j=_x1;j<_x2;j++) {
                 //if(RAND.nextInt(1000)>=100) {
                 //final int self = i*j;
@@ -159,6 +166,7 @@ public class WorkerDiscrete implements Worker {
                     p2.setCell(j,i,p1.getCell(j,i));
                 }
                 else {
+                    _pctx.c[0] = j-p1.getWidth()/2;
                     counts++;
                     if(_moore) {
                         p1.getBlock(_pattern, j-_size, i-_size, /*dx*/ d, /*dy*/ d, 0);
@@ -198,13 +206,15 @@ public class WorkerDiscrete implements Worker {
         //final Pattern p = createPattern(pool);
         //System.err.println("created pattern: "+p);
         for(int i=_y1;i<_y2;i++) {
+            _pctx.c[1]=i-c.getHeight()/2;
             for(int j=0;j<w;j++) {
+                _pctx.c[0]=j-c.getWidth()/2;
                 if(_umode!=null&&!_umode.update(c, j, 0, 0, _vars)) {
                     c.setCell(j,i,c.getCell(j,i-1));
                 }
                 else {
                     c.getBlock(pattern, j-size, i-1, pattern.length, 1, 0);
-                    final int v = _wp.next(0, pattern);
+                    final int v = _wp.next(0, pattern, _pctx);
                     final int ov = pattern[pattern.length/2];
                     final int nv = (int) ((_oWeight*ov)+(_weight*v));
                     c.setCell(j, i, nv);

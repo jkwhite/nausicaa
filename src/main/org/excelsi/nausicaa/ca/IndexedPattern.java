@@ -45,7 +45,7 @@ public final class IndexedPattern implements Pattern {
         return _target[pattern];
     }
 
-    @Override public int next(int pattern, int[] p2) {
+    @Override public int next(int pattern, int[] p2, Ctx ctx) {
         int idx = 0;
         for(int k=0;k<p2.length;k++) {
             idx += p2[k] * _pow[k];

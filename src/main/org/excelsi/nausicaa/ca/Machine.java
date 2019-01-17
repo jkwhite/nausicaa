@@ -65,9 +65,10 @@ public class Machine {
         if(io.v==Values.discrete) {
             _ti.reset();
             final int[] p = io.ii;
+            final Pattern.Ctx ctx = io.ctx;
             for(int i=0;i<_prg.length;i++) {
                 //long st = System.currentTimeMillis();
-                _prg[i].op(p, _ti);
+                _prg[i].op(p, _ti, ctx);
                 //long en = System.currentTimeMillis();
                 //if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
                 //_inst[i] += en-st;

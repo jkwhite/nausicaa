@@ -79,6 +79,8 @@ public class Codons {
     public static final String EQUAL_A = "po";
     public static final String MOST = "wa";
     public static final String LEAST = "wo";
+    public static final String COORD = "kya";
+    public static final String MANDELBROT = "nya";
 
 
     public static Codon codon(final String s, final Implicate im) {
@@ -262,6 +264,10 @@ public class Codons {
                     return new Convolve(im.archetype().sourceLength());
                 case RAND:
                     return new Rand();
+                case COORD:
+                    return new Coord(p);
+                case MANDELBROT:
+                    return new Mandelbrot();
                 default:
                     throw new IllegalStateException("unknown opcode '"+code+"'");
             }
@@ -2448,6 +2454,96 @@ public class Codons {
         @Override public void op(float[] p, FloatTape t) {
             float v = t.pop();
             t.push(v*R.nextFloat());
+        }
+    }
+
+    public static class Coord implements Codon, Unstable {
+        private final int _c;
+
+
+        public Coord(int c) {
+            _c = c;
+        }
+
+        @Override public Codon copy() { return new Coord(_c); }
+
+        @Override public String code() { return _c==-1?COORD:(COORD+_c); }
+
+        @Override public boolean usesPattern() { return false; }
+
+        @Override public boolean usesTape() { return false; }
+
+        @Override public boolean supports(Values v) { return true; }
+
+        @Override public boolean deterministic() { return false; }
+
+        @Override public void op(int[] p, IntTape t) {
+        }
+
+        @Override public void op(int[] p, IntTape t, Pattern.Ctx ctx) {
+            if(_c==-1) {
+                for(int i=0;i<ctx.c.length;i++) {
+                    t.push(ctx.c[i]);
+                }
+            }
+            else {
+                t.push(ctx.c[_c%ctx.c.length]);
+            }
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
+        }
+
+        @Override public Codon destabilize(Random r) {
+            return new Coord(r.nextInt(4)-1);
+        }
+    }
+
+    public static class Mandelbrot implements Codon {
+        private static final int SAFETY = 1000;
+
+
+        @Override public Codon copy() { return new Mandelbrot(); }
+
+        @Override public String code() { return MANDELBROT; }
+
+        @Override public boolean usesPattern() { return false; }
+
+        @Override public boolean usesTape() { return true; }
+
+        @Override public boolean supports(Values v) { return true; }
+
+        @Override public boolean deterministic() { return true; }
+
+        @Override public void op(int[] p, IntTape t) {
+        }
+
+        @Override public void op(int[] p, IntTape t, Pattern.Ctx ctx) {
+            float x1 = 0;
+            float y1 = 0;
+            //int c;
+            float scl = t.pop();
+            int z = Math.min(t.pop(), SAFETY);
+            //float cx = ctx.c[0]/scl;
+            //float cy = ctx.c[1]/scl;
+            float cy = t.pop()/scl;
+            float cx = t.pop()/scl;
+            while(z>0 && x1*x1+y1*y1<4) {
+                z--;
+                float xx = x1*x1 - y1*y1 + cx;
+                y1 = 2 * x1 *y1 + cy;
+                x1 = xx;
+            }
+            //if(z>=100) {
+                //c = 0;
+            //}
+            //else {
+                //c = 1;
+            //}
+            t.push(z);
+        }
+
+        @Override public void op(float[] p, FloatTape t) {
         }
     }
 

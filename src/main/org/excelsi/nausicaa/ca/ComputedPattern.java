@@ -343,7 +343,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
     private long _misses;
     private static final int[] ZEROS = new int[9];
 
-    @Override public int next(int pattern, final int[] p2) {
+    @Override public int next(int pattern, final int[] p2, Ctx ctx) {
         int r;
         if(ENABLE_CACHE && _cache!=null) {
             r = _cache.find(p2);
@@ -361,6 +361,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         }
         _misses++;
         _io.ii = p2;
+        _io.ctx = ctx;
         _logic.next(_io);
         r = _io.io;
         //if(_cache.lk!=0) {

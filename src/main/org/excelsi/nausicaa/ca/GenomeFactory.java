@@ -93,6 +93,10 @@ public class GenomeFactory {
         else {
             cs.add(weight(1,new HistoTroveInt()));
         }
+        if(true) {
+            cs.add(weight(1,new Coord(-1)));
+            cs.add(weight(1,new Mandelbrot()));
+        }
         for(Iterator<Weight<Codon>> it=cs.iterator();it.hasNext();) {
             if(!it.next().e().supports(a.values())) {
                 it.remove();
