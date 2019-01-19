@@ -5,6 +5,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.event.*;
 import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 import org.excelsi.nausicaa.ca.*;
 
@@ -250,6 +252,7 @@ public class NViewer extends JFrame implements UIActions {
         createPaletteMenu(shortcut, bar);
         createMutateMenu(shortcut, bar);
         createRenderMenu(shortcut, bar);
+        createFunctionsMenu(shortcut, bar);
         createViewMenu(shortcut, bar);
         createWindowMenu(shortcut, bar);
         root().setJMenuBar(bar);
@@ -1484,6 +1487,10 @@ public class NViewer extends JFrame implements UIActions {
         automode.setText("Toggle auto mutate");
 
         bar.add(mutate);
+    }
+
+    private void createFunctionsMenu(int shortcut, JMenuBar bar) {
+        JMenu functions = new JMenu("Functions");
     }
 
     private void createRenderMenu(int shortcut, JMenuBar bar) {
