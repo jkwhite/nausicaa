@@ -15,9 +15,10 @@ run = { ca, args, api ->
     def inc = args['step'] as Float
     def iter = args['iter'] as Integer
     def file = args['file']
-    for(int i=start;i<=end;i+=inc) {
+    int suf = 0
+    for(i=start;i<=end;i+=inc) {
         def vars = new Varmap().put(variable, i as String)
-        def cur1 = ca.vars(vars)
+        def cur1 = ca.vars(ca.vars.merge(vars))
         def cur2 = cur1.mutate(cur1.rule.origin().create(cur1.rule.genome(), api.mutationFactor.withVars(vars)), ca.random)
         def it = cur2.compileRule().frameIterator(
             cur2.createPlane(api.pool, api.options),
@@ -28,6 +29,7 @@ run = { ca, args, api ->
         for(j=1;j<iter;j++) {
             fr = it.next()
         }
-        fr.save(file+'-'+i+'.png', api.rendering)
+        fr.save(file+'-'+suf+'.png', api.rendering)
+        suf++
     }
 }

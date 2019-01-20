@@ -30,12 +30,13 @@ public class FunctionRunner extends JDialog {
         main.add(task, BorderLayout.WEST);
         main.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(main, BorderLayout.CENTER);
+        final JDialog d = this;
 
         final Thread runner = new Thread() {
             @Override public void run() {
                 try {
                     fn.run(ca, vars, api);
-                    dispose();
+                    d.dispose();
                 }
                 catch(Exception e) {
                     e.printStackTrace();
