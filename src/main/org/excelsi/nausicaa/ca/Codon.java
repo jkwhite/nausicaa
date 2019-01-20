@@ -10,6 +10,9 @@ public interface Codon {
         op(p, t);
     }
     default void op(float[] p, FloatTape t) { }
+    default void op(float[] p, FloatTape t, Pattern.Ctx ctx) {
+        op(p, t);
+    }
     default boolean supports(Values v) { return v==Values.discrete; }
     Codon copy();
     String code();

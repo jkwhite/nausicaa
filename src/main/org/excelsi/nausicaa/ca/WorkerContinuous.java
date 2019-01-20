@@ -24,6 +24,7 @@ public class WorkerContinuous implements Worker {
     private final UpdateMode _umode;
     private final ExternalForce _ef;
     private final Random _r;
+    private final Pattern.Ctx _pctx;
     private float _weight;
     private float _oWeight;
 
@@ -47,6 +48,8 @@ public class WorkerContinuous implements Worker {
         _umode = umode.simpleSynchronous() ? null:umode.plan(_wp.archetype());
         _ef = ef;
         _r = r;
+        _pctx = new Pattern.Ctx();
+        _pctx.c = new int[3];
 
         //_pow = new int[_wp.archetype().sourceLength()];
         //for(int i=0;i<_pow.length;i++) {
@@ -65,12 +68,15 @@ public class WorkerContinuous implements Worker {
     public void frame3d(final FloatBlockPlane p1, final FloatBlockPlane p2) {
         final int d = _size*2+1;
         for(int i=_y1;i<_y2;i++) {
+            _pctx.c[1] = i-p1.getHeight()/2;
             for(int j=_x1;j<_x2;j++) {
+                _pctx.c[0] = j-p1.getWidth()/2;
                 for(int k=0;k<p1.getDepth();k++) {
                     if(_umode!=null&&!_umode.update(p1, j, i, k, _vars)) {
                         p2.setCell(j,i,k,p1.getCell(j,i,k));
                     }
                     else {
+                        _pctx.c[2] = k-p1.getDepth()/2;
                         if(!_vars.weightVaries()) {
                             _weight = _vars.weight();
                         }
@@ -109,7 +115,7 @@ public class WorkerContinuous implements Worker {
     */
 
     private final float next(final float[] pattern) {
-        final float v = _wp.next(0, pattern);
+        final float v = _wp.next(0, pattern, _pctx);
         final float ov = pattern[pattern.length/2];
         final float nv = (float) ((_oWeight*ov)+(_weight*v));
         return nv;
@@ -143,6 +149,7 @@ public class WorkerContinuous implements Worker {
         final int d = _size*2+1;
         final int mx = (_y2-_y1)*(_x2-_x1);
         for(int i=_y1;i<_y2;i++) {
+            _pctx.c[1] = i-p1.getHeight()/2;
             for(int j=_x1;j<_x2;j++) {
                 //if(RAND.nextInt(1000)>=100) {
                 final int self = i*j;
@@ -151,6 +158,7 @@ public class WorkerContinuous implements Worker {
                     p2.setCell(j,i,p1.getCell(j,i));
                 }
                 else {
+                    _pctx.c[0] = j-p1.getWidth()/2;
                     counts++;
                     if(!_vars.weightVaries()) {
                         _weight = _vars.weight();
@@ -197,13 +205,15 @@ public class WorkerContinuous implements Worker {
         //final Pattern p = createPattern(pool);
         //System.err.println("created pattern: "+p);
         for(int i=_y1;i<_y2;i++) {
+            _pctx.c[1]=i-c.getHeight()/2;
             for(int j=0;j<w;j++) {
+                _pctx.c[0]=j-c.getWidth()/2;
                 if(_umode!=null&&!_umode.update(c, j, 0, 0, _vars)) {
                     c.setCell(j,i,c.getCell(j,i-1));
                 }
                 else {
                     c.getBlock(pattern, j-size, i-1, pattern.length, 1, 0);
-                    final float v = _wp.next(0, pattern);
+                    final float v = _wp.next(0, pattern, _pctx);
                     final float ov = pattern[pattern.length/2];
                     final float nv = (float) ((_oWeight*ov)+(_weight*v));
                     c.setCell(j, i, nv);

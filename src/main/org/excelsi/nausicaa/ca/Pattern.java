@@ -7,7 +7,7 @@ public interface Pattern {
     default int next(int pattern, int[] p2, Ctx ctx) {
         throw new UnsupportedOperationException();
     }
-    default float next(int pattern, float[] p2) {
+    default float next(int pattern, float[] p2, Ctx ctx) {
         throw new UnsupportedOperationException();
     }
     default Pattern copy() {

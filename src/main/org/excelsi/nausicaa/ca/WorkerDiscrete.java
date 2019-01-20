@@ -112,8 +112,6 @@ public class WorkerDiscrete implements Worker {
     }
 
     private final int next(final int[] pattern) {
-        //float weight, oweight;
-
         final int v = _wp.next(0, pattern, _pctx);
         final int ov = pattern[pattern.length/2];
         final int nv = (int) ((_oWeight*ov)+(_weight*v));

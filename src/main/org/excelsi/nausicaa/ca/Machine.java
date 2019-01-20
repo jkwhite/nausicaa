@@ -7,6 +7,7 @@ import java.util.Random;
 
 public class Machine {
     private static final int TAPE_LENGTH = 65535*2;
+    private static final int MAX_INSTRUCTIONS = 1000;
     private final Archetype _a;
     private final Datamap _d;
     private final Language _lang;
@@ -62,12 +63,21 @@ public class Machine {
 
     // WEIGHT IS ALPHA
     public void compute(final IO io) {
+        int execCount = 0;
+        final Pattern.Ctx ctx = io.ctx;
         if(io.v==Values.discrete) {
             _ti.reset();
             final int[] p = io.ii;
-            final Pattern.Ctx ctx = io.ctx;
             for(int i=0;i<_prg.length;i++) {
                 //long st = System.currentTimeMillis();
+                if(++execCount>MAX_INSTRUCTIONS) {
+                    System.err.println("******* EXEC LIMIT BREAK *******");
+                    break;
+                }
+                if(_trace) {
+                    System.err.println("Tape: "+_ti);
+                    System.err.println("Codon: "+_prg[i]);
+                }
                 _prg[i].op(p, _ti, ctx);
                 //long en = System.currentTimeMillis();
                 //if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
@@ -75,14 +85,16 @@ public class Machine {
                 if(_ti.stopped()) break;
                 if(_ti.jumped()!=0) {
                     int j = _ti.jumped() % _prg.length;
-                    if(j<0) j=0; //throw new IllegalStateException("negative jump: "+j);
+                    //if(j<0) j=0; //throw new IllegalStateException("negative jump: "+j);
                     i += j;
+                    if(i<0) i=0;
                     //System.err.println("jumped by "+j);
                     //if(i<_prg.length-1) System.err.println("next inst: "+_prg[i+1]);
                     //else System.err.println("end of the line");
                     _ti.jump(0);
                 }
             }
+            if(_trace) System.err.println("Final Tape: "+_ti);
             int res = _ti.pop();
             //if(res<0) res=-res;
             res = res % _a.colors();
@@ -97,19 +109,24 @@ public class Machine {
             final float[] p = io.fi;
             for(int i=0;i<_prg.length;i++) {
                 //long st = System.currentTimeMillis();
+                if(++execCount>MAX_INSTRUCTIONS) {
+                    System.err.println("******* EXEC LIMIT BREAK *******");
+                    break;
+                }
                 if(_trace) {
                     System.err.println("Tape: "+_tf);
                     System.err.println("Codon: "+_prg[i]);
                 }
-                _prg[i].op(p, _tf);
+                _prg[i].op(p, _tf, ctx);
                 //long en = System.currentTimeMillis();
                 //if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
                 //_inst[i] += en-st;
                 if(_tf.stopped()) break;
                 if(_tf.jumped()!=0) {
                     int j = _tf.jumped() % _prg.length;
-                    if(j<0) j=0; //throw new IllegalStateException("negative jump: "+j);
+                    //if(j<0) j=0; //throw new IllegalStateException("negative jump: "+j);
                     i += j;
+                    if(i<0) i=0;
                     //System.err.println("jumped by "+j);
                     _tf.jump(0);
                 }

@@ -373,7 +373,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         return r;
     }
 
-    @Override public float next(int pattern, final float[] p2) {
+    @Override public float next(int pattern, final float[] p2, Pattern.Ctx ctx) {
         float r;
         if(ENABLE_CACHE && _fcache!=null) {
             r = _fcache.find(p2);
@@ -391,6 +391,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         }
         _misses++;
         _io.fi = p2;
+        _io.ctx = ctx;
         _logic.next(_io);
         r = _io.fo;
         if(ENABLE_CACHE && _fcache!=null) {

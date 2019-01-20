@@ -2258,7 +2258,7 @@ public class Codons {
         @Override public Codon copy() { return new Exclamatory(); }
 
         @Override public String code() {
-            return POW;
+            return EXCLAMATORY;
         }
 
         @Override public boolean usesPattern() {
@@ -2407,13 +2407,15 @@ public class Codons {
         @Override public void op(int[] p, IntTape t) {
             int v = t.pop();
             //System.err.println("set jump by "+v);
-            t.jump(Math.abs(v));
+            //t.jump(Math.abs(v));
+            t.jump(v);
         }
 
         @Override public void op(float[] p, FloatTape t) {
             float v = (float) Math.ceil(t.pop());
             //System.err.println("set jump by "+v);
-            t.jump(Math.abs((int)v));
+            //t.jump(Math.abs((int)v));
+            t.jump((int)v);
         }
     }
 
@@ -2491,7 +2493,15 @@ public class Codons {
             }
         }
 
-        @Override public void op(float[] p, FloatTape t) {
+        @Override public void op(float[] p, FloatTape t, Pattern.Ctx ctx) {
+            if(_c==-1) {
+                for(int i=0;i<ctx.c.length;i++) {
+                    t.push(ctx.c[i]);
+                }
+            }
+            else {
+                t.push(ctx.c[_c%ctx.c.length]);
+            }
         }
 
         @Override public Codon destabilize(Random r) {
@@ -2521,11 +2531,8 @@ public class Codons {
         @Override public void op(int[] p, IntTape t, Pattern.Ctx ctx) {
             float x1 = 0;
             float y1 = 0;
-            //int c;
             float scl = t.pop();
             int z = Math.min(t.pop(), SAFETY);
-            //float cx = ctx.c[0]/scl;
-            //float cy = ctx.c[1]/scl;
             float cy = t.pop()/scl;
             float cx = t.pop()/scl;
             while(z>0 && x1*x1+y1*y1<4) {
@@ -2534,16 +2541,25 @@ public class Codons {
                 y1 = 2 * x1 *y1 + cy;
                 x1 = xx;
             }
-            //if(z>=100) {
-                //c = 0;
-            //}
-            //else {
-                //c = 1;
-            //}
             t.push(z);
         }
 
-        @Override public void op(float[] p, FloatTape t) {
+        @Override public void op(float[] p, FloatTape t, Pattern.Ctx ctx) {
+            float x1 = 0;
+            float y1 = 0;
+            float scl = t.pop();
+            int z = Math.min((int)t.pop(), SAFETY);
+            float cy = t.pop()/scl;
+            float cx = t.pop()/scl;
+            //System.err.println("cx: "+cx+", cy: "+cy+", z: "+z+", scl: "+scl);
+            while(z>0 && x1*x1+y1*y1<4) {
+                z--;
+                float xx = x1*x1 - y1*y1 + cx;
+                y1 = 2 * x1 *y1 + cy;
+                x1 = xx;
+            }
+            //System.err.println("fz: "+z);
+            t.push(z);
         }
     }
 
