@@ -44,6 +44,14 @@ public class Varmap {
         return this;
     }
 
+    public String getAt(String name) {
+        return get(name);
+    }
+
+    public Varmap putAt(String name, String value) {
+        return put(name, value);
+    }
+
     public Varmap merge(Varmap o) {
         Set<String> names = new HashSet<>();
         names.addAll(_names);

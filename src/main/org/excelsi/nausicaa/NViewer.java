@@ -1491,6 +1491,19 @@ public class NViewer extends JFrame implements UIActions {
 
     private void createFunctionsMenu(int shortcut, JMenuBar bar) {
         JMenu functions = new JMenu("Functions");
+
+        Functions fns = new Functions(new File(System.getProperty("app.root")+"/etc/functions"));
+        for(Functions.CAFunction fn:fns.catalog()) {
+            JMenuItem mfn = new JMenuItem(new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    _a.invokeFunction(NViewer.this, fn);
+                }
+            });
+            functions.add(mfn);
+            mfn.setText(fn.getName());
+        }
+
+        bar.add(functions);
     }
 
     private void createRenderMenu(int shortcut, JMenuBar bar) {

@@ -21,6 +21,9 @@ public class Implicate {
         _d = d;
         _l = lang;
         _vars = vars;
+        if(vars==null) {
+            throw new IllegalArgumentException("null varmap");
+        }
     }
 
     public Archetype archetype() {

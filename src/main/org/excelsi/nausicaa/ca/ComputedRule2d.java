@@ -331,6 +331,8 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         MutationFactor mf = null;
         if(o.has("transition")) {
             mf = new MutationFactor().withTransition(Json.flot(o, "transition", 0.1f));
+            //TODO TODO TODO
+            mf.withVars(new Varmap());
         }
         Language lang;
         if(o.has("language")) {

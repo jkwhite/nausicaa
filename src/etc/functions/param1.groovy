@@ -4,21 +4,30 @@ import org.excelsi.nausicaa.ca.*
 meta = { ca ->
     [
       'name' : 'Param Generator',
-      'args' : ['param', 'start', 'end', 'step', 'iter', 'file']
+      'args' : ['variable', 'start', 'end', 'step', 'iter', 'file']
     ]
 }
 
-run = { ca, mf, params ->
-    def param = params['param']
-    def start = params['start'] as Float
-    def end = params['end'] as Float
-    def inc = params['step'] as Float
-    def iter = params['iter'] as Integer
-    def file = params['file']
-    for(i=start;i<=end;i+=inc) {
-        def cur = ca.vars(new Varmap().put(param, i))
-            .mutate(ca.rule.origin().create(ca.rule.genome(), mf), ca.random)
-        cur.frame(iter).save(file+'-'+i+'.png')
-        System.err.println(i)
+run = { ca, args, api ->
+    def variable = args['variable']
+    def start = args['start'] as Float
+    def end = args['end'] as Float
+    def inc = args['step'] as Float
+    def iter = args['iter'] as Integer
+    def file = args['file']
+    for(int i=start;i<=end;i+=inc) {
+        def vars = new Varmap().put(variable, i as String)
+        def cur1 = ca.vars(vars)
+        def cur2 = cur1.mutate(cur1.rule.origin().create(cur1.rule.genome(), api.mutationFactor.withVars(vars)), ca.random)
+        def it = cur2.compileRule().frameIterator(
+            cur2.createPlane(api.pool, api.options),
+            api.pool,
+            api.options)
+        System.err.println("iter ${i}: ${cur2.rule}, vars: ${vars}")
+        def fr = it.next()
+        for(j=1;j<iter;j++) {
+            fr = it.next()
+        }
+        fr.save(file+'-'+i+'.png', api.rendering)
     }
 }

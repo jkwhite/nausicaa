@@ -20,6 +20,7 @@ import java.util.Random;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 
 public class Actions {
@@ -1806,6 +1807,58 @@ public class Actions {
         d.setVisible(true);
     }
 
+    public void invokeFunction(final NViewer v, final Functions.CAFunction fn) {
+        final CA ca = v.getActiveCA();
+        final String[] args = fn.getArgs();
+        final Varmap vm = new Varmap(args);
+
+        final JDialog d = new JDialog(v, "Run "+fn.getName());
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel();
+
+        final VarPanel vp = new VarPanel(vm);
+        top.add(vp);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Run");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                Varmap vn = vp.commit();
+                final MutationFactor mf = createMutationFactor(ca, v.getConfig(), v.getRandom());
+                int ccores = v.getConfig().getIntVariable("animation_computeCores", 2);
+                final ExecutorService pool = Pools.named("compute", ccores);
+                final GOptions opt = new GOptions(true, ccores, 0, 1f)
+                        .computeMode(ComputeMode.from(v.getConfig().<String>getVariable("rgb_computemode","combined")));
+                final Rendering rend = v.getPlaneDisplayProvider().getActivePlaneDisplay().getRendering();
+                Functions.API api = new Functions.API() {
+                    @Override public MutationFactor getMutationFactor() { return mf; }
+                    @Override public ExecutorService getPool() { return pool; }
+                    @Override public GOptions getOptions() { return opt; }
+                    @Override public Rendering getRendering() { return rend; }
+                };
+                new FunctionRunner(v, ca, api, vn, fn);
+            }
+        });
+        de.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+            }
+        });
+        bot.add(ne);
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
     public void resizeCA(NViewer v) {
         final Config config = v.getConfig();
         final JDialog d = new JDialog(v, "Size");
@@ -1884,7 +1937,7 @@ public class Actions {
         final JDialog d = new JDialog(v, "Variables");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(/*new GridLayout(1,1)*/);
+        JPanel top = new JPanel();
 
         final VarPanel vp = new VarPanel(v.getActiveCA().getVars());
         top.add(vp);

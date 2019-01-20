@@ -15,7 +15,6 @@ public class VarPanel extends JPanel {
 
 
     public VarPanel(Varmap v) {
-        System.err.println("*** showing vars: "+v);
         for(String n:v.names()) {
             addPair(n, v.get(n));
         }
