@@ -54,6 +54,7 @@ public class Functions {
         GOptions getOptions();
         MutationFactor getMutationFactor();
         Rendering getRendering();
+        boolean getCancelled();
     }
 
     private static class GroovyCAFunction implements CAFunction {

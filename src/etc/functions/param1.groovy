@@ -18,18 +18,19 @@ run = { ca, args, api ->
     int suf = 0
     for(i=start;i<=end;i+=inc) {
         def vars = new Varmap().put(variable, i as String)
-        def cur1 = ca.vars(ca.vars.merge(vars))
-        def cur2 = cur1.mutate(cur1.rule.origin().create(cur1.rule.genome(), api.mutationFactor.withVars(vars)), ca.random)
+        def cur1 = ca.vars(vars.merge(ca.vars))
+        def cur2 = cur1.mutate(cur1.rule.origin().create(cur1.rule.genome(), api.mutationFactor.withVars(cur1.vars)), ca.random)
         def it = cur2.compileRule().frameIterator(
             cur2.createPlane(api.pool, api.options),
             api.pool,
             api.options)
-        System.err.println("iter ${i}: ${cur2.rule}, vars: ${vars}")
+        System.err.println("iter ${i}: ${cur2.rule}, vars: ${cur2.vars}")
         def fr = it.next()
         for(j=1;j<iter;j++) {
             fr = it.next()
         }
         fr.save(file+'-'+suf+'.png', api.rendering)
         suf++
+        if(api.cancelled) break;
     }
 }

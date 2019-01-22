@@ -1840,6 +1840,7 @@ public class Actions {
                     @Override public ExecutorService getPool() { return pool; }
                     @Override public GOptions getOptions() { return opt; }
                     @Override public Rendering getRendering() { return rend; }
+                    @Override public boolean getCancelled() { return Thread.currentThread().isInterrupted(); }
                 };
                 new FunctionRunner(v, ca, api, vn, fn);
             }

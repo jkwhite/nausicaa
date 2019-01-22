@@ -2,6 +2,7 @@ package org.excelsi.nausicaa.ca;
 
 
 import java.util.*;
+import com.google.gson.*;
 
 
 public class Varmap {
@@ -25,6 +26,13 @@ public class Varmap {
         for(String n:names) {
             _vars.put(n, null);
         }
+    }
+
+    public Varmap(Map<String,String> vars) {
+        for(Map.Entry<String,String> v:vars.entrySet()) {
+            _vars.put(v.getKey(), v.getValue());
+        }
+        _names = new HashSet<>(vars.keySet());
     }
 
     public String[] names() {
@@ -71,6 +79,23 @@ public class Varmap {
 
     @Override public String toString() {
         return "VarMap::"+_vars.toString();
+    }
+
+    public JsonElement toJson() {
+        JsonObject o = new JsonObject();
+        for(Map.Entry<String,String> e:_vars.entrySet()) {
+            o.addProperty(e.getKey(), e.getValue());
+        }
+        return o;
+    }
+
+    public static Varmap fromJson(JsonElement e) {
+        JsonObject o = (JsonObject) e;
+        Map<String,String> vs = new HashMap<>();
+        for(Map.Entry<String,JsonElement> v:o.entrySet()) {
+            vs.put(v.getKey(), Json.string(v.getValue()));
+        }
+        return new Varmap(vs);
     }
 
     public static final boolean containsVar(String s) {

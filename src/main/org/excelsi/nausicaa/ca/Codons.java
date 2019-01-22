@@ -2555,7 +2555,7 @@ public class Codons {
             while(z>0 && x1*x1+y1*y1<4) {
                 z--;
                 float xx = x1*x1 - y1*y1 + cx;
-                y1 = 2 * x1 *y1 + cy;
+                y1 = 2 * x1 * y1 + cy;
                 x1 = xx;
             }
             //System.err.println("fz: "+z);

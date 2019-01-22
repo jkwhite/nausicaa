@@ -74,7 +74,7 @@ public class RuleEditor extends JComponent implements TimelineListener {
                 for(int i=0;i<ptext.length;i++) {
                     ps[i] = Float.parseFloat(ptext[i]);
                 }
-                float next = p.next(0, ps);
+                float next = p.next(0, ps, new Pattern.Ctx());
                 System.err.println("Next: "+next);
             }
         });

@@ -16,6 +16,11 @@ public final class Json {
         return ja;
     }
 
+    public static String string(JsonElement e) {
+        JsonPrimitive p = (JsonPrimitive) e;
+        return p!=null?p.getAsString():null;
+    }
+
     public static String string(JsonObject o, String name) {
         JsonPrimitive v = o.getAsJsonPrimitive(name);
         return v!=null?v.getAsString():null;

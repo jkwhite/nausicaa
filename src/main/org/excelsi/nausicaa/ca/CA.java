@@ -29,8 +29,6 @@ import java.util.concurrent.ExecutorService;
 import javax.imageio.ImageIO;
 import java.awt.image.*;
 import org.excelsi.rlyehian.Codec;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.*;
 
 
@@ -615,11 +613,12 @@ public final class CA {
         UpdateMode umode = UpdateMode.fromJson(o.get("update_mode"));
         EdgeMode emode = o.has("edge_mode") ? EdgeMode.fromJson(o.get("edge_mode")) : EdgeMode.defaultMode();
         Initializer i = Initializers.fromJson(o.get("initializer"));
+        Varmap vars = o.has("vars") ? Varmap.fromJson(o.get("vars")) : new Varmap();
         Rule r = ComputedRuleReader.fromJson(o.get("rule"));
         Palette p = Palette.fromJson(o.get("palette"));
         ExternalForce ef = o.has("external_force") ? ExternalForce.fromJson(o.get("external_force")) : ExternalForce.nop();
         CA meta = o.has("meta") ? fromJson(o.get("meta")):null;
-        return new CA(r, p, i, new Random(), seed, w, h, d, pre, weight, coda, cmode, umode, emode, ef, new Varmap(), meta);
+        return new CA(r, p, i, new Random(), seed, w, h, d, pre, weight, coda, cmode, umode, emode, ef, vars, meta);
     }
 
     private static CA fromLegacyTextFile(String filename) throws IOException {
@@ -760,6 +759,7 @@ public final class CA {
         o.add("initializer", _i.toJson());
         o.add("rule", _r.toJson());
         o.add("palette", _p.toJson());
+        o.add("vars", _vars.toJson());
         if(_meta!=null) {
             o.add("meta", _meta.toJson());
         }
