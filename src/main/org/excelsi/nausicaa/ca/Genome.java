@@ -34,16 +34,20 @@ public final class Genome {
     }
 
     public Codon[] codons(Implicate i) {
+        return codons(i, true);
+    }
+
+    public Codon[] codons(Implicate i, boolean resolveParams) {
         final List<Codon> ops = new ArrayList<>();
         final String sep = _v==1?"-":" ";
-        for(final String op:replaceParams(_c, i).split(sep)) {
+        for(final String op:(resolveParams?replaceParams(_c, i):_c).split(sep)) {
             ops.add(Codons.codon(op, i));
         }
         return ops.toArray(new Codon[0]);
     }
 
     public Genome prune(Implicate im) {
-        final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(im)));
+        final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(im,false)));
         //System.err.println("prune init codons: "+cs);
         while(cs.size()>1) {
             //if(!cs.get(0).usesPattern()) {
@@ -99,7 +103,7 @@ public final class Genome {
     }
 
     private Genome replicate(final Implicate im, final WeightedFactory<GenomeMutator> mutators, final GenomeFactory gf, final MutationFactor mf) {
-        final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(im)));
+        final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(im,false)));
         float mult = mf.alpha()/20f;
         int max = (int) (mult*(1+mf.random().nextInt(Math.max(1,cs.size()/3))));
         System.err.println("applying "+max+" mutators");
