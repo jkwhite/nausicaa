@@ -8,6 +8,7 @@ import java.util.Map;
 import java.io.*;
 import com.google.gson.*;
 import org.excelsi.nausicaa.ca.Json;
+import org.excelsi.nausicaa.ca.Varmap;
 
 
 public class Config {
@@ -27,6 +28,7 @@ public class Config {
     private boolean _weightVariations = true;
     private boolean _paramVariations = true;
     private final Map<String,Object> _variables = new HashMap<>();
+    private final Map<String,Varmap> _funcArgs = new HashMap<>();
     private String _saveDir = System.getProperty("user.home");
     private String _imgDir = System.getProperty("user.home");
     private String _genDir = System.getProperty("user.home");
@@ -259,6 +261,15 @@ public class Config {
         }
     }
 
+    public Varmap getFunctionArgs(String fn) {
+        return _funcArgs.get(fn);
+    }
+
+    public void setFunctionArgs(String fn, Varmap args) {
+        _funcArgs.put(fn, args);
+        notify("funcArgs");
+    }
+
     public void notify(final String p) {
         for(ConfigListener l:new ArrayList<>(_listeners)) {
             l.configChanged(this, p);
@@ -291,6 +302,11 @@ public class Config {
             vars.add(e.getKey(), vo);
         }
         o.add("variables", vars);
+        JsonObject funcArgs = new JsonObject();
+        for(Map.Entry<String,Varmap> e:_funcArgs.entrySet()) {
+            funcArgs.add(e.getKey(), e.getValue().toJson());
+        }
+        o.add("funcArgs", funcArgs);
         return o;
     }
 
@@ -340,6 +356,20 @@ public class Config {
                     }
                     catch(Exception ex) {
                         System.err.println("failed reading var "+e.getKey()+", skipping: "+ex);
+                        ex.printStackTrace();
+                    }
+                }
+            }
+            JsonElement efargs = o.get("funcArgs");
+            if(efargs!=null && efargs instanceof JsonObject) {
+                JsonObject fargs = (JsonObject) efargs;
+                for(Map.Entry<String,JsonElement> e:fargs.entrySet()) {
+                    try {
+                        JsonObject vo = (JsonObject) e.getValue();
+                        c._funcArgs.put(e.getKey(), Varmap.fromJson(vo));
+                    }
+                    catch(Exception ex) {
+                        System.err.println("failed reading funcArg "+e.getKey()+", skipping: "+ex);
                         ex.printStackTrace();
                     }
                 }

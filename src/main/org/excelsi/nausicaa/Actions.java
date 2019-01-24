@@ -1809,8 +1809,14 @@ public class Actions {
 
     public void invokeFunction(final NViewer v, final Functions.CAFunction fn) {
         final CA ca = v.getActiveCA();
-        final String[] args = fn.getArgs();
+        final String[] args = fn.buildArgs(ca);
         final Varmap vm = new Varmap(args);
+        final Varmap prevars = v.getConfig().getFunctionArgs(fn.getName());
+        if(prevars!=null) {
+            for(String arg:args) {
+                vm.put(arg, prevars.get(arg));
+            }
+        }
 
         final JDialog d = new JDialog(v, "Run "+fn.getName());
         JPanel p = new JPanel(new BorderLayout());
@@ -1829,6 +1835,7 @@ public class Actions {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
                 Varmap vn = vp.commit();
+                v.getConfig().setFunctionArgs(fn.getName(), vn);
                 final MutationFactor mf = createMutationFactor(ca, v.getConfig(), v.getRandom());
                 int ccores = v.getConfig().getIntVariable("animation_computeCores", 2);
                 final ExecutorService pool = Pools.named("compute", ccores);
@@ -1851,6 +1858,7 @@ public class Actions {
             }
         });
         bot.add(ne);
+        bot.add(de);
         p.add(bot, BorderLayout.SOUTH);
         d.getContentPane().add(p);
         Dimension dim = p.getPreferredSize();

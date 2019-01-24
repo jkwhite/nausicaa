@@ -1500,7 +1500,7 @@ public class NViewer extends JFrame implements UIActions {
                 }
             });
             functions.add(mfn);
-            mfn.setText(fn.getName());
+            mfn.setText(fn.getName()+" ...");
         }
 
         bar.add(functions);

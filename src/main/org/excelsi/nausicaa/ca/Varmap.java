@@ -9,7 +9,7 @@ public class Varmap {
     public static final String P_START = "{";
     public static final String P_END = "}";
 
-    private final Set<String> _names;
+    private final Collection<String> _names;
     private final Map<String,String> _vars = new HashMap<>();
 
 
@@ -17,12 +17,12 @@ public class Varmap {
         this(new String[0]);
     }
 
-    public Varmap(Set<String> names) {
+    public Varmap(Collection<String> names) {
         this(names.toArray(new String[0]));
     }
 
     public Varmap(String[] names) {
-        _names = new HashSet<>(Arrays.asList(names));
+        _names = new ArrayList<>(Arrays.asList(names));
         for(String n:names) {
             _vars.put(n, null);
         }
@@ -32,12 +32,14 @@ public class Varmap {
         for(Map.Entry<String,String> v:vars.entrySet()) {
             _vars.put(v.getKey(), v.getValue());
         }
-        _names = new HashSet<>(vars.keySet());
+        _names = new ArrayList<>(vars.keySet());
     }
 
     public String[] names() {
         return _names.toArray(new String[0]);
     }
+
+    public String[] getNames() { return names(); }
 
     public String get(String name) {
         String v = _vars.get(name);
@@ -61,10 +63,12 @@ public class Varmap {
     }
 
     public Varmap merge(Varmap o) {
-        Set<String> names = new HashSet<>();
+        Collection<String> names = new ArrayList<>();
         names.addAll(_names);
         if(o!=null) {
-            names.addAll(o._names);
+            for(String on:o._names) {
+                if(!names.contains(on)) names.add(on);
+            }
         }
         Varmap merged = new Varmap(names);
         for(String n:names) {

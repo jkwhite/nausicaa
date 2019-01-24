@@ -26,12 +26,12 @@ public class ComputedRuleReader {
         return new ComputedRuleset(a).create(genome, _version);
     }
 
-    public static Rule fromJson(JsonElement e) {
+    public static Rule fromJson(JsonElement e, Varmap vars) {
         JsonObject o = (JsonObject) e;
         String type = Json.string(o, "type");
         switch(type) {
             case "computed":
-                return ComputedRule2d.fromJson(e);
+                return ComputedRule2d.fromJson(e, vars);
             case "indexed2d":
             case "indexed1d":
                 return AbstractIndexedRule.fromJson(e);

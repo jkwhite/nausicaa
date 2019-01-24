@@ -45,7 +45,7 @@ public class Functions {
 
     public static interface CAFunction {
         String getName();
-        String[] getArgs();
+        String[] buildArgs(CA ca);
         void run(CA ca, Varmap params, API api) throws Exception;
     }
 
@@ -59,7 +59,7 @@ public class Functions {
 
     private static class GroovyCAFunction implements CAFunction {
         private final String _name;
-        private final String[] _args;
+        //private final String[] _args;
 
         private final GroovyShell _s;
         private final Binding _b;
@@ -86,21 +86,48 @@ public class Functions {
                 else {
                     _name = "<"+f+">";
                 }
-                if(mr.containsKey("args") && mr.get("args") instanceof List) {
-                    _args = ((List<String>)mr.get("args")).toArray(new String[0]);
-                }
-                else {
-                    _args = new String[0];
-                }
+                //if(mr.containsKey("args") && mr.get("args") instanceof List) {
+                    //_args = ((List<String>)mr.get("args")).toArray(new String[0]);
+                //}
+                //else {
+                    //_args = new String[0];
+                //}
             }
             else {
                 _name = "<"+f+">";
-                _args = new String[0];
+                //_args = new String[0];
             }
         }
 
         @Override public String getName() { return _name; }
-        @Override public String[] getArgs() { return _args; }
+
+        @Override public String[] buildArgs(CA ca) {
+            try {
+                _b.setVariable("_ca", ca);
+                Object res = _s.evaluate("meta(_ca)");
+                String[] args;
+                if(res instanceof Map) {
+                    Map mr = (Map) res;
+                    if(mr.containsKey("args") && mr.get("args") instanceof List) {
+                        List as = (List) mr.get("args");
+                        for(Object aso:as) {
+                            System.err.println(aso.toString()+":"+aso.getClass().toString());
+                        }
+                        args = ((List<String>)mr.get("args")).toArray(new String[0]);
+                    }
+                    else {
+                        args = new String[0];
+                    }
+                }
+                else {
+                    args = new String[0];
+                }
+                return args;
+            }
+            catch(Exception e) {
+                throw new IllegalStateException("failed building args: "+e, e);
+            }
+        }
 
         @Override public void run(CA ca, Varmap args, API api) throws Exception {
             System.err.println("start running param with args: "+args);

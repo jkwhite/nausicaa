@@ -614,7 +614,7 @@ public final class CA {
         EdgeMode emode = o.has("edge_mode") ? EdgeMode.fromJson(o.get("edge_mode")) : EdgeMode.defaultMode();
         Initializer i = Initializers.fromJson(o.get("initializer"));
         Varmap vars = o.has("vars") ? Varmap.fromJson(o.get("vars")) : new Varmap();
-        Rule r = ComputedRuleReader.fromJson(o.get("rule"));
+        Rule r = ComputedRuleReader.fromJson(o.get("rule"), vars);
         Palette p = Palette.fromJson(o.get("palette"));
         ExternalForce ef = o.has("external_force") ? ExternalForce.fromJson(o.get("external_force")) : ExternalForce.nop();
         CA meta = o.has("meta") ? fromJson(o.get("meta")):null;

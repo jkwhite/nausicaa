@@ -17,7 +17,8 @@ public enum Initializers {
     gaussian((byte)5),
     clusteredgaussian((byte)6),
     ca((byte)7),
-    custom((byte)8);
+    custom((byte)8),
+    coordinate((byte)9);
 
     private final byte _id;
 
@@ -47,6 +48,8 @@ public enum Initializers {
                 return new CustomInitializer();
             case ca:
                 return new CAInitializer();
+            case coordinate:
+                return new CoordinateInitializer();
             case random:
             default:
                 return new RandomInitializer();
@@ -111,6 +114,8 @@ public enum Initializers {
                 return CustomInitializer.fromJson(o);
             case "random":
                 return RandomInitializer.fromJson(o);
+            case "coordinate":
+                return CoordinateInitializer.fromJson(o);
             default:
                 throw new IllegalArgumentException("unknown initializer '"+type+"'");
         }
