@@ -2441,14 +2441,14 @@ public class Codons {
         @Override public void op(int[] p, IntTape t) {
             int m = 1;
             int v = t.pop();
-            if(v<0) {
-                v=-v;
-                m=-1;
-            }
             if(v==0) {
                 t.push(0);
             }
             else {
+                if(v<0) {
+                    v=-v;
+                    m=-1;
+                }
                 t.push(m*R.nextInt(v));
             }
         }

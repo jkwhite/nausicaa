@@ -1842,14 +1842,7 @@ public class Actions {
                 final GOptions opt = new GOptions(true, ccores, 0, 1f)
                         .computeMode(ComputeMode.from(v.getConfig().<String>getVariable("rgb_computemode","combined")));
                 final Rendering rend = v.getPlaneDisplayProvider().getActivePlaneDisplay().getRendering();
-                Functions.API api = new Functions.API() {
-                    @Override public MutationFactor getMutationFactor() { return mf; }
-                    @Override public ExecutorService getPool() { return pool; }
-                    @Override public GOptions getOptions() { return opt; }
-                    @Override public Rendering getRendering() { return rend; }
-                    @Override public boolean getCancelled() { return Thread.currentThread().isInterrupted(); }
-                };
-                new FunctionRunner(v, ca, api, vn, fn);
+                new FunctionRunner(v, ca, mf, pool, opt, rend, vn, fn);
             }
         });
         de.addActionListener(new AbstractAction() {

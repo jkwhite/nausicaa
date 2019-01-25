@@ -15,17 +15,33 @@ import org.excelsi.nausicaa.ca.*;
 
 
 public class FunctionRunner extends JDialog {
-    public FunctionRunner(final JFrame root, final CA ca, final Functions.API api, final Varmap vars, final Functions.CAFunction fn) {
+    public FunctionRunner(final JFrame root, final CA ca, final MutationFactor mf, final ExecutorService pool, final GOptions opt, final Rendering rend, final Varmap vars, final Functions.CAFunction fn) {
         super(root, "Executing "+fn.getName());
-
-        JPanel main = new JPanel(new BorderLayout());
-        final JLabel task = new JLabel("Running...");
-        Font font = task.getFont();
-        task.setFont(font.deriveFont(font.getSize()-2f));
 
         final JProgressBar prog = new JProgressBar(1, 100);
         prog.setValue(0);
-        prog.setIndeterminate(true);
+        final JLabel task = new JLabel("Running...");
+
+        final Functions.Progress progress = new Functions.Progress() {
+            @Override public void setMaximum(int max) { SwingUtilities.invokeLater(()->{prog.setMaximum(max);}); }
+            @Override public void setCurrent(int cur) { SwingUtilities.invokeLater(()->{prog.setValue(cur);}); }
+            @Override public void setStatus(String status) { SwingUtilities.invokeLater(()->{task.setText(status);}); }
+        };
+        final Functions.API api = 
+            new Functions.API() {
+                @Override public MutationFactor getMutationFactor() { return mf; }
+                @Override public ExecutorService getPool() { return pool; }
+                @Override public GOptions getOptions() { return opt; }
+                @Override public Rendering getRendering() { return rend; }
+                @Override public boolean getCancelled() { return Thread.currentThread().isInterrupted(); }
+                @Override public Functions.Progress getProgress() { return progress; }
+            };
+
+        JPanel main = new JPanel(new BorderLayout());
+        Font font = task.getFont();
+        task.setFont(font.deriveFont(font.getSize()-2f));
+
+        //prog.setIndeterminate(true);
         main.add(prog, BorderLayout.NORTH);
         main.add(task, BorderLayout.WEST);
         main.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

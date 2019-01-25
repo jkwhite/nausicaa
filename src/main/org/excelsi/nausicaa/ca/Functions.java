@@ -55,6 +55,13 @@ public class Functions {
         MutationFactor getMutationFactor();
         Rendering getRendering();
         boolean getCancelled();
+        Progress getProgress();
+    }
+
+    public static interface Progress {
+        void setMaximum(int max);
+        void setCurrent(int cur);
+        void setStatus(String status);
     }
 
     private static class GroovyCAFunction implements CAFunction {
