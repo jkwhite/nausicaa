@@ -117,9 +117,9 @@ public class Functions {
                     Map mr = (Map) res;
                     if(mr.containsKey("args") && mr.get("args") instanceof List) {
                         List as = (List) mr.get("args");
-                        for(Object aso:as) {
-                            System.err.println(aso.toString()+":"+aso.getClass().toString());
-                        }
+                        //for(Object aso:as) {
+                            //System.err.println(aso.toString()+":"+aso.getClass().toString());
+                        //}
                         args = ((List<String>)mr.get("args")).toArray(new String[0]);
                     }
                     else {

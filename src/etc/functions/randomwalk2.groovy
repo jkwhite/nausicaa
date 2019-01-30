@@ -8,6 +8,8 @@ class var {
     float min
     float vel
     float accel
+    float orig
+    float dest
     int time
     int maxtime
     int dir
@@ -23,7 +25,7 @@ meta = { ca ->
     }
     args.addAll(['seed', 'frames', 'iter', 'file'])
     [
-      'name' : 'Random Walk',
+      'name' : 'Random Walk 2',
       'args' : args
     ]
 }
@@ -42,9 +44,13 @@ run = { ca, args, api ->
         var.max = args["${a} max"] as Float 
         var.min = args["${a} min"] as Float
         var.val = var.min + rnd.nextFloat() * var.max
-        var.vel = (2*rnd.nextFloat()-1) * (var.max - var.min) / 100
+        var.vel = var.val
+        var.orig = var.vel
+        def wgt = rnd.nextFloat()
+        var.dest = var.min*wgt + var.max*(1f-wgt)
         var.accel = 0.99
-        var.time = rnd.nextInt(50)+10
+        //var.time = rnd.nextInt(100)+100
+        var.time = 400f; //Math.abs(var.dest-var.orig)*400f
         var.maxtime = var.time
         var.dir = rnd.nextInt(3)
         vals[a] = var
@@ -74,16 +80,43 @@ run = { ca, args, api ->
         nargs.each { a ->
             def v = vals[a]
             def cur = v.val
+            def dst = v.dest
+            def org = v.orig
+
             if(--v.time<=0) {
-                v.time = rnd.nextInt(50)+10
+                v.time = rnd.nextInt(100)+100
+                v.val = v.min + rnd.nextFloat() * v.max
+                //v.orig = v.vel
+                v.orig = v.dest
+                def wgt = rnd.nextFloat()
+                //v.dest = v.min + rnd.nextFloat() * v.max
+                v.dest = v.min*wgt + v.max*(1f-wgt)
+                v.time = 400f; //Math.abs(v.dest-v.orig)*400f
+                System.err.println("reset time for ${a} to ${v.time}")
                 v.maxtime = v.time
-                v.vel = (2*rnd.nextFloat()-1) * (v.max - v.min) / 100
-                v.accel = 0.99
+                //v.accel = 0.99
             }
-            def delta = v.vel * (v.maxtime - Math.abs(v.maxtime/2f-v.time))/v.maxtime
-            cur += delta
-            if(cur>v.max) { cur = v.max; v.vel = -v.vel; }
-            if(cur<v.min) { cur = v.min; v.vel = -v.vel; }
+
+            //def dlt = (dst+org - dst+org)/2f
+            def midpoint = (dst+org)/2f
+            def loc = midpoint/(dst+org);
+            def locs = loc * loc
+            def tm = (v.maxtime - v.time) - (v.maxtime/2)
+            def tm2 = (v.maxtime - v.time) / (v.maxtime)
+            //tm2 = tm2*tm2
+            mt2 = Math.pow(Math.sin(3.1415*tm2),8)
+            //cur = v.min + (tm * locs)
+            cur = v.orig*(1f-tm2) + v.dest*(tm2)
+            System.err.println("moved ${a} from ${v.val} to ${cur} in ${v.orig} to ${v.dest} with ${tm2} and time ${v.time}/${v.maxtime}")
+            //def sqrt = Math.sqrt(midpoint)
+
+            //def delta = v.vel * (v.maxtime - Math.abs(v.maxtime/2f-v.time))/v.maxtime
+
+            //def move = (cur+dst)*delta
+
+            //cur += delta
+            //if(cur>v.max) { cur = v.max; v.vel = -v.vel; }
+            //if(cur<v.min) { cur = v.min; v.vel = -v.vel; }
             v.val = cur
         }
     }
