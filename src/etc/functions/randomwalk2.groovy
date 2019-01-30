@@ -106,8 +106,8 @@ run = { ca, args, api ->
             //tm2 = tm2*tm2
             mt2 = Math.pow(Math.sin(3.1415*tm2),8)
             //cur = v.min + (tm * locs)
-            cur = v.orig*(1f-tm2) + v.dest*(tm2)
-            System.err.println("moved ${a} from ${v.val} to ${cur} in ${v.orig} to ${v.dest} with ${tm2} and time ${v.time}/${v.maxtime}")
+            cur = v.orig*(1f-mt2) + v.dest*(mt2)
+            System.err.println("moved ${a} from ${v.val} to ${cur} in ${v.orig} to ${v.dest} with ${mt2} and time ${v.time}/${v.maxtime}")
             //def sqrt = Math.sqrt(midpoint)
 
             //def delta = v.vel * (v.maxtime - Math.abs(v.maxtime/2f-v.time))/v.maxtime
