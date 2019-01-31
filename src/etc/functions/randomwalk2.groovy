@@ -85,9 +85,10 @@ run = { ca, args, api ->
 
             if(--v.time<=0) {
                 v.time = rnd.nextInt(100)+100
-                v.val = v.min + rnd.nextFloat() * v.max
+                //v.val = v.min + rnd.nextFloat() * v.max
                 //v.orig = v.vel
-                v.orig = v.dest
+                //v.orig = v.dest
+                v.orig = v.val
                 def wgt = rnd.nextFloat()
                 //v.dest = v.min + rnd.nextFloat() * v.max
                 v.dest = v.min*wgt + v.max*(1f-wgt)
@@ -104,7 +105,8 @@ run = { ca, args, api ->
             def tm = (v.maxtime - v.time) - (v.maxtime/2)
             def tm2 = (v.maxtime - v.time) / (v.maxtime)
             //tm2 = tm2*tm2
-            mt2 = Math.pow(Math.sin(3.1415*tm2),8)
+            //mt2 = Math.pow(Math.sin(3.1415*tm2),8)
+            mt2 = 1f/(1f+Math.exp(-(12*tm2-6)))
             //cur = v.min + (tm * locs)
             cur = v.orig*(1f-mt2) + v.dest*(mt2)
             System.err.println("moved ${a} from ${v.val} to ${cur} in ${v.orig} to ${v.dest} with ${mt2} and time ${v.time}/${v.maxtime}")
