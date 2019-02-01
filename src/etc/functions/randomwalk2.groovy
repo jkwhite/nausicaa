@@ -23,7 +23,7 @@ meta = { ca ->
             args << k+' max'
         }
     }
-    args.addAll(['seed', 'frames', 'iter', 'file'])
+    args.addAll(['seed', 'frames', 'iter', 'file', 'min time', 'max time'])
     [
       'name' : 'Random Walk 2',
       'args' : args
@@ -35,6 +35,8 @@ run = { ca, args, api ->
     def iter = args['iter'] as Integer
     def file = args['file']
     def seed = args['seed']
+    def mintime = args['min time'] as Integer
+    def maxtime = args['max time'] as Integer
     def rnd = new Random()
     if(!"".equals(seed.trim())) { rnd.setSeed(seed.trim() as Integer) }
     def vals = [:]
@@ -49,7 +51,7 @@ run = { ca, args, api ->
         def wgt = rnd.nextFloat()
         var.dest = var.min*wgt + var.max*(1f-wgt)
         var.accel = 0.99
-        var.time = rnd.nextInt(300)+100
+        var.time = rnd.nextInt(maxtime-mintime)+mintime
         //var.time = 100f; //Math.abs(var.dest-var.orig)*400f
         var.maxtime = var.time
         var.dir = rnd.nextInt(3)
@@ -92,7 +94,8 @@ run = { ca, args, api ->
                 //v.dest = v.min + rnd.nextFloat() * v.max
                 v.dest = v.min*wgt + v.max*(1f-wgt)
                 //v.time = 100f; //Math.abs(v.dest-v.orig)*400f
-                v.time = rnd.nextInt(300)+100
+                //v.time = rnd.nextInt(300)+100
+                v.time = rnd.nextInt(maxtime-mintime)+mintime
                 System.err.println("reset time for ${a} to ${v.time}")
                 v.maxtime = v.time
                 //v.accel = 0.99
