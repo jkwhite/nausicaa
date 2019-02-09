@@ -2563,6 +2563,56 @@ public class Codons {
         }
     }
 
+    public static class Biomorph implements Codon {
+        private static final int SAFETY = 1000;
+
+
+        @Override public Codon copy() { return new Mandelbrot(); }
+
+        @Override public String code() { return MANDELBROT; }
+
+        @Override public boolean usesPattern() { return false; }
+
+        @Override public boolean usesTape() { return true; }
+
+        @Override public boolean supports(Values v) { return true; }
+
+        @Override public boolean deterministic() { return true; }
+
+        @Override public void op(int[] p, IntTape t) {
+        }
+
+        @Override public void op(int[] p, IntTape t, Pattern.Ctx ctx) {
+            float x1 = 0;
+            float y1 = 0;
+            float scl = t.pop();
+            int z = Math.min(t.pop(), SAFETY);
+            float cy = t.pop()/scl;
+            float cx = t.pop()/scl;
+            while(z>0 && x1*x1+y1*y1<4) {
+                z--;
+                float xx = x1*x1 - y1*y1 + cx;
+                y1 = 2 * x1 *y1 + cy;
+                x1 = xx;
+            }
+            t.push(z);
+        }
+
+        @Override public void op(float[] p, FloatTape t, Pattern.Ctx ctx) {
+            float x1 = 0;
+            float y1 = 0;
+            float scl = t.pop();
+            int z = Math.min((int)t.pop(), SAFETY);
+            float cy = t.pop()/scl;
+            float cx = t.pop()/scl;
+            while(z>0 && x1*x1+y1*y1<4) {
+                z--;
+
+            }
+            t.push(z);
+        }
+    }
+
     public static class Cos implements Codon {
         @Override public Codon copy() { return new Cos(); }
 
