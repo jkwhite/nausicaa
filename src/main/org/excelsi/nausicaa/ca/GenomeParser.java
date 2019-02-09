@@ -209,7 +209,10 @@ public class GenomeParser {
         for(S seq:ps) {
             if(seq.n==null) {
                 s.s(seq.c, seq.weight, new ComputedPattern(_a,
-                    new ComputedPattern.MachineElf(new Machine(new Implicate(_a, dm, _lang, _mf.vars()), new Genome(seq.g, 2), _mf.trace()))));
+                    new ComputedPattern.MachineElf(
+                        new Machine(
+                            new Implicate(_a, dm, _lang, _mf!=null?_mf.vars():new Varmap()),
+                            new Genome(seq.g, 2), _mf!=null?_mf.trace():false))));
             }
             else {
                 s.d(seq.n, dm.find(seq.n));
