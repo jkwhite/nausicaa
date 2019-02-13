@@ -18,7 +18,8 @@ public class WorkerDiscrete implements Worker {
     private final int[][] _chanpattern;
     private final int[] _pow;
     private final Variables _vars;
-    private final boolean _moore;
+    //private final boolean _moore;
+    private final Rogers _neighbors;
     private final boolean _useDepth;
     private final boolean _channels;
     private final UpdateMode _umode;
@@ -41,7 +42,8 @@ public class WorkerDiscrete implements Worker {
         _pattern = new int[_prev.length];
         _chanpattern = new int[4][_prev.length];
         _useDepth = p.archetype().dims()==3;
-        _moore = p.archetype().neighborhood()==Archetype.Neighborhood.moore;
+        //_moore = p.archetype().neighborhood()==Archetype.Neighborhood.moore;
+        _neighbors = Rogers.forPattern(p);
         _channels = cmode==ComputeMode.channel;
         _umode = umode.simpleSynchronous() ? null:umode.plan(_wp.archetype());
         //System.err.println("********** umode: "+_umode);
@@ -83,12 +85,13 @@ public class WorkerDiscrete implements Worker {
                             _weight = _vars.weight(p1, j, i, 0);
                         }
                         _oWeight = 1f - _weight;
-                        if(_moore) {
-                            p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
-                        }
-                        else {
-                            p1.getCardinal(_pattern, j, i, k, /*dx*/ _size, /*dy*/ _size, /*dz*/ _size, 0);
-                        }
+                        //if(_moore) {
+                            //p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
+                        //}
+                        //else {
+                            //p1.getCardinal(_pattern, j, i, k, /*dx*/ _size, /*dy*/ _size, /*dz*/ _size, 0);
+                        //}
+                        _neighbors.getNeighborhood(p1, _pattern, j, i, k, 0);
                         if(_channels) {
                             p2.setCell(j, i, k, channels());
                         }
@@ -166,12 +169,13 @@ public class WorkerDiscrete implements Worker {
                 else {
                     _pctx.c[0] = j-p1.getWidth()/2;
                     counts++;
-                    if(_moore) {
-                        p1.getBlock(_pattern, j-_size, i-_size, /*dx*/ d, /*dy*/ d, 0);
-                    }
-                    else {
-                        p1.getCardinal(_pattern, j, i, _size, _size, 0);
-                    }
+                    //if(_moore) {
+                        //p1.getBlock(_pattern, j-_size, i-_size, /*dx*/ d, /*dy*/ d, 0);
+                    //}
+                    //else {
+                        //p1.getCardinal(_pattern, j, i, _size, _size, 0);
+                    //}
+                    _neighbors.getNeighborhood(p1, _pattern, j, i, 0);
                     if(_channels) {
                         p2.setCell(j, i, channels());
                     }

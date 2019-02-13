@@ -9,7 +9,9 @@ public interface IntPlane extends Plane {
     int getCell(int x, int y, int z);
     int[] getRow(int[] into, int y, int offset);
     int[] getBlock(int[] into, int x, int y, int dx, int dy, int offset);
+    int[] getBlock(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset);
     int[] getCardinal(int[] into, int x, int y, int dx, int dy, int offset);
     int[] getCardinal(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset);
+    int[] getCoords(int[] into, int x, int y, int[][] coords, int offset);
     void setRow(int[] row, int y);
 }

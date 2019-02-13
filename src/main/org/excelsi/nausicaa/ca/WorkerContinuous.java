@@ -18,7 +18,8 @@ public class WorkerContinuous implements Worker {
     private final float[] _pattern;
     private final float[][] _chanpattern;
     //private final int[] _pow;
-    private final boolean _moore;
+    //private final boolean _moore;
+    private final Rogers _neighbors;
     private final boolean _useDepth;
     private final boolean _channels;
     private final UpdateMode _umode;
@@ -43,7 +44,8 @@ public class WorkerContinuous implements Worker {
         _pattern = new float[_prev.length];
         _chanpattern = new float[4][_prev.length];
         _useDepth = p.archetype().dims()==3;
-        _moore = p.archetype().neighborhood()==Archetype.Neighborhood.moore;
+        //_moore = p.archetype().neighborhood()==Archetype.Neighborhood.moore;
+        _neighbors = Rogers.forPattern(p);
         _channels = cmode==ComputeMode.channel;
         _umode = umode.simpleSynchronous() ? null:umode.plan(_wp.archetype());
         _ef = ef;
@@ -84,12 +86,13 @@ public class WorkerContinuous implements Worker {
                             _weight = _vars.weight(p1, j, i, 0);
                         }
                         _oWeight = 1f - _weight;
-                        if(_moore) {
-                            p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
-                        }
-                        else {
-                            p1.getCardinal(_pattern, j, i, k, /*dx*/ _size, /*dy*/ _size, /*dz*/ _size, 0);
-                        }
+                        //if(_moore) {
+                            //p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
+                        //}
+                        //else {
+                            //p1.getCardinal(_pattern, j, i, k, /*dx*/ _size, /*dy*/ _size, /*dz*/ _size, 0);
+                        //}
+                        _neighbors.getNeighborhood(p1, _pattern, j, i, k, 0);
                         if(_channels) {
                             //p2.setCell(j, i, k, channels());
                         }
@@ -167,12 +170,13 @@ public class WorkerContinuous implements Worker {
                         _weight = _vars.weight(p1, j, i, 0);
                     }
                     _oWeight = 1f - _weight;
-                    if(_moore) {
-                        p1.getBlock(_pattern, j-_size, i-_size, /*dx*/ d, /*dy*/ d, 0);
-                    }
-                    else {
-                        p1.getCardinal(_pattern, j, i, _size, _size, 0);
-                    }
+                    //if(_moore) {
+                        //p1.getBlock(_pattern, j-_size, i-_size, /*dx*/ d, /*dy*/ d, 0);
+                    //}
+                    //else {
+                        //p1.getCardinal(_pattern, j, i, _size, _size, 0);
+                    //}
+                    _neighbors.getNeighborhood(p1, _pattern, j, i, 0);
                     if(_channels) {
                         //p2.setCell(j, i, channels());
                     }

@@ -65,6 +65,14 @@ public class CompositeIntPlane extends AbstractIntPlane implements Sliceable, Co
         return pr().getBlock(into, x, y, dx, dy, offset);
     }
 
+    @Override public int[] getBlock(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
+        return pr().getBlock(into, x, y, z, dx, dy, dz, offset);
+    }
+
+    @Override public int[] getCoords(int[] into, int x, int y, int[][] coords, int offset) {
+        return pr().getCoords(into, x, y, coords, offset);
+    }
+
     @Override public int[] getCardinal(int[] into, int x, int y, int dx, int dy, int offset) {
         return pr().getCardinal(into, x, y, dx, dy, offset);
     }

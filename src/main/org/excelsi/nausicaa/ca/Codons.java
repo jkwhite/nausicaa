@@ -2479,6 +2479,8 @@ public class Codons {
 
         @Override public boolean deterministic() { return false; }
 
+        @Override public boolean usesContext() { return true; }
+
         @Override public void op(int[] p, IntTape t) {
         }
 
@@ -2510,7 +2512,7 @@ public class Codons {
     }
 
     public static class Mandelbrot implements Codon {
-        private static final int SAFETY = 1000;
+        private static final int SAFETY = 100;
 
 
         @Override public Codon copy() { return new Mandelbrot(); }
@@ -2549,6 +2551,7 @@ public class Codons {
             float y1 = 0;
             float scl = t.pop();
             int z = Math.min((int)t.pop(), SAFETY);
+            //if(z>100) System.err.println("Z"+z);
             float cy = t.pop()/scl;
             float cx = t.pop()/scl;
             //System.err.println("cx: "+cx+", cy: "+cy+", z: "+z+", scl: "+scl);
@@ -2759,12 +2762,14 @@ public class Codons {
         private final boolean _usesPattern;
         private final boolean _usesTape;
         private final boolean _deterministic;
+        private final boolean _usesContext;
 
         public Chain(Codon... cs) {
             _cs = cs;
             boolean up = false;
             boolean ut = false;
             boolean det = true;
+            boolean uctx = false;
             for(Codon c:cs) {
                 if(c.usesPattern()) {
                     up = true;
@@ -2775,10 +2780,14 @@ public class Codons {
                 if(!c.deterministic()) {
                     det = false;
                 }
+                if(c.usesContext()) {
+                    uctx = true;
+                }
             }
             _usesPattern = up;
             _usesTape = ut;
             _deterministic = det;
+            _usesContext = uctx;
         }
 
         @Override public Codon copy() { return new Chain(_cs); }
@@ -2791,6 +2800,8 @@ public class Codons {
             b.setLength(b.length()-1);
             return b.toString();
         }
+
+        @Override public boolean usesContext() { return _usesContext; }
 
         @Override public boolean usesPattern() { return _usesPattern; }
 

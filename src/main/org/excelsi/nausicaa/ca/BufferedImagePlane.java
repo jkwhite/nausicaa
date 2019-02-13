@@ -237,6 +237,20 @@ public class BufferedImagePlane extends AbstractIntPlane implements java.io.Seri
         }
     }
 
+    @Override public int[] getBlock(int[] into, int x, int y, int z, int w, int h, int dz, int offset) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public int[] getCoords(int[] into, int x, int y, int[][] coords, int offset) {
+        int idx=offset;
+
+        for(int i=0;i<coords.length;i++) {
+            int v = getCell(x+coords[i][0], y+coords[i][1], 0);
+            into[idx++] = v;
+        }
+        return into;
+    }
+
     @Override public int getCell(int x, int y, int z) {
         return getCell(x, y);
     }

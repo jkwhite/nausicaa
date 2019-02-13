@@ -216,19 +216,23 @@ public final class CA {
                 r.generate(p, 1, _h, pool, false, true, null, opt);
                 break;
             case 3:
-                System.err.println("generating for "+_prelude);
+                System.err.println("prelude generating for "+_prelude);
                 final long st = System.currentTimeMillis();
                 r.generate(p, 1, _prelude, pool, false, true, null, opt);
                 final long en = System.currentTimeMillis();
-                System.err.println("generation took "+(en-st)+" millis");
+                System.err.println("prelude generation took "+(en-st)+" millis");
                 break;
             case 2:
             default:
+                System.err.println("prelude generating for "+_prelude);
+                final long st2 = System.currentTimeMillis();
                 r.generate(p, 1, _prelude, pool, false, true, null, opt);
                 if(_d>1) {
                     p = r.generate(p, 1, _d, pool, false, true, null, opt.higherDim(_d));
                     //System.err.println("****** expanding dimension result: "+p);
                 }
+                final long en2 = System.currentTimeMillis();
+                System.err.println("prelude generation took "+(en2-st2)+" millis");
                 break;
         }
         return p;

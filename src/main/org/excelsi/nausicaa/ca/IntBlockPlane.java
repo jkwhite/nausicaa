@@ -96,7 +96,7 @@ public class IntBlockPlane extends AbstractIntPlane implements Sliceable {
         return getCell(x, y, _readDepthIdx);
     }
 
-    public int getCell(int x, int y, int z) {
+    public final int getCell(int x, int y, int z) {
         int nx = normX(x);
         int ny = normY(y);
         int nz = normZ(z);
@@ -148,7 +148,7 @@ public class IntBlockPlane extends AbstractIntPlane implements Sliceable {
         return into;
     }
 
-    public int[] getBlock(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
+    @Override public int[] getBlock(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
         //System.err.println("x="+x+", y="+y+", z="+z+", dx="+dx+", dy="+dy+", dz="+dz);
         int idx=offset;
         for(int i=x;i<x+dx;i++) {
@@ -164,6 +164,16 @@ public class IntBlockPlane extends AbstractIntPlane implements Sliceable {
                     into[idx++] = v;
                 }
             }
+        }
+        return into;
+    }
+
+    @Override public int[] getCoords(int[] into, int x, int y, int[][] coords, int offset) {
+        int idx=offset;
+
+        for(int i=0;i<coords.length;i++) {
+            int v = getCell(x+coords[i][0], y+coords[i][1], _readDepthIdx);
+            into[idx++] = v;
         }
         return into;
     }

@@ -2,6 +2,8 @@ package org.excelsi.nausicaa.ca;
 
 
 import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -15,8 +17,20 @@ public final class Archetype {
     public static final int COLORS_INFINITE = -1;
 
     public enum Neighborhood {
-        vonneumann,
-        moore;
+        moore("Moore"),
+        vonneumann("Von Neumann"),
+        circular("Circular");
+
+        private final String _name;
+
+
+        Neighborhood(String n) {
+            _name = n;
+        }
+
+        public String getName() {
+            return _name;
+        }
 
         public static Neighborhood from(String s) {
             switch(s) {
@@ -24,6 +38,8 @@ public final class Archetype {
                     return vonneumann;
                 case "moore":
                     return moore;
+                case "circular":
+                    return circular;
                 default:
                     throw new IllegalArgumentException("no such neighborhood '"+s+"'");
             }
@@ -101,8 +117,11 @@ public final class Archetype {
         switch(_neighborhood) {
             case vonneumann:
                 return 1+dims()*(2*size());
-            case moore:
+            case circular:
+                //return (int) (Math.PI*Math.pow(0.5+size(),2));
+                return circularCoords(dims(), size()).length;
             default:
+            case moore:
                 return (int) Math.pow(2*size()+1, dims());
         }
         //2 1 -> 5
@@ -238,6 +257,23 @@ public final class Archetype {
             Neighborhood.from(Json.string(o, "neighborhood", "moore")),
             Values.from(Json.string(o, "values", "discrete"))
         );
+    }
+
+    public static int[][] circularCoords(int d, int r) {
+        List<int[]> cs = new ArrayList<>();
+        for(int i=-r;i<=r;i++) {
+            for(int j=-r;j<=r;j++) {
+                double dist = Math.sqrt(i*i+j*j);
+                if(dist<r+0.5) {
+                    cs.add(new int[]{i,j});
+                }
+            }
+        }
+        int[][] ret = new int[cs.size()][];
+        for(int i=0;i<ret.length;i++) {
+            ret[i] = cs.get(i);
+        }
+        return ret;
     }
 
     @Override public String toString() {

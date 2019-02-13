@@ -122,6 +122,14 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
         return _p[ix].next(pattern, p2, ctx);
     }
 
+    @Override public boolean usesSource() {
+        return _s.usesSource();
+    }
+
+    @Override public boolean usesContext() {
+        return _s.usesContext();
+    }
+
     @Override public String humanize() {
         return _s.humanize();
     }
@@ -193,6 +201,24 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                 return 0;
             }
             return _t;
+        }
+
+        public boolean usesSource() {
+            for(SEntry s:_s) {
+                if(s.p.usesSource()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public boolean usesContext() {
+            for(SEntry s:_s) {
+                if(s.p.usesContext()) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public Sequence copy() {

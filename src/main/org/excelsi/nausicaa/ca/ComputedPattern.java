@@ -401,6 +401,14 @@ public final class ComputedPattern implements Pattern, Mutatable {
         return r;
     }
 
+    @Override public boolean usesSource() {
+        return _logic.usesSource();
+    }
+
+    @Override public boolean usesContext() {
+        return _logic.usesContext();
+    }
+
     private static String fmt(int[] p) {
         StringBuilder b = new StringBuilder();
         for(int i:p) {
@@ -459,6 +467,8 @@ public final class ComputedPattern implements Pattern, Mutatable {
         }
         default void tick() { }
         default boolean isDeterministic() { return true; }
+        default boolean usesSource() { return true; }
+        default boolean usesContext() { return false; }
     }
 
     public static class RARule implements RuleLogic {
@@ -503,6 +513,14 @@ public final class ComputedPattern implements Pattern, Mutatable {
 
         @Override public boolean isDeterministic() {
             return _m.isDeterministic();
+        }
+
+        @Override public boolean usesSource() {
+            return _m.usesSource();
+        }
+
+        @Override public boolean usesContext() {
+            return _m.usesContext();
         }
 
         @Override public void next(IO io) {

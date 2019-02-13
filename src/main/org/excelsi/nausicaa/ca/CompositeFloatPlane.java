@@ -62,8 +62,16 @@ public class CompositeFloatPlane extends AbstractFloatPlane implements Sliceable
         return pr().getRow(into, y, offset);
     }
 
+    @Override public float[] getCoords(float[] into, int x, int y, int[][] coords, int offset) {
+        return pr().getCoords(into, x, y, coords, offset);
+    }
+
     @Override public float[] getBlock(float[] into, int x, int y, int dx, int dy, int offset) {
         return pr().getBlock(into, x, y, dx, dy, offset);
+    }
+
+    @Override public float[] getBlock(float[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
+        return pr().getBlock(into, x, y, z, dx, dy, dz, offset);
     }
 
     @Override public float[] getCardinal(float[] into, int x, int y, int dx, int dy, int offset) {

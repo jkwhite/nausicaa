@@ -75,6 +75,20 @@ public class WindowedPlane extends AbstractIntPlane {
         return _p.getBlock(into, x+_x1, y+_y1, dx, dy, offset);
     }
 
+    @Override public int[] getBlock(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
+        return _p.getBlock(into, x+_x1, y+_y1, z, dx, dy, dz, offset);
+    }
+
+    @Override public int[] getCoords(int[] into, int x, int y, int[][] coords, int offset) {
+        int idx=offset;
+
+        for(int i=0;i<coords.length;i++) {
+            int v = getCell(x+_x1+coords[i][0], y+_y1+coords[i][1]);
+            into[idx++] = v;
+        }
+        return into;
+    }
+
     @Override public void setRow(int[] row, int y) {
         _p.setRow(row, y+_y1);
     }

@@ -9,6 +9,8 @@ public interface FloatPlane extends Plane {
     float getCell(int x, int y, int z);
     float[] getRow(float[] into, int y, int offset);
     float[] getBlock(float[] into, int x, int y, int dx, int dy, int offset);
+    float[] getBlock(float[] into, int x, int y, int z, int dx, int dy, int dz, int offset);
+    float[] getCoords(float[] into, int x, int y, int[][] coords, int offset);
     float[] getCardinal(float[] into, int x, int y, int dx, int dy, int offset);
     float[] getCardinal(float[] into, int x, int y, int z, int dx, int dy, int dz, int offset);
     void setRow(float[] row, int y);

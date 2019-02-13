@@ -103,6 +103,16 @@ public class BitSetBlockPlane extends AbstractIntPlane {
         throw new UnsupportedOperationException();
     }
 
+    @Override public int[] getCoords(int[] into, int x, int y, int[][] coords, int offset) {
+        int idx=offset;
+
+        for(int i=0;i<coords.length;i++) {
+            int v = getCell(x+coords[i][0], y+coords[i][1], 0);
+            into[idx++] = v;
+        }
+        return into;
+    }
+
     @Override public int[] getCardinal(int[] into, int x, int y, int dx, int dy, int offset) {
         into[offset++] = getCell(x+1,y,0);
         into[offset++] = getCell(x,y-1,0);

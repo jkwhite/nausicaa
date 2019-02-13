@@ -16,6 +16,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.util.EnumSet;
 import java.util.Random;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
@@ -94,6 +95,7 @@ public class Actions {
         top.add(new JLabel("Neighborhood"));
         ButtonGroup nei = new ButtonGroup();
 
+        /*
         AbstractAction von = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 neihack[0] = Archetype.Neighborhood.vonneumann;
@@ -117,6 +119,25 @@ public class Actions {
         neis.add(rmoo);
         rmoo.setSelected(true);
         neihack[0] = Archetype.Neighborhood.moore;
+        */
+        JPanel neis = new JPanel();
+        String defNei = config.getVariable("default_neighborhood", Archetype.Neighborhood.moore.name());
+        for(Archetype.Neighborhood neighbor:EnumSet.allOf(Archetype.Neighborhood.class)) {
+            AbstractAction von = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    neihack[0] = neighbor;
+                }
+            };
+            JRadioButton rvon = new JRadioButton(von);
+            rvon.setText(neighbor.getName());
+            nei.add(rvon);
+            if(neighbor.name().equals(defNei)) {
+                rvon.setSelected(true);
+                neihack[0] = neighbor;
+            }
+            neis.add(rvon);
+        }
+
         top.add(neis);
 
         // Color kind
@@ -236,6 +257,7 @@ public class Actions {
                 config.setVariable("default_size", siz.getText());
                 config.setVariable("default_kind", colhack[0]);
                 config.setVariable("default_language", lng);
+                config.setVariable("default_neighborhood", neihack[0].name());
                 Random rand = new Random();
                 Palette pal;
                 boolean usePalColors;

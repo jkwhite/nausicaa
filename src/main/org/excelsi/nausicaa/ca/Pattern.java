@@ -14,6 +14,8 @@ public interface Pattern {
         throw new UnsupportedOperationException();
     }
     void tick();
+    default boolean usesSource() { return true; }
+    default boolean usesContext() { return false; }
 
     static class Ctx {
         /** coordinates */

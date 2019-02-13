@@ -54,6 +54,24 @@ public class Machine {
         return true;
     }
 
+    public boolean usesSource() {
+        for(Codon c:_prg) {
+            if(c.usesPattern()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean usesContext() {
+        for(Codon c:_prg) {
+            if(c.usesContext()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Machine copy(Datamap dm) {
         return new Machine(new Implicate(_a, dm, _lang, _vars), _g, _trace);
     }

@@ -240,6 +240,21 @@ public class WritableImagePlane extends AbstractIntPlane {
         }
         return into;
     }
+
+    @Override public int[] getBlock(int[] into, int x, int y, int z, int w, int h, int dz, int offset) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public int[] getCoords(int[] into, int x, int y, int[][] coords, int offset) {
+        int idx=offset;
+
+        for(int i=0;i<coords.length;i++) {
+            int v = getCell(x+coords[i][0], y+coords[i][1]);
+            into[idx++] = v;
+        }
+        return into;
+    }
+
 //
     //public int[] getBlock(int[] into, int x, int y, int d, int offset) {
         //return _i.getRGB(x, y, d, d, into, offset, 0);
