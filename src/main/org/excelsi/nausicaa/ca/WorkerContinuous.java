@@ -59,6 +59,8 @@ public class WorkerContinuous implements Worker {
         //}
     }
 
+    public Stats getStats() { return new Stats(); }
+
     private void validate(IntPlane p) {
         for(int i=0;i<p.getWidth();i++) {
             for(int j=0;j<p.getHeight();j++) {

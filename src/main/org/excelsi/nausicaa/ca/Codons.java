@@ -81,6 +81,7 @@ public class Codons {
     public static final String LEAST = "wo";
     public static final String COORD = "kya";
     public static final String MANDELBROT = "nya";
+    public static final String LIFE = "life";
 
 
     public static Codon codon(final String s, final Implicate im) {
@@ -268,6 +269,8 @@ public class Codons {
                     return new Coord(p);
                 case MANDELBROT:
                     return new Mandelbrot();
+                case LIFE:
+                    return new Life();
                 default:
                     throw new IllegalStateException("unknown opcode '"+code+"'");
             }
@@ -2563,6 +2566,65 @@ public class Codons {
             }
             //System.err.println("fz: "+z);
             t.push(z);
+        }
+    }
+
+    public static class Life implements Codon {
+        @Override public Codon copy() { return new Life(); }
+
+        @Override public String code() { return LIFE; }
+
+        @Override public boolean usesPattern() { return true; }
+
+        @Override public boolean usesTape() { return false; }
+
+        @Override public boolean supports(Values v) { return v==Values.discrete; }
+
+        @Override public boolean deterministic() { return true; }
+
+        public void op(int[] p, IntTape t) {
+            int s0 = 0;
+            for(int i=0;i<p.length;i++) {
+                if(i!=p.length/2) s0 += p[i];
+            }
+            int a0 = 2;
+            int a1 = 3;
+            //boolean b0 = s0 >= a0 && s0 <= a1;
+            int b0 = s0 >= a0 && s0 <= a1 ? 1 : 0;
+
+            int s1 = 0;
+            for(int i=0;i<p.length;i++) {
+                if(i!=p.length/2) s1 += p[i];
+            }
+
+            int a2 = 3;
+            //boolean b1 = s1 == a2;
+            int b1 = s1 == a2 ? 1 : 0;
+            
+            int p0 = p[p.length/2];
+
+            int res = p0 == 0 ? b1 : b0;
+            t.push(res);
+        }
+
+        public void op0(int[] p, IntTape t) {
+            int s = 0;
+            for(int i=0;i<p.length;i++) {
+                s += p[i];
+            }
+            int self = p[p.length/2];
+            s -= self;
+            int r;
+            if(self==1) {
+                r = s==2||s==3 ? 1 : 0;
+            }
+            else {
+                r = s==3 ? 1 : 0;
+            }
+            t.push(r);
+        }
+
+        @Override public void op(float[] p, FloatTape t, Pattern.Ctx ctx) {
         }
     }
 

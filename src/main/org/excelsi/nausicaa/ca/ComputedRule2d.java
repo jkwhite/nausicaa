@@ -198,7 +198,9 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                     p2 = p1.copy();
                 }
                 if(++count%500==0) {
-                    System.err.println("frame "+count);
+                    for(int i=0;i<workers.length;i++) {
+                        System.err.println("worker "+i+" stat: "+workers[i].getStats());
+                    }
                 }
                 return p1;
             }

@@ -18,7 +18,6 @@ public class WorkerDiscrete implements Worker {
     private final int[][] _chanpattern;
     private final int[] _pow;
     private final Variables _vars;
-    //private final boolean _moore;
     private final Rogers _neighbors;
     private final boolean _useDepth;
     private final boolean _channels;
@@ -28,6 +27,7 @@ public class WorkerDiscrete implements Worker {
     private final Pattern.Ctx _pctx;
     private float _weight;
     private float _oWeight;
+    private final Stats _stats;
 
     public WorkerDiscrete(Pattern p, int x1, int y1, int x2, int y2, Variables vars, ComputeMode cmode, UpdateMode umode, ExternalForce ef, Random r) {
         _x1 = x1;
@@ -42,21 +42,22 @@ public class WorkerDiscrete implements Worker {
         _pattern = new int[_prev.length];
         _chanpattern = new int[4][_prev.length];
         _useDepth = p.archetype().dims()==3;
-        //_moore = p.archetype().neighborhood()==Archetype.Neighborhood.moore;
         _neighbors = Rogers.forPattern(p);
         _channels = cmode==ComputeMode.channel;
         _umode = umode.simpleSynchronous() ? null:umode.plan(_wp.archetype());
-        //System.err.println("********** umode: "+_umode);
         _ef = ef;
         _r = r;
         _pctx = new Pattern.Ctx();
         _pctx.c = new int[3];
+        _stats = new Stats();
 
         _pow = new int[_wp.archetype().sourceLength()];
         for(int i=0;i<_pow.length;i++) {
             _pow[_pow.length-1-i] = (int) Math.pow(colors, i);
         }
     }
+
+    public Stats getStats() { return _stats; }
 
     private void validate(IntPlane p) {
         for(int i=0;i<p.getWidth();i++) {
@@ -85,12 +86,6 @@ public class WorkerDiscrete implements Worker {
                             _weight = _vars.weight(p1, j, i, 0);
                         }
                         _oWeight = 1f - _weight;
-                        //if(_moore) {
-                            //p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
-                        //}
-                        //else {
-                            //p1.getCardinal(_pattern, j, i, k, /*dx*/ _size, /*dy*/ _size, /*dz*/ _size, 0);
-                        //}
                         _neighbors.getNeighborhood(p1, _pattern, j, i, k, 0);
                         if(_channels) {
                             p2.setCell(j, i, k, channels());
@@ -131,10 +126,12 @@ public class WorkerDiscrete implements Worker {
     }
 
     public void frame(final Plane ip1, final Plane ip2) {
-        //_weight = _vars.weight();
-        //_oWeight = 1f - _weight;
+        final long startTime = System.currentTimeMillis();
         if(_useDepth) {
             frame3d((IntBlockPlane)ip1, (IntBlockPlane)ip2);
+            final long endTime = System.currentTimeMillis();
+            _stats.timeMsec += (endTime-startTime);
+            _stats.frames++;
             return;
         }
         final IntPlane p1 = (IntPlane) ip1;
@@ -151,8 +148,6 @@ public class WorkerDiscrete implements Worker {
         for(int i=_y1;i<_y2;i++) {
             _pctx.c[1] = i-p1.getHeight()/2;
             for(int j=_x1;j<_x2;j++) {
-                //if(RAND.nextInt(1000)>=100) {
-                //final int self = i*j;
                 if(!_vars.weightVaries()) {
                     _weight = _vars.weight();
                 }
@@ -161,20 +156,12 @@ public class WorkerDiscrete implements Worker {
                     //System.err.println("got w for "+j+","+i+":"+_weight);
                 }
                 _oWeight = 1f - _weight;
-                //if(RAND.nextInt(mx)>=self) {
-                //if(_umode!=null) System.err.println("umode: "+_umode);
                 if(_umode!=null&&!_umode.update(p1, j, i, 0, _vars)) {
                     p2.setCell(j,i,p1.getCell(j,i));
                 }
                 else {
                     _pctx.c[0] = j-p1.getWidth()/2;
                     counts++;
-                    //if(_moore) {
-                        //p1.getBlock(_pattern, j-_size, i-_size, /*dx*/ d, /*dy*/ d, 0);
-                    //}
-                    //else {
-                        //p1.getCardinal(_pattern, j, i, _size, _size, 0);
-                    //}
                     _neighbors.getNeighborhood(p1, _pattern, j, i, 0);
                     if(_channels) {
                         p2.setCell(j, i, channels());
@@ -186,6 +173,9 @@ public class WorkerDiscrete implements Worker {
             }
         }
         _ef.apply(p2, _r);
+        final long endTime = System.currentTimeMillis();
+        _stats.timeMsec += (endTime-startTime);
+        _stats.frames++;
         //mutateRule();
         //System.err.println("set "+counts+" cells");
     }
