@@ -180,7 +180,12 @@ top:        while(_state==State.animate) {
         }
 
         public void run() {
-            step();
+            try {
+                step();
+            }
+            catch(Exception e) {
+                e.printStackTrace();
+            }
         }
 
         public void step() {

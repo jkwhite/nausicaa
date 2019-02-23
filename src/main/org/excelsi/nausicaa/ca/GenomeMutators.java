@@ -102,7 +102,10 @@ public class GenomeMutators {
             (cs,im,gf,m)->{
                 boolean any = true;
                 boolean de = false;
-                while(any && !de) {
+                int tries = 0;
+                while(++tries<100 && any && !de) {
+                    System.err.print("#");
+                    if(tries%10==0) System.err.println();
                     any = false;
                     for(int i=0;i<cs.size();i++) {
                         final Codon c = cs.get(i);

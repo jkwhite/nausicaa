@@ -18,6 +18,7 @@ public class Machine {
     private final IntTape _ti;
     private final FloatTape _tf;
     private final boolean _trace;
+    private long _computeCount = 0;
     private long _e = 0;
 
 
@@ -89,7 +90,7 @@ public class Machine {
             for(int i=0;i<_prg.length;i++) {
                 //long st = System.currentTimeMillis();
                 if(++execCount>MAX_INSTRUCTIONS) {
-                    System.err.println("******* EXEC LIMIT BREAK *******");
+                    if(++_computeCount%1000==0) System.err.println("******* EXEC LIMIT BREAK *******");
                     break;
                 }
                 if(_trace) {
@@ -128,7 +129,7 @@ public class Machine {
             for(int i=0;i<_prg.length;i++) {
                 //long st = System.currentTimeMillis();
                 if(++execCount>MAX_INSTRUCTIONS) {
-                    System.err.println("******* EXEC LIMIT BREAK *******");
+                    if(++_computeCount%1000==0) System.err.println("******* EXEC LIMIT BREAK *******");
                     break;
                 }
                 if(_trace) {

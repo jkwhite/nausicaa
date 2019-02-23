@@ -79,11 +79,13 @@ public final class Genome {
         int tries = 0;
         Genome child;
         do {
+            System.err.print(".");
+            if(tries%100==0) System.err.println();
             child = replicate(im, mf, gf, m);
             if(tries==999) {
                 System.err.println("failed to mutate "+this);
             }
-        } while(child.equals(this) && ++tries<1000);
+        } while(++tries<1000 && child.equals(this));
         System.err.println(this+" => "+child);
         return child;
     }
