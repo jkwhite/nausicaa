@@ -1,7 +1,7 @@
 package org.excelsi.nausicaa.ca;
 
 
-import gnu.trove.*;
+import gnu.trove.map.hash.TLongIntHashMap;
 
 
 public class SparsePattern implements Pattern {
@@ -22,7 +22,7 @@ public class SparsePattern implements Pattern {
         return (byte) 0;
     }
 
-    @Override public int next(int pattern, int[] p2) {
+    @Override public int next(int pattern, int[] p2, Ctx ctx) {
         return 0;
     }
 

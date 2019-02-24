@@ -1,6 +1,9 @@
 package org.excelsi.nausicaa.ca;
 
 
+import java.util.Random;
+
+
 public interface Pattern {
     Archetype archetype();
     byte next(int pattern, byte[] p2);
@@ -20,5 +23,7 @@ public interface Pattern {
     static class Ctx {
         /** coordinates */
         public int[] c;
+        /** random */
+        public Random r;
     }
 }

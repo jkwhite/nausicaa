@@ -53,4 +53,8 @@ public class ByteInitializer implements Initializer {
         o.addProperty("type","byte");
         return o;
     }
+
+    @Override public String humanize() {
+        return "ByteInitializer";
+    }
 }

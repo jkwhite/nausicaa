@@ -49,6 +49,10 @@ public class EncodingInitializer implements Initializer {
     @Override public void write(PrintWriter w) {
     }
 
+    @Override public String humanize() {
+        return "EncodingInitializer";
+    }
+
     @Override public JsonElement toJson() {
         JsonObject o = new JsonObject();
         o.addProperty("type","encode");

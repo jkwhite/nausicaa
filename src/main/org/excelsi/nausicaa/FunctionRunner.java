@@ -66,7 +66,15 @@ public class FunctionRunner extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 task.setText("Canceling");
                 cancel.setEnabled(false);
-                runner.interrupt();
+                int tries = 0;
+                while(++tries<10 && !runner.isInterrupted()) {
+                    runner.interrupt();
+                    try {
+                        Thread.sleep(100);
+                    }
+                    catch(InterruptedException ex) {
+                    }
+                }
             }
         });
         hack[0] = cancel;

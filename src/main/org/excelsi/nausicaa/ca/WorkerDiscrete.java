@@ -25,8 +25,8 @@ public class WorkerDiscrete implements Worker {
     private final ExternalForce _ef;
     private final Random _r;
     private final Pattern.Ctx _pctx;
-    private float _weight;
-    private float _oWeight;
+    private double _weight;
+    private double _oWeight;
     private final Stats _stats;
 
     public WorkerDiscrete(Pattern p, int x1, int y1, int x2, int y2, Variables vars, ComputeMode cmode, UpdateMode umode, ExternalForce ef, Random r) {
@@ -49,6 +49,7 @@ public class WorkerDiscrete implements Worker {
         _r = r;
         _pctx = new Pattern.Ctx();
         _pctx.c = new int[3];
+        _pctx.r = r;
         _stats = new Stats();
 
         _pow = new int[_wp.archetype().sourceLength()];
@@ -85,7 +86,7 @@ public class WorkerDiscrete implements Worker {
                         else {
                             _weight = _vars.weight(p1, j, i, 0);
                         }
-                        _oWeight = 1f - _weight;
+                        _oWeight = 1d - _weight;
                         _neighbors.getNeighborhood(p1, _pattern, j, i, k, 0);
                         if(_channels) {
                             p2.setCell(j, i, k, channels());
@@ -155,7 +156,7 @@ public class WorkerDiscrete implements Worker {
                     _weight = _vars.weight(ip1, j, i, 0);
                     //System.err.println("got w for "+j+","+i+":"+_weight);
                 }
-                _oWeight = 1f - _weight;
+                _oWeight = 1d - _weight;
                 if(_umode!=null&&!_umode.update(p1, j, i, 0, _vars)) {
                     p2.setCell(j,i,p1.getCell(j,i));
                 }
@@ -190,7 +191,7 @@ public class WorkerDiscrete implements Worker {
         final int size = _wp.archetype().size();
         final int colors = _wp.archetype().colors();
         _weight = _vars.weight();
-        _oWeight = 1f - _weight;
+        _oWeight = 1d - _weight;
 
         int[] prev = new int[2*size+1];
         int[] pattern = new int[prev.length];

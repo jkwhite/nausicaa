@@ -18,7 +18,7 @@ public class Config {
     private int _h;
     private int _d;
     private int _prelude = 0;
-    private float _weight = 1f;
+    private double _weight = 1d;
     private long _seed = System.currentTimeMillis(); //19450806L;
     private float _scale = 1f;
     private long _animationDelay = 100;
@@ -38,7 +38,7 @@ public class Config {
         this(300, 300, 1, 1f);
     }
 
-    public Config(int w, int h, int d, float weight) {
+    public Config(int w, int h, int d, double weight) {
         _w = w;
         _h = h;
         _d = d;
@@ -74,7 +74,7 @@ public class Config {
         notify("size");
     }
 
-    public void setSize(int w, int h, int d, int prelude, float weight) {
+    public void setSize(int w, int h, int d, int prelude, double weight) {
         _w = w;
         _h = h;
         _d = d;
@@ -112,11 +112,11 @@ public class Config {
         return _prelude;
     }
 
-    public float getWeight() {
+    public double getWeight() {
         return _weight;
     }
 
-    public void setWeight(float w) {
+    public void setWeight(double w) {
         _weight = w;
     }
 
@@ -335,7 +335,7 @@ public class Config {
             c._h = Json.integer(o, "height", 300);
             c._d = Json.integer(o, "depth", 1);
             c._prelude = Json.integer(o, "prelude", 0);
-            c._weight = Json.flot(o, "weight", 1f);
+            c._weight = Json.dobl(o, "weight", 1d);
             c._scale = Json.flot(o, "scale", 1f);
             c._animationDelay = Json.lng(o, "animationDelay", 100);
             c._forceSymmetry = Json.bool(o, "forceSymmetry", false);

@@ -2423,7 +2423,7 @@ public class Codons {
     }
 
     public static class Rand implements Codon {
-        private static final Random R = new Random();
+        //private static final Random R = new Random();
 
         @Override public Codon copy() { return new Rand(); }
 
@@ -2437,11 +2437,17 @@ public class Codons {
 
         @Override public boolean usesTape() { return true; }
 
+        @Override public boolean usesContext() { return true; }
+
         @Override public boolean supports(Values v) { return true; }
 
         @Override public boolean deterministic() { return false; }
 
         @Override public void op(int[] p, IntTape t) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override public void op(int[] p, IntTape t, Pattern.Ctx ctx) {
             int m = 1;
             int v = t.pop();
             if(v==0) {
@@ -2452,13 +2458,13 @@ public class Codons {
                     v=-v;
                     m=-1;
                 }
-                t.push(m*R.nextInt(v));
+                t.push(m*ctx.r.nextInt(v));
             }
         }
 
-        @Override public void op(float[] p, FloatTape t) {
+        @Override public void op(float[] p, FloatTape t, Pattern.Ctx ctx) {
             float v = t.pop();
-            t.push(v*R.nextFloat());
+            t.push(v*ctx.r.nextFloat());
         }
     }
 

@@ -59,4 +59,9 @@ public final class Json {
         JsonPrimitive v = o.getAsJsonPrimitive(name);
         return v!=null?v.getAsFloat():def;
     }
+
+    public static double dobl(JsonObject o, String name, double def) {
+        JsonPrimitive v = o.getAsJsonPrimitive(name);
+        return v!=null?v.getAsDouble():def;
+    }
 }

@@ -167,12 +167,12 @@ public class CompositeRule implements Rule {
         public void setIndex(int i) { _i = i; }
         public void setStack(int s) { _s = s; }
 
-        @Override public Float weight() { return null; }
+        @Override public Double weight() { return null; }
 
         @Override public boolean weightVaries() { return true; }
 
-        @Override public Float weight(Plane p, int x, int y, int z) {
-            float w = _ps[_s][_i].probe().probeNorm(x,y,z);
+        @Override public Double weight(Plane p, int x, int y, int z) {
+            double w = _ps[_s][_i].probe().probeNorm(x,y,z);
             //System.err.println("w: "+w);
             return w;
         }

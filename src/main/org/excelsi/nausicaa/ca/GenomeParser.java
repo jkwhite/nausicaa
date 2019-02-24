@@ -145,7 +145,7 @@ public class GenomeParser {
             final String gr = gs[i].trim();
             //String g = gr.trim();
             int c = 100;
-            Float w = null;
+            Double w = null;
             String n = null;
             if(gr.indexOf(':')>=0) {
                 String[] cg = gr.split(":");
@@ -155,7 +155,7 @@ public class GenomeParser {
                     int splk = pref.indexOf('/');
                     if(splk>0) {
                         c = Integer.parseInt(pref.substring(0, splk));
-                        w = Float.parseFloat(pref.substring(splk+1));
+                        w = Double.parseDouble(pref.substring(splk+1));
                         System.err.println("C: "+c+", W: "+w);
                     }
                     else {
@@ -267,12 +267,12 @@ public class GenomeParser {
 
     private static class S {
         public final int c;
-        public final Float weight;
+        public final Double weight;
         public final String n;
         public final String g;
         public final String[] params;
 
-        public S(int c, Float w, String n, String g, String[] params) {
+        public S(int c, Double w, String n, String g, String[] params) {
             this.c = c;
             this.weight = w;
             this.n = n;

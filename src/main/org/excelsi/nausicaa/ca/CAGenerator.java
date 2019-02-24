@@ -27,6 +27,8 @@ public class CAGenerator implements Runnable {
     private float _weight = 1f;
     private int _skipFrames = 0;
     private Progress _prog = new Noprogress();
+    private Rendering _rend = new Rendering()
+            .composition(Rendering.Composition.from("front"));
 
     
     public CAGenerator progress(Progress p) {
@@ -144,7 +146,7 @@ public class CAGenerator implements Runnable {
                         //}
                     //});
                     //hack[0].setEnabled(false);
-                    plane.save(selfile);
+                    plane.save(selfile, _rend);
                 }
             }
             else {

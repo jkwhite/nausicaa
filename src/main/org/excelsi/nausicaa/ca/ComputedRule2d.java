@@ -111,7 +111,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         final Pattern[] patterns = new Pattern[nworkers];
         System.err.println("rule compute using "+workers.length+" workers on blocksize "+block);
         final Variables vars = new Variables() {
-            @Override public Float weight() { return c.creator().getWeight(); }
+            @Override public Double weight() { return c.creator().getWeight(); }
         };
         for(int i=0;i<workers.length;i++) {
             patterns[i] = createPattern(pool);
@@ -223,7 +223,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                 //Plane tmp;
                 final Pattern pat = createPattern(pool);
                 Variables vars = new Variables() {
-                    @Override public Float weight() { return c.creator().getWeight(); }
+                    @Override public Double weight() { return c.creator().getWeight(); }
                 };
                 if(pat instanceof Variables) {
                     vars = Variables.cascade((Variables)pat, vars);

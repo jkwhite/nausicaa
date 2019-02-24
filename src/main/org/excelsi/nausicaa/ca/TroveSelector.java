@@ -1,7 +1,7 @@
 package org.excelsi.nausicaa.ca;
 
 
-import gnu.trove.*;
+import gnu.trove.map.hash.TLongByteHashMap;
 
 
 public class TroveSelector implements Selector {

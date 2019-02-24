@@ -48,7 +48,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
         return _trans;
     }
 
-    @Override public Float weight() {
+    @Override public Double weight() {
         return _s.weight();
     }
 
@@ -160,7 +160,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
         public Sequence() {
         }
 
-        public Sequence s(int t, Float weight, ComputedPattern p) {
+        public Sequence s(int t, Double weight, ComputedPattern p) {
             _s.add(new SEntry(t, weight, p));
             _t = _s.get(0).t;
             _i = 0;
@@ -180,7 +180,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
             return _s.get((_i+1)%_s.size()).p;
         }
 
-        public Float weight() {
+        public Double weight() {
             return _s.get(_i).weight;
         }
 
@@ -252,7 +252,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                     for(int i=0;i<_s.size();i++) {
                         final SEntry s = _s.get(i);
                         ComputedPattern np;
-                        Float nw = s.weight;
+                        Double nw = s.weight;
                         if(m.stage()==-1 || i==m.stage()) {
                             //System.err.println("MUTATING "+i);
                             boolean typ = false;
@@ -268,7 +268,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                             if(typ) {
                                 np = (ComputedPattern)s.p.copy(dm);
                                 if(nw==null) {
-                                    nw = m.random().nextFloat();
+                                    nw = m.random().nextDouble();
                                 }
                                 nw = UpdateWeightTransform.mutateWeight(nw, m.random());
                             }
@@ -289,7 +289,7 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                     for(SEntry s:_s) {
                         ns.add(new SEntry(s.t, s.weight, (ComputedPattern)s.p.copy(dm)));
                     }
-                    ns.add(new SEntry(m.random().nextInt(70)+70, 1f, new ComputedPattern(a, ComputedPattern.random(a, dm, m.random()))));
+                    ns.add(new SEntry(m.random().nextInt(70)+70, 1d, new ComputedPattern(a, ComputedPattern.random(a, dm, m.random()))));
                     break;
                 case "add_data":
                     final Archetype ar = _s.get(0).p.archetype();
@@ -371,10 +371,10 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
 
     private static class SEntry {
         public final int t;
-        public final Float weight;
+        public final Double weight;
         public final ComputedPattern p;
 
-        public SEntry(int t, Float weight, ComputedPattern p) {
+        public SEntry(int t, Double weight, ComputedPattern p) {
             this.t = t;
             this.weight = weight;
             this.p = p;

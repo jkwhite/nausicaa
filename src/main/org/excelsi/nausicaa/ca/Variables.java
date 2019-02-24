@@ -2,14 +2,14 @@ package org.excelsi.nausicaa.ca;
 
 
 public interface Variables {
-    Float weight();
+    Double weight();
     default boolean weightVaries() { return false; }
-    default Float weight(Plane p, int x, int y, int z) { return weight(); }
+    default Double weight(Plane p, int x, int y, int z) { return weight(); }
     default boolean update(Plane p, int x, int y, int z, float chance) { return true; }
 
-    public static Variables constant(final Float weight) {
+    public static Variables constant(final Double weight) {
         return new Variables() {
-            @Override public Float weight() {
+            @Override public Double weight() {
                 return weight;
             }
         };
@@ -18,35 +18,36 @@ public interface Variables {
     public static Variables byPlane(Plane p) {
         final Probe probe = p.probe();
         return new Variables() {
-            @Override public Float weight() { return null; }
+            @Override public Double weight() { return null; }
             @Override public boolean weightVaries() { return true; }
-            @Override public Float weight(Plane p, int x, int y, int z) {
-                return probe.probeNorm(x,y,z);
+            @Override public Double weight(Plane p, int x, int y, int z) {
+                double w = probe.probeNorm(x,y,z);
+                return w;
             }
         };
     }
 
     public static Variables cascade(Variables... vars) {
         return new Variables() {
-            @Override public Float weight() {
+            @Override public Double weight() {
                 for(Variables v:vars) {
                     if(v.weight()!=null) {
                         return v.weight();
                     }
                 }
-                return 1f;
+                return 1d;
             }
 
             @Override public boolean weightVaries() { return vars[0].weightVaries(); }
 
-            @Override public Float weight(Plane p, int x, int y, int z) {
+            @Override public Double weight(Plane p, int x, int y, int z) {
                 for(Variables v:vars) {
-                    Float w = v.weight(p, x, y, z);
+                    Double w = v.weight(p, x, y, z);
                     if(w!=null) {
                         return w;
                     }
                 }
-                return 1f;
+                return 1d;
             }
 
             @Override public boolean update(Plane p, int x, int y, int z, float chance) {

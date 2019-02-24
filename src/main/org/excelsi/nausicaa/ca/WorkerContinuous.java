@@ -26,8 +26,8 @@ public class WorkerContinuous implements Worker {
     private final ExternalForce _ef;
     private final Random _r;
     private final Pattern.Ctx _pctx;
-    private float _weight;
-    private float _oWeight;
+    private double _weight;
+    private double _oWeight;
 
     public WorkerContinuous(Pattern p, int x1, int y1, int x2, int y2, Variables vars, ComputeMode cmode, UpdateMode umode, ExternalForce ef, Random r) {
         _x1 = x1;
@@ -52,6 +52,7 @@ public class WorkerContinuous implements Worker {
         _r = r;
         _pctx = new Pattern.Ctx();
         _pctx.c = new int[3];
+        _pctx.r = r;
 
         //_pow = new int[_wp.archetype().sourceLength()];
         //for(int i=0;i<_pow.length;i++) {
@@ -87,7 +88,7 @@ public class WorkerContinuous implements Worker {
                         else {
                             _weight = _vars.weight(p1, j, i, 0);
                         }
-                        _oWeight = 1f - _weight;
+                        _oWeight = 1d - _weight;
                         //if(_moore) {
                             //p1.getBlock(_pattern, j-_size, i-_size, k-_size, /*dx*/ d, /*dy*/ d, /*dz*/ d, 0);
                         //}
@@ -137,7 +138,7 @@ public class WorkerContinuous implements Worker {
 
     public void frame(final Plane ip1, final Plane ip2) {
         _weight = _vars.weight();
-        _oWeight = 1f - _weight;
+        _oWeight = 1d - _weight;
         if(_useDepth) {
             frame3d((FloatBlockPlane)ip1, (FloatBlockPlane)ip2);
             return;

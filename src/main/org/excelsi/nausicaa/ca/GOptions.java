@@ -5,7 +5,7 @@ public class GOptions {
     private final boolean _doubleBuffer;
     private final int _parallel;
     private final int _stride;
-    @Deprecated private final float _weight;
+    @Deprecated private final double _weight;
     private final int _hd;
     @Deprecated private final ComputeMode _compMode;
     private final Variables _vars;
@@ -15,19 +15,19 @@ public class GOptions {
         this(true, 1, 0, 1f, 0);
     }
  
-    public GOptions(boolean db, int par, int s, float w) {
+    public GOptions(boolean db, int par, int s, double w) {
         this(db, par, s, w, 0);
     }
  
-    public GOptions(boolean db, int par, int s, float w, int hd) {
+    public GOptions(boolean db, int par, int s, double w, int hd) {
         this(db, par, s, w, hd, ComputeMode.combined);
     }
 
-    public GOptions(boolean db, int par, int s, float w, int hd, ComputeMode comp) {
+    public GOptions(boolean db, int par, int s, double w, int hd, ComputeMode comp) {
         this(db, par, s, w, hd, comp, null);
     }
 
-    public GOptions(boolean db, int par, int s, float w, int hd, ComputeMode comp, Variables vars) {
+    public GOptions(boolean db, int par, int s, double w, int hd, ComputeMode comp, Variables vars) {
         _doubleBuffer = db;
         _parallel = par;
         _stride = s;
@@ -40,7 +40,7 @@ public class GOptions {
     public boolean doubleBuffer() { return _doubleBuffer; }
     public int parallel() { return _parallel; }
     public int stride() { return _stride; }
-    public float weight() { return _weight; }
+    public double weight() { return _weight; }
     public int higherDim() { return _hd; }
     public ComputeMode computeMode() { return _compMode; }
     public Variables variables() { return _vars; }
@@ -49,7 +49,7 @@ public class GOptions {
         return new GOptions(_doubleBuffer, _parallel, s, _weight, _hd);
     }
 
-    public GOptions weight(float w) {
+    public GOptions weight(double w) {
         return new GOptions(_doubleBuffer, _parallel, _stride, w, _hd);
     }
 

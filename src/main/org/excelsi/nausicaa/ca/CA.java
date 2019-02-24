@@ -44,7 +44,7 @@ public final class CA {
     private int _coda;
     private Random _rand;
     private long _seed;
-    private float _weight;
+    private double _weight;
     private ComputeMode _cmode;
     private UpdateMode _umode;
     private EdgeMode _emode;
@@ -54,7 +54,7 @@ public final class CA {
     private static final byte VERSION = 6;
 
 
-    public CA(Rule r, Palette p, Initializer i, Random rand, long seed, int w, int h, int d, int prelude, float weight, int coda, ComputeMode cmode, UpdateMode umode, EdgeMode emode, ExternalForce ef, Varmap vars, CA meta) {
+    public CA(Rule r, Palette p, Initializer i, Random rand, long seed, int w, int h, int d, int prelude, double weight, int coda, ComputeMode cmode, UpdateMode umode, EdgeMode emode, ExternalForce ef, Varmap vars, CA meta) {
         if(i==null) {
             throw new IllegalArgumentException("null initializer");
         }
@@ -280,7 +280,7 @@ public final class CA {
         return _coda;
     }
 
-    public float getWeight() {
+    public double getWeight() {
         return _weight;
     }
 
@@ -372,7 +372,7 @@ public final class CA {
         return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, coda, _cmode, _umode, _emode, _ef, _vars, _meta);
     }
 
-    public CA weight(float weight) {
+    public CA weight(double weight) {
         return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, weight, _coda, _cmode, _umode, _emode, _ef, _vars, _meta);
     }
 
@@ -496,7 +496,7 @@ public final class CA {
         Random rand = new Random();
         Rule rule = rs.random(rand).next();
         ImageInitializer init = new ImageInitializer(new File(filename));
-        CA ca = new CA(rule, p, init, rand, 0, w, h, d, 0, 1f, 0, ComputeMode.combined, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null);
+        CA ca = new CA(rule, p, init, rand, 0, w, h, d, 0, 1d, 0, ComputeMode.combined, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null);
         return ca;
     }
 
@@ -524,7 +524,7 @@ public final class CA {
             Palette p = Palette.read(dis);
             Initializer i = Initializers.read(dis);
             Rule r = new IndexedRuleReader(dis).read();
-            return new CA(r, p, i, new Random(), seed, w, h, 10, 10, 1f, 0, ComputeMode.combined, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null);
+            return new CA(r, p, i, new Random(), seed, w, h, 10, 10, 1d, 0, ComputeMode.combined, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null);
         }
         finally {
             if(in!=null) {
@@ -611,7 +611,7 @@ public final class CA {
         int d = Json.integer(o, "depth", 1);
         int pre = Json.integer(o, "prelude", 0);
         int seed = Json.integer(o, "seed", 0);
-        float weight = Json.flot(o, "weight", 1f);
+        double weight = Json.dobl(o, "weight", 1d);
         int coda = Json.integer(o, "coda", 0);
         ComputeMode cmode = ComputeMode.from(Json.string(o, "compute_mode", "combined"));
         UpdateMode umode = UpdateMode.fromJson(o.get("update_mode"));
