@@ -16,21 +16,21 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
     private final int _d;
     private final int _hstride;
     private final int _dstride;
-    private final float[] _s;
+    private final double[] _s;
     private final Palette _p;
     private final BufferedImage _i;
     private final WritableRaster _r;
     private final boolean _wrap;
-    private final float _oob;
+    private final double _oob;
     private int _readDepthIdx;
     private int _writeDepthIdx;
 
 
-    public FloatBlockPlane(CA ca, int w, int h, int d, Palette p, Float oob) {
-        this(ca, w, h, d, p, oob, new float[w*h*d]);
+    public FloatBlockPlane(CA ca, int w, int h, int d, Palette p, Double oob) {
+        this(ca, w, h, d, p, oob, new double[w*h*d]);
     }
 
-    public FloatBlockPlane(CA ca, int w, int h, int d, Palette p, Float oob, float[] s) {
+    public FloatBlockPlane(CA ca, int w, int h, int d, Palette p, Double oob, double[] s) {
         _ca = ca;
         _w = w;
         _h = h;
@@ -43,7 +43,7 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
         _r = _i.getRaster();
         if(oob!=null) {
             _wrap = false;
-            _oob = oob.floatValue();
+            _oob = oob.doubleValue();
         }
         else {
             _wrap = true;
@@ -70,11 +70,11 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
     @Override public void init() {
     }
 
-    @Override public void setCell(int x, int y, float v) {
+    @Override public void setCell(int x, int y, double v) {
         setCell(x, y, _writeDepthIdx, v);
     }
 
-    public void setCell(int x, int y, int z, float v) {
+    public void setCell(int x, int y, int z, double v) {
         //try {
             //_s[x+_hstride*y+_dstride*z] = v;
             _s[normX(x)+_hstride*normY(y)+_dstride*normZ(z)] = v;
@@ -92,11 +92,11 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
         throw new UnsupportedOperationException();
     }
 
-    @Override public float getCell(int x, int y) {
+    @Override public double getCell(int x, int y) {
         return getCell(x, y, _readDepthIdx);
     }
 
-    public float getCell(int x, int y, int z) {
+    public double getCell(int x, int y, int z) {
         int nx = normX(x);
         int ny = normY(y);
         int nz = normZ(z);
@@ -116,19 +116,19 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
         //}
     }
 
-    @Override public float[] getRow(float[] into, int y, int offset) {
+    @Override public double[] getRow(double[] into, int y, int offset) {
         for(int i=0;i<_w;i++) {
             into[offset++] = getCell(i, y, _readDepthIdx);
         }
         return into;
     }
 
-    @Override public float[] getBlock(float[] into, int x, int y, int dx, int dy, int offset) {
+    @Override public double[] getBlock(double[] into, int x, int y, int dx, int dy, int offset) {
         //throw new UnsupportedOperationException();
         return getBlock(into, x, y, /*z*/ _readDepthIdx, dx, dy, /*dz*/ 1, offset);
     }
 
-    @Override public float[] getCardinal(float[] into, int x, int y, int dx, int dy, int offset) {
+    @Override public double[] getCardinal(double[] into, int x, int y, int dx, int dy, int offset) {
         into[offset++] = getCell(x+1,y,_readDepthIdx);
         into[offset++] = getCell(x,y-1,_readDepthIdx);
         into[offset++] = getCell(x,y,_readDepthIdx);
@@ -137,7 +137,7 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
         return into;
     }
 
-    @Override public float[] getCardinal(float[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
+    @Override public double[] getCardinal(double[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
         into[offset++] = getCell(x,y+1,z);
         into[offset++] = getCell(x,y-1,z);
         into[offset++] = getCell(x+1,y,z);
@@ -148,24 +148,24 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
         return into;
     }
 
-    @Override public float[] getCoords(float[] into, int x, int y, int[][] coords, int offset) {
+    @Override public double[] getCoords(double[] into, int x, int y, int[][] coords, int offset) {
         int idx=offset;
 
         for(int i=0;i<coords.length;i++) {
-            float v = getCell(x+coords[i][0], y+coords[i][1], _readDepthIdx);
+            double v = getCell(x+coords[i][0], y+coords[i][1], _readDepthIdx);
             into[idx++] = v;
         }
         return into;
     }
 
-    @Override public float[] getBlock(float[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
+    @Override public double[] getBlock(double[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
         //System.err.println("x="+x+", y="+y+", z="+z+", dx="+dx+", dy="+dy+", dz="+dz);
         int idx=offset;
         for(int i=x;i<x+dx;i++) {
             for(int j=y;j<y+dy;j++) {
                 for(int k=z;k<z+dz;k++) {
                     //System.err.println(i+", "+j+", "+k+" @ "+idx);
-                    final float v = getCell(i,j,k);
+                    final double v = getCell(i,j,k);
                     //if(x==4&&y==2&&z==0) {
                         //if(v!=0) {
                             //System.err.println("got value "+v+" for ("+x+","+y+","+z+")");
@@ -201,11 +201,11 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
     }
     */
 
-    @Override public void setRow(float[] row, int y) {
+    @Override public void setRow(double[] row, int y) {
         throw new UnsupportedOperationException();
     }
 
-    private final float[] _rgb = new float[4];
+    private final double[] _rgb = new double[4];
     private final int[] _irgb = new int[4];
     private final int[] _unpack = new int[4];
     private final boolean FIRST = true;
@@ -216,15 +216,15 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
         return toImage(DEFAULT_RENDERING);
     }
 
-    @Override public int computeRgbColor(float idx) {
+    @Override public int computeRgbColor(double idx) {
         return computeColor2(idx);
     }
 
-    public int computeColor2(final float idx) {
+    public int computeColor2(final double idx) {
         if(_ca.archetype().colors()<_p.getColorCount()) {
             final int pc = _p.getColorCount();
             final int ac = _ca.archetype().colors();
-            final float acp = idx/ac;
+            final double acp = idx/ac;
             final int pcp = (int)(pc*acp);
             return _p.color(pcp);
         }
@@ -233,17 +233,17 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
         }
     }
 
-    private int computeColor(final float idx) {
-        final float ceil = (float)Math.ceil(idx);
-        final float floor = (float)Math.floor(idx);
+    private int computeColor(final double idx) {
+        final double ceil = (double)Math.ceil(idx);
+        final double floor = (double)Math.floor(idx);
         final int p1 = _p.color((int)ceil);
         final int p2 = _p.color((int)floor);
-        int c = Colors.avg(p1,p2,1f-(ceil-idx));
+        int c = Colors.avg(p1,p2,1d-(ceil-idx));
         //System.err.println("to rgb color: "+c+" for p1="+p1+",p2="+p2+",idx="+idx);
         return c;
         //final int pc = _p.getColorCount();
         //final int ac = _ca.archetype().colors();
-        //final float acp = idx/ac;
+        //final double acp = idx/ac;
         //final int pcp = (int)(pc*acp);
         //return _p.color(pcp);
     }
@@ -254,7 +254,7 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
             return _i;
         }
         else {
-            final float[] rgb = _rgb;
+            final double[] rgb = _rgb;
             final int[] irgb = _irgb;
             for(int i=0;i<_w;i++) {
                 for(int j=0;j<_h;j++) {
@@ -266,14 +266,14 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
                     irgb[2]=0;
                     int mx = 0;
                     if(_d==1) {
-                        float idx = getCell(i,j,0);
+                        double idx = getCell(i,j,0);
                         _i.setRGB(i,j,computeColor2(idx));
                         //_i.setRGB(i,j,_p.color(idx));
                     }
                     else {
                         //System.err.println("comp: "+comp+", d: "+_d);
                         if(comp==Rendering.Composition.channel) {
-                            final float max = creator().archetype().colors()-1f;
+                            final double max = creator().archetype().colors()-1d;
                             if(_d==3) {
                                 rgb[0] = getCell(i,j,0);
                                 rgb[1] = getCell(i,j,1);
@@ -292,13 +292,13 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
                         }
                         else if(comp==Rendering.Composition.front||comp==Rendering.Composition.wavg) {
                             for(int k=0;k<_d;k++) {
-                                float idx = getCell(i,j,k);
+                                double idx = getCell(i,j,k);
                                 int packed = computeColor2(idx);
-                                //Colors.dump(packed, "float0");
+                                //Colors.dump(packed, "double0");
                                 //final int[] u = _p.unpack(idx, _unpack);
                                 final int[] u = Colors.unpack(packed, _unpack);
                                 //System.err.println("u: "+java.util.Arrays.toString(u));
-                                float mult = ((_d-k)/(float)_d);
+                                double mult = ((_d-k)/(double)_d);
                                 //System.err.println("mult: "+mult+", k: "+k);
                                 irgb[0] += (int)(mult*u[0]);
                                 irgb[1] += (int)(mult*u[1]);
@@ -310,7 +310,7 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
                             mx = 1;
                             int pkd = Colors.pack(irgb[2], irgb[1], irgb[0]);
                             //System.err.println("rgb: "+java.util.Arrays.toString(irgb));
-                            //Colors.dump(pkd, "float1");
+                            //Colors.dump(pkd, "double1");
                             _i.setRGB(i,j,pkd);
                         }
                         /*
@@ -318,7 +318,7 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
                             for(int k=_d-1;k>=0;k--) {
                                 int idx = getCell(i,j,k);
                                 final int[] u = _p.unpack(idx, _unpack);
-                                float mult = ((1+k)/(float)_d);
+                                double mult = ((1+k)/(double)_d);
                                 rgb[0] += (int)(mult*u[0]);
                                 rgb[1] += (int)(mult*u[1]);
                                 rgb[2] += (int)(mult*u[2]);
@@ -333,7 +333,7 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
                             for(int k=0;k<_d;k++) {
                                 int idx = getCell(i,j,k);
                                 final int[] u = _p.unpack(idx, _unpack);
-                                //float mult = ((1+k)/(float)_d);
+                                //double mult = ((1+k)/(double)_d);
                                 rgb[0] += u[0];
                                 rgb[1] += u[1];
                                 rgb[2] += u[2];
@@ -383,7 +383,7 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
     }
 
     @Override public Plane copy() {
-        float[] sc = new float[_s.length];
+        double[] sc = new double[_s.length];
         System.arraycopy(_s, 0, sc, 0, _s.length);
         return new FloatBlockPlane(_ca, _w, _h, _d, _p, oob(), sc);
     }
@@ -450,11 +450,11 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
         //_lockOwner = -1;
     //}
 
-    protected float[] getBuffer() {
+    protected double[] getBuffer() {
         return _s;
     }
 
-    protected Float oob() {
+    protected Double oob() {
         return _wrap?null:_oob;
     }
 

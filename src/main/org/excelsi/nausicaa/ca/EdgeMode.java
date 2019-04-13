@@ -11,7 +11,7 @@ public class EdgeMode implements Humanizable {
 
     private final Type _t;
     private final int _iconstant;
-    private final float _fconstant;
+    private final double _fconstant;
 
 
     public EdgeMode(Type t) {
@@ -26,13 +26,13 @@ public class EdgeMode implements Humanizable {
         _fconstant = 0;
     }
 
-    public EdgeMode(Type t, float constant) {
+    public EdgeMode(Type t, double constant) {
         _t = t;
         _iconstant = 0;
         _fconstant = constant;
     }
 
-    public EdgeMode(Type t, int iconstant, float fconstant) {
+    public EdgeMode(Type t, int iconstant, double fconstant) {
         _t = t;
         _iconstant = iconstant;
         _fconstant = fconstant;
@@ -59,7 +59,7 @@ public class EdgeMode implements Humanizable {
         return _iconstant;
     }
 
-    public float floatConstant() {
+    public double floatConstant() {
         return _fconstant;
     }
 
@@ -79,13 +79,13 @@ public class EdgeMode implements Humanizable {
         return oobValue();
     }
 
-    public Float floatOobValue() {
+    public Double floatOobValue() {
         switch(_t) {
             case toroidal:
             default:
                 return null;
             case zero:
-                return 0f;
+                return 0d;
             case constant:
                 return _fconstant;
         }
@@ -112,7 +112,7 @@ public class EdgeMode implements Humanizable {
             case "constant":
                 return new EdgeMode(Type.constant,
                     Json.integer(o, "constant", 0),
-                    Json.flot(o, "floatConstant", 0f));
+                    Json.dobl(o, "floatConstant", 0d));
         }
         throw new IllegalArgumentException("unknown type '"+t+"'");
     }

@@ -580,6 +580,7 @@ public class Actions {
                 createText(new GenomeParser(r.archetype(), ((ComputedRuleset)r.origin()).language()).info(cr.archetype(), cr.genome()).toString(), 10, true));
         }
         p.addPair("Colors", createColorPanel(ca.getPalette()));
+        p.addPair("Caption", createText(createCaption(ca), 10, true));
         p.done();
         i.getContentPane().add(p);
         int shortcut = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -2184,6 +2185,46 @@ public class Actions {
         a.setLineWrap(false);
         a.setWrapStyleWord(false);
         return scroll ? new JScrollPane(a) : a;
+    }
+
+    private static String dimension2Text(int d) {
+        switch(d) {
+            case 1:
+                return "One dimension";
+            case 2:
+                return "Two dimensions";
+            case 3:
+                return "Three dimensions";
+            default:
+                return "Hyperdimensional";
+        }
+    }
+
+    private static String createCaption(CA ca) {
+        Rule r = ca.getRule();
+        String fmt = "%s, %d colors, %s neighborhood of %s %d, %s values, %s updates, %s edge, initialized with %s";
+        String capt = String.format(fmt,
+            dimension2Text(r.archetype().dims()),
+            r.archetype().colors(),
+            r.archetype().neighborhood().getName(),
+            r.archetype().neighborhood()==Archetype.Neighborhood.circular?"radius":"size",
+            r.archetype().size(),
+            r.archetype().values(),
+            ca.getUpdateMode().humanize().toLowerCase(),
+            ca.getEdgeMode().humanize().toLowerCase(),
+            ca.getInitializer().humanize().toLowerCase()
+        );
+        if(! (ca.getExternalForce() instanceof ExternalForce.NopExternalForce) ) {
+            capt += ", external force of "+ca.getExternalForce().humanize();
+        }
+        if(r instanceof ComputedRule2d) {
+            ComputedRule2d cr = (ComputedRule2d) r;
+            capt += "\n\nRule Genome:\n"+cr.prettyGenome();
+        }
+        else {
+            capt += "\n\nRule:\n\n"+r.humanize();
+        }
+        return capt;
     }
 
     private static JComponent createColorPanel(Palette palette) {

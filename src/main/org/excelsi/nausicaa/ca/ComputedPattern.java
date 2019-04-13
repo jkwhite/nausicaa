@@ -208,27 +208,27 @@ public final class ComputedPattern implements Pattern, Mutatable {
         private final int _psize;
         protected final int _csize;
         private final int _bsize;
-        private final float[] _c;
+        private final double[] _c;
         //private final int[][] _p;
-        protected final float[] _p;
+        protected final double[] _p;
         private final int[] _hot;
 
         public FPCache(int csize, int psize) {
-            _c = new float[csize];
+            _c = new double[csize];
             _hot = new int[csize];
             //_p = new int[csize][];
             _csize = csize;
             _psize = psize;
             _bsize = _psize + 1;
             //_p = new int[csize*psize];
-            _p = new float[_bsize*csize];
+            _p = new double[_bsize*csize];
             //System.err.println("plen: "+_p.length);
             //for(int i=0;i<_p.length;i++) {
                 //_p[i] = new int[psize];
             //}
         }
 
-        public float find(float[] p) {
+        public double find(double[] p) {
             int i = key(p);
             lk = i;
             i=0;
@@ -236,9 +236,9 @@ public final class ComputedPattern implements Pattern, Mutatable {
             int j = 0;
             //if(i<0) throw new IllegalStateException("negative i: "+i);
             int idx = i*_psize;
-            if(_p[idx++]==0f) {
+            if(_p[idx++]==0d) {
                 h = false;
-                return 0f;
+                return 0d;
             }
             for(;idx<=(i+1)*_psize;idx++) {
                 //if(j<0) throw new IllegalStateException("negative j: "+j+" idx: "+idx+" i: "+i+" psize: "+_psize);
@@ -254,7 +254,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
             //return _p[idx];
         }
 
-        public void put(float[] p, float r) {
+        public void put(double[] p, double r) {
             //if(Arrays.equals(ZEROS, p)) System.err.println("*** PCACHE PUT: "+fmt(p)+" => "+r);
             //final int i = key(p);
             final int i = lk;
@@ -291,11 +291,11 @@ public final class ComputedPattern implements Pattern, Mutatable {
             System.err.println("total writes: "+w+" total buckets in use: "+b+" / "+_hot.length+" max: "+max+"("+mb+") min: "+min);
         }
 
-        protected static final int f(float f) {
-            return Float.floatToIntBits(f);
+        protected static final int f(double f) {
+            return (int) Double.doubleToLongBits(f);
         }
 
-        protected int key(float[] p) {
+        protected int key(double[] p) {
             int k = (f(p[0])<<24^f(p[1])<<16^f(p[2])<<8^f(p[3])^f(p[4])<<8^f(p[5])<<16^f(p[6])<<24);
             k = k^(f(p[7])<<24^f(p[8])); //<<16^p[9]<<8^p[10]^p[11]<<8^p[12]<<16^p[13]<<24);
             k = k % _p.length;
@@ -323,7 +323,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
             super(csize, psize);
         }
 
-        protected int key(float[] p) {
+        protected int key(double[] p) {
             int k = (f(p[0])<<24^f(p[1])<<16^f(p[2])<<8^f(p[3])^f(p[4])<<8);
             if(p.length>6) {
                 k = k^f(p[5])<<16^f(p[6])<<24;
@@ -373,8 +373,8 @@ public final class ComputedPattern implements Pattern, Mutatable {
         return r;
     }
 
-    @Override public float next(int pattern, final float[] p2, Pattern.Ctx ctx) {
-        float r;
+    @Override public double next(int pattern, final double[] p2, Pattern.Ctx ctx) {
+        double r;
         if(ENABLE_CACHE && _fcache!=null) {
             r = _fcache.find(p2);
             if(_fcache.h) {

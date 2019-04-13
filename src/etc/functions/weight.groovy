@@ -18,7 +18,7 @@ run = { ca, args, api ->
     int suf = 0
     api.progress.maximum = ((end-start)/inc) as Integer
     for(i=start;i<=end;i+=inc) {
-        api.progress.current = ((i-start/inc) as Integer
+        api.progress.current = ((i-start)/inc) as Integer
         def genome = ca.rule.genome()
         def ngenome = genome.replaceFirst(/\/\d+(\.\d+)?:/, "/${i}:")
         System.err.println("iter ${i}: orig: ${genome}, new: ${ngenome}")

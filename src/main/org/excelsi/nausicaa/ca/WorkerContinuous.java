@@ -14,9 +14,9 @@ public class WorkerContinuous implements Worker {
     private final Pattern _wp;
     private final int _size;
     private final Variables _vars;
-    private final float[] _prev;
-    private final float[] _pattern;
-    private final float[][] _chanpattern;
+    private final double[] _prev;
+    private final double[] _pattern;
+    private final double[][] _chanpattern;
     //private final int[] _pow;
     //private final boolean _moore;
     private final Rogers _neighbors;
@@ -40,9 +40,9 @@ public class WorkerContinuous implements Worker {
         //_oWeight = 1f - weight;
         _size = _wp.archetype().size();
         final int colors = _wp.archetype().colors();
-        _prev = new float[_wp.archetype().sourceLength()];
-        _pattern = new float[_prev.length];
-        _chanpattern = new float[4][_prev.length];
+        _prev = new double[_wp.archetype().sourceLength()];
+        _pattern = new double[_prev.length];
+        _chanpattern = new double[4][_prev.length];
         _useDepth = p.archetype().dims()==3;
         //_moore = p.archetype().neighborhood()==Archetype.Neighborhood.moore;
         _neighbors = Rogers.forPattern(p);
@@ -112,22 +112,22 @@ public class WorkerContinuous implements Worker {
     /*TODO
     private final int channels() {
         Colors.extractChannels(_pattern, _chanpattern);
-        final float r = next(_chanpattern[0]);
-        final float g = next(_chanpattern[1]);
-        final float b = next(_chanpattern[2]);
-        final float a = next(_chanpattern[3]);
+        final double r = next(_chanpattern[0]);
+        final double g = next(_chanpattern[1]);
+        final double b = next(_chanpattern[2]);
+        final double a = next(_chanpattern[3]);
         return Colors.packBounded(r,g,b,a);
     }
     */
 
-    private final float next(final float[] pattern) {
-        final float v = _wp.next(0, pattern, _pctx);
-        final float ov = pattern[pattern.length/2];
-        final float nv = (float) ((_oWeight*ov)+(_weight*v));
+    private final double next(final double[] pattern) {
+        final double v = _wp.next(0, pattern, _pctx);
+        final double ov = pattern[pattern.length/2];
+        final double nv = (double) ((_oWeight*ov)+(_weight*v));
         return nv;
     }
 
-    private static void dump(int x, int y, int z, float[] p, float v) {
+    private static void dump(int x, int y, int z, double[] p, double v) {
         StringBuilder b = new StringBuilder("("+x+","+y+","+z+") => ");
         for(int i=0;i<p.length;i++) {
             b.append(p[i]).append(" ");
@@ -172,7 +172,7 @@ public class WorkerContinuous implements Worker {
                     else {
                         _weight = _vars.weight(p1, j, i, 0);
                     }
-                    _oWeight = 1f - _weight;
+                    _oWeight = 1d - _weight;
                     //if(_moore) {
                         //p1.getBlock(_pattern, j-_size, i-_size, /*dx*/ d, /*dy*/ d, 0);
                     //}
@@ -204,10 +204,10 @@ public class WorkerContinuous implements Worker {
         final int size = _wp.archetype().size();
         final int colors = _wp.archetype().colors();
         _weight = _vars.weight();
-        _oWeight = 1f - _weight;
+        _oWeight = 1d - _weight;
 
-        float[] prev = new float[2*size+1];
-        float[] pattern = new float[prev.length];
+        double[] prev = new double[2*size+1];
+        double[] pattern = new double[prev.length];
 
         //final Pattern p = createPattern(pool);
         //System.err.println("created pattern: "+p);
@@ -220,9 +220,9 @@ public class WorkerContinuous implements Worker {
                 }
                 else {
                     c.getBlock(pattern, j-size, i-1, pattern.length, 1, 0);
-                    final float v = _wp.next(0, pattern, _pctx);
-                    final float ov = pattern[pattern.length/2];
-                    final float nv = (float) ((_oWeight*ov)+(_weight*v));
+                    final double v = _wp.next(0, pattern, _pctx);
+                    final double ov = pattern[pattern.length/2];
+                    final double nv = (double) ((_oWeight*ov)+(_weight*v));
                     c.setCell(j, i, nv);
                     //System.err.print(".");
                 }
@@ -251,7 +251,7 @@ public class WorkerContinuous implements Worker {
                 p1.getBlock(_prev, j-_size, i-1, /*dx*/ 3, /*dy*/ 3, 0);
                 int idx = 0;
                 for(int k=0;k<_prev.length;k++) {
-                    _pattern[k] = (float) (_prev[k]);
+                    _pattern[k] = (double) (_prev[k]);
                     //TODO: ???
                     //idx += _prev[k] * _pow[k];
                     //System.err.println(String.format("prev[%d]=%d, pow[%d]=%d", k, _prev[k], k, _pow[k]));

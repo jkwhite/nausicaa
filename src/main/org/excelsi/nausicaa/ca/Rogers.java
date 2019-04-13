@@ -3,9 +3,9 @@ package org.excelsi.nausicaa.ca;
 
 public interface Rogers {
     int[] getNeighborhood(IntPlane p, int[] into, int i, int j, int k, int offset);
-    float[] getNeighborhood(FloatPlane p, float[] into, int i, int j, int k, int offset);
+    double[] getNeighborhood(FloatPlane p, double[] into, int i, int j, int k, int offset);
     int[] getNeighborhood(IntPlane p, int[] into, int i, int j, int offset);
-    float[] getNeighborhood(FloatPlane p, float[] into, int i, int j, int offset);
+    double[] getNeighborhood(FloatPlane p, double[] into, int i, int j, int offset);
 
     public static Rogers forPattern(final Pattern p) {
         final Archetype a = p.archetype();
@@ -17,7 +17,7 @@ public interface Rogers {
                     return into;
                 }
 
-                @Override public float[] getNeighborhood(FloatPlane p, float[] into, int i, int j, int k, int offset) {
+                @Override public double[] getNeighborhood(FloatPlane p, double[] into, int i, int j, int k, int offset) {
                     return into;
                 }
 
@@ -25,7 +25,7 @@ public interface Rogers {
                     return into;
                 }
 
-                @Override public float[] getNeighborhood(FloatPlane p, float[] into, int i, int j, int offset) {
+                @Override public double[] getNeighborhood(FloatPlane p, double[] into, int i, int j, int offset) {
                     return into;
                 }
             };
@@ -38,7 +38,7 @@ public interface Rogers {
                         return p.getBlock(into, i-size, j-size, k-size, /*dx*/ d, /*dy*/ d, /*dz*/ d, offset);
                     }
 
-                    @Override public float[] getNeighborhood(FloatPlane p, float[] into, int i, int j, int k, int offset) {
+                    @Override public double[] getNeighborhood(FloatPlane p, double[] into, int i, int j, int k, int offset) {
                         return p.getBlock(into, i-size, j-size, k-size, /*dx*/ d, /*dy*/ d, /*dz*/ d, offset);
                     }
 
@@ -46,7 +46,7 @@ public interface Rogers {
                         return p.getBlock(into, i-size, j-size, /*dx*/ d, /*dy*/ d, offset);
                     }
 
-                    @Override public float[] getNeighborhood(FloatPlane p, float[] into, int i, int j, int offset) {
+                    @Override public double[] getNeighborhood(FloatPlane p, double[] into, int i, int j, int offset) {
                         return p.getBlock(into, i-size, j-size, /*dx*/ d, /*dy*/ d, offset);
                     }
                 };
@@ -56,7 +56,7 @@ public interface Rogers {
                         return p.getCardinal(into, i, j, k, size, size, size, offset);
                     }
 
-                    @Override public float[] getNeighborhood(FloatPlane p, float[] into, int i, int j, int k, int offset) {
+                    @Override public double[] getNeighborhood(FloatPlane p, double[] into, int i, int j, int k, int offset) {
                         return p.getCardinal(into, i, j, k, size, size, size, offset);
                     }
 
@@ -64,7 +64,7 @@ public interface Rogers {
                         return p.getCardinal(into, i, j, size, size, offset);
                     }
 
-                    @Override public float[] getNeighborhood(FloatPlane p, float[] into, int i, int j, int offset) {
+                    @Override public double[] getNeighborhood(FloatPlane p, double[] into, int i, int j, int offset) {
                         return p.getCardinal(into, i, j, size, size, offset);
                     }
                 };
@@ -76,7 +76,7 @@ public interface Rogers {
                         return p.getCoords(into, i, j, coords, offset);
                     }
 
-                    @Override public float[] getNeighborhood(FloatPlane p, float[] into, int i, int j, int k, int offset) {
+                    @Override public double[] getNeighborhood(FloatPlane p, double[] into, int i, int j, int k, int offset) {
                         return p.getCoords(into, i, j, coords, offset);
                     }
 
@@ -84,7 +84,7 @@ public interface Rogers {
                         return p.getCoords(into, i, j, coords, offset);
                     }
 
-                    @Override public float[] getNeighborhood(FloatPlane p, float[] into, int i, int j, int offset) {
+                    @Override public double[] getNeighborhood(FloatPlane p, double[] into, int i, int j, int offset) {
                         // TODO
                         return p.getCoords(into, i, j, coords, offset);
                     }

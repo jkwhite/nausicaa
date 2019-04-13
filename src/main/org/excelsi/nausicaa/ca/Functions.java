@@ -37,6 +37,7 @@ public class Functions {
                     _fs.put(fn.getName(), fn);
                 }
                 catch(Exception e) {
+                    System.err.println("failed processing '"+f+"': "+e);
                     e.printStackTrace();
                 }
             }

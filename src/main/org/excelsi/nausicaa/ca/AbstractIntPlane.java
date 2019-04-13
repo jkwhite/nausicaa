@@ -50,7 +50,7 @@ public abstract class AbstractIntPlane extends AbstractPlane implements IntPlane
                 AbstractIntPlane.this.setCell(x, y, z, v);
             }
 
-            @Override public void setCell(int x, int y, int z, float v) {
+            @Override public void setCell(int x, int y, int z, double v) {
                 AbstractIntPlane.this.setCell(x, y, z, (int) v);
             }
 
@@ -66,13 +66,13 @@ public abstract class AbstractIntPlane extends AbstractPlane implements IntPlane
             _probe = new Probe() {
                 final int max = creator().archetype().colors();
 
-                @Override public float probe(int x, int y, int z) {
+                @Override public double probe(int x, int y, int z) {
                     return AbstractIntPlane.this.getCell(x,y,z);
                 }
 
-                @Override public float probeNorm(int x, int y, int z) {
+                @Override public double probeNorm(int x, int y, int z) {
                     int val = AbstractIntPlane.this.getCell(x,y,z);
-                    return (float)val/(float)max;
+                    return (double)val/(double)max;
                 }
             };
         }

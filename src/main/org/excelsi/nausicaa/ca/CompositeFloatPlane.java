@@ -38,11 +38,11 @@ public class CompositeFloatPlane extends AbstractFloatPlane implements Sliceable
         _writeDepthIdx = idx;
     }
 
-    @Override public void setCell(int x, int y, float v) {
+    @Override public void setCell(int x, int y, double v) {
         pw().setCell(x, y, v);
     }
 
-    @Override public void setCell(int x, int y, int z, float v) {
+    @Override public void setCell(int x, int y, int z, double v) {
         pw().setCell(x, y, z, v);
     }
 
@@ -50,39 +50,39 @@ public class CompositeFloatPlane extends AbstractFloatPlane implements Sliceable
         pw().setRGBCell(x, y, rgb);
     }
 
-    @Override public float getCell(int x, int y) {
+    @Override public double getCell(int x, int y) {
         return pr().getCell(x, y);
     }
 
-    @Override public float getCell(int x, int y, int z) {
+    @Override public double getCell(int x, int y, int z) {
         return pr().getCell(x, y, z);
     }
 
-    @Override public float[] getRow(float[] into, int y, int offset) {
+    @Override public double[] getRow(double[] into, int y, int offset) {
         return pr().getRow(into, y, offset);
     }
 
-    @Override public float[] getCoords(float[] into, int x, int y, int[][] coords, int offset) {
+    @Override public double[] getCoords(double[] into, int x, int y, int[][] coords, int offset) {
         return pr().getCoords(into, x, y, coords, offset);
     }
 
-    @Override public float[] getBlock(float[] into, int x, int y, int dx, int dy, int offset) {
+    @Override public double[] getBlock(double[] into, int x, int y, int dx, int dy, int offset) {
         return pr().getBlock(into, x, y, dx, dy, offset);
     }
 
-    @Override public float[] getBlock(float[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
+    @Override public double[] getBlock(double[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
         return pr().getBlock(into, x, y, z, dx, dy, dz, offset);
     }
 
-    @Override public float[] getCardinal(float[] into, int x, int y, int dx, int dy, int offset) {
+    @Override public double[] getCardinal(double[] into, int x, int y, int dx, int dy, int offset) {
         return pr().getCardinal(into, x, y, dx, dy, offset);
     }
 
-    @Override public float[] getCardinal(float[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
+    @Override public double[] getCardinal(double[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
         return pr().getCardinal(into, x, y, z, dx, dy, dz, offset);
     }
 
-    @Override public void setRow(float[] row, int y) {
+    @Override public void setRow(double[] row, int y) {
         pw().setRow(row, y);
     }
 
@@ -103,7 +103,7 @@ public class CompositeFloatPlane extends AbstractFloatPlane implements Sliceable
         return toImage(DEFAULT_RENDERING);
     }
 
-    private final float[] _rgb = new float[3];
+    private final double[] _rgb = new double[3];
     private final int[] _irgb = new int[4];
     private final int[] _unpack = new int[4];
     @Override public java.awt.Image toImage(Rendering rend) {
@@ -112,7 +112,7 @@ public class CompositeFloatPlane extends AbstractFloatPlane implements Sliceable
             _r = _i.getRaster();
         }
         final Rendering.Composition comp = rend.composition();
-        final float[] rgb = _rgb;
+        final double[] rgb = _rgb;
         final int[] irgb = _irgb;
         for(int i=0;i<getWidth();i++) {
             for(int j=0;j<getHeight();j++) {
@@ -132,11 +132,11 @@ public class CompositeFloatPlane extends AbstractFloatPlane implements Sliceable
                     if(comp==Rendering.Composition.front||comp==Rendering.Composition.truefront||comp==Rendering.Composition.wavg) {
                         for(int k=0;k<_ps.length;k++) {
                             final FloatPlane fp = p(k);
-                            float idx = fp.getCell(i,j);
+                            double idx = fp.getCell(i,j);
                             int packed = fp.computeRgbColor(idx);
                             //final int[] u = _ps[k].creator().getPalette().unpack(idx, _unpack);
                             final int[] u = Colors.unpack(packed, _unpack);
-                            float mult = ((_ps.length-k)/(float)_ps.length);
+                            double mult = ((_ps.length-k)/(double)_ps.length);
                             irgb[0] += (int)(mult*u[0]);
                             irgb[1] += (int)(mult*u[1]);
                             irgb[2] += (int)(mult*u[2]);
@@ -150,11 +150,11 @@ public class CompositeFloatPlane extends AbstractFloatPlane implements Sliceable
                     else if(comp==Rendering.Composition.back||comp==Rendering.Composition.revwavg) {
                         for(int k=_ps.length-1;k>=0;k--) {
                             final FloatPlane fp = p(k);
-                            float idx = fp.getCell(i,j);
+                            double idx = fp.getCell(i,j);
                             int packed = fp.computeRgbColor(idx);
                             //final int[] u = _ps[k].creator().getPalette().unpack(idx, _unpack);
                             final int[] u = Colors.unpack(packed, _unpack);
-                            float mult = ((1+k)/(float)_ps.length);
+                            double mult = ((1+k)/(double)_ps.length);
                             irgb[0] += (int)(mult*u[0]);
                             irgb[1] += (int)(mult*u[1]);
                             irgb[2] += (int)(mult*u[2]);
@@ -168,11 +168,11 @@ public class CompositeFloatPlane extends AbstractFloatPlane implements Sliceable
                     else if(comp==Rendering.Composition.multiply||comp==Rendering.Composition.avg||comp==Rendering.Composition.difference) {
                         for(int k=0;k<_ps.length;k++) {
                             final FloatPlane fp = p(k);
-                            float idx = fp.getCell(i,j);
+                            double idx = fp.getCell(i,j);
                             int packed = fp.computeRgbColor(idx);
                             //final int[] u = _ps[k].creator().getPalette().unpack(idx, _unpack);
                             final int[] u = Colors.unpack(packed, _unpack);
-                            //float mult = ((1+k)/(float)_d);
+                            //double mult = ((1+k)/(double)_d);
                             switch(comp) {
                                 case avg:
                                 default:
@@ -254,9 +254,9 @@ public class CompositeFloatPlane extends AbstractFloatPlane implements Sliceable
     }
 
     private int extractColor(int p, int i, int j) {
-        final float c = p(p).getCell(i,j);
+        final double c = p(p).getCell(i,j);
         final int mc = p(p).creator().archetype().colors();
-        final float r = (float)c/(float)mc;
+        final double r = (double)c/(double)mc;
         return (int) (r*255f);
     }
 
@@ -323,7 +323,7 @@ public class CompositeFloatPlane extends AbstractFloatPlane implements Sliceable
     @Override public void tick() {
     }
 
-    @Override public int computeRgbColor(float idx) {
+    @Override public int computeRgbColor(double idx) {
         throw new UnsupportedOperationException();
     }
 

@@ -4,9 +4,9 @@ package org.excelsi.nausicaa.ca;
 public class IO {
     public final Values v;
     public int[] ii;
-    public float[] fi;
+    public double[] fi;
     public int io;
-    public float fo;
+    public double fo;
     public Pattern.Ctx ctx;
 
     public IO(Values v) {

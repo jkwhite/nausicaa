@@ -231,17 +231,17 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype>, Humanizable
                     return new EnergyAsynchronous(_r, _chance, _size) {
                         @Override public boolean update(Plane p, int x, int y, int z, Variables vars) {
                             final FloatPlane qp = (FloatPlane) p;
-                            float c;
+                            double c;
                             switch(_size) {
                                 case 1:
                                     c = 1+qp.getCell(x,y,z);
                                     break;
                                 default:
-                                    float m = 0;
+                                    double m = 0;
                                     for(int i=x-_size;i<=x+_size;i++) {
                                         for(int j=y-_size;j<=y+_size;j++) {
                                             for(int k=z-_size;k<=z+_size;k++) {
-                                                float t = qp.getCell(i,j,k);
+                                                double t = qp.getCell(i,j,k);
                                                 if(t>m) m=t;
                                             }
                                         }
@@ -250,8 +250,8 @@ public interface UpdateMode extends Plannable<UpdateMode,Archetype>, Humanizable
                                     break;
                             }
                             int m = qp.creator().archetype().colors();
-                            float e = _chance*(float)c/(float)m;
-                            return _r.nextFloat()<=e;
+                            double e = _chance*(double)c/(double)m;
+                            return _r.nextDouble()<=e;
                         }
                     };
             }

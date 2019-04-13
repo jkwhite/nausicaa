@@ -125,7 +125,7 @@ public class Machine {
         }
         else {
             _tf.reset();
-            final float[] p = io.fi;
+            final double[] p = io.fi;
             for(int i=0;i<_prg.length;i++) {
                 //long st = System.currentTimeMillis();
                 if(++execCount>MAX_INSTRUCTIONS) {
@@ -151,9 +151,9 @@ public class Machine {
                 }
             }
             if(_trace) System.err.println("Final Tape: "+_tf);
-            float res = _tf.pop();
+            double res = _tf.pop();
             if(res<0) res = -res;
-            if(res>_a.colors()-1f) {
+            if(res>_a.colors()-1d) {
                 res = res % (_a.colors()-1);
             }
             /*

@@ -70,11 +70,11 @@ public class RuleEditor extends JComponent implements TimelineListener {
                 MutationFactor mf = Actions.createMutationFactor(current, _ui.getConfig(), new Random(), true);
                 String[] ptext = pat.getText().replace("\n", " ").split(" ");
                 Pattern p = ((ComputedRule2d)_rule.origin().create(rule.getText(), mf)).createPattern();
-                float[] ps = new float[ptext.length];
+                double[] ps = new double[ptext.length];
                 for(int i=0;i<ptext.length;i++) {
-                    ps[i] = Float.parseFloat(ptext[i]);
+                    ps[i] = Double.parseDouble(ptext[i]);
                 }
-                float next = p.next(0, ps, new Pattern.Ctx());
+                double next = p.next(0, ps, new Pattern.Ctx());
                 System.err.println("Next: "+next);
             }
         });

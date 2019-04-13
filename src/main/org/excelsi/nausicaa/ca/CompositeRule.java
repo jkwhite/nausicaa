@@ -178,7 +178,7 @@ public class CompositeRule implements Rule {
         }
 
         @Override public boolean update(Plane p, int x, int y, int z, float chance) {
-            float v = _ps[_s][_i].probe().probeNorm(x,y,z);
+            double v = _ps[_s][_i].probe().probeNorm(x,y,z);
             //System.err.println("varp: "+x+","+y+","+z+":"+chance+", "+v);
             return v>=chance;
         }

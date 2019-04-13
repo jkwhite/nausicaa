@@ -2,6 +2,7 @@ package org.excelsi.nausicaa.ca;
 
 
 import java.util.*;
+import java.io.IOException;
 
 
 public class Compiler {
@@ -53,6 +54,7 @@ public class Compiler {
         if(n instanceof Variable) {
             r.push(new Assign((Variable)n));
         }
+        return "this is where the output program goes if there was one";
     }
 
     public static class Register {
@@ -79,7 +81,7 @@ public class Compiler {
     }
 
     public static interface Node {
-        void emit(Appendable a);
+        void emit(Appendable a) throws IOException;
     }
 
     public static class Return implements Node {
@@ -90,7 +92,7 @@ public class Compiler {
         }
 
         @Override public void emit(Appendable a) {
-            a.append
+            //a.append
         }
     }
 
@@ -104,7 +106,7 @@ public class Compiler {
             _childs = childs;
         }
 
-        public void emit(Appendable a) {
+        public void emit(Appendable a) throws IOException {
             for(int i=0;i<_childs.length;i++) {
                 _childs[i].emit(a);
                 if(i<_childs.length-1) {
@@ -122,7 +124,7 @@ public class Compiler {
             _v = v;
         }
 
-        @Override public void emit(Appendable a) {
+        @Override public void emit(Appendable a) throws IOException {
             a.append(_v.type()+" "+_v.name()+" = ");
             _v.emit(a);
         }
@@ -142,7 +144,7 @@ public class Compiler {
 
         @Override public String toString() { return _name; }
 
-        @Override public void emit(Appendable a) {
+        @Override public void emit(Appendable a) throws IOException {
             if(_value!=null) {
                 a.append(_value);
             }
@@ -156,6 +158,7 @@ public class Compiler {
 
         public Variable value(String value) {
             _value = value;
+            return this;
         }
 
         public static Variable next(String type) {

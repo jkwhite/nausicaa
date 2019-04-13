@@ -3,7 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 public final class FloatTape {
     //private int dump = 0;
-    private final float[] _t;
+    private final double[] _t;
     private int _i = -1;
     private int _s = -1;
     private boolean _a;
@@ -12,7 +12,7 @@ public final class FloatTape {
 
 
     public FloatTape(int len) {
-        _t = new float[len];
+        _t = new double[len];
     }
 
     public void reset() {
@@ -66,10 +66,10 @@ public final class FloatTape {
         _a = a;
     }
 
-    public void apply(TapeOp op, float[] p) {
+    public void apply(TapeOp op, double[] p) {
         //System.err.print("s="+_s+", i="+_i);
         if(_s>=0&&_i>=0) {
-            float v = op.op(_t, _s, _i, p);
+            double v = op.op(_t, _s, _i, p);
             //System.err.println(", v="+v);
             if(_a) {
                 _i = _s;
@@ -89,7 +89,7 @@ public final class FloatTape {
         //else System.err.println();
     }
 
-    public void push(float v) {
+    public void push(double v) {
         if(_i<_t.length-1) {
             //d("push %d", v);
             _t[++_i] = v;
@@ -99,9 +99,9 @@ public final class FloatTape {
         //}
     }
 
-    public float pop() {
+    public double pop() {
         if(_i>=0) {
-            float r = _t[_i];
+            double r = _t[_i];
             _i--;
             //d("pop %d", r);
             return r;
@@ -110,7 +110,7 @@ public final class FloatTape {
         return 0f;
     }
 
-    public float peek() {
+    public double peek() {
         if(_i>=0) {
             return _t[_i];
         }
@@ -121,7 +121,7 @@ public final class FloatTape {
         return _i;
     }
 
-    public int pushAll(float[] v, int c) {
+    public int pushAll(double[] v, int c) {
         int m = Math.min(v.length, c);
         if(_i+1+m>=_t.length) {
             m = _t.length-(_i+1);
@@ -131,14 +131,14 @@ public final class FloatTape {
         return m;
     }
 
-    public int pushAll(float[] v, int c, int offset) {
+    public int pushAll(double[] v, int c, int offset) {
         int m = Math.min(v.length-offset, c);
         System.arraycopy(v, offset, _t, _i+1, m);
         _i+=m;
         return m;
     }
 
-    public int popAll(float[] r, int c) {
+    public int popAll(double[] r, int c) {
         if(c==-1) {
             c = _i+1;
         }
@@ -182,7 +182,7 @@ public final class FloatTape {
         return j;
     }
 
-    public void op(final TapeOp op, final float[] p) {
+    public void op(final TapeOp op, final double[] p) {
         int ni = (int) op.op(_t, 0, _i, p);
         _i = ni;
     }
@@ -198,7 +198,7 @@ public final class FloatTape {
     }
 
     public interface TapeOp {
-        float op(float[] t, int s, int e, float[] p);
+        double op(double[] t, int s, int e, double[] p);
     }
 
     private static void d(String s, Object... args) {

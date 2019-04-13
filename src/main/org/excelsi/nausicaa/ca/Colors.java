@@ -25,8 +25,16 @@ public final class Colors {
         return Math.min(1f,Math.max(0f,c));
     }
 
+    public static double bound(double c) {
+        return Math.min(1d,Math.max(0d,c));
+    }
+
     public static int integer(float c) {
         return (int) (c*255f);
+    }
+
+    public static int integer(double c) {
+        return (int) (c*255d);
     }
 
     public static int pack(int r, int g, int b) {
@@ -54,7 +62,22 @@ public final class Colors {
     }
 
     public static int packBounded(float r, float g, float b, float a) {
-        //System.err.println("values: "+integer(bound(b))+","+integer(bound(g))+","+integer(bound(r))+","+integer(bound(a)));
+        return integer(bound(b))|(integer(bound(g))<<8)|(integer(bound(r))<<16)|(integer(bound(a))<<24);
+    }
+
+    public static int pack(double r, double g, double b) {
+        return pack(r, g, b, 1d);
+    }
+
+    public static int pack(double r, double g, double b, double a) {
+        return integer(b)|(integer(g)<<8)|(integer(r)<<16)|(integer(a)<<24);
+    }
+
+    public static int packBounded(double r, double g, double b) {
+        return packBounded(r,g,b,1d);
+    }
+
+    public static int packBounded(double r, double g, double b, double a) {
         return integer(bound(b))|(integer(bound(g))<<8)|(integer(bound(r))<<16)|(integer(bound(a))<<24);
     }
 
@@ -83,16 +106,31 @@ public final class Colors {
         int w2 = wgt(c11,c21,w);
         int w3 = wgt(c12,c22,w);
         int w4 = wgt(c13,c23,w);
-        //System.err.println("c10="+c10+",c11="+c11+",c12="+c12+"c13="+c13);
-        //System.err.println("c20="+c20+",c21="+c21+",c22="+c22+"c23="+c23);
-        //System.err.println("w1 ="+w1+", w2="+w2+", w3="+w3+" w4="+w4+",w="+w);
-
         return pack(w3,w2,w1,w4);
-        //return pack(w1,w2,w3,w4);
     }
 
     private static int wgt(final int c1, final int c2, final float zw) {
         return (int)(c1*zw+c2*(1f-zw));
+    }
+
+    public static int avg(int c1, int c2, double w) {
+        int c10 = c1 & 0xff;
+        int c11 = (c1>>8)&0xff;
+        int c12 = (c1>>16)&0xff;
+        int c13 = (c1>>24)&0xff;
+        int c20 = c2 & 0xff;
+        int c21 = (c2>>8)&0xff;
+        int c22 = (c2>>16)&0xff;
+        int c23 = (c2>>24)&0xff;
+        int w1 = wgt(c10,c20,w);
+        int w2 = wgt(c11,c21,w);
+        int w3 = wgt(c12,c22,w);
+        int w4 = wgt(c13,c23,w);
+        return pack(w3,w2,w1,w4);
+    }
+
+    private static int wgt(final int c1, final int c2, final double zw) {
+        return (int)(c1*zw+c2*(1d-zw));
     }
 
     public static int[] unpackRgb(int c, int[] u) {

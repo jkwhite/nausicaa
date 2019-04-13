@@ -9,8 +9,8 @@ public interface Codon {
     default void op(int[] p, IntTape t, Pattern.Ctx ctx) {
         op(p, t);
     }
-    default void op(float[] p, FloatTape t) { }
-    default void op(float[] p, FloatTape t, Pattern.Ctx ctx) {
+    default void op(double[] p, FloatTape t) { }
+    default void op(double[] p, FloatTape t, Pattern.Ctx ctx) {
         op(p, t);
     }
     default boolean supports(Values v) { return v==Values.discrete; }
@@ -30,4 +30,5 @@ public interface Codon {
     default Codon chain(Codon c) {
         return new Codons.Chain(this, c);
     }
+    default void compile(Compiler c) { }
 }
