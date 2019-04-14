@@ -29,8 +29,17 @@ public class Functions {
     }
 
     private void load() {
-        //Map<CAFunction> cat = new ArrayList<>();
-        for(File f:new File(System.getProperty("app.root")+"/etc/functions").listFiles()) {
+        File funcs = new File(System.getProperty("app.root")+"/etc/functions");
+        if(System.getProperty("app.root")==null) {
+            throw new IllegalStateException("Quite a pickle: Nausicaa missing app.root sysproperty; cwd="+System.getProperty("user.dir"));
+        }
+        if(!funcs.exists() || !funcs.isDirectory()) {
+            funcs = new File(System.getProperty("app.root")+"/resources/main/functions");
+            if(!funcs.exists() || !funcs.isDirectory()) {
+                throw new IllegalStateException("Quite a pickle: "+funcs+" does not exist or is not a dir, app.root="+System.getProperty("app.root"));
+            }
+        }
+        for(File f:funcs.listFiles()) {
             if(!f.getName().startsWith(".")) {
                 try {
                     CAFunction fn = new GroovyCAFunction(f);

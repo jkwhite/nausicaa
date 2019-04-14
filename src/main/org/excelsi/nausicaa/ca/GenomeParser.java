@@ -3,7 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 import java.io.*;
 import java.util.*;
-import org.yaml.snakeyaml.Yaml;
+//import org.yaml.snakeyaml.Yaml;
 
 
 public class GenomeParser {
@@ -124,6 +124,7 @@ public class GenomeParser {
     }
 
     private Rule parse3(final String g, final Ruleset origin) {
+        /*
         final String pre = "--- !!org.excelsi.nausicaa.ca.GenomeParser$Data\n"+g;
 
         Data d = null;
@@ -133,6 +134,7 @@ public class GenomeParser {
         catch(Exception e) {
             throw new IllegalArgumentException(e.toString(), e);
         }
+        */
         throw new UnsupportedOperationException();
     }
 

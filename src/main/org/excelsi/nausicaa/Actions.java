@@ -551,9 +551,9 @@ public class Actions {
             else {
                 p.addPair("Rval", id.length()+" digits elided");
             }
-            if(b64.length()<100000) {
-                p.addPair("Incantation", createRuleText(ca.toIncantation()));
-            }
+            //if(b64.length()<100000) {
+                //p.addPair("Incantation", createRuleText(ca.toIncantation()));
+            //}
             if(ca.archetype().dims()>1) {
                 final Plane plane = v.getPlaneDisplayProvider().getActivePlane();
                 final Plane nextPlane = ca.getRule().frameIterator(plane, Pools.adhoc(), new GOptions(false, 1, 1, 1f)).next();

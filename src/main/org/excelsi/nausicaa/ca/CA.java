@@ -28,7 +28,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import javax.imageio.ImageIO;
 import java.awt.image.*;
-import org.excelsi.rlyehian.Codec;
+//import org.excelsi.rlyehian.Codec;
 import com.google.gson.*;
 
 
@@ -431,10 +431,10 @@ public final class CA {
         return Base64.encodeObject(toBinary());
     }
 
-    public String toIncantation() {
-        Codec c = Codec.get();
-        return c.encode(toBinary());
-    }
+    //public String toIncantation() {
+        //Codec c = Codec.get();
+        //return c.encode(toBinary());
+    //}
 
     public void save(String filename, String format) throws IOException {
         if("binary".equals(format)) {
