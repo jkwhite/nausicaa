@@ -36,7 +36,7 @@ public class Functions {
         if(!funcs.exists() || !funcs.isDirectory()) {
             funcs = new File(System.getProperty("app.root")+"/resources/main/functions");
             if(!funcs.exists() || !funcs.isDirectory()) {
-                throw new IllegalStateException("Quite a pickle: "+funcs+" does not exist or is not a dir, app.root="+System.getProperty("app.root"));
+                throw new IllegalStateException("Quite a pickle: "+funcs+" does not exist or is not a dir, app.root='"+System.getProperty("app.root")+"'");
             }
         }
         for(File f:funcs.listFiles()) {

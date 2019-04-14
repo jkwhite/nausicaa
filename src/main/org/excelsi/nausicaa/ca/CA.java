@@ -570,7 +570,9 @@ public final class CA {
         }
         finally {
             try {
-                in.close();
+                if(in!=null) {
+                    in.close();
+                }
             }
             catch(IOException e) {
             }
