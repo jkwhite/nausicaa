@@ -1,7 +1,13 @@
 plugins {
     id 'java'
     id 'application'
+    id "edu.sc.seis.macAppBundle" version "2.3.0"
 }
+
+version='1.0'
+group='excelsiorg'
+applicationName='Nausicaa'
+mainClassName='org.excelsi.nausicaa.Nausicaa'
 
 repositories {
     //jcenter()
@@ -55,7 +61,9 @@ application {
 
 distributions {
     main {
+        baseName='Nausicaa'
         contents {
+            //from 'src/etc/' into 'etc'
         }
     }
 }
@@ -64,7 +72,27 @@ applicationDistribution.from("src/etc/") {
     into "etc"
 }
 
-version='1.0'
-group='excelsiorg'
-applicationName='Nausicaa'
-mainClassName='org.excelsi.nausicaa.Nausicaa'
+macAppBundle {
+    appName='Nausicaa'
+    mainClassName = project.mainClassName
+    //icon = 'src/resources/na1.png'
+    bundleJRE = false
+    javaProperties.put("apple.laf.useScreenMenuBar", "true")
+    //backgroundImage = "doc/macbackground.png"
+    appStyle='Oracle'
+}
+
+task fixupDist(type: Copy) {
+    mustRunAfter("createApp")
+    System.err.println("******** HERE *********")
+    from("$buildDir/install/Nausicaa/lib/")
+    include("*")
+    into("${project.buildDir}/${project.macAppBundle.appOutputDir}/${project.macAppBundle.appName}.app/Contents/${project.macAppBundle.jarSubdir}")
+    System.err.println("******** DONE *********")
+}
+
+project.tasks.getByName("createApp").dependsOn(project.tasks.getByName("installDist"))
+
+//project.tasks.getByName("fixupDist").shouldRunAfter project.tasks.getByName("createApp")
+
+//project.tasks.getByName("createApp").doLast project.tasks.getByName("fixupDist")
