@@ -32,13 +32,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
-//task createStartScripts(type: CreateStartScripts) {
-    //defaultJvmOpts=['-Dapp2.root=$APP_HOME']
-//}
-
 sourceSets {
     main {
-        //output.resourcesDir="$buildDir/resources"
         java {
             srcDirs = ['src/main']
         }
@@ -63,7 +58,6 @@ distributions {
     main {
         baseName='Nausicaa'
         contents {
-            //from 'src/etc/' into 'etc'
         }
     }
 }
@@ -75,28 +69,24 @@ applicationDistribution.from("src/etc/") {
 macAppBundle {
     appName='Nausicaa'
     mainClassName = project.mainClassName
-    //icon = 'src/resources/na1.png'
+    // makeicns -in src/resources/na1_1024.png -out src/resources/nausicaa.icns
+    icon = 'src/resources/nausicaa.icns'
     bundleJRE = false
     javaProperties.put("apple.laf.useScreenMenuBar", "true")
-    javaProperties.put("app.root", "${project.buildDir}/${project.macAppBundle.appOutputDir}/${project.macAppBundle.appName}.app/Contents/")
-    //backgroundImage = "doc/macbackground.png"
     appStyle='Oracle'
 }
 
 task fixupDist(type: Copy) {
-    mustRunAfter("createApp")
-    //System.err.println("******** HERE *********")
-    from("$buildDir/install/Nausicaa/lib/")
-    include("*")
-    into("${project.buildDir}/${project.macAppBundle.appOutputDir}/${project.macAppBundle.appName}.app/Contents/${project.macAppBundle.jarSubdir}")
-    from("$buildDir/install/Nausicaa/etc/")
-    into("${project.buildDir}/${project.macAppBundle.appOutputDir}/${project.macAppBundle.appName}.app/Contents/etc")
-    //System.err.println("******** DONE *********")
+    from("$buildDir/install/Nausicaa/lib/") {
+        into("${project.macAppBundle.jarSubdir}")
+    }
+    from("$buildDir/install/Nausicaa/etc/") {
+        into("etc")
+    }
+    into("${project.buildDir}/${project.macAppBundle.appOutputDir}/${project.macAppBundle.appName}.app/Contents/")
 }
 
 project.tasks.getByName("createApp").dependsOn(project.tasks.getByName("installDist"))
+project.tasks.getByName("fixupDist").dependsOn(project.tasks.getByName("createApp"))
+project.tasks.getByName("fixupDist").dependsOn(project.tasks.getByName("installDist"))
 project.tasks.getByName("createDmg").dependsOn(project.tasks.getByName("fixupDist"))
-
-//project.tasks.getByName("fixupDist").shouldRunAfter project.tasks.getByName("createApp")
-
-//project.tasks.getByName("createApp").doLast project.tasks.getByName("fixupDist")

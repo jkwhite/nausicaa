@@ -28,17 +28,50 @@ public class Functions {
         return _fs.get(name);
     }
 
-    private void load() {
-        File funcs = new File(System.getProperty("app.root")+"/etc/functions");
-        if(System.getProperty("app.root")==null) {
-            System.getProperties().list(System.err);
-            throw new IllegalStateException("Quite a pickle: Nausicaa missing app.root sysproperty");
-        }
-        if(!funcs.exists() || !funcs.isDirectory()) {
-            funcs = new File(System.getProperty("app.root")+"/resources/main/functions");
-            if(!funcs.exists() || !funcs.isDirectory()) {
-                throw new IllegalStateException("Quite a pickle: "+funcs+" does not exist or is not a dir, app.root='"+System.getProperty("app.root")+"'");
+    public static void abandon(String msg) {
+        try {
+            PrintWriter pw = new PrintWriter(new FileWriter("/Users/jkw/nausicaa-debug"));
+            for(Map.Entry e:System.getProperties().entrySet()) {
+                pw.println("'"+e.getKey()+"' => '"+e.getValue()+"'");
             }
+            pw.println(System.getenv().toString());
+            pw.println(msg);
+            pw.close();
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        System.exit(1);
+    }
+
+    public static void initAppRoot() {
+        if(System.getProperty("app.root")==null) {
+            String jcp = System.getProperty("java.class.path");
+            if(jcp.indexOf("Contents/")>0) {
+                jcp = jcp.substring(0, jcp.indexOf("Contents/"));
+                File root = new File(jcp+"/Contents/");
+                if(root.isDirectory()) {
+                    System.setProperty("app.root", root.toString());
+                }
+                else {
+                    abandon("not a directory or no such file '"+root+"'");
+                }
+            }
+            else {
+                abandon("Could not find 'Contents/' in '"+jcp+"'");
+            }
+        }
+        if(System.getProperty("app.root")==null) {
+            abandon("somehow app.root is still null");
+        }
+        System.err.println("app.root='"+System.getProperty("app.root")+"'");
+    }
+
+    private void load() {
+        initAppRoot();
+        File funcs = new File(System.getProperty("app.root")+"/etc/functions");
+        if(!funcs.exists() || !funcs.isDirectory()) {
+            abandon("bad function path '"+funcs+"'");
         }
         for(File f:funcs.listFiles()) {
             if(!f.getName().startsWith(".")) {
