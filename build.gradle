@@ -78,20 +78,24 @@ macAppBundle {
     //icon = 'src/resources/na1.png'
     bundleJRE = false
     javaProperties.put("apple.laf.useScreenMenuBar", "true")
+    javaProperties.put("app.root", "${project.buildDir}/${project.macAppBundle.appOutputDir}/${project.macAppBundle.appName}.app/Contents/")
     //backgroundImage = "doc/macbackground.png"
     appStyle='Oracle'
 }
 
 task fixupDist(type: Copy) {
     mustRunAfter("createApp")
-    System.err.println("******** HERE *********")
+    //System.err.println("******** HERE *********")
     from("$buildDir/install/Nausicaa/lib/")
     include("*")
     into("${project.buildDir}/${project.macAppBundle.appOutputDir}/${project.macAppBundle.appName}.app/Contents/${project.macAppBundle.jarSubdir}")
-    System.err.println("******** DONE *********")
+    from("$buildDir/install/Nausicaa/etc/")
+    into("${project.buildDir}/${project.macAppBundle.appOutputDir}/${project.macAppBundle.appName}.app/Contents/etc")
+    //System.err.println("******** DONE *********")
 }
 
 project.tasks.getByName("createApp").dependsOn(project.tasks.getByName("installDist"))
+project.tasks.getByName("createDmg").dependsOn(project.tasks.getByName("fixupDist"))
 
 //project.tasks.getByName("fixupDist").shouldRunAfter project.tasks.getByName("createApp")
 
