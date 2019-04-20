@@ -54,7 +54,23 @@ public final class CA {
     private static final byte VERSION = 6;
 
 
-    public CA(Rule r, Palette p, Initializer i, Random rand, long seed, int w, int h, int d, int prelude, double weight, int coda, ComputeMode cmode, UpdateMode umode, EdgeMode emode, ExternalForce ef, Varmap vars, CA meta) {
+    public CA(Rule r,
+            Palette p,
+            Initializer i,
+            Random rand,
+            long seed,
+            int w,
+            int h,
+            int d,
+            int prelude,
+            double weight,
+            int coda,
+            ComputeMode cmode,
+            UpdateMode umode,
+            EdgeMode emode,
+            ExternalForce ef,
+            Varmap vars,
+            CA meta) {
         if(i==null) {
             throw new IllegalArgumentException("null initializer");
         }

@@ -22,13 +22,17 @@ rules = { d, s, c, h=null ->
     Ruleset.create(new Archetype(d,s,c), h)
 }
 
+rule = { rs, r ->
+    GenomeParser.parse(r, rs)
+}
+
 init_single = { Initializers.single.create() }
 
 init_random = { rnd=__random__, seed=19771026, zero=0 ->
     new RandomInitializer(rnd, seed, new RandomInitializer.Params(zero))
 }
 
-ca = { dims, rule, pal=null, init=null, prelude=0, weight=1f ->
+ca = { dims, rule, pal=null, init=null, prelude=0, weight=1d ->
     if(pal==null) {
         p = Palette.random(rule.archetype().colors(), __random__);
     }
@@ -41,7 +45,7 @@ ca = { dims, rule, pal=null, init=null, prelude=0, weight=1f ->
     if(init==null) {
         init = Initializers.random.create()
     }
-    def c = new CA(rule, p, init, __random__, __random__.nextInt(), dims[0], dims[1], dims.size()>2?dims[2]:1, prelude, weight, 0, ComputeMode.channel);
+    def c = new CA(rule, p, init, __random__, __random__.nextLong(), dims[0], dims[1], dims.size()>2?dims[2]:1, prelude, weight, 0, ComputeMode.channel, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null);
     //rule.init(c, Rule.Initialization.single);
     //rule.generate(c, 1, hei, false, false, null);
     //c.rule = rule;
@@ -111,7 +115,7 @@ org.excelsi.nausicaa.ca.CA.metaClass.mutateGenome = { genome ->
 
 org.excelsi.nausicaa.ca.CA.metaClass.frame = { int nFrames ->
     def pool = Executors.newFixedThreadPool(6);
-    def it = delegate.getRule().frameIterator(delegate.createPlane(), pool, new GOptions(true, 7, 0, 1f));
+    def it = delegate.getRule().frameIterator(delegate.createPlane(), pool, new GOptions(true, 7, 0, 1d));
 
     def fr = it.next();
     for(int i=1;i<nFrames;i++) {
