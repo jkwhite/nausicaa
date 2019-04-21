@@ -6,8 +6,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.SplittableRandom;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
-public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic, Variables {
+
+public class SequencePattern extends Enloggened implements Pattern, Mutatable, Humanizable, Genomic, Variables {
+    private static final Logger LOG = LoggerFactory.getLogger(CA.class);
     private static final Random R = new Random();
     private static final int[] OFFSETS = new int[30059];
     static {
@@ -75,7 +79,8 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
             _thresh = (int)(_trans*_s.peek());
             _samples = 1;
             _idx = 0;
-            System.err.println("t0 for transition "+_trans);
+            //System.err.println("t0 for transition "+_trans);
+            LOG.debug("t0 for transition "+_trans);
             //_idx = OFFSETS[t%OFFSETS.length];
             //_idx = R.nextInt(OFFSETS.length);
         }
@@ -196,7 +201,8 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
                     _i = 0;
                 }
                 final SEntry s = _s.get(_i); 
-                System.err.println("switched to pattern "+_i+": "+s.p);
+                //System.err.println("switched to pattern "+_i+": "+s.p);
+                LOG.debug("switched to pattern "+_i+": "+s.p);
                 _t = s.t;
                 return 0;
             }
@@ -248,7 +254,8 @@ public class SequencePattern implements Pattern, Mutatable, Humanizable, Genomic
             m = m.withDatamap(dm);
             switch(m.mode()) {
                 case "normal":
-                    System.err.println("stage mutate: "+m.stage()+" of max "+_s.size());
+                    //System.err.println("stage mutate: "+m.stage()+" of max "+_s.size());
+                    LOG.debug("stage mutate: "+m.stage()+" of max "+(_s.size()-1));
                     for(int i=0;i<_s.size();i++) {
                         final SEntry s = _s.get(i);
                         ComputedPattern np;

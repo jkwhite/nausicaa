@@ -19,7 +19,7 @@ public final class Archetype {
     public enum Neighborhood {
         moore("Moore"),
         vonneumann("von Neumann"),
-        circular("circular");
+        circular("Circular");
 
         private final String _name;
 

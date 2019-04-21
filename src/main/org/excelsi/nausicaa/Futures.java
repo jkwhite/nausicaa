@@ -8,10 +8,14 @@ import java.util.concurrent.ExecutorService;
 import java.awt.event.KeyAdapter;
 import java.awt.event.*;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.excelsi.nausicaa.ca.*;
 
 
 public class Futures extends JComponent implements ConfigListener, PlaneDisplayProvider, PlanescapeProvider {
+    private static final Logger LOG = LoggerFactory.getLogger(Futures.class);
     //private int _w, _h;
     private boolean _show = true;
     //private java.util.List<Branch<World>> _timeline = new LinkedList<Branch<World>>();
@@ -397,11 +401,11 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             .computeMode(ComputeMode.from(_config.<String>getVariable("rgb_computemode","combined")));
         switch(_viewType) {
             case view3d:
-                System.err.println("creating 3d view");
+                LOG.debug("creating 3d view");
                 return new JfxPlaneDisplay(ca, g);
             case view2d:
             default:
-                System.err.println("creating 2d view");
+                LOG.debug("creating 2d view");
                 return new SwingPlaneDisplay(ca, g, _config);
         }
     }
@@ -444,6 +448,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         generate(init, true);
     }
 
+    private static long _tid = 0;
     public void generate(final Initializer init, final boolean reroll) {
         _timeline.notifyListeners(new TimelineEvent("tick"));
         java.util.List<Thread> threads = new ArrayList<Thread>();
@@ -456,13 +461,14 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             int width = getCAWidth() > 60 ? getCAWidth()/3-10 : getCAWidth();
             int height = getCAHeight() > 60 ? getCAHeight()/3-10 : getCAHeight();
             final CA ca = _ca.size(width,height,getCADepth(),getCAPrelude());
-            final Vector<Long> created = new Vector<Long>();
+            //final Vector<Long> created = new Vector<Long>();
             Thread tdm = new Thread() {
                 public void run() {
                     _displays[4].setCA(ca, pool, opt);
                 }
             };
             threads.add(tdm);
+            tdm.setName("Futures-4-"+(_tid++));
             tdm.start();
             final int[] order = {2, 5, 8, 7, 6, 3, 0, 1, 4};
             for(int i=0;i<_displays.length;i++) {
@@ -472,7 +478,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                         public void run() {
                             CA nca;
                             do {
-                                System.err.print(".");
+                                //System.err.print(".");
                                 nca = mutate(ca);
                             } while(useHistory && History.named(_name).contains(nca));
                             System.err.println();
@@ -486,6 +492,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                         }
                     };
                     threads.add(td);
+                    td.setName("Futures-"+ix+"-"+(_tid++));
                     td.start();
                 }
             }

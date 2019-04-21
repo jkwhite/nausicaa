@@ -31,8 +31,12 @@ import java.awt.image.*;
 //import org.excelsi.rlyehian.Codec;
 import com.google.gson.*;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public final class CA {
+    private static final Logger LOG = LoggerFactory.getLogger(CA.class);
     private static final ExecutorService POOL = Executors.newSingleThreadExecutor();
     private Rule _r;
     private Palette _p;
@@ -153,7 +157,7 @@ public final class CA {
 
     private Plane createMetaPlane(ExecutorService pool, GOptions opt) {
         List<CA> chain = buildCAChain();
-        System.err.println("creating meta plane over chain "+chain);
+        LOG.debug("creating meta plane over chain "+chain);
         Plane[] ps = new Plane[chain.size()];
         for(int i=0;i<ps.length;i++) {
             CA ca = chain.get(i);
@@ -232,15 +236,15 @@ public final class CA {
                 r.generate(p, 1, _h, pool, false, true, null, opt);
                 break;
             case 3:
-                System.err.println("prelude generating for "+_prelude);
+                LOG.debug("prelude generating for "+_prelude);
                 final long st = System.currentTimeMillis();
                 r.generate(p, 1, _prelude, pool, false, true, null, opt);
                 final long en = System.currentTimeMillis();
-                System.err.println("prelude generation took "+(en-st)+" millis");
+                LOG.debug("prelude generation took "+(en-st)+" millis");
                 break;
             case 2:
             default:
-                System.err.println("prelude generating for "+_prelude);
+                LOG.debug("prelude generating for "+_prelude);
                 final long st2 = System.currentTimeMillis();
                 r.generate(p, 1, _prelude, pool, false, true, null, opt);
                 if(_d>1) {
@@ -248,7 +252,7 @@ public final class CA {
                     //System.err.println("****** expanding dimension result: "+p);
                 }
                 final long en2 = System.currentTimeMillis();
-                System.err.println("prelude generation took "+(en2-st2)+" millis");
+                LOG.debug("prelude generation took "+(en2-st2)+" millis");
                 break;
         }
         return p;
@@ -504,7 +508,7 @@ public final class CA {
         int h = i.getHeight();
         int d = "continuous-channels".equals(paletteMode) ? 4 : 1;
         int colors = v==Values.discrete ? p.getColorCount() : 2;
-        System.err.println("image with "+p.getColorCount()+" colors");
+        LOG.debug("image with "+p.getColorCount()+" colors");
         int size = 1;
         int dims = "continuous-channels".equals(paletteMode) ? 3 : 2;
         Archetype a = new Archetype(dims, size, colors, Archetype.Neighborhood.moore, v);

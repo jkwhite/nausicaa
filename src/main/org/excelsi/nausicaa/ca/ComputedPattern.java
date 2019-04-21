@@ -7,8 +7,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public final class ComputedPattern implements Pattern, Mutatable {
+    private static final Logger LOG = LoggerFactory.getLogger(ComputedPattern.class);
     private static final boolean ENABLE_CACHE = true;
     private final Archetype _a;
     private final RuleLogic _logic;
@@ -31,7 +35,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         // -11833
         int csize = Math.max(5000, -11833*_a.size()+110000);
         _io = new IO(a.values());
-        System.err.println("deterministic machine: "+logic.isDeterministic());
+        LOG.debug("deterministic machine: "+logic.isDeterministic());
         if(ENABLE_CACHE && logic.isDeterministic()) {
             if(a.isDiscrete()) {
                 if(a.sourceLength()<9) {
@@ -176,7 +180,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
                     //System.err.println();
                 //}
             }
-            System.err.println("total writes: "+w+" total buckets in use: "+b+" / "+_hot.length+" max: "+max+"("+mb+") min: "+min);
+            LOG.info("total writes: "+w+" total buckets in use: "+b+" / "+_hot.length+" max: "+max+"("+mb+") min: "+min);
         }
 
         protected int key(int[] p) {
@@ -288,7 +292,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
                     //System.err.println();
                 //}
             }
-            System.err.println("total writes: "+w+" total buckets in use: "+b+" / "+_hot.length+" max: "+max+"("+mb+") min: "+min);
+            LOG.info("total writes: "+w+" total buckets in use: "+b+" / "+_hot.length+" max: "+max+"("+mb+") min: "+min);
         }
 
         protected static final int f(double f) {
@@ -380,7 +384,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
             if(_fcache.h) {
                 _hits++;
                 if(_hits%1000000==0) {
-                    System.err.println("hits: "+_hits+" misses: "+_misses+" ratio: "+(_hits/((float)_hits+_misses)));
+                    LOG.info("hits: "+_hits+" misses: "+_misses+" ratio: "+(_hits/((float)_hits+_misses)));
                     //if(_hits%5000000==0) {
                         //_cache.dump();
                     //}
@@ -428,21 +432,21 @@ public final class ComputedPattern implements Pattern, Mutatable {
         Integer res = _dumpmap.get(key);
         if(res!=null) {
             if(r!=res.intValue()) {
-                System.err.println("!!!!!!!!! BUG!!!!!!!!!! "+key+"=> res: "+res+" r: "+r);
+                LOG.error("!!!!!!!!! BUG!!!!!!!!!! "+key+"=> res: "+res+" r: "+r);
                 Thread.dumpStack();
             }
         }
         else {
             _dumpmap.put(key, r);
             if(true||Arrays.equals(ZEROS, p)) {
-                System.err.println("PUTTING "+key+" => "+r);
+                LOG.info("PUTTING "+key+" => "+r);
             }
         }
         _io.ii = p;
         _logic.next(_io);
         int rp = _io.io;
         if(r!=rp) {
-            System.err.println("!!!!!!!!! BUG!!!!!!!!!!"+key+"=> said: "+r+" real: "+rp);
+            LOG.error("!!!!!!!!! BUG!!!!!!!!!!"+key+"=> said: "+r+" real: "+rp);
             Thread.dumpStack();
         }
         //b.append("=> ").append(r);

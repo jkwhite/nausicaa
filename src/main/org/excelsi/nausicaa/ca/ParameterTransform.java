@@ -24,7 +24,7 @@ public class ParameterTransform implements Transform {
 
     @Override public CA transform(CA c) {
         Mutator m = MUTATORS[_r.nextInt(MUTATORS.length)];
-        System.err.println("PARAM MUTATOR: "+m);
+        //System.err.println("PARAM MUTATOR: "+m);
         return m.mutate(c, _r);
     }
 

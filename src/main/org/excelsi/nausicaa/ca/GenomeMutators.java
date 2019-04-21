@@ -4,8 +4,14 @@ package org.excelsi.nausicaa.ca;
 
 import java.util.Collections;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
-public class GenomeMutators {
+
+public class GenomeMutators extends Enloggened {
+    private static final Logger LOG = LoggerFactory.getLogger(CA.class);
+
+
     public static GenomeMutator jumble() {
         return
             (cs,im,gf,m)->{
@@ -103,21 +109,26 @@ public class GenomeMutators {
                 boolean any = true;
                 boolean de = false;
                 int tries = 0;
+                LOG.debug("running adjust mutate");
                 while(++tries<100 && any && !de) {
-                    System.err.print("#");
-                    if(tries%10==0) System.err.println();
+                    //System.err.print("#");
+                    //if(tries%10==0) System.err.println();
                     any = false;
                     for(int i=0;i<cs.size();i++) {
                         final Codon c = cs.get(i);
                         if(c instanceof Unstable) {
                             any = true;
                             if(m.r().nextInt(3)==0) {
-                                cs.set(i, ((Unstable)c).destabilize(m.r()));
+                                //System.err.print("c:"+c+":");
+                                Codon after = ((Unstable)c).destabilize(m.r());
+                                LOG.debug("unstable before: "+c.code()+", after: "+after.code());
+                                cs.set(i, after);
                                 de = true;
                             }
                         }
                     }
                 }
+                LOG.debug("done adjust mutate");
             };
     }
 

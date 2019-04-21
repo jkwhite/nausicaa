@@ -12,9 +12,14 @@ import org.excelsi.nausicaa.ca.Pools;
 import org.excelsi.nausicaa.ca.GOptions;
 import org.excelsi.nausicaa.ca.ComputeMode;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public class Animation extends Thread implements TimelineListener, ConfigListener {
     enum State { animate, pause, reinit, die };
+    private static long _tid = 0;
+    private final Logger _log = LoggerFactory.getLogger(getClass());
     private final Config _config;
     private final PlanescapeProvider _f;
     private final Timeline _timeline;
@@ -26,7 +31,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
 
 
     public Animation(Config config, PlanescapeProvider f, Timeline timeline, int steps) {
-        super("Animation");
+        super("Animation-"+(++_tid));
         _config = config;
         _f = f;
         _timeline = timeline;
@@ -35,7 +40,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         _timeline.addTimelineListener(this);
         _config.addListener(this);
         _delay = _config.getAnimationDelay();
-        System.err.println("new animator");
+        _log.info("new animator");
     }
 
     @Override public void timelineChanged(TimelineEvent e) {
@@ -64,7 +69,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
     }
 
     public void stopAnimation() {
-        System.err.println("stopping animator");
+        _log.info("stopping animator");
         _state = State.die;
         interrupt();
         while(isAlive()) {
@@ -76,7 +81,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
                 //break;
             }
         }
-        System.err.println("stopped animator");
+        _log.info("stopped animator");
     }
 
     public void run() {
@@ -111,7 +116,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         int ccores = _config.getIntVariable("animation_computeCores", 2);
         int rcores = Math.min(ds.length, _config.getIntVariable("animation_renderCores", 2));
         float weight = _config.getFloatVariable("weight", 1f);
-        System.err.println("using "+ccores+" compute cores and "+rcores+" render cores");
+        _log.debug("using "+ccores+" compute cores and "+rcores+" render cores");
         ExecutorService compute = Pools.named("compute", ccores);
         ExecutorService render = Pools.named("render", rcores);
         for(int i=0;i<ds.length;i++) {
@@ -131,7 +136,7 @@ top:        while(_state==State.animate) {
                     _state = State.die;
                     try {
                         render.shutdown();
-                        System.err.print("awaiting render... ");
+                        _log.debug("awaiting render... ");
                         render.awaitTermination(5, TimeUnit.SECONDS);
                         //System.err.println("done");
                     }
@@ -215,7 +220,7 @@ top:        while(_state==State.animate) {
                             _d.setPlane(frame);
                         }
                         else {
-                            System.err.println("not rendering: int: "+calling.isInterrupted()+", st: "+_state);
+                            _log.debug("not rendering: int: "+calling.isInterrupted()+", st: "+_state);
                         }
                     }
                     finally {

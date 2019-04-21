@@ -11,7 +11,7 @@ mainClassName='org.excelsi.nausicaa.Nausicaa'
 
 repositories {
     //jcenter()
-    //mavenCentral()
+    mavenCentral()
     flatDir {
         dirs '/Users/jkw/.mu/lib'
     }
@@ -28,6 +28,9 @@ dependencies {
     implementation 'google:gson:2.8.5'
     implementation 'apache:log4j:1.2.15'
     implementation 'asomov:snakeyaml:1.21'
+    implementation 'slf4j:slf4j-api:1.7.7'
+    implementation 'slf4j:slf4j-log4j12:1.7.7'
+    implementation 'apache:log4j:1.2.15'
 
     testImplementation 'junit:junit:4.12'
 }

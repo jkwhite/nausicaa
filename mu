@@ -27,6 +27,9 @@ uses:
     - Fxyz-Core-1.0.jar
     - Fxyz-lib-1.0.jar
     - gson-2.8.5.jar
+    - slf4j-api-1.7.7.jar
+    - slf4j-log4j12-1.7.7.jar
+    - log4j-1.2.15.jar
 #main: org.excelsi.gimmal.AppFactory
 #main: org.excelsi.nausicaa.NViewer
 #main: org.excelsi.nausicaa.JfxUniverse

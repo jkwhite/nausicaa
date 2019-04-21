@@ -3,10 +3,12 @@ package org.excelsi.nausicaa;
 
 import java.util.*;
 import javafx.application.Application;
+import org.apache.log4j.PropertyConfigurator;
 
 
 public class Nausicaa {
     public static void main(String[] args) {
+        PropertyConfigurator.configure(Nausicaa.class.getClassLoader().getResource("log4j.properties"));
         int i = 0;
         boolean jfx = false;
         boolean cmd = false;

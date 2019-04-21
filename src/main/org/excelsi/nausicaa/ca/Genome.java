@@ -9,8 +9,13 @@ import java.util.List;
 import java.util.Random;
 import static org.excelsi.nausicaa.ca.WeightedFactory.Weight;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public final class Genome {
+    private static final Logger LOG = LoggerFactory.getLogger(Genome.class);
+
     private final String _c;
     private final int _v;
     private final String[] _params;
@@ -79,14 +84,15 @@ public final class Genome {
         int tries = 0;
         Genome child;
         do {
-            System.err.print(".");
-            if(tries%100==0) System.err.println();
+            //System.err.print(".");
+            //if(tries%10==0) System.err.println();
             child = replicate(im, mf, gf, m);
-            if(tries==999) {
-                System.err.println("failed to mutate "+this);
+            if(++tries==100) {
+                LOG.info("failed to mutate "+this);
+                break;
             }
-        } while(++tries<1000 && child.equals(this));
-        System.err.println(this+" => "+child);
+        } while(child.equals(this));
+        //System.err.println(this+" => "+child);
         return child;
     }
 
@@ -107,8 +113,9 @@ public final class Genome {
     private Genome replicate(final Implicate im, final WeightedFactory<GenomeMutator> mutators, final GenomeFactory gf, final MutationFactor mf) {
         final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(im,false)));
         float mult = mf.alpha()/20f;
-        int max = (int) (mult*(1+mf.random().nextInt(Math.max(1,cs.size()/3))));
-        System.err.println("applying "+max+" mutators");
+        int max = Math.max(1, (int) (mult*(1+mf.random().nextInt(Math.max(1,cs.size()/3)))));
+        //System.err.println("applying "+max+" mutators");
+        LOG.info("applying "+max+" mutators (alpha="+mf.alpha()+", mult="+mult+", size="+cs.size()+")");
         for(int i=0;i<max;i++) {
             final GenomeMutator m = mf.genomeMutator()!=null?mf.genomeMutator():mutators.random(mf.random());
             //System.err.println("premutate "+m+": "+cs);
@@ -127,6 +134,7 @@ public final class Genome {
         b.setLength(b.length()-1);
         try {
             return fromCodons(cs, im.language()).prune(im);
+            LOG.info("done replicate");
         }
         catch(Exception e) {
             throw new IllegalStateException("illegal genome '"+b+"': "+e, e);

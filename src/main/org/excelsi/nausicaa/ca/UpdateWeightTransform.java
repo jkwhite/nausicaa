@@ -1,10 +1,14 @@
 package org.excelsi.nausicaa.ca;
 
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import java.util.Random;
 
 
 public class UpdateWeightTransform implements Transform {
+    private static final Logger LOG = LoggerFactory.getLogger(UpdateWeightTransform.class);
     private static final double MIN_WEIGHT = 0.0001f;
     private final Random _rand;
 
@@ -19,14 +23,14 @@ public class UpdateWeightTransform implements Transform {
         double a = (double)_rand.nextGaussian()/8f;
         double ow = c.getWeight();
         double nw = Math.max(MIN_WEIGHT,Math.min(1d,a+ow));
-        System.err.println("old weight: "+ow+", new weight: "+nw+", a: "+a);
+        LOG.debug("old weight: "+ow+", new weight: "+nw+", a: "+a);
         return c.weight(nw);
     }
 
     public static double mutateWeight(double ow, Random r) {
         double a = (double)r.nextGaussian()/8f;
         double nw = Math.max(MIN_WEIGHT,Math.min(1d,a+ow));
-        System.err.println("old weight: "+ow+", new weight: "+nw+", a: "+a);
+        LOG.debug("old weight: "+ow+", new weight: "+nw+", a: "+a);
         return nw;
     }
 }

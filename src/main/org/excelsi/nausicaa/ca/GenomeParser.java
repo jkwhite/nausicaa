@@ -158,7 +158,7 @@ public class GenomeParser {
                     if(splk>0) {
                         c = Integer.parseInt(pref.substring(0, splk));
                         w = Double.parseDouble(pref.substring(splk+1));
-                        System.err.println("C: "+c+", W: "+w);
+                        //System.err.println("C: "+c+", W: "+w);
                     }
                     else {
                         c = Integer.parseInt(pref);

@@ -11,8 +11,12 @@ import java.util.concurrent.Future;
 import java.util.Random;
 import com.google.gson.*;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
+    private static final Logger LOG = LoggerFactory.getLogger(ComputedRule2d.class);
     private final Ruleset _origin;
     private final Pattern _p;
     private final Rule _meta;
@@ -109,7 +113,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         int nworkers = c.getHeight()/block + (c.getHeight()%block>0?1:0);
         final Worker[] workers = new Worker[nworkers];
         final Pattern[] patterns = new Pattern[nworkers];
-        System.err.println("rule compute using "+workers.length+" workers on blocksize "+block);
+        LOG.info("rule compute using "+workers.length+" workers on blocksize "+block);
         final Variables vars = new Variables() {
             @Override public Double weight() { return c.creator().getWeight(); }
         };
@@ -178,8 +182,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                                 patterns[i].tick();
                             }
                             catch(ExecutionException e) {
-                                System.err.println(humanize()+": "+e);
-                                e.printStackTrace();
+                                LOG.info(humanize()+": "+e, e);
                             }
                         }
                     }
@@ -199,7 +202,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                 }
                 if(++count%500==0) {
                     for(int i=0;i<workers.length;i++) {
-                        System.err.println("worker "+i+" stat: "+workers[i].getStats());
+                        LOG.info("worker "+i+" stat: "+workers[i].getStats());
                     }
                 }
                 return p1;
