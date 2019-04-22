@@ -8,8 +8,12 @@ import groovy.lang.GroovyShell;
 import groovy.lang.Binding;
 //import org.excelsi.solace.GShell;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public class Functions {
+    private static final Logger LOG = LoggerFactory.getLogger(Functions.class);
     private final File _dir;
     private final Map<String,CAFunction> _fs;
 
@@ -80,8 +84,8 @@ public class Functions {
                     _fs.put(fn.getName(), fn);
                 }
                 catch(Exception e) {
-                    System.err.println("failed processing '"+f+"': "+e);
-                    e.printStackTrace();
+                    LOG.error("failed processing '"+f+"': "+e, e);
+                    //e.printStackTrace();
                 }
             }
         }
@@ -181,7 +185,7 @@ public class Functions {
         }
 
         @Override public void run(CA ca, Varmap args, API api) throws Exception {
-            System.err.println("start running param with args: "+args);
+            LOG.info("start running param with args: "+args);
             _b.setVariable("_ca", ca);
             _b.setVariable("_api", api);
             _b.setVariable("_args", args);
@@ -190,7 +194,7 @@ public class Functions {
             //_gs.setVariable("_api", api);
             //_gs.setVariable("_args", args);
             //_gs.evaluate("run(_ca, _args, _api)");
-            System.err.println("done running param with args: "+args);
+            LOG.info("done running param with args: "+args);
         }
     }
 }

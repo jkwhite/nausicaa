@@ -8,8 +8,12 @@ import gnu.trove.map.hash.TDoubleIntHashMap;
 import gnu.trove.procedure.TIntIntProcedure;
 import gnu.trove.procedure.TDoubleIntProcedure;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public class Codons {
+    private static final Logger LOG = LoggerFactory.getLogger(Codons.class);
     private static final int BUF_SIZE = 32768;
 
     public static final String CONS = "a";
@@ -348,7 +352,7 @@ public class Codons {
                 return new Nonzero(1+r.nextInt(9));
             }
             else {
-                int nc = _c+(r.nextInt(5)-2);
+                int nc = _c+(r.nextInt(10)-4);
                 if(nc<=0) {
                     nc = -1;
                 }
@@ -804,7 +808,7 @@ public class Codons {
         }
 
         @Override public Codon destabilize(Random r) {
-            int nc = _c+(r.nextInt(5)-2);
+            int nc = _c+(r.nextInt(10)-4);
             if(nc<=0) {
                 nc = 1;
             }
@@ -1921,7 +1925,7 @@ public class Codons {
         }
 
         @Override public Codon destabilize(Random r) {
-            int nc = _c+(r.nextInt(5)-2);
+            int nc = _c+(r.nextInt(10)-4);
             if(nc<=0) {
                 nc = -1;
             }
@@ -1930,7 +1934,7 @@ public class Codons {
     }
 
     private static void debug(String m) {
-        System.err.println(m);
+        LOG.debug(m);
     }
 
     public static final class MaxN extends NAggregateN {
@@ -2022,7 +2026,7 @@ public class Codons {
     }
 
     private static void dump(int[] vs, int m, int e, int[] p, int sum, int res) {
-        System.err.println("vs.length="+vs.length+", m="+m+", e="+e+", sum="+sum+", res="+res);
+        LOG.debug("vs.length="+vs.length+", m="+m+", e="+e+", sum="+sum+", res="+res);
     }
 
     public static final class AvgN extends NAggregateN {

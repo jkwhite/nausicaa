@@ -202,7 +202,8 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                 }
                 final SEntry s = _s.get(_i); 
                 //System.err.println("switched to pattern "+_i+": "+s.p);
-                LOG.debug("switched to pattern "+_i+": "+s.p);
+                //LOG.debug("switched to pattern "+_i+": "+s.p);
+                LOG.debug("switched to pattern "+_i);
                 _t = s.t;
                 return 0;
             }

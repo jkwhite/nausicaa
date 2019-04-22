@@ -29,7 +29,7 @@ public class History {
         //PrintWriter pw = new PrintWriter(new OutputStreamWriter(gos));
         //pw.write(s);
         //pw.close();
-        System.err.println(enc);
+        //System.err.println(enc);
         _past.add(enc);
         _hashes.add(enc);
     }

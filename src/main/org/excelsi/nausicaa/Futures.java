@@ -481,7 +481,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                                 //System.err.print(".");
                                 nca = mutate(ca);
                             } while(useHistory && History.named(_name).contains(nca));
-                            System.err.println();
+                            //System.err.println();
                             if(reroll) {
                                 nca = nca.seed();
                             }

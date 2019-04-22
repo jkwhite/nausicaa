@@ -94,7 +94,7 @@ public class CompositeRule implements Rule {
     @Override public Plane generate(Plane c, int start, int end, ExecutorService pool, boolean stopOnSame, boolean overwrite, Updater u, GOptions opt) {
         Sliceable p = (Sliceable) c;
         for(int i=_rs.length-1;i>=0;i--) {
-            System.err.println("compositing at depth "+i);
+            //System.err.println("compositing at depth "+i);
             p.setReadDepth(i);
             p.setWriteDepth(i);
             _rs[i].generate(c, start, end, pool, stopOnSame, overwrite, u, opt);

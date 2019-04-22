@@ -9,8 +9,37 @@ import org.slf4j.Logger;
 
 
 public class GenomeMutators extends Enloggened {
-    private static final Logger LOG = LoggerFactory.getLogger(CA.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GenomeMutators.class);
 
+
+    public static GenomeMutator makeDeterministic() {
+        return
+            (cs,im,gf,m)->{
+                boolean hasUnd = false;
+                for(Codon c:cs) {
+                    if(!c.deterministic()) {
+                        hasUnd = true;
+                        break;
+                    }
+                }
+                if(hasUnd) {
+                    int st = m.r().nextInt(cs.size());
+                    int en = st==0?cs.size():st-1;
+                    for(int i=st;i!=en;) {
+                        if(!cs.get(i).deterministic()) {
+                            cs.remove(i);
+                            break;
+                        }
+                        if(++i==cs.size()) {
+                            i=0;
+                        }
+                    }
+                }
+                else {
+                    replace().mutate(cs,im,gf,m);
+                }
+            };
+    }
 
     public static GenomeMutator jumble() {
         return
@@ -114,17 +143,23 @@ public class GenomeMutators extends Enloggened {
                     //System.err.print("#");
                     //if(tries%10==0) System.err.println();
                     any = false;
-                    for(int i=0;i<cs.size();i++) {
+                    int st = m.r().nextInt(cs.size());
+                    int en = st==0?cs.size():st-1;
+                    for(int i=st;i!=en;) {
                         final Codon c = cs.get(i);
                         if(c instanceof Unstable) {
                             any = true;
-                            if(m.r().nextInt(3)==0) {
-                                //System.err.print("c:"+c+":");
-                                Codon after = ((Unstable)c).destabilize(m.r());
-                                LOG.debug("unstable before: "+c.code()+", after: "+after.code());
-                                cs.set(i, after);
+                            Codon after = ((Unstable)c).destabilize(m.r());
+                            LOG.debug("unstable before: "+c.code()+", after: "+after.code());
+                            cs.set(i, after);
+                            if(!c.code().equals(after.code())) {
                                 de = true;
+                                LOG.debug("found destabilize");
+                                break;
                             }
+                        }
+                        if(++i==cs.size()) {
+                            i=0;
                         }
                     }
                 }

@@ -10,8 +10,13 @@ import java.io.IOException;
 import java.util.Random;
 import org.excelsi.nausicaa.ca.*;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public class NViewer extends JFrame implements UIActions {
+    private static final Logger LOG = LoggerFactory.getLogger(NViewer.class);
+
     private static int _width;
     private static int _height;
     private static JFrame _root;
@@ -1348,7 +1353,8 @@ public class NViewer extends JFrame implements UIActions {
                             _a.mutate(NViewer.this, _config, _random, gm);
                         }
                         catch(Exception ex) {
-                            System.err.println(mname+" failed: "+ex.getMessage());
+                            LOG.error(mname+" failed: "+ex.getMessage(), ex);
+                            //System.err.println(mname+" failed: "+ex.getMessage());
                         }
                     }
                 };

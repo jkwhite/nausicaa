@@ -4,8 +4,12 @@ package org.excelsi.nausicaa.ca;
 import java.util.Arrays;
 import java.util.Random;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public class Machine {
+    private static final Logger LOG = LoggerFactory.getLogger(Machine.class);
     private static final int TAPE_LENGTH = 65535*2;
     private static final int MAX_INSTRUCTIONS = 1000;
     private final Archetype _a;
@@ -90,7 +94,7 @@ public class Machine {
             for(int i=0;i<_prg.length;i++) {
                 //long st = System.currentTimeMillis();
                 if(++execCount>MAX_INSTRUCTIONS) {
-                    if(++_computeCount%1000==0) System.err.println("******* EXEC LIMIT BREAK *******");
+                    if(++_computeCount%10000==0) LOG.warn("******* EXEC LIMIT BREAK *******");
                     break;
                 }
                 if(_trace) {
@@ -129,7 +133,7 @@ public class Machine {
             for(int i=0;i<_prg.length;i++) {
                 //long st = System.currentTimeMillis();
                 if(++execCount>MAX_INSTRUCTIONS) {
-                    if(++_computeCount%1000==0) System.err.println("******* EXEC LIMIT BREAK *******");
+                    if(++_computeCount%1000==0) LOG.warn("******* EXEC LIMIT BREAK *******");
                     break;
                 }
                 if(_trace) {

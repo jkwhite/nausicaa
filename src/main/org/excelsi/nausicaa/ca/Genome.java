@@ -77,9 +77,10 @@ public final class Genome {
             new Weight<>(20, GenomeMutators.remove()),
             new Weight<>(10, GenomeMutators.decimate()),
             new Weight<>(5,  GenomeMutators.repeat()),
-            new Weight<>(10, GenomeMutators.symmetry()),
+            //new Weight<>(10, GenomeMutators.symmetry()),
             new Weight<>(40, GenomeMutators.add()),
-            new Weight<>(30, GenomeMutators.adjust())
+            new Weight<>(30, GenomeMutators.adjust()),
+            new Weight<>(20, GenomeMutators.makeDeterministic())
         );
         int tries = 0;
         Genome child;
@@ -113,7 +114,7 @@ public final class Genome {
     private Genome replicate(final Implicate im, final WeightedFactory<GenomeMutator> mutators, final GenomeFactory gf, final MutationFactor mf) {
         final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(im,false)));
         float mult = mf.alpha()/20f;
-        int max = Math.max(1, (int) (mult*(1+mf.random().nextInt(Math.max(1,cs.size()/3)))));
+        int max = Math.max(1, (int) (mult*(1+mf.random().nextInt(Math.max(1,cs.size()/6)))));
         //System.err.println("applying "+max+" mutators");
         LOG.info("applying "+max+" mutators (alpha="+mf.alpha()+", mult="+mult+", size="+cs.size()+")");
         for(int i=0;i<max;i++) {
@@ -133,8 +134,9 @@ public final class Genome {
         }
         b.setLength(b.length()-1);
         try {
-            return fromCodons(cs, im.language()).prune(im);
+            Genome rep = fromCodons(cs, im.language()).prune(im);
             LOG.info("done replicate");
+            return rep;
         }
         catch(Exception e) {
             throw new IllegalStateException("illegal genome '"+b+"': "+e, e);
