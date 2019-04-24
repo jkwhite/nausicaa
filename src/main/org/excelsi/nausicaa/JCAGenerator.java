@@ -250,7 +250,7 @@ public class JCAGenerator extends JDialog {
                                     if(createGif) {
                                         Plane plane = c.createPlane();
                                         ExecutorService pool = Executors.newFixedThreadPool(1);
-                                        Iterator<Plane> cas = c.compileRule().frameIterator(plane, pool, new GOptions(true, 1, 1, frameWeight));
+                                        Iterator<Plane> cas = c.compileRule().frameIterator(plane, pool, new GOptions(true, 1, 1, frameWeight).metaMode(c.getMetaMode()));
                                         AnimatedGifEncoder age = new AnimatedGifEncoder();
                                         age.start(selfile.endsWith(".gif")?selfile:(selfile+".gif"));
                                         age.setRepeat(0);
@@ -305,7 +305,7 @@ public class JCAGenerator extends JDialog {
                                         if(scale==1f) {
                                             System.err.println("skip scaling");
                                             c.compileRule()
-                                                .stream(c.createPlane(), pool, new GOptions(true, ccores, 1, frameWeight))
+                                                .stream(c.createPlane(), pool, new GOptions(true, ccores, 1, frameWeight).metaMode(c.getMetaMode()))
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))
                                                 .map(Pipeline.toBufferedImage("p", "b"))
@@ -317,7 +317,7 @@ public class JCAGenerator extends JDialog {
                                         else {
                                             System.err.println("scaling");
                                             c.compileRule()
-                                                .stream(c.createPlane(), pool, new GOptions(true, ccores, 1, frameWeight))
+                                                .stream(c.createPlane(), pool, new GOptions(true, ccores, 1, frameWeight).metaMode(c.getMetaMode()))
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))
                                                 .map(Pipeline.toBufferedImage("p", "b"))

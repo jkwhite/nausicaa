@@ -176,10 +176,12 @@ top:        while(_state==State.animate) {
                 }
                 p = d.getPlane();
             }
+            _log.debug("animating with plane impl "+p+" ("+p.getClass().getName()+")");
             _parallel = parallel;
             _frames = d.compileRule().frameIterator(p, pool,
                 new GOptions(true, _parallel, 0, weight)
                     .computeMode(ComputeMode.from(_config.<String>getVariable("rgb_computemode","combined")))
+                    .metaMode(p.creator().getMetaMode())
                 );
             _d = d;
         }

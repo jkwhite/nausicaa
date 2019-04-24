@@ -301,6 +301,7 @@ public class Actions {
                         v.getConfig().getWeight(),
                         0,
                         ComputeMode.combined,
+                        MetaMode.depth,
                         new UpdateMode.SimpleSynchronous(),
                         EdgeMode.defaultMode(),
                         ExternalForce.nop(),

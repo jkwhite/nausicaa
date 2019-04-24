@@ -192,6 +192,7 @@ public class NViewer extends JFrame implements UIActions {
                 weight,
                 0,
                 cmode,
+                MetaMode.depth,
                 new UpdateMode.SimpleSynchronous(),
                 EdgeMode.defaultMode(),
                 ExternalForce.nop(),
@@ -1555,6 +1556,34 @@ public class NViewer extends JFrame implements UIActions {
         rgbhack[_config.getVariable("rgb_computemode","combined").equals("combined")?0:1].setState(true);
 
         render.add(rgbopt);
+
+        JMenu metaopt = new JMenu("Meta compute mode");
+        final JCheckBoxMenuItem[] metahack = new JCheckBoxMenuItem[2];
+        JCheckBoxMenuItem metacomb = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                metahack[0].setState(true);
+                metahack[1].setState(false);
+                _config.setVariable("meta_computemode", "depth");
+                setActiveCA(getActiveCA().metaMode(MetaMode.depth));
+            }
+        });
+        metacomb.setText("Depth");
+        metaopt.add(metacomb);
+        JCheckBoxMenuItem metachan = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                metahack[0].setState(false);
+                metahack[1].setState(true);
+                _config.setVariable("meta_computemode", "none");
+                setActiveCA(getActiveCA().metaMode(MetaMode.none));
+            }
+        });
+        metachan.setText("None");
+        metaopt.add(metachan);
+        metahack[0] = metacomb;
+        metahack[1] = metachan;
+        metahack[_config.getVariable("meta_computemode","depth").equals("depth")?0:1].setState(true);
+
+        render.add(metaopt);
 
         JMenu compopt = new JMenu("Composition mode");
         final JCheckBoxMenuItem[] comphack = new JCheckBoxMenuItem[9];

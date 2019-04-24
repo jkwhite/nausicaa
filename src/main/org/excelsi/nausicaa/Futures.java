@@ -398,8 +398,10 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     }
 
     private PlaneDisplay createPlaneDisplay(final CA ca) {
-        GOptions g = new GOptions(true, 1, 0, ca.getWeight())
-            .computeMode(ComputeMode.from(_config.<String>getVariable("rgb_computemode","combined")));
+        //GOptions g = new GOptions(true, 1, 0, ca.getWeight(), 0, ca.getComputeMode())
+            //.computeMode(ComputeMode.from(_config.<String>getVariable("rgb_computemode","combined")));
+        GOptions g = new GOptions(true, 1, 0, ca.getWeight(), 0, ca.getComputeMode())
+            .metaMode(ca.getMetaMode());
         switch(_viewType) {
             case view3d:
                 LOG.debug("creating 3d view");

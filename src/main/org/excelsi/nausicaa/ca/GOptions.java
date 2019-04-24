@@ -9,6 +9,7 @@ public class GOptions {
     private final int _hd;
     @Deprecated private final ComputeMode _compMode;
     private final Variables _vars;
+    private final MetaMode _meta;
 
 
     public GOptions() {
@@ -28,6 +29,10 @@ public class GOptions {
     }
 
     public GOptions(boolean db, int par, int s, double w, int hd, ComputeMode comp, Variables vars) {
+        this(db, par, s, w, hd, comp, vars, MetaMode.depth);
+    }
+
+    public GOptions(boolean db, int par, int s, double w, int hd, ComputeMode comp, Variables vars, MetaMode meta) {
         _doubleBuffer = db;
         _parallel = par;
         _stride = s;
@@ -35,6 +40,7 @@ public class GOptions {
         _hd = hd;
         _compMode = comp;
         _vars = vars;
+        _meta = meta;
     }
 
     public boolean doubleBuffer() { return _doubleBuffer; }
@@ -44,24 +50,29 @@ public class GOptions {
     public int higherDim() { return _hd; }
     public ComputeMode computeMode() { return _compMode; }
     public Variables variables() { return _vars; }
+    public MetaMode metaMode() { return _meta; }
 
     public GOptions stride(int s) {
-        return new GOptions(_doubleBuffer, _parallel, s, _weight, _hd);
+        return new GOptions(_doubleBuffer, _parallel, s, _weight, _hd, _compMode, _vars, _meta);
     }
 
     public GOptions weight(double w) {
-        return new GOptions(_doubleBuffer, _parallel, _stride, w, _hd);
+        return new GOptions(_doubleBuffer, _parallel, _stride, w, _hd, _compMode, _vars, _meta);
     }
 
     public GOptions higherDim(int hd) {
-        return new GOptions(_doubleBuffer, _parallel, _stride, _weight, hd);
+        return new GOptions(_doubleBuffer, _parallel, _stride, _weight, hd, _compMode, _vars, _meta);
     }
 
     public GOptions computeMode(ComputeMode comp) {
-        return new GOptions(_doubleBuffer, _parallel, _stride, _weight, _hd, comp);
+        return new GOptions(_doubleBuffer, _parallel, _stride, _weight, _hd, comp, _vars, _meta);
+    }
+
+    public GOptions metaMode(MetaMode meta) {
+        return new GOptions(_doubleBuffer, _parallel, _stride, _weight, _hd, _compMode, _vars, meta);
     }
 
     public GOptions variables(Variables vars) {
-        return new GOptions(_doubleBuffer, _parallel, _stride, _weight, _hd, _compMode, vars);
+        return new GOptions(_doubleBuffer, _parallel, _stride, _weight, _hd, _compMode, vars, _meta);
     }
 }

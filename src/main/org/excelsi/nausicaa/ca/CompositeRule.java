@@ -115,7 +115,13 @@ public class CompositeRule implements Rule {
 
         final Iterator[] its = new Iterator[ps1.length];
         for(int i=0;i<its.length;i++) {
-            GOptions vs = i<its.length-1?opt.variables(dv):opt;
+            GOptions vs;
+            if(opt.metaMode()==MetaMode.none) {
+                vs = opt;
+            }
+            else {
+                vs = i<its.length-1?opt.variables(dv):opt;
+            }
             its[i] = _rs[i].frameIterator(ps1[i], pool, vs);
         }
 
