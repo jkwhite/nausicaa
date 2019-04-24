@@ -251,6 +251,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             .hueVariations(_config.getHueVariations())
             .weightVariations(_config.getWeightVariations())
             .paramVariations(_config.getParamVariations())
+            .initVariations(_config.getInitializerVariations())
             .transform(ca);
         return res;
     }

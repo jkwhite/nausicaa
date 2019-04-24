@@ -64,6 +64,14 @@ public class CustomInitializer implements Initializer {
         return o;
     }
 
+    @Override public Mutatable mutate(MutationFactor m) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public boolean supportsMutation() {
+        return false;
+    }
+
     public static CustomInitializer read(BufferedReader r, int version) throws IOException {
         StringBuilder t = new StringBuilder();
         String delim = r.readLine();

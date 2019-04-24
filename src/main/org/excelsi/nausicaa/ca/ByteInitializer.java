@@ -54,6 +54,14 @@ public class ByteInitializer implements Initializer {
         return o;
     }
 
+    @Override public Mutatable mutate(MutationFactor m) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public boolean supportsMutation() {
+        return false;
+    }
+
     @Override public String humanize() {
         return "ByteInitializer";
     }

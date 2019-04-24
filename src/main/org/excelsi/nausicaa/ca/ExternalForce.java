@@ -26,6 +26,15 @@ public interface ExternalForce extends Humanizable {
         throw new IllegalArgumentException("unknown type '"+type+"'");
     }
 
+    public static ExternalForce createRandom(Random r) {
+        if(r.nextBoolean()) {
+            return new NopExternalForce();
+        }
+        else {
+            return new RandomExternalForce(r.nextFloat());
+        }
+    }
+
     public static class NopExternalForce implements ExternalForce {
         @Override public String humanize() {
             return "None";

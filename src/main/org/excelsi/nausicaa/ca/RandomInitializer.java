@@ -156,6 +156,15 @@ public class RandomInitializer implements Initializer {
         return o;
     }
 
+    @Override public Mutatable mutate(MutationFactor m) {
+        float nzw = m.r().nextFloat();
+        return new RandomInitializer(null, _seed, new Params(nzw));
+    }
+
+    @Override public boolean supportsMutation() {
+        return true;
+    }
+
     public static RandomInitializer read(BufferedReader r, int version) throws IOException {
         return new RandomInitializer(
             null,

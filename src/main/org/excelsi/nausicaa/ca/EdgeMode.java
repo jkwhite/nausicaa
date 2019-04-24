@@ -2,6 +2,7 @@ package org.excelsi.nausicaa.ca;
 
 
 import com.google.gson.*;
+import java.util.Random;
 
 
 public class EdgeMode implements Humanizable {
@@ -119,5 +120,18 @@ public class EdgeMode implements Humanizable {
 
     public static EdgeMode defaultMode() {
         return new EdgeMode(Type.toroidal);
+    }
+
+    public static EdgeMode createRandom(Random r, MutationFactor f) {
+        switch(r.nextInt(3)) {
+            case 2:
+                float col = r.nextFloat()*(f.archetype().colors()-1f);
+                return new EdgeMode(Type.constant, (int)col, col);
+            case 1:
+                return new EdgeMode(Type.zero);
+            case 0:
+            default:
+                return new EdgeMode(Type.toroidal);
+        }
     }
 }

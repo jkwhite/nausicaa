@@ -159,6 +159,14 @@ public class CoordinateInitializer implements Initializer {
         return o;
     }
 
+    @Override public Mutatable mutate(MutationFactor m) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public boolean supportsMutation() {
+        return false;
+    }
+
     //public static RandomInitializer read(BufferedReader r, int version) throws IOException {
         //return new RandomInitializer(
             //null,

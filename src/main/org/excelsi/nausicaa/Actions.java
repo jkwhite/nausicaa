@@ -2104,8 +2104,10 @@ public class Actions {
             .withMeta("true".equals(config.getVariable("mutator_meta", "false")))
             .withUpdateWeight(config.getWeightVariations())
             .withRule(config.getRuleVariations())
+            .withInitializers(config.getInitializerVariations())
             .withLanguage(Languages.universal())
             .withVars(ca.getVars())
+            .withArchetype(ca.getRule().archetype())
             .withTrace(trace)
             .withValidator((a)->{
                 return a.colors()<mc;

@@ -161,6 +161,14 @@ public class CAInitializer implements Initializer {
         return o;
     }
 
+    @Override public Mutatable mutate(MutationFactor m) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public boolean supportsMutation() {
+        return false;
+    }
+
     public static CAInitializer read(BufferedReader r, int version) throws IOException {
         return new CAInitializer(
             r.readLine(),

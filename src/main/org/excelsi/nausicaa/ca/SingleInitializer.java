@@ -128,6 +128,21 @@ public class SingleInitializer implements Initializer {
         return o;
     }
 
+    @Override public Mutatable mutate(MutationFactor m) {
+        float nc;
+        if(m.r().nextBoolean()) {
+            nc = -1;
+        }
+        else {
+            nc = m.r().nextFloat()*(m.archetype().colors()-1f);
+        }
+        return new SingleInitializer(nc, _x, _y, _z, _size);
+    }
+
+    @Override public boolean supportsMutation() {
+        return true;
+    }
+
     private int coordX(Plane p, int v) {
         return v==-1?p.getWidth()/2:v%p.getWidth();
     }

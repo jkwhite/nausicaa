@@ -159,6 +159,14 @@ public class ImageInitializer implements Initializer {
         return o;
     }
 
+    @Override public Mutatable mutate(MutationFactor m) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public boolean supportsMutation() {
+        return false;
+    }
+
     public static ImageInitializer read(BufferedReader r, int version) throws IOException {
         return new ImageInitializer(
             new File(r.readLine()),

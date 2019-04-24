@@ -179,6 +179,25 @@ public class GaussianInitializer implements Initializer {
         return o;
     }
 
+    @Override public Mutatable mutate(MutationFactor m) {
+        float nzw = m.r().nextFloat();
+        int nmp = _params.maxPoints + m.r().nextInt(3)-1;
+        float nmr = _params.maxRadius + (m.r().nextFloat()-0.5f);
+        float nd = _params.density + (m.r().nextFloat()-0.5f);
+        return new GaussianInitializer(null, _seed,
+            new Params(
+                nzw,
+                nmp,
+                nmr,
+                nd
+            )
+        );
+    }
+
+    @Override public boolean supportsMutation() {
+        return true;
+    }
+
     public static GaussianInitializer read(BufferedReader r, int version) throws IOException {
         return new GaussianInitializer(
             null,

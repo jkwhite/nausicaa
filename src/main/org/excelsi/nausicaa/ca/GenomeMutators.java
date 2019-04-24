@@ -30,7 +30,7 @@ public class GenomeMutators extends Enloggened {
                             cs.remove(i);
                             break;
                         }
-                        if(++i==cs.size()) {
+                        if(++i==cs.size()&&i!=en) {
                             i=0;
                         }
                     }
@@ -158,7 +158,7 @@ public class GenomeMutators extends Enloggened {
                                 break;
                             }
                         }
-                        if(++i==cs.size()) {
+                        if(++i==cs.size()&&i!=en) {
                             i=0;
                         }
                     }

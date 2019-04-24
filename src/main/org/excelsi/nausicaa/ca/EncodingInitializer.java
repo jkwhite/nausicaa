@@ -58,4 +58,12 @@ public class EncodingInitializer implements Initializer {
         o.addProperty("type","encode");
         return o;
     }
+
+    @Override public Mutatable mutate(MutationFactor m) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override public boolean supportsMutation() {
+        return false;
+    }
 }

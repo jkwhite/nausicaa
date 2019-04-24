@@ -130,6 +130,14 @@ public class WordInitializer implements Initializer {
         return o;
     }
 
+    @Override public Mutatable mutate(MutationFactor m) {
+        return new WordInitializer(_alphabet, _input);
+    }
+
+    @Override public boolean supportsMutation() {
+        return false;
+    }
+
     public static WordInitializer read(BufferedReader r, int version) throws IOException {
         return new WordInitializer(
             r.readLine(),

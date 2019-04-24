@@ -55,6 +55,14 @@ public class NeapolitanInitializer implements Initializer {
         return o;
     }
 
+    @Override public Mutatable mutate(MutationFactor m) {
+        return new NeapolitanInitializer();
+    }
+
+    @Override public boolean supportsMutation() {
+        return true;
+    }
+
     public static NeapolitanInitializer read(BufferedReader r, int version) throws IOException {
         return new NeapolitanInitializer();
     }

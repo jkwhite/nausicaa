@@ -1034,7 +1034,7 @@ public class NViewer extends JFrame implements UIActions {
         auto.add(cai);
         hack[6] = cai;
         cai.setText("CA initial state ...");
-        cai.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcut));
+        //cai.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcut));
         cai.setState(_init==Initializers.ca);
 
         JCheckBoxMenuItem custi = new JCheckBoxMenuItem(new AbstractAction() {
@@ -1307,7 +1307,7 @@ public class NViewer extends JFrame implements UIActions {
         _repeat = mutate.add(rep);
         _repeat.setText("Repeat last mutation");
         _repeat.setEnabled(false);
-        _repeat.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, shortcut));
+        _repeat.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcut));
 
         /*
         AbstractAction rand = new AbstractAction() {
@@ -1411,7 +1411,7 @@ public class NViewer extends JFrame implements UIActions {
         mutate.add(rotmeta);
         rotmeta.setText("Rotate Meta");
 
-        final JCheckBoxMenuItem[] mhack = new JCheckBoxMenuItem[5];
+        final JCheckBoxMenuItem[] mhack = new JCheckBoxMenuItem[6];
 
         mutate.addSeparator();
         JCheckBoxMenuItem incHueVariations = new JCheckBoxMenuItem(new AbstractAction() {
@@ -1465,6 +1465,19 @@ public class NViewer extends JFrame implements UIActions {
         incParamVariations.setText("Parameter variations");
         incParamVariations.setState(_config.getParamVariations());
         incParamVariations.setSelected(_config.getParamVariations());
+
+        JCheckBoxMenuItem incInitVariations = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _config.setInitializerVariations(!_config.getInitializerVariations());
+                mhack[5].setState(!mhack[5].getState());
+                mhack[5].setSelected(!mhack[5].getState());
+            }
+        });
+        mutate.add(incInitVariations);
+        mhack[5] = incInitVariations;
+        incInitVariations.setText("Initializer variations");
+        incInitVariations.setState(_config.getInitializerVariations());
+        incInitVariations.setSelected(_config.getInitializerVariations());
 
         JMenuItem mparams = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {

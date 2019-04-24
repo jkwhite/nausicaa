@@ -9,9 +9,10 @@ import java.io.IOException;
 import com.google.gson.JsonElement;
 
 
-public interface Initializer extends Humanizable {
+public interface Initializer extends Humanizable, Mutatable {
     void init(Plane plane, Rule rule, Random random);
     void write(DataOutputStream dos) throws IOException;
     void write(PrintWriter w);
     JsonElement toJson();
+    boolean supportsMutation();
 }

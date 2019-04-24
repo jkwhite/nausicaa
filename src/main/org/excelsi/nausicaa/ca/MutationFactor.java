@@ -15,11 +15,13 @@ public final class MutationFactor {
     private boolean _symmetry;
     private boolean _weight;
     private boolean _rule;
+    private boolean _inits;
     private boolean _meta;
     private Datamap _data;
     private Varmap _vars;
     private GenomeMutator _gm;
     private Language _lang;
+    private Archetype _archetype;
     private boolean _trace;
 
 
@@ -109,6 +111,11 @@ public final class MutationFactor {
         return this;
     }
 
+    public MutationFactor withInitializers(boolean i) {
+        _inits = i;
+        return this;
+    }
+
     public MutationFactor withMeta(boolean m) {
         _meta = m;
         return this;
@@ -134,6 +141,10 @@ public final class MutationFactor {
 
     public boolean rule() {
         return _rule;
+    }
+
+    public boolean initializers() {
+        return _inits;
     }
 
     public boolean meta() {
@@ -164,6 +175,15 @@ public final class MutationFactor {
 
     public Varmap vars() {
         return _vars;
+    }
+
+    public MutationFactor withArchetype(Archetype a) {
+        _archetype = a;
+        return this;
+    }
+
+    public Archetype archetype() {
+        return _archetype;
     }
 
     public MutationFactor withGenomeMutator(GenomeMutator gm) {
