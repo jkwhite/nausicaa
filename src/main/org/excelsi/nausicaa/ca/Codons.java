@@ -80,6 +80,7 @@ public class Codons {
     public static final String NEGATE = "bo";
     public static final String PUSH_CARDINAL = "pa";
     public static final String FILTER = "pi";
+    public static final String ABS = "pe";
     public static final String EQUAL_A = "po";
     public static final String MOST = "wa";
     public static final String LEAST = "wo";
@@ -275,6 +276,8 @@ public class Codons {
                     return new Mandelbrot();
                 case LIFE:
                     return new Life();
+                case ABS:
+                    return new Abs();
                 default:
                     throw new IllegalStateException("unknown opcode '"+code+"'");
             }
@@ -2738,6 +2741,30 @@ public class Codons {
         }
     }
 
+    public static class Abs implements Codon {
+        @Override public Codon copy() { return new Abs(); }
+
+        @Override public String code() {
+            return ABS;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public boolean usesTape() { return true; }
+
+        @Override public boolean supports(Values v) { return true; }
+
+        @Override public void op(int[] p, IntTape t) {
+            t.push(Math.abs(t.pop()));
+        }
+
+        @Override public void op(double[] p, FloatTape t) {
+            t.push(Math.abs(t.pop()));
+        }
+    }
+
     public static class Sin implements Codon {
         @Override public Codon copy() { return new Sin(); }
 
@@ -2805,6 +2832,7 @@ public class Codons {
 
     public static class Placeholder implements Codon {
         private final String _name;
+        private long _cnt = 0;
 
         public Placeholder(String name) {
             _name = name;
@@ -2819,6 +2847,11 @@ public class Codons {
         @Override public boolean usesTape() { return false; }
 
         @Override public void op(int[] p, IntTape t) {
+            if(++_cnt%1000==0) LOG.debug("executing placeholder '"+_name+"'");
+        }
+
+        @Override public void op(double[] p, FloatTape t) {
+            if(++_cnt%1000==0) LOG.debug("executing placeholder '"+_name+"'");
         }
     }
 

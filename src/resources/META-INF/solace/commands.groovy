@@ -45,7 +45,7 @@ ca = { dims, rule, pal=null, init=null, prelude=0, weight=1d ->
     if(init==null) {
         init = Initializers.random.create()
     }
-    def c = new CA(rule, p, init, __random__, __random__.nextLong(), dims[0], dims[1], dims.size()>2?dims[2]:1, prelude, weight, 0, ComputeMode.channel, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null);
+    def c = new CA(rule, p, init, __random__, __random__.nextLong(), dims[0], dims[1], dims.size()>2?dims[2]:1, prelude, weight, 0, ComputeMode.channel, MetaMode.none, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null);
     //rule.init(c, Rule.Initialization.single);
     //rule.generate(c, 1, hei, false, false, null);
     //c.rule = rule;

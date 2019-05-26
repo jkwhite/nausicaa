@@ -82,6 +82,7 @@ public class GenomeFactory {
             weight(1, new Codons.Rand()),
             weight(1, new Most(-1)),
             weight(1, new Least(-1)),
+            weight(1, new Abs()),
             weight(1, new Mod())
         ));
         //if(a.colors()<1000000) {
@@ -95,6 +96,8 @@ public class GenomeFactory {
         }
         if(true) {
             cs.add(weight(1,new Coord(-1)));
+            cs.add(weight(1,new Coord(0)));
+            cs.add(weight(1,new Coord(1)));
             cs.add(weight(1,new Mandelbrot()));
         }
         for(Iterator<Weight<Codon>> it=cs.iterator();it.hasNext();) {

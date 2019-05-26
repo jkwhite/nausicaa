@@ -2227,6 +2227,9 @@ public class Actions {
         else {
             capt += "\n\nRule:\n\n"+r.humanize();
         }
+        if(ca.getMeta()!=null) {
+            capt = capt+"\n\nWith meta "+createCaption(ca.getMeta());
+        }
         return capt;
     }
 

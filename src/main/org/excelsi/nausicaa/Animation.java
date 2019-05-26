@@ -166,7 +166,6 @@ top:        while(_state==State.animate) {
 
 
         public DisplayAnimator(Planescape d, ExecutorService pool, int parallel, float weight) {
-            //_frames = ((Multirule2D)d.getRule()).frames(d.getCA());
             Plane p = d.getPlane();
             while(p==null) {
                 try {

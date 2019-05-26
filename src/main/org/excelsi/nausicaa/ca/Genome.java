@@ -45,6 +45,7 @@ public final class Genome {
     public Codon[] codons(Implicate i, boolean resolveParams) {
         final List<Codon> ops = new ArrayList<>();
         final String sep = _v==1?"-":" ";
+        LOG.debug("resolveParams="+resolveParams);
         for(final String op:(resolveParams?replaceParams(_c, i):_c).split(sep)) {
             ops.add(Codons.codon(op, i));
         }
@@ -100,7 +101,7 @@ public final class Genome {
     private String replaceParams(String g, Implicate i) {
         final String P_START = Varmap.P_START;
         final String P_END = Varmap.P_END;
-        //System.err.println("** replaceParams vars: "+i.vars());
+        LOG.debug("replaceParams vars: "+i.vars());
         //Thread.dumpStack();
         for(String p:GenomeParser.createVarmap(g).names()) {
             String v = i.vars().get(p);
