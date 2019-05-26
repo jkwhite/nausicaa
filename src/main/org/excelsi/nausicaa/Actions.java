@@ -1864,7 +1864,9 @@ public class Actions {
                 int ccores = v.getConfig().getIntVariable("animation_computeCores", 2);
                 final ExecutorService pool = Pools.named("compute", ccores);
                 final GOptions opt = new GOptions(true, ccores, 0, 1f)
-                        .computeMode(ComputeMode.from(v.getConfig().<String>getVariable("rgb_computemode","combined")));
+                        .computeMode(ComputeMode.from(v.getConfig().<String>getVariable("rgb_computemode","combined")))
+                        .metaMode(ca.getMetaMode())
+                        ;
                 final Rendering rend = v.getPlaneDisplayProvider().getActivePlaneDisplay().getRendering();
                 new FunctionRunner(v, ca, mf, pool, opt, rend, vn, fn);
             }
