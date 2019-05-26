@@ -439,7 +439,7 @@ public class Codons {
         };
         private final TIntIntProcedure _proci = new TIntIntProcedure() {
             @Override public boolean execute(int k, int v) {
-                if(v<_leastValueF) {
+                if(v<_leastValueI) {
                     _leastKeyI = k;
                     _leastValueI = v;
                 }
@@ -721,12 +721,16 @@ public class Codons {
 
         @Override public void op(int[] p, IntTape t) {
             if(_c==-1) {
+                //System.err.println("***** NAggregate SELECT ALL");
                 t.selectAggAll();
             }
             else {
+                //System.err.println("***** NAggregate SELECT AGG");
                 t.selectAgg(_c);
             }
+            //System.err.println("***** NAggregate APPLY START");
             t.apply(this, p);
+            //System.err.println("***** NAggregate APPLY DONE");
         }
 
         @Override public void op(double[] p, FloatTape t) {
