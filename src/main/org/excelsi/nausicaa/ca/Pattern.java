@@ -21,9 +21,13 @@ public interface Pattern {
     default boolean usesContext() { return false; }
 
     static class Ctx {
-        /** coordinates */
+        /** absolute coordinates */
         public int[] c;
+        /** relative coordinates */
+        public double[] cr;
         /** random */
         public Random r;
+        /** time step */
+        public long time;
     }
 }

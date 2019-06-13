@@ -472,3 +472,15 @@ picture:
 136:a0.9199823 nya ja a-1.344913 a18.392256 wo ki a-0.89794374 ne kya mi2 mu2 a104.20664 chi chi o4 kya kya mi5 go a87.359856 mi2 bi mu5 mu bi ho ge a1.8661972 gu gu ra nu go go gi wa
 136:a0.9199823 nya ja a-1.344913 a18.392256 wo ki a-0.89794374 ne kya mi2 mu2 a104.20664 chi chi o4 kya kya mi5 go a87.359856 mi2 bi mu5 mu bi ho ge a1.8661972 gu gu chi o4 kya kya go a87.359856 mi2 bi mi5 mu bi ho ge a1.8661972 gu gu ra nu nu go go gi wa do
 136:a0.9199823 nya ja a-1.344913 a18.392256 wo ki a-0.89794374 ne kya mi2 mu2 chi chi o4 kya kya mi5 go a87.359856 bi mu5 mu bi ho ge a1.8661972 gu gu chi o4 kya kya go a87.359856 mi2 bi mi5 mu bi ho ya a1.8661972 gu gu ra nu nu go go gi wa do
+
+ki	Write all neighboring cells to the tape and advance the head
+mi	Read the entire tape and write the sum of all values to the tape
+a2	Write the constant 2 to the tape and advance the head
+a3	Write the constant 3 to the tape and advance the head
+u	Read the preceding 3 values from the tape, and if the 3rd value is inclusive-between the 1st and 2nd, write a 1, else write a 0
+ki	Write all neighboring cells to the tape and advance the head (again)
+mi8	Read the preceding 8 values from the tape and write the sum of these values to the tape
+a3	Write the constant 3 to the tape and advance the head
+ma	Read the preceding 2 values from the tape, and if they are equal write a 1 else write a 0
+ya	Push the current cell to the tape and advance the head
+ra	Read the preceding 3 values from the tape, and if the 1st value is a 1 then write the 2nd value to the tape otherwise write the 3rd value

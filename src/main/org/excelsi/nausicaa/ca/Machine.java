@@ -124,6 +124,7 @@ public class Machine {
             if(res<0) {
                 res = _a.colors()+res;
             }
+            if(_trace) System.err.println("Final: "+res);
             io.io = res;
             if(_ti.pos()>0) _e += _ti.pos();
         }

@@ -98,6 +98,9 @@ public class GenomeFactory {
             cs.add(weight(1,new Coord(-1)));
             cs.add(weight(1,new Coord(0)));
             cs.add(weight(1,new Coord(1)));
+            cs.add(weight(1,new CoordRel(-1)));
+            cs.add(weight(1,new CoordRel(0)));
+            cs.add(weight(1,new CoordRel(1)));
             cs.add(weight(1,new Mandelbrot()));
         }
         for(Iterator<Weight<Codon>> it=cs.iterator();it.hasNext();) {

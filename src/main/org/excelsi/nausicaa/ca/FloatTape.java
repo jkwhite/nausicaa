@@ -107,7 +107,7 @@ public final class FloatTape {
             return r;
         }
         //d("pop end");
-        return 0f;
+        return 0d;
     }
 
     public double peek() {

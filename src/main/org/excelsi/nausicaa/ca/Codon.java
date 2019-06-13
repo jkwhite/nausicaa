@@ -5,15 +5,11 @@ import java.util.Random;
 
 
 public interface Codon {
-    void op(int[] p, IntTape t);
-    default void op(int[] p, IntTape t, Pattern.Ctx ctx) {
-        op(p, t);
-    }
-    default void op(double[] p, FloatTape t) { }
-    default void op(double[] p, FloatTape t, Pattern.Ctx ctx) {
-        op(p, t);
-    }
-    default boolean supports(Values v) { return v==Values.discrete; }
+    //void op(int[] p, IntTape t);
+    void op(int[] p, IntTape t, Pattern.Ctx ctx);
+    //void op(double[] p, FloatTape t);
+    void op(double[] p, FloatTape t, Pattern.Ctx ctx);
+    boolean supports(Values v);
     Codon copy();
     String code();
     boolean usesPattern();

@@ -52,6 +52,7 @@ public class WorkerContinuous implements Worker {
         _r = r;
         _pctx = new Pattern.Ctx();
         _pctx.c = new int[3];
+        _pctx.cr = new double[3];
         _pctx.r = r;
 
         //_pow = new int[_wp.archetype().sourceLength()];
@@ -74,14 +75,17 @@ public class WorkerContinuous implements Worker {
         final int d = _size*2+1;
         for(int i=_y1;i<_y2;i++) {
             _pctx.c[1] = i-p1.getHeight()/2;
+            _pctx.cr[1] = _pctx.c[1]/(double)p1.getHeight();
             for(int j=_x1;j<_x2;j++) {
                 _pctx.c[0] = j-p1.getWidth()/2;
+                _pctx.cr[0] = _pctx.c[0]/(double)p1.getWidth();
                 for(int k=0;k<p1.getDepth();k++) {
                     if(_umode!=null&&!_umode.update(p1, j, i, k, _vars)) {
                         p2.setCell(j,i,k,p1.getCell(j,i,k));
                     }
                     else {
                         _pctx.c[2] = k-p1.getDepth()/2;
+                        _pctx.cr[2] = _pctx.c[2]/Math.min(1,p1.getDepth());
                         if(!_vars.weightVaries()) {
                             _weight = _vars.weight();
                         }
@@ -156,6 +160,7 @@ public class WorkerContinuous implements Worker {
         final int mx = (_y2-_y1)*(_x2-_x1);
         for(int i=_y1;i<_y2;i++) {
             _pctx.c[1] = i-p1.getHeight()/2;
+            _pctx.cr[1] = _pctx.c[1]/(double)p1.getHeight();
             for(int j=_x1;j<_x2;j++) {
                 //if(RAND.nextInt(1000)>=100) {
                 final int self = i*j;
@@ -165,6 +170,7 @@ public class WorkerContinuous implements Worker {
                 }
                 else {
                     _pctx.c[0] = j-p1.getWidth()/2;
+                    _pctx.cr[0] = _pctx.c[0]/(double)p1.getWidth();
                     counts++;
                     if(!_vars.weightVaries()) {
                         _weight = _vars.weight();
