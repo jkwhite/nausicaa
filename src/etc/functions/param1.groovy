@@ -16,9 +16,9 @@ run = { ca, args, api ->
     def iter = args['iter'] as Integer
     def file = args['file']
     int suf = 0
-    api.progress.maximum = end-start
-    for(i=start;i<=end;i+=inc) {
-        api.progress.current = i-start
+    api.progress.maximum = Math.abs(end-start)
+    for(i=start;;i+=inc) {
+        api.progress.current = Math.abs(i-start)
         def vars = new Varmap().put(variable, i as String)
         def cur1 = ca.vars(vars.merge(ca.vars))
         def cur2 = cur1.mutate(cur1.rule.origin().create(cur1.rule.genome(), api.mutationFactor.withVars(cur1.vars)), ca.random)
@@ -34,5 +34,6 @@ run = { ca, args, api ->
         fr.save(file+'-'+suf+'.png', api.rendering)
         suf++
         if(api.cancelled) break;
+        if((inc>0 && i>=end) || (inc<0 && i<=end)) break;
     }
 }
