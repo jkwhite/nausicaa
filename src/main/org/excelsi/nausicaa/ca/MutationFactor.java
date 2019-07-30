@@ -23,6 +23,8 @@ public final class MutationFactor {
     private Language _lang;
     private Archetype _archetype;
     private boolean _trace;
+    private boolean _bonding;
+    private boolean _intrabond;
 
 
     public MutationFactor() {
@@ -131,6 +133,16 @@ public final class MutationFactor {
         return this;
     }
 
+    public MutationFactor withBondMutations(boolean b) {
+        _bonding = b;
+        return this;
+    }
+
+    public MutationFactor withIntrabondMutations(boolean b) {
+        _intrabond = b;
+        return this;
+    }
+
     public boolean symmetry() {
         return _symmetry;
     }
@@ -157,6 +169,14 @@ public final class MutationFactor {
 
     public boolean trace() {
         return _trace;
+    }
+
+    public boolean bondMutations() {
+        return _bonding;
+    }
+
+    public boolean intrabondMutations() {
+        return _intrabond;
     }
 
     public MutationFactor withDatamap(Datamap dm) {

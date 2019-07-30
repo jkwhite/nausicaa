@@ -83,6 +83,10 @@ public final class Genome {
             new Weight<>(30, GenomeMutators.adjust()),
             new Weight<>(20, GenomeMutators.makeDeterministic())
         );
+        if(m.bondMutations()) {
+            mf.add(new Weight<GenomeMutator>(5, GenomeMutators.bond()));
+            mf.add(new Weight<GenomeMutator>(5, GenomeMutators.unbond()));
+        }
         int tries = 0;
         Genome child;
         do {
@@ -90,7 +94,7 @@ public final class Genome {
             //if(tries%10==0) System.err.println();
             child = replicate(im, mf, gf, m);
             if(++tries==100) {
-                LOG.info("failed to mutate "+this);
+                LOG.warn("failed to mutate "+this);
                 break;
             }
         } while(child.equals(this));
@@ -135,7 +139,8 @@ public final class Genome {
         }
         b.setLength(b.length()-1);
         try {
-            Genome rep = fromCodons(cs, im.language()).prune(im);
+            //Genome rep = fromCodons(cs, im.language()).prune(im);
+            Genome rep = fromCodons(cs, im.language());
             LOG.info("done replicate");
             return rep;
         }

@@ -10,6 +10,9 @@ public class Language {
     private final String _name;
     private final Map<String,String[]> _lang;
     private final Map<String,String> _rev;
+    private boolean _deterministic;
+    private boolean _context;
+    private boolean _symmetric;
 
 
     public Language(String name) {
@@ -26,6 +29,18 @@ public class Language {
         _lang.put(key(word), phonemes);
         _rev.put(combine(phonemes), word);
         return this;
+    }
+
+    public boolean accept(Codon c) {
+        if(_deterministic && !c.deterministic()) return false;
+        if(!_context && c.usesContext()) return false;
+        if(_symmetric && !c.symmetric()) return false;
+
+        return true;
+    }
+
+    public String[] chains() {
+        return _rev.keySet().toArray(new String[0]);
     }
 
     public String[] phonemes(String word) {

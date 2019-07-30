@@ -16,9 +16,10 @@ run = { ca, args, api ->
     def iter = args['iter'] as Integer
     def file = args['file']
     int suf = 0
-    api.progress.maximum = Math.abs(end-start)
+    //api.progress.maximum = Math.abs(end-start)
+    api.progress.maximum = 100
     for(i=start;;i+=inc) {
-        api.progress.current = Math.abs(i-start)
+        api.progress.current = 100 * (Math.abs((i-start)/(end-start)))
         def vars = new Varmap().put(variable, i as String)
         def cur1 = ca.vars(vars.merge(ca.vars))
         def cur2 = cur1.mutate(cur1.rule.origin().create(cur1.rule.genome(), api.mutationFactor.withVars(cur1.vars)), ca.random)

@@ -3,6 +3,7 @@ package org.excelsi.nausicaa.ca;
 
 
 import java.util.Collections;
+import java.util.LinkedList;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ public class GenomeMutators extends Enloggened {
     public static GenomeMutator makeDeterministic() {
         return
             (cs,im,gf,m)->{
+                LOG.debug("running makeDeterministic mutate");
                 boolean hasUnd = false;
                 for(Codon c:cs) {
                     if(!c.deterministic()) {
@@ -25,7 +27,7 @@ public class GenomeMutators extends Enloggened {
                 if(hasUnd) {
                     int st = m.r().nextInt(cs.size());
                     int en = st==0?cs.size():st-1;
-                    for(int i=st;i!=en;) {
+                    for(int i=st;i!=en&&cs.size()>1;) {
                         if(!cs.get(i).deterministic()) {
                             cs.remove(i);
                             break;
@@ -44,6 +46,7 @@ public class GenomeMutators extends Enloggened {
     public static GenomeMutator jumble() {
         return
             (cs,im,gf,m)->{
+                LOG.debug("running jumble mutate");
                 Collections.shuffle(cs,m.r());
             };
     }
@@ -51,6 +54,7 @@ public class GenomeMutators extends Enloggened {
     public static GenomeMutator replace() {
         return
             (cs,im,gf,m)->{
+                LOG.debug("running replace mutate");
                 int idx = m.r().nextInt(cs.size());
                 cs.set(idx, gf.randomCodon(im, m.r()));
             };
@@ -59,6 +63,7 @@ public class GenomeMutators extends Enloggened {
     public static GenomeMutator swap() {
         return
             (cs,im,gf,m)->{
+                LOG.debug("running swap mutate");
                 if(cs.size()>1) {
                     int idx1 = m.r().nextInt(cs.size());
                     boolean d = m.r().nextBoolean();
@@ -74,6 +79,7 @@ public class GenomeMutators extends Enloggened {
     public static GenomeMutator insert() {
         return
             (cs,im,gf,m)->{
+                LOG.debug("running insert mutate");
                 int idx = m.r().nextInt(cs.size());
                 cs.add(idx, gf.randomCodon(im, m.r()));
             };
@@ -82,6 +88,7 @@ public class GenomeMutators extends Enloggened {
     public static GenomeMutator duplicate() {
         return
             (cs,im,gf,m)->{
+                LOG.debug("running duplicate mutate");
                 int idx = m.r().nextInt(cs.size());
                 cs.add(idx, cs.get(idx).copy());
             };
@@ -90,6 +97,7 @@ public class GenomeMutators extends Enloggened {
     public static GenomeMutator remove() {
         return
             (cs,im,gf,m)->{
+                LOG.debug("running remove mutate");
                 if(cs.size()>2) {
                     int idx = m.r().nextInt(cs.size());
                     cs.remove(idx);
@@ -100,8 +108,9 @@ public class GenomeMutators extends Enloggened {
     public static GenomeMutator decimate() {
         return
             (cs,im,gf,m)->{
+                LOG.debug("running decimate mutate");
                 boolean first = true;
-                while(cs.size()>1 && (first || m.r().nextInt(3)==0)) {
+                while(cs.size()>2 && (first || m.r().nextInt(3)==0)) {
                     int idx = m.r().nextInt(cs.size());
                     cs.remove(idx);
                     first = false;
@@ -112,6 +121,7 @@ public class GenomeMutators extends Enloggened {
     public static GenomeMutator repeat() {
         return
             (cs,im,gf,m)->{
+                LOG.debug("running repeat mutate");
                 int st = m.r().nextInt(cs.size());
                 int en = st+m.r().nextInt(cs.size()-st);
                 int o = en;
@@ -128,6 +138,7 @@ public class GenomeMutators extends Enloggened {
     public static GenomeMutator add() {
         return
             (cs,im,gf,m)->{
+                LOG.debug("running add mutate");
                 cs.add(gf.randomCodon(im, m.r()));
             };
     }
@@ -147,7 +158,8 @@ public class GenomeMutators extends Enloggened {
                     int en = st==0?cs.size():st-1;
                     for(int i=st;i!=en;) {
                         final Codon c = cs.get(i);
-                        if(c instanceof Unstable) {
+                        if(c instanceof Unstable
+                            && (! (c instanceof Codons.Chain) || m.intrabondMutations())) {
                             any = true;
                             Codon after = ((Unstable)c).destabilize(m.r());
                             LOG.debug("unstable before: "+c.code()+", after: "+after.code());
@@ -167,6 +179,58 @@ public class GenomeMutators extends Enloggened {
             };
     }
 
+    public static GenomeMutator bond() {
+        return
+            (cs,im,gf,m)->{
+                LOG.debug("running bond mutate");
+                LinkedList<Codon> ncs = new LinkedList<>();
+                int s = m.r().nextInt(cs.size());
+                int e = s+1+m.r().nextInt(cs.size()-s-1);
+                if(s>0) ncs.addAll(cs.subList(0,s));
+                LinkedList<Codon> ch = new LinkedList<>();
+                for(int i=s;i<=e;i++) {
+                    Codon ic = cs.get(i);
+                    if(ic instanceof Codons.Chain) {
+                        for(Codon child:((Codons.Chain)ic).childs()) {
+                            ch.add(child);
+                        }
+                    }
+                    else {
+                        ch.add(ic);
+                    }
+                }
+                ncs.add(new Codons.Chain(ch.toArray(new Codon[0])));
+                if(e<cs.size()-1) ncs.addAll(cs.subList(e+1,cs.size()));
+                LOG.debug("bond orig: "+cs);
+                LOG.debug("bond res:  "+ncs);
+                cs.clear();
+                cs.addAll(ncs);
+            };
+    }
+
+    public static GenomeMutator unbond() {
+        return
+            (cs,im,gf,m)->{
+                LOG.debug("running unbond mutate");
+                LinkedList<Codon> ncs = new LinkedList<>();
+                for(Codon c:cs) {
+                    if(c instanceof Codons.Chain) {
+                        if(m.r().nextInt(100)<20) {
+                            for(Codon ch:((Codons.Chain)c).childs()) {
+                                ncs.add(ch);
+                            }
+                        }
+                    }
+                    else {
+                        ncs.add(c);
+                    }
+                }
+                LOG.debug("unbond orig: "+cs);
+                LOG.debug("unbond res:  "+ncs);
+                cs.clear();
+                cs.addAll(ncs);
+            };
+    }
 
     private GenomeMutators() {
     }

@@ -86,28 +86,40 @@ public class Codons {
     public static final String LEAST = "wo";
     public static final String COORD = "kya";
     public static final String COORD_REL = "jya";
+    public static final String COORD_CIRC = "ryu";
+    public static final String COORD_CIRC_REL = "ryo";
     public static final String MANDELBROT = "nya";
     public static final String LIFE = "life";
 
 
     public static Codon codon(final String s, final Implicate im) {
-        if(Varmap.containsVar(s)) {
-            return new Placeholder(s);
-        }
-        Language lang = im.language();
-        if(lang==null) {
-            lang = Languages.universal();
-        }
-        String[] phon = lang.phonemes(s);
-        if(phon.length==1) {
-            return universalCodon(phon[0], im);
-        }
-        else {
+        if(s.indexOf('+')>0) {
+            String[] phon = s.split("\\+");
             Codon[] cs = new Codon[phon.length];
             for(int i=0;i<phon.length;i++) {
-                cs[i] = universalCodon(phon[i], im);
+                cs[i] = codon(phon[i], im);
             }
             return new Chain(cs);
+        }
+        else {
+            if(Varmap.containsVar(s)) {
+                return new Placeholder(s);
+            }
+            Language lang = im.language();
+            if(lang==null) {
+                lang = Languages.universal();
+            }
+            String[] phon = lang.phonemes(s);
+            if(phon.length==1) {
+                return universalCodon(phon[0], im);
+            }
+            else {
+                Codon[] cs = new Codon[phon.length];
+                for(int i=0;i<phon.length;i++) {
+                    cs[i] = universalCodon(phon[i], im);
+                }
+                return new Chain(cs);
+            }
         }
     }
 
@@ -275,6 +287,10 @@ public class Codons {
                     return new Coord(p);
                 case COORD_REL:
                     return new CoordRel(p);
+                //case COORD_CIRC:
+                    //return new CoordCirc(p);
+                //case COORD_CIRC_REL:
+                    //return new CoordCircRel(p);
                 case MANDELBROT:
                     return new Mandelbrot();
                 case LIFE:
@@ -3100,12 +3116,13 @@ public class Codons {
         }
     }
 
-    public static final class Chain implements Codon {
+    public static final class Chain implements Codon, Unstable {
         private final Codon[] _cs;
         private final boolean _usesPattern;
         private final boolean _usesTape;
         private final boolean _deterministic;
         private final boolean _usesContext;
+        private final boolean _unstable;
 
         public Chain(Codon... cs) {
             _cs = cs;
@@ -3113,6 +3130,7 @@ public class Codons {
             boolean ut = false;
             boolean det = true;
             boolean uctx = false;
+            boolean unst = false;
             for(Codon c:cs) {
                 if(c.usesPattern()) {
                     up = true;
@@ -3126,14 +3144,24 @@ public class Codons {
                 if(c.usesContext()) {
                     uctx = true;
                 }
+                if(c instanceof Unstable) {
+                    unst = true;
+                }
             }
             _usesPattern = up;
             _usesTape = ut;
             _deterministic = det;
             _usesContext = uctx;
+            _unstable = unst;
         }
 
-        @Override public Codon copy() { return new Chain(_cs); }
+        @Override public Codon copy() {
+            Codon[] cs = new Codon[_cs.length];
+            for(int i=0;i<_cs.length;i++) {
+                cs[i] = _cs[i].copy();
+            }
+            return new Chain(cs);
+        }
 
         @Override public String code() {
             StringBuilder b = new StringBuilder(12);
@@ -3167,6 +3195,39 @@ public class Codons {
             System.arraycopy(_cs, 0, cs, 0, _cs.length);
             cs[cs.length-1] = c;
             return new Codons.Chain(cs);
+        }
+
+        @Override public void tick() {
+            for(int i=0;i<_cs.length;i++) {
+                _cs[i].tick();
+            }
+        }
+
+        @Override public Codon destabilize(Random r) {
+            Codon[] cs = new Codon[_cs.length];
+            System.arraycopy(_cs, 0, cs, 0, cs.length);
+            if(_unstable) {
+                int st = r.nextInt(cs.length);
+                int en = st==0?cs.length:st-1;
+                for(int i=st;i!=en;) {
+                    final Codon c = cs[i];
+                    if(c instanceof Unstable) {
+                        //any = true;
+                        Codon after = ((Unstable)c).destabilize(r);
+                        LOG.debug("unstable before: "+c.code()+", after: "+after.code());
+                        cs[i] = after;
+                        if(!c.code().equals(after.code())) {
+                            //de = true;
+                            LOG.debug("found destabilize");
+                            break;
+                        }
+                    }
+                    if(++i==cs.length&&i!=en) {
+                        i=0;
+                    }
+                }
+            }
+            return new Chain(cs);
         }
 
         @Override public String toString() {

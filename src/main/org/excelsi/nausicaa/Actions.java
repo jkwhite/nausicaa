@@ -768,7 +768,7 @@ public class Actions {
         final JDialog d = new JDialog(v, "Mutation parameters");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(7,2));
+        JPanel top = new JPanel(new GridLayout(9,2));
 
         top.add(new JLabel("Alpha"));
         final JTextField alpha = new JTextField();
@@ -804,6 +804,16 @@ public class Actions {
         meta.setSelected("true".equals(config.getVariable("mutator_meta", "false")));
         top.add(meta);
 
+        top.add(new JLabel("Allow bond mutations"));
+        final JCheckBox bonding = new JCheckBox();
+        bonding.setSelected("true".equals(config.getVariable("mutator_bonding", "false")));
+        top.add(bonding);
+
+        top.add(new JLabel("Allow intrabond mutations"));
+        final JCheckBox intrabond = new JCheckBox();
+        intrabond.setSelected("true".equals(config.getVariable("mutator_intrabond", "false")));
+        top.add(intrabond);
+
         top.add(new JLabel("Never repeat"));
         final JCheckBox rp = new JCheckBox();
         rp.setSelected("true".equals(config.getVariable("mutator_neverrepeat", "false")));
@@ -823,6 +833,8 @@ public class Actions {
                 config.setVariable("mutator_transition", tf.getText());
                 config.setVariable("mutator_symmetry", ""+as.isSelected());
                 config.setVariable("mutator_meta", ""+meta.isSelected());
+                config.setVariable("mutator_bonding", ""+bonding.isSelected());
+                config.setVariable("mutator_intrabond", ""+intrabond.isSelected());
                 config.setVariable("mutator_neverrepeat", ""+rp.isSelected());
                 config.notify("mutator");
             }
@@ -2112,6 +2124,8 @@ public class Actions {
             .withVars(ca.getVars())
             .withArchetype(ca.getRule().archetype())
             .withTrace(trace)
+            .withBondMutations("true".equals(config.getVariable("mutator_bonding", "false")))
+            .withIntrabondMutations("true".equals(config.getVariable("mutator_intrabond", "false")))
             .withValidator((a)->{
                 return a.colors()<mc;
             });

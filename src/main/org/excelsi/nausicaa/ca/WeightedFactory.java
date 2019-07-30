@@ -5,17 +5,26 @@ import java.util.Random;
 
 
 public class WeightedFactory<E> {
-    private final Weight<E>[] _mutators;
-    private final int _sumWeight;
+    private Weight<E>[] _mutators;
+    private int _sumWeight;
 
 
     public WeightedFactory(Weight<E>... mutators) {
         _mutators = mutators;
-        int sum = 0;
-        for(Weight<E> w:_mutators) {
-            sum += w.weight();
-        }
-        _sumWeight = sum;
+        reweight();
+        //int sum = 0;
+        //for(Weight<E> w:_mutators) {
+            //sum += w.weight();
+        //}
+        //_sumWeight = sum;
+    }
+
+    public void add(Weight<E> m) {
+        Weight<E>[] ms = new Weight[_mutators.length+1];
+        System.arraycopy(_mutators, 0, ms, 0, _mutators.length);
+        ms[ms.length-1] = m;
+        _mutators = ms;
+        reweight();
     }
 
     public Weight<E>[] all() {
@@ -39,6 +48,14 @@ public class WeightedFactory<E> {
             return m;
         }
         throw new IllegalStateException("impossible weight range for "+_sumWeight);
+    }
+
+    private void reweight() {
+        int sum = 0;
+        for(Weight<E> w:_mutators) {
+            sum += w.weight();
+        }
+        _sumWeight = sum;
     }
 
     public static <E> Weight<E> weight(int weight, E m) {
