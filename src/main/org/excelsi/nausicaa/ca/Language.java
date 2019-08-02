@@ -10,9 +10,9 @@ public class Language {
     private final String _name;
     private final Map<String,String[]> _lang;
     private final Map<String,String> _rev;
-    private boolean _deterministic;
-    private boolean _context;
-    private boolean _symmetric;
+    private boolean _deterministic = true;
+    private boolean _nondeterministic = true;
+    private boolean _context = true;
 
 
     public Language(String name) {
@@ -31,10 +31,25 @@ public class Language {
         return this;
     }
 
+    public Language deterministic(boolean d) {
+        _deterministic = d;
+        return this;
+    }
+
+    public Language nondeterministic(boolean nd) {
+        _nondeterministic = nd;
+        return this;
+    }
+
+    public Language contextual(boolean c) {
+        _context = c;
+        return this;
+    }
+
     public boolean accept(Codon c) {
-        if(_deterministic && !c.deterministic()) return false;
+        if(!_deterministic && c.deterministic()) return false;
+        if(!_nondeterministic && !c.deterministic()) return false;
         if(!_context && c.usesContext()) return false;
-        if(_symmetric && !c.symmetric()) return false;
 
         return true;
     }
@@ -43,6 +58,7 @@ public class Language {
         return _rev.keySet().toArray(new String[0]);
     }
 
+    /*
     public String[] phonemes(String word) {
         String[] parts = parts(word);
         String[] ph = _lang.get(parts[0]);
@@ -92,16 +108,19 @@ public class Language {
         b.setLength(b.length()-1);
         return b.toString();
     }
+    */
 
     public String randomCodon(Archetype a, Random r) {
-        String[] cs = _lang.keySet().toArray(new String[0]);
+        //String[] cs = _lang.keySet().toArray(new String[0]);
+        //return cs[r.nextInt(cs.length)];
+        String[] cs = _rev.keySet().toArray(new String[0]);
         return cs[r.nextInt(cs.length)];
     }
 
-    public String[] words() {
-        String[] cs = _lang.keySet().toArray(new String[0]);
-        return cs;
-    }
+    //public String[] words() {
+        //String[] cs = _lang.keySet().toArray(new String[0]);
+        //return cs;
+    //}
 
     public Genome generate(final Archetype a, final Random r) {
         return new Genome(randomCodon(a, r)+" "

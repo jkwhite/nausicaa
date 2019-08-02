@@ -12,9 +12,11 @@ public class Languages {
     public static String[] catalog() {
         return new String[]{
             "Universal",
-            "Symmetric2d",
-            "Symmetric3d",
-            "Menagerie"
+            "Classic",
+            "Circular"
+            //"Symmetric2d",
+            //"Symmetric3d",
+            //"Menagerie"
         };
     }
 
@@ -22,6 +24,10 @@ public class Languages {
         switch(name) {
             case "Universal":
                 return universal();
+            case "Classic":
+                return classic();
+            case "Circular":
+                return circular();
             case "Symmetric2d":
                 return simpleSymmetry();
             case "Menagerie":
@@ -34,6 +40,20 @@ public class Languages {
 
     public static Language universal() {
         return new Universal();
+    }
+
+    public static Language classic() {
+        return new Language("Classic")
+            .nondeterministic(false)
+            .contextual(false);
+    }
+
+    public static Language circular() {
+        return new Language("Circular")
+            .nondeterministic(true)
+            .contextual(true)
+            .add("circle","kya0+kya0+mu2+kya1+kya1+mu2+mi2+ni")
+            ;
     }
 
     public static Language simpleSymmetry() {
@@ -130,6 +150,14 @@ public class Languages {
             super("Universal");
         }
 
+        @Override public boolean accept(Codon c) {
+            return true;
+        }
+
+        @Override public String[] chains() {
+            return new String[0];
+        }
+
         public String[] phonemes(String word) {
             return new String[]{word};
         }
@@ -144,7 +172,8 @@ public class Languages {
 
         public Genome generate(final Archetype a, final Random r) {
             GenomeFactory f = new GenomeFactory();
-            return f.generate(a, r);
+            //return f.generate(a, r);
+            return f.generate(new Implicate(a, new Datamap(), this), r);
         }
 
         public String randomCodon(Archetype a, Random r) {

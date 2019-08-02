@@ -10,9 +10,13 @@ import java.util.function.Predicate;
 import static org.excelsi.nausicaa.ca.WeightedFactory.Weight;
 import static org.excelsi.nausicaa.ca.WeightedFactory.weight;
 import static org.excelsi.nausicaa.ca.Codons.*;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 public class GenomeFactory {
+    private static final Logger LOG = LoggerFactory.getLogger(GenomeFactory.class);
+
     private static final WeightedFactory<Codon> buildFactory(final Implicate im) {
         final Archetype a = im.archetype();
         List<Weight<Codon>> cs = new ArrayList<>(Arrays.asList(
@@ -103,9 +107,15 @@ public class GenomeFactory {
             cs.add(weight(1,new Mandelbrot()));
         }
         for(Iterator<Weight<Codon>> it=cs.iterator();it.hasNext();) {
-            if(!it.next().e().supports(a.values())) {
+            final Weight<Codon> wc = it.next();
+            if(!wc.e().supports(a.values()) ||
+                ! im.language().accept(wc.e())) {
                 it.remove();
             }
+        }
+        for(String ch:im.language().chains()) {
+            LOG.info("adding chain '"+ch+"'");
+            cs.add(weight(1,Codons.codon(ch, im)));
         }
         return new WeightedFactory<Codon>(cs.toArray(new Weight[0]));
     }

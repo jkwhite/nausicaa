@@ -616,7 +616,8 @@ public final class ComputedPattern implements Pattern, Mutatable {
     @Deprecated
     public static RuleLogic random(final Archetype a, final Datamap d, final Random r) {
         GenomeFactory gf = new GenomeFactory();
-        return new MachineElf(new Machine(new Implicate(a, d, Languages.universal()), gf.generate(a, r)));
+        final Implicate im = new Implicate(a, d, Languages.universal());
+        return new MachineElf(new Machine(im, gf.generate(im, r)));
     }
 
     public static RuleLogic random(final Implicate i, final Random r) {

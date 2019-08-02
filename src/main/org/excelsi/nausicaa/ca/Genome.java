@@ -171,7 +171,8 @@ public final class Genome {
     private static Genome fromCodons(List<Codon> cs, Language lang) {
         StringBuilder b = new StringBuilder();
         for(Codon c:cs) {
-            b.append(lang.word(c.code()));
+            //b.append(lang.word(c.code()));
+            b.append(c.code());
             b.append(" ");
         }
         b.setLength(b.length()-1);

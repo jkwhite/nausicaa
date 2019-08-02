@@ -93,6 +93,7 @@ public class Codons {
 
 
     public static Codon codon(final String s, final Implicate im) {
+        LOG.info("parsing codon '"+s+"'");
         if(s.indexOf('+')>0) {
             String[] phon = s.split("\\+");
             Codon[] cs = new Codon[phon.length];
@@ -109,7 +110,8 @@ public class Codons {
             if(lang==null) {
                 lang = Languages.universal();
             }
-            String[] phon = lang.phonemes(s);
+            //String[] phon = lang.phonemes(s);
+            String[] phon = new String[]{s};
             if(phon.length==1) {
                 return universalCodon(phon[0], im);
             }
