@@ -60,6 +60,10 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         return new ComputedRule2d(pattern, _origin, _meta, null);
     }
 
+    public ComputedRule2d derive(Language lang) {
+        return new ComputedRule2d(_p, new ComputedRuleset(archetype(), lang), _meta, null);
+    }
+
     //@Override public ComputedRule2d derive(Pattern.Transform transform) {
         //return new ComputedRule2d(pattern().transform(transform), _origin, _meta!=null?_meta.derive(transform):null, getHyperrule());
     //}

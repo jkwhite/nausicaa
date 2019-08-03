@@ -44,12 +44,14 @@ public class Languages {
 
     public static Language classic() {
         return new Language("Classic")
+            .deterministic(true)
             .nondeterministic(false)
             .contextual(false);
     }
 
     public static Language circular() {
         return new Language("Circular")
+            .deterministic(true)
             .nondeterministic(true)
             .contextual(true)
             .add("circle","kya0+kya0+mu2+kya1+kya1+mu2+mi2+ni")

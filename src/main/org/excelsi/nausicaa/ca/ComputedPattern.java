@@ -36,7 +36,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         int csize = Math.max(5000, -11833*_a.size()+110000);
         _io = new IO(a.values());
         LOG.debug("deterministic machine: "+logic.isDeterministic());
-        if(ENABLE_CACHE && logic.isDeterministic()) {
+        if(ENABLE_CACHE && logic.isCacheable()) {
             if(a.isDiscrete()) {
                 if(a.sourceLength()<9) {
                     _cache = new ShortPCache(csize, size);
@@ -471,6 +471,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         }
         default void tick() { }
         default boolean isDeterministic() { return true; }
+        default boolean isCacheable() { return isDeterministic() && ! usesContext(); }
         default boolean usesSource() { return true; }
         default boolean usesContext() { return false; }
     }

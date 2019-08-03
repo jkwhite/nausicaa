@@ -31,10 +31,13 @@ public class NViewer extends JFrame implements UIActions {
     private Timeline _timeline;
     private JFrame _peditor;
     private JFrame _reditor;
+    private JFrame _leditor;
     private PaletteEditor _paletteEditor;
     private RuleEditor _ruleEditor;
+    private LangEditor _langEditor;
     private JMenuItem _pehack;
     private JMenuItem _rehack;
+    private JMenuItem _lehack;
     private Random _random;
 
 
@@ -1840,6 +1843,16 @@ public class NViewer extends JFrame implements UIActions {
         formed.setText("Show rule editor");
         window.add(formed);
 
+        final JMenuItem langed = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                toggleLangEditor();
+            }
+        });
+        _lehack = langed;
+        //langed.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, shortcut));
+        langed.setText("Show language editor");
+        window.add(langed);
+
         window.addSeparator();
 
         final JMenuItem conso = new JMenuItem(new AbstractAction() {
@@ -1964,6 +1977,55 @@ public class NViewer extends JFrame implements UIActions {
             });
         }
         _rehack.setText(_reditor!=null?"Hide rule editor":"Show rule editor");
+    }
+
+    private void toggleLangEditor() {
+        if(_leditor!=null) {
+            _langEditor.disconnect();
+            _langEditor = null;
+            _leditor.setVisible(false);
+            _leditor = null;
+        }
+        else {
+            _leditor = new JFrame("Language Editor");
+            _langEditor = new LangEditor(_leditor, this, _timeline,
+                Actions.createMutationFactor(getActiveCA(), _config, _random));
+            _leditor.getContentPane().add(_langEditor);
+            _leditor.pack();
+            Dimension dim = _leditor.getContentPane().getPreferredSize();
+            _leditor.setSize(16+dim.width, 24+dim.height);
+
+            int shortcut = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+            JMenuBar bar = new JMenuBar();
+            JMenu file = new JMenu("File");
+            AbstractAction close = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    _leditor.setVisible(false);
+                    _leditor = null;
+                }
+            };
+            JMenuItem cl = file.add(close);
+            cl.setText("Close");
+            cl.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));
+            bar.add(file);
+            _leditor.setJMenuBar(bar);
+
+            _leditor.setVisible(true);
+
+            _leditor.addWindowListener(new WindowAdapter() {
+                public void windowClosed(WindowEvent e) {
+                    _lehack.setText("Show language editor");
+                    _leditor = null;
+                    _langEditor.disconnect();
+                }
+
+                public void windowClosing(WindowEvent e) {
+                    _lehack.setText("Show language editor");
+                    _leditor = null;
+                }
+            });
+        }
+        _lehack.setText(_leditor!=null?"Hide language editor":"Show language editor");
     }
 
     /*

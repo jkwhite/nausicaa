@@ -2680,7 +2680,7 @@ public class Codons {
 
         @Override public boolean supports(Values v) { return true; }
 
-        @Override public boolean deterministic() { return false; }
+        @Override public boolean deterministic() { return true; }
 
         @Override public boolean usesContext() { return true; }
 
@@ -2729,7 +2729,7 @@ public class Codons {
 
         @Override public boolean supports(Values v) { return true; }
 
-        @Override public boolean deterministic() { return false; }
+        @Override public boolean deterministic() { return true; }
 
         @Override public boolean usesContext() { return true; }
 

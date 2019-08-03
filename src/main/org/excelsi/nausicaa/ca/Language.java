@@ -8,7 +8,7 @@ import com.google.gson.*;
 public class Language {
     public static final boolean FAIL = false;
     private final String _name;
-    private final Map<String,String[]> _lang;
+    private final Map<String,String> _lang;
     private final Map<String,String> _rev;
     private boolean _deterministic = true;
     private boolean _nondeterministic = true;
@@ -26,9 +26,17 @@ public class Language {
     }
 
     public Language add(String word, String... phonemes) {
-        _lang.put(key(word), phonemes);
+        _lang.put(key(word), combine(phonemes));
         _rev.put(combine(phonemes), word);
         return this;
+    }
+
+    public Map<String,String> dict() {
+        return _lang;
+    }
+
+    public boolean deterministic() {
+        return _deterministic;
     }
 
     public Language deterministic(boolean d) {
@@ -36,9 +44,17 @@ public class Language {
         return this;
     }
 
+    public boolean nondeterministic() {
+        return _nondeterministic;
+    }
+
     public Language nondeterministic(boolean nd) {
         _nondeterministic = nd;
         return this;
+    }
+
+    public boolean contextual() {
+        return _context;
     }
 
     public Language contextual(boolean c) {
@@ -133,16 +149,20 @@ public class Language {
     public JsonElement toJson() {
         JsonObject o = new JsonObject();
         o.addProperty("name", _name);
+        o.addProperty("deterministic", _deterministic);
+        o.addProperty("nondeterministic", _nondeterministic);
+        o.addProperty("context", _context);
         JsonObject dict = new JsonObject();
         o.add("dict", dict);
-        for(Map.Entry<String,String[]> e:_lang.entrySet()) {
-            dict.add(e.getKey(), Json.toArray(e.getValue()));
+        for(Map.Entry<String,String> e:_lang.entrySet()) {
+            dict.addProperty(e.getKey(), e.getValue());
         }
         return o;
     }
 
     private static String key(String word) {
-        return word.replaceAll("[0-9]+", "");
+        return word;
+        //return word.replaceAll("[0-9]+", "");
     }
 
     private static String[] parts(String word) {
@@ -161,9 +181,12 @@ public class Language {
         }
         else {
             Language lang = new Language(name);
+            lang._deterministic = Json.bool(o, "deterministic", true);
+            lang._nondeterministic = Json.bool(o, "nondeterministic", true);
+            lang._context = Json.bool(o, "context", true);
             JsonObject dict = (JsonObject) o.get("dict");
             for(Map.Entry<String,JsonElement> e:dict.entrySet()) {
-                lang.add(e.getKey(), Json.sarray(e.getValue()));
+                lang.add(e.getKey(), Json.string(e.getValue()));
             }
             return lang;
         }
