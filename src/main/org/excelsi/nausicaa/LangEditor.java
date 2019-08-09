@@ -3,10 +3,12 @@ package org.excelsi.nausicaa;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
 import java.util.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.*;
 import org.excelsi.nausicaa.ca.*;
+import com.google.gson.*;
 
 
 public class LangEditor extends JComponent implements TimelineListener {
@@ -48,6 +50,13 @@ public class LangEditor extends JComponent implements TimelineListener {
         BoxLayout bl = new BoxLayout(scr, BoxLayout.Y_AXIS);
         scr.setLayout(bl);
 
+        JPanel nam = new JPanel();
+        final JTextField name = new JTextField(40);
+        name.setText(_lang.name());
+        nam.add(new JLabel("Name"));
+        nam.add(name);
+        scr.add(nam);
+
         scr.add(new JLabel("Dictionary"));
 
         //final JTextField rule = new JTextField(50);
@@ -69,54 +78,80 @@ public class LangEditor extends JComponent implements TimelineListener {
         scr.add(ndet);
 
         final JCheckBox ctx = new JCheckBox("Contextual");
-        ctx.setSelected(_lang.context());
+        ctx.setSelected(_lang.contextual());
         scr.add(ctx);
 
-        //scr.add(new JLabel("Test Pattern"));
-        //final JTextArea pat = new JTextArea(3,80);
-        //scr.add(pat);
-        /*
-        JButton testp = new JButton(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                MutationFactor mf = Actions.createMutationFactor(current, _ui.getConfig(), new Random(), true);
-                String[] ptext = pat.getText().replace("\n", " ").split(" ");
-                Pattern p = ((ComputedRule2d)_rule.origin().create(rule.getText(), mf)).createPattern();
-                double[] ps = new double[ptext.length];
-                for(int i=0;i<ptext.length;i++) {
-                    ps[i] = Double.parseDouble(ptext[i]);
-                }
-                double next = p.next(0, ps, new Pattern.Ctx());
-                System.err.println("Next: "+next);
-            }
-        });
-        testp.setText("Test");
-        scr.add(testp);
-        */
-        dict.addKeyListener(new KeyAdapter() {
-            public void keyTyped(KeyEvent e) {
-                if(e.getModifiers()!=0) {
-                    return;
-                }
-                if(e.getKeyChar()=='\n') {
-                    _ui.doWait(new Runnable() {
-                        public void run() {
-                            updateCA(dict, det, ndet, ctx);
-                        }
-                    }, 1000);
-                }
-            }
-        });
+        final JCheckBox pos = new JCheckBox("Positioning");
+        pos.setSelected(_lang.positioning());
+        scr.add(pos);
+
         add(scr, BorderLayout.CENTER);
 
         JPanel bot = new JPanel();
-        JButton ne = new JButton("Ok");
+        JButton ne = new JButton("Update");
+        JButton exp = new JButton("Export ...");
+        JButton imp = new JButton("Import ...");
         //JButton de = new JButton("Cancel");
         bot.add(ne);
+        bot.add(exp);
+        bot.add(imp);
         add(bot, BorderLayout.SOUTH);
         ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                dispose();
-                updateCA(dict, det, ndet, ctx);
+                updateCA(name, dict, det, ndet, ctx, pos);
+            }
+        });
+        exp.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                final JFileChooser f = new JFileChooser(_ui.getConfig().getLangDir());
+                f.setDialogTitle("Export language");
+                f.setDialogType(f.SAVE_DIALOG);
+                f.setMultiSelectionEnabled(false);
+                int ret = f.showSaveDialog(_root);
+                if(ret==f.APPROVE_OPTION) {
+                    File lang = f.getSelectedFile();
+
+                    _ui.getConfig().setLangDir(lang.getParent());
+                    if(!lang.getName().endsWith(".lang")) {
+                        lang = new File(lang.toString()+".lang");
+                    }
+                    try(BufferedWriter w=new BufferedWriter(new FileWriter(lang))) {
+                        Gson gson = new GsonBuilder()
+                            .setPrettyPrinting()
+                            .create();
+                        gson.toJson(_lang.toJson(), w);
+                    }
+                    catch(IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+        imp.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent ev) {
+                final JFileChooser f = new JFileChooser(_ui.getConfig().getLangDir());
+                f.setDialogTitle("Import language");
+                f.setDialogType(f.OPEN_DIALOG);
+                f.setMultiSelectionEnabled(false);
+                int ret = f.showOpenDialog(_root);
+                if(ret==f.APPROVE_OPTION) {
+                    File lang = f.getSelectedFile();
+                    _ui.getConfig().setLangDir(lang.getParent());
+                    try(BufferedReader r=new BufferedReader(new FileReader(lang))) {
+                        JsonElement e = new JsonParser().parse(r);
+                        Language nlang = Language.fromJson(e);
+                        name.setText(nlang.name());
+                        dict.setText(buildText(nlang));
+                        det.setSelected(nlang.deterministic());
+                        ndet.setSelected(nlang.nondeterministic());
+                        ctx.setSelected(nlang.contextual());
+                        pos.setSelected(nlang.positioning());
+                        _lang = nlang;
+                    }
+                    catch(IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
             }
         });
 
@@ -127,15 +162,19 @@ public class LangEditor extends JComponent implements TimelineListener {
         }
     }
 
-    private void updateCA(JTextArea dict, JCheckBox det, JCheckBox ndet, JCheckBox ctx) {
-        final CA current = _ui.getActiveCA();
+    private void updateCA(JTextField name, JTextArea dict, JCheckBox det, JCheckBox ndet, JCheckBox ctx, JCheckBox pos) {
         String d = dict.getText();
-        Language nlang = parseLang(d, det.isSelected(), ndet.isSelected(), ctx.isSelected());
+        Language nlang = parseLang(name.getText(), d, det.isSelected(), ndet.isSelected(), ctx.isSelected(), pos.isSelected());
         //System.err.println("*** FACTOR: "+_f.transition());
         //_ui.setActiveCA(current.mutate(_rule.origin().create(g, _f), _ui.getActiveCA().getRandom()));
-        _ui.setActiveCA(current.mutate(((ComputedRule2d)_rule).derive(nlang), _ui.getActiveCA().getRandom()));
+        updateCA(nlang);
         dict.setText(d);
         dict.requestFocus();
+    }
+
+    private void updateCA(Language nlang) {
+        final CA current = _ui.getActiveCA();
+        _ui.setActiveCA(current.mutate(((ComputedRule2d)_rule).derive(nlang), _ui.getActiveCA().getRandom()));
     }
 
     private String buildText(Language lang) {
@@ -147,11 +186,18 @@ public class LangEditor extends JComponent implements TimelineListener {
         return dict.toString();
     }
 
-    private Language parseLang(String s, boolean det, boolean ndet, boolean ctx) {
-        Language lang = new Language("apwodkaw");
+    private Language parseLang(String name, String dict, boolean det, boolean ndet, boolean ctx, boolean pos) {
+        Language lang = new Language(name);
+        for(String ent:dict.split("\\n")) {
+            if(ent.trim().length()>0) {
+                String[] kv = ent.split(":");
+                lang.add(kv[0].trim(), kv[1].trim());
+            }
+        }
         lang.deterministic(det);
         lang.nondeterministic(ndet);
-        lang.context(ctx);
+        lang.contextual(ctx);
+        lang.positioning(pos);
         return lang;
     }
 }

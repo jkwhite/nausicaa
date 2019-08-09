@@ -31,6 +31,7 @@ public class Config {
     private final Map<String,Object> _variables = new HashMap<>();
     private final Map<String,Varmap> _funcArgs = new HashMap<>();
     private String _saveDir = System.getProperty("user.home");
+    private String _langDir = System.getProperty("user.home");
     private String _imgDir = System.getProperty("user.home");
     private String _genDir = System.getProperty("user.home");
 
@@ -204,6 +205,15 @@ public class Config {
         return _saveDir;
     }
 
+    public void setLangDir(String dir) {
+        _langDir = dir;
+        notify("langDir");
+    }
+
+    public String getLangDir() {
+        return _langDir;
+    }
+
     public void setImgDir(String dir) {
         _imgDir = dir;
         notify("imgDir");
@@ -303,6 +313,7 @@ public class Config {
         o.addProperty("initializerVariations", _weightVariations);
         o.addProperty("paramVariations", _paramVariations);
         o.addProperty("saveDir", _saveDir);
+        o.addProperty("langDir", _langDir);
         o.addProperty("imgDir", _imgDir);
         o.addProperty("genDir", _genDir);
         JsonObject vars = new JsonObject();
@@ -356,6 +367,7 @@ public class Config {
             c._initializerVariations = Json.bool(o, "initializerVariations", true);
             c._paramVariations = Json.bool(o, "paramVariations", true);
             c._saveDir = Json.string(o, "saveDir", c._saveDir);
+            c._langDir = Json.string(o, "langDir", c._langDir);
             c._imgDir = Json.string(o, "imgDir", c._imgDir);
             c._genDir = Json.string(o, "genDir", c._genDir);
             JsonElement evars = o.get("variables");

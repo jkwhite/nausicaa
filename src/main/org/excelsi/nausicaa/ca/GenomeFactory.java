@@ -110,6 +110,7 @@ public class GenomeFactory {
             final Weight<Codon> wc = it.next();
             if(!wc.e().supports(a.values()) ||
                 ! im.language().accept(wc.e())) {
+                //LOG.warn("LANG filtered out "+wc.e());
                 it.remove();
             }
         }

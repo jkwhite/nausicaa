@@ -13,6 +13,7 @@ public class Language {
     private boolean _deterministic = true;
     private boolean _nondeterministic = true;
     private boolean _context = true;
+    private boolean _positioning = true;
 
 
     public Language(String name) {
@@ -62,10 +63,20 @@ public class Language {
         return this;
     }
 
+    public boolean positioning() {
+        return _positioning;
+    }
+
+    public Language positioning(boolean p) {
+        _positioning = p;
+        return this;
+    }
+
     public boolean accept(Codon c) {
         if(!_deterministic && c.deterministic()) return false;
         if(!_nondeterministic && !c.deterministic()) return false;
         if(!_context && c.usesContext()) return false;
+        if(!_positioning && c.positioning()) return false;
 
         return true;
     }
@@ -126,12 +137,12 @@ public class Language {
     }
     */
 
-    public String randomCodon(Archetype a, Random r) {
+    //public String randomCodon(Archetype a, Random r) {
         //String[] cs = _lang.keySet().toArray(new String[0]);
         //return cs[r.nextInt(cs.length)];
-        String[] cs = _rev.keySet().toArray(new String[0]);
-        return cs[r.nextInt(cs.length)];
-    }
+        //String[] cs = _rev.keySet().toArray(new String[0]);
+        //return cs[r.nextInt(cs.length)];
+    //}
 
     //public String[] words() {
         //String[] cs = _lang.keySet().toArray(new String[0]);
@@ -139,12 +150,22 @@ public class Language {
     //}
 
     public Genome generate(final Archetype a, final Random r) {
-        return new Genome(randomCodon(a, r)+" "
-                +randomCodon(a, r)+" "
-                +randomCodon(a, r)+" "
-                +randomCodon(a, r)
-            );
+        GenomeFactory f = new GenomeFactory();
+        return f.generate(new Implicate(a, new Datamap(), this), r);
     }
+
+    public String randomCodon(Archetype a, Random r) {
+        GenomeFactory f = new GenomeFactory();
+        return f.randomCodon(new Implicate(a, new Datamap(), this), r).code();
+    }
+
+    //public Genome generate(final Archetype a, final Random r) {
+        //return new Genome(randomCodon(a, r)+" "
+                //+randomCodon(a, r)+" "
+                //+randomCodon(a, r)+" "
+                //+randomCodon(a, r)
+            //);
+    //}
 
     public JsonElement toJson() {
         JsonObject o = new JsonObject();
@@ -152,6 +173,7 @@ public class Language {
         o.addProperty("deterministic", _deterministic);
         o.addProperty("nondeterministic", _nondeterministic);
         o.addProperty("context", _context);
+        o.addProperty("positioning", _positioning);
         JsonObject dict = new JsonObject();
         o.add("dict", dict);
         for(Map.Entry<String,String> e:_lang.entrySet()) {
@@ -184,6 +206,7 @@ public class Language {
             lang._deterministic = Json.bool(o, "deterministic", true);
             lang._nondeterministic = Json.bool(o, "nondeterministic", true);
             lang._context = Json.bool(o, "context", true);
+            lang._positioning = Json.bool(o, "positioning", true);
             JsonObject dict = (JsonObject) o.get("dict");
             for(Map.Entry<String,JsonElement> e:dict.entrySet()) {
                 lang.add(e.getKey(), Json.string(e.getValue()));

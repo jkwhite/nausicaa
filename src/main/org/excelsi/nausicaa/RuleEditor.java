@@ -57,7 +57,7 @@ public class RuleEditor extends JComponent implements TimelineListener {
         scr.add(new JLabel("Genome"));
 
         //final JTextField rule = new JTextField(50);
-        final JTextArea rule = new JTextArea(5,80);
+        final JTextArea rule = new JTextArea(10,80);
         if(_rule instanceof Genomic) {
             rule.setText(((Genomic)_rule).prettyGenome());
         }

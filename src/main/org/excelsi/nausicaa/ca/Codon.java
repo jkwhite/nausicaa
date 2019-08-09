@@ -18,6 +18,7 @@ public interface Codon {
     default boolean reversible() { return true; }
     default boolean symmetric() { return true; }
     default boolean deterministic() { return true; }
+    default boolean positioning() { return false; }
     default String generate(Random r) {
         return code();
     }

@@ -6,6 +6,8 @@ import java.util.Arrays;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TDoubleIntHashMap;
 import gnu.trove.procedure.TIntIntProcedure;
+import gnu.trove.list.linked.TIntLinkedList;
+import gnu.trove.list.linked.TDoubleLinkedList;
 import gnu.trove.procedure.TDoubleIntProcedure;
 
 import org.slf4j.LoggerFactory;
@@ -93,7 +95,7 @@ public class Codons {
 
 
     public static Codon codon(final String s, final Implicate im) {
-        LOG.info("parsing codon '"+s+"'");
+        //LOG.info("parsing codon '"+s+"'");
         if(s.indexOf('+')>0) {
             String[] phon = s.split("\\+");
             Codon[] cs = new Codon[phon.length];
@@ -509,9 +511,11 @@ public class Codons {
 
     public static final class HistoTroveInt implements Codon {
         private final TIntIntHashMap _m;
+        private final TIntLinkedList _l;
 
         public HistoTroveInt() {
             _m = new TIntIntHashMap();
+            _l = new TIntLinkedList();
         }
 
         @Override public Codon copy() {
@@ -532,11 +536,22 @@ public class Codons {
 
         @Override public void op(int[] p, IntTape t, Pattern.Ctx c) {
             _m.clear();
+            _l.clear();
             for(int i=0;i<p.length;i++) {
-                _m.adjustOrPutValue(p[i], 1, 1);
+                final int v = _m.adjustOrPutValue(p[i], 1, 1);
+                if(v==1) {
+                    _l.add(p[i]);
+                }
             }
-            for(int i=0;i<p.length;i++) {
-                t.push(_m.get(p[i]));
+            _l.sort();
+            //for(int i=0;i<p.length;i++) {
+                //t.push(_m.get(p[i]));
+            //}
+            //LOG.info("LIST: "+_l);
+            for(int i=0;i<_l.size();i++) {
+                final int v = _m.get(_l.get(i));
+                //LOG.info("PUSHING: "+v);
+                t.push(v);
             }
         }
 
@@ -547,9 +562,11 @@ public class Codons {
 
     public static final class HistoTroveFloat implements Codon {
         private final TDoubleIntHashMap _m;
+        private final TDoubleLinkedList _l;
 
         public HistoTroveFloat() {
             _m = new TDoubleIntHashMap();
+            _l = new TDoubleLinkedList();
         }
 
         @Override public Codon copy() {
@@ -574,11 +591,19 @@ public class Codons {
 
         @Override public void op(double[] p, FloatTape t, Pattern.Ctx c) {
             _m.clear();
+            _l.clear();
             for(int i=0;i<p.length;i++) {
-                _m.adjustOrPutValue(p[i], 1, 1);
+                final int v = _m.adjustOrPutValue(p[i], 1, 1);
+                if(v==1) {
+                    _l.add(p[i]);
+                }
             }
-            for(int i=0;i<p.length;i++) {
-                t.push(_m.get(p[i]));
+            _l.sort();
+            //for(int i=0;i<p.length;i++) {
+            for(int i=0;i<_l.size();i++) {
+                final int v = _m.get(_l.get(i));
+                t.push(v);
+                //t.push(_m.get(p[i]));
             }
         }
     }
@@ -2602,7 +2627,7 @@ public class Codons {
         }
 
         @Override public boolean usesTape() { return true; }
-
+        @Override public boolean positioning() { return true; }
         @Override public boolean supports(Values v) { return true; }
 
         @Override public void op(int[] p, IntTape t, Pattern.Ctx c) {

@@ -117,6 +117,25 @@ public class Machine {
                     _ti.jump(0);
                 }
             }
+
+            /*
+300/0.21948378900708806:kya go+chi9 su kya0 o4 go ra ya ka no do go+do+do+ja+tsu+gi+za+ni+ta ra ki+mu9 ma ge
+200/0.2706857701305492:go ho jya2 ja a4 jya mo ka ku hi mo ka pa o4 yu
+200/0.8103341563073866:go kya1 a14 ho gi go pe su su ne ru e wa
+500/0.18948378900708806:kya go+chi9 su kya0 o4 go ra ya ka no do go+do+do+ja+tsu+gi+za+ni+ta ra ki+mu9 ma ge
+400/0.4706857701305492:go ho jya2 ja a4 jya mo ka ku hi mo ka pa o4 yu
+400/0.6103341563073866:go kya1 a14 ho gi go pe su su ne ru e wa
+200/0.2694837890070881:kya go+chi9 su kya0 o4 go ra ya ka no do go+do+do+ja+tsu+gi+za+ni+ta ra ki+mu9 ma ge
+80/0.1307085465522224:to pa+ta5 kya2 kya0 pa+ta5 su ki+ta9 ge a6.598080158233643 ro to sa o0 to ya ji gi
+200/0.1126351711549516:kya1 to gi go+do+do+ja+tsu+gi+za+ni+ta pe bo ne za za re jo mi6 sa ge chi ge chi mi ge a3.7314462661743164 ki+gi9 ku ro1 u jo za
+800/0.0694837890070881:kya go+chi9 su kya0 o4 go ra ya ka no do go+do+do+ja+tsu+gi+za+ni+ta ra ki+mu9 ma ge
+300/1.0:pa pa ji re pa+chi5 go+mu9 hi to to to u kya0 ni ni ji ka
+300/0.04589037605947676:go go+do+do+ja+tsu+gi+za+ni+ta mo na ri ki bi ja tsu jya go ga jya ra ki chi sa
+100/0.05:go e jya0 ni wa ne shi pa+chi5 jya ji re e gi kya1 ki+mu9
+200/0.4:ra ki+mi9 hu ro2 pe ro7 mi2 e go chi go+mi9 ya go+gi9
+200/0.7:go jo he ge sa
+*/
+            //89:wa ta na na go ge no kya1 kya0 wo hu hu ga ke gu kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni e kya0 ke tsu he ka ki re ko ko kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni do jya2 jya1 chi gi4 gi4 gu hu gi2 hu kya1 a24 a14 o4 no sa do re o6 mi mi jya2 kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni ru be ku kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni hu ta sa wa tsu kya1 ku wa u wo wa wo ya u o4 na kya1 ho kya1 pa hu ji u ku ta kya kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni no u kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni ta ge kya0+kya0+mu2+kya1+kya1+mu2+mi2+ni pa ru ku hu ma wo ku ku ku ta mo hi yu o4 ke ni u u tsu wa wa su re po ho ho go ki ge wa za i kya2 ni ku jya1 u ra ke to gu ma hi ko za go o3 o4 u ro8 kya2 bi e u ke kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni mi go ki su ge a14 pe o4 e nu su e bi kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni ku ke mi hu wo ri po re o4 be do bu ku sa kya a88.73789620399475 kya1 o0 mi do o5 e me hu o3 kya1 chi wo ho ta o2 u i gu su ru go wo po a26.38485622406006 ya tsu tsu bu gi o2 ke jya me ya ri tsu a23 de o0 bu
             if(_trace) System.err.println("Final Tape: "+_ti);
             int res = _ti.pop();
             //if(res<0) res=-res;

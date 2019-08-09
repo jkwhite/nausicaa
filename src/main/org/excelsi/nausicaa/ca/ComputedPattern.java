@@ -35,7 +35,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         // -11833
         int csize = Math.max(5000, -11833*_a.size()+110000);
         _io = new IO(a.values());
-        LOG.debug("deterministic machine: "+logic.isDeterministic());
+        LOG.debug("cacheable machine: "+logic.isCacheable());
         if(ENABLE_CACHE && logic.isCacheable()) {
             if(a.isDiscrete()) {
                 if(a.sourceLength()<9) {

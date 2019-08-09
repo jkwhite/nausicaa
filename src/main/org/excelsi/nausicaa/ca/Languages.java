@@ -13,8 +13,8 @@ public class Languages {
         return new String[]{
             "Universal",
             "Classic",
-            "Circular"
-            //"Symmetric2d",
+            "Circular",
+            "Symmetric2d"
             //"Symmetric3d",
             //"Menagerie"
         };

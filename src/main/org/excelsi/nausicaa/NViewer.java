@@ -1849,7 +1849,7 @@ public class NViewer extends JFrame implements UIActions {
             }
         });
         _lehack = langed;
-        //langed.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, shortcut));
+        langed.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, shortcut | InputEvent.SHIFT_DOWN_MASK));
         langed.setText("Show language editor");
         window.add(langed);
 
@@ -2002,6 +2002,7 @@ public class NViewer extends JFrame implements UIActions {
                 public void actionPerformed(ActionEvent e) {
                     _leditor.setVisible(false);
                     _leditor = null;
+                    _lehack.setText("Show language editor");
                 }
             };
             JMenuItem cl = file.add(close);
