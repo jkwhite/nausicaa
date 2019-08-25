@@ -1825,7 +1825,7 @@ public class Codons {
         }
     }
 
-    public static class Multiply extends Binary {
+    public static class Multiply extends Binary implements Transmutable {
         public Multiply() { super(MULTIPLY); }
         @Override public Codon copy() { return new Multiply(); }
         @Override public boolean supports(Values v) { return true; }
@@ -1835,9 +1835,12 @@ public class Codons {
         @Override double expr(double v1, double v2) {
             return v1*v2;
         }
+        @Override public Codon transmute(Implicate im, Random r) {
+            return new Divide();
+        }
     }
 
-    public static class Divide extends Binary {
+    public static class Divide extends Binary implements Transmutable {
         public Divide() { super(DIVIDE); }
         @Override public Codon copy() { return new Divide(); }
         @Override public boolean supports(Values v) { return true; }
@@ -1846,6 +1849,9 @@ public class Codons {
         }
         @Override double expr(double v1, double v2) {
             return v2==0?v1:v1/v2;
+        }
+        @Override public Codon transmute(Implicate im, Random r) {
+            return new Divide();
         }
     }
 
@@ -1874,7 +1880,7 @@ public class Codons {
         }
     }
 
-    public static class Sqrt implements Codon {
+    public static class Sqrt implements Codon, Transmutable {
         @Override public Codon copy() { return new Sqrt(); }
 
         @Override public String code() {
@@ -1898,9 +1904,12 @@ public class Codons {
             double v = (double) Math.sqrt(Math.abs(t.pop()));
             t.push(v);
         }
+        @Override public Codon transmute(Implicate im, Random r) {
+            return new Cbrt();
+        }
     }
 
-    public static class Cbrt implements Codon {
+    public static class Cbrt implements Codon, Transmutable {
         @Override public Codon copy() { return new Cbrt(); }
 
         @Override public String code() {
@@ -1923,6 +1932,9 @@ public class Codons {
         @Override public void op(double[] p, FloatTape t, Pattern.Ctx c) {
             double v = (double) Math.cbrt(t.pop());
             t.push(v);
+        }
+        @Override public Codon transmute(Implicate im, Random r) {
+            return new Sqrt();
         }
     }
 
@@ -2227,11 +2239,13 @@ public class Codons {
             return v1^v2;
         }
         @Override double expr(double v1, double v2) {
-            return v1;
+            //return v1;
+            return Double.longBitsToDouble(
+                Double.doubleToLongBits(v1) ^ Double.doubleToLongBits(v2));
         }
     }
 
-    public static class GreaterThan extends Binary {
+    public static class GreaterThan extends Binary implements Transmutable {
         public GreaterThan() { super(GT); }
         @Override public Codon copy() { return new GreaterThan(); }
         @Override public boolean supports(Values v) { return true; }
@@ -2241,9 +2255,12 @@ public class Codons {
         @Override double expr(double v1, double v2) {
             return v1>v2?1:0;
         }
+        @Override public Codon transmute(Implicate im, Random r) {
+            return new LessThan();
+        }
     }
 
-    public static class LessThan extends Binary {
+    public static class LessThan extends Binary implements Transmutable {
         public LessThan() { super(LT); }
         @Override public Codon copy() { return new LessThan(); }
         @Override public boolean supports(Values v) { return true; }
@@ -2252,6 +2269,9 @@ public class Codons {
         }
         @Override double expr(double v1, double v2) {
             return v1<v2?1:0;
+        }
+        @Override public Codon transmute(Implicate im, Random r) {
+            return new GreaterThan();
         }
     }
 
@@ -2533,7 +2553,7 @@ public class Codons {
         }
     }
 
-    public static class Sigmoid implements Codon {
+    public static class Sigmoid implements Codon, Transmutable {
         @Override public Codon copy() { return new Sigmoid(); }
 
         @Override public String code() {
@@ -2555,9 +2575,21 @@ public class Codons {
             double v = 1d/(1d+(double)Math.exp(-t.pop()));
             t.push(v);
         }
+
+        @Override public Codon transmute(Implicate im, Random r) {
+            switch(r.nextInt(3)) {
+                case 0:
+                    return new Sin();
+                case 1:
+                    return new Cos();
+                case 2:
+                default:
+                    return new Tanh();
+            }
+        }
     }
 
-    public static class Tanh implements Codon {
+    public static class Tanh implements Codon, Transmutable {
         @Override public Codon copy() { return new Tanh(); }
 
         @Override public String code() {
@@ -2578,6 +2610,18 @@ public class Codons {
         @Override public void op(double[] p, FloatTape t, Pattern.Ctx c) {
             double v = (double) Math.tanh(t.pop());
             t.push(v);
+        }
+
+        @Override public Codon transmute(Implicate im, Random r) {
+            switch(r.nextInt(3)) {
+                case 0:
+                    return new Sin();
+                case 1:
+                    return new Cos();
+                case 2:
+                default:
+                    return new Sigmoid();
+            }
         }
     }
 
@@ -2687,7 +2731,7 @@ public class Codons {
         }
     }
 
-    public static class Coord implements Codon, Unstable {
+    public static class Coord implements Codon, Unstable, Transmutable {
         private final int _c;
 
 
@@ -2734,9 +2778,13 @@ public class Codons {
         @Override public Codon destabilize(Random r) {
             return new Coord(r.nextInt(4)-1);
         }
+
+        @Override public Codon transmute(Implicate im, Random r) {
+            return new CoordRel(_c);
+        }
     }
 
-    public static class CoordRel implements Codon, Unstable {
+    public static class CoordRel implements Codon, Unstable, Transmutable {
         private final int _c;
 
 
@@ -2784,6 +2832,10 @@ public class Codons {
 
         @Override public Codon destabilize(Random r) {
             return new CoordRel(r.nextInt(4)-1);
+        }
+
+        @Override public Codon transmute(Implicate im, Random r) {
+            return new Coord(_c);
         }
     }
 
@@ -2946,7 +2998,7 @@ public class Codons {
         }
     }
 
-    public static class Cos implements Codon {
+    public static class Cos implements Codon, Transmutable {
         @Override public Codon copy() { return new Cos(); }
 
         @Override public String code() {
@@ -2966,6 +3018,18 @@ public class Codons {
 
         @Override public void op(double[] p, FloatTape t, Pattern.Ctx ctx) {
             t.push((double)Math.cos(t.pop()));
+        }
+
+        @Override public Codon transmute(Implicate im, Random r) {
+            switch(r.nextInt(3)) {
+                case 0:
+                    return new Sin();
+                case 1:
+                    return new Sigmoid();
+                case 2:
+                default:
+                    return new Tanh();
+            }
         }
     }
 
@@ -2993,7 +3057,7 @@ public class Codons {
         }
     }
 
-    public static class Sin implements Codon {
+    public static class Sin implements Codon, Transmutable {
         @Override public Codon copy() { return new Sin(); }
 
         @Override public String code() {
@@ -3013,6 +3077,18 @@ public class Codons {
 
         @Override public void op(double[] p, FloatTape t, Pattern.Ctx ctx) {
             t.push((double)Math.sin(t.pop()));
+        }
+
+        @Override public Codon transmute(Implicate im, Random r) {
+            switch(r.nextInt(3)) {
+                case 0:
+                    return new Cos();
+                case 1:
+                    return new Sigmoid();
+                case 2:
+                default:
+                    return new Tanh();
+            }
         }
     }
 

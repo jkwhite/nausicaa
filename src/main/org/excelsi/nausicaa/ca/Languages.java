@@ -55,6 +55,9 @@ public class Languages {
             .nondeterministic(true)
             .contextual(true)
             .add("circle","kya0+kya0+mu2+kya1+kya1+mu2+mi2+ni")
+            .add("blitx","jya0+a200+mu2+re+a5+mu2")
+            .add("blity","jya1+a200+mu2+re+a5+mu2")
+            .add("blitxy","jya0+a200+mu2+re+a5+mu2+jya1+a200+mu2+re+a5+mu2+mi3")
             ;
     }
 

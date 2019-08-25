@@ -80,7 +80,7 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
             _samples = 1;
             _idx = 0;
             //System.err.println("t0 for transition "+_trans);
-            LOG.debug("t0 for transition "+_trans);
+            //LOG.debug("t0 for transition "+_trans);
             //_idx = OFFSETS[t%OFFSETS.length];
             //_idx = R.nextInt(OFFSETS.length);
         }
@@ -203,7 +203,7 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                 final SEntry s = _s.get(_i); 
                 //System.err.println("switched to pattern "+_i+": "+s.p);
                 //LOG.debug("switched to pattern "+_i+": "+s.p);
-                LOG.debug("switched to pattern "+_i);
+                LOG.trace("switched to pattern "+_i);
                 _t = s.t;
                 return 0;
             }

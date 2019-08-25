@@ -75,39 +75,44 @@ public class MultiTransform implements Transform {
     private CA runTransform(CA c) throws MutationFailedException {
         //System.err.println("multi: hv: "+_hueVariations+", wv: "+_weightVariations);
         Transform t = null;
-        int tries = 0;
-        do {
-            switch(_rand.nextInt(7)) {
-                case 8:
-                    if(_weightVariations) {
-                        t = new UpdateWeightTransform(_rand);
-                        break;
-                    }
-                case 5:
-                    if(_initializerVariations) {
-                        if(c.getInitializer().supportsMutation()) {
-                            t = new InitializerTransform(_rand, _factor);
+        if(_factor.genomeMutator()!=null) {
+            t = new RuleTransform(_rand, createMutator(c), _factor);
+        }
+        else {
+            int tries = 0;
+            do {
+                switch(_rand.nextInt(7)) {
+                    case 8:
+                        if(_weightVariations) {
+                            t = new UpdateWeightTransform(_rand);
+                            break;
                         }
-                    }
-                    break;
-                case 3:
-                    if(_paramVariations) {
-                        t = new ParameterTransform(_rand, _factor);
+                    case 5:
+                        if(_initializerVariations) {
+                            if(c.getInitializer().supportsMutation()) {
+                                t = new InitializerTransform(_rand, _factor);
+                            }
+                        }
                         break;
-                    }
-                case 1:
-                    if(_hueVariations) {
-                        t = new HueTransform(_rand);
+                    case 3:
+                        if(_paramVariations) {
+                            t = new ParameterTransform(_rand, _factor);
+                            break;
+                        }
+                    case 1:
+                        if(_hueVariations) {
+                            t = new HueTransform(_rand);
+                            break;
+                        }
+                    default:
+                    case 0:
+                        if(_ruleVariations||_weightVariations) {
+                            t = new RuleTransform(_rand, createMutator(c), _factor);
+                        }
                         break;
-                    }
-                default:
-                case 0:
-                    if(_ruleVariations||_weightVariations) {
-                        t = new RuleTransform(_rand, createMutator(c), _factor);
-                    }
-                    break;
-            }
-        } while(++tries<10 && t==null);
+                }
+            } while(++tries<10 && t==null);
+        }
         if(t!=null) {
             LOG.info("transforming with "+t.name());
             return t.transform(c);

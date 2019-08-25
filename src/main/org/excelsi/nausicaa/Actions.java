@@ -594,7 +594,7 @@ public class Actions {
         };
         JMenuItem cl = file.add(close);
         cl.setText("Close");
-        cl.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, shortcut));
+        cl.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));
         bar.add(file);
         i.setJMenuBar(bar);
         i.pack();
@@ -839,7 +839,13 @@ public class Actions {
                 config.notify("mutator");
             }
         });
+        de.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+            }
+        });
         bot.add(ne);
+        bot.add(de);
 
         p.add(bot, BorderLayout.SOUTH);
         d.getContentPane().add(p);
@@ -1954,7 +1960,9 @@ public class Actions {
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
         JButton ne = new JButton("Ok");
-        JButton de = new JButton("Reset");
+        JButton de = new JButton("Cancel");
+        JButton dbl = new JButton("x2");
+        JButton half = new JButton("/2");
         d.getRootPane().setDefaultButton(ne);
         ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -1962,7 +1970,35 @@ public class Actions {
                 config.setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(depth.getText()), Integer.parseInt(prelude.getText()), Float.parseFloat(updateWeight.getText()));
             }
         });
+        de.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+            }
+        });
+        dbl.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                width.setText((Integer.parseInt(width.getText())*2)+"");
+                height.setText((Integer.parseInt(height.getText())*2)+"");
+                int dep = Integer.parseInt(depth.getText());
+                if(dep>1) {
+                    depth.setText((dep*2)+"");
+                }
+            }
+        });
+        half.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                width.setText((Integer.parseInt(width.getText())/2)+"");
+                height.setText((Integer.parseInt(height.getText())/2)+"");
+                int dep = Integer.parseInt(depth.getText());
+                if(dep>1) {
+                    depth.setText((dep/2)+"");
+                }
+            }
+        });
         bot.add(ne);
+        bot.add(de);
+        bot.add(dbl);
+        bot.add(half);
         p.add(bot, BorderLayout.SOUTH);
         d.getContentPane().add(p);
         Dimension dim = p.getPreferredSize();

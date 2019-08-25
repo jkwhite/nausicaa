@@ -175,7 +175,7 @@ top:        while(_state==State.animate) {
                 }
                 p = d.getPlane();
             }
-            _log.debug("animating with plane impl "+p+" ("+p.getClass().getName()+")");
+            //_log.debug("animating with plane impl "+p+" ("+p.getClass().getName()+")");
             _parallel = parallel;
             _frames = d.compileRule().frameIterator(p, pool,
                 new GOptions(true, _parallel, 0, weight)

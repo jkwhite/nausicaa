@@ -45,7 +45,7 @@ public final class Genome {
     public Codon[] codons(Implicate i, boolean resolveParams) {
         final List<Codon> ops = new ArrayList<>();
         final String sep = _v==1?"-":" ";
-        LOG.debug("resolveParams="+resolveParams);
+        //LOG.debug("resolveParams="+resolveParams);
         for(final String op:(resolveParams?replaceParams(_c, i):_c).split(sep)) {
             ops.add(Codons.codon(op, i));
         }
@@ -70,18 +70,19 @@ public final class Genome {
 
     public Genome mutate(final Implicate im, final GenomeFactory gf, final MutationFactor m) {
         final WeightedFactory<GenomeMutator> mf = new WeightedFactory<>(
-            new Weight<>(5,  GenomeMutators.jumble()),
+            new Weight<>(3,  GenomeMutators.jumble()),
             new Weight<>(20, GenomeMutators.replace()),
             new Weight<>(30, GenomeMutators.swap()),
-            new Weight<>(40, GenomeMutators.insert()),
-            new Weight<>(20, GenomeMutators.duplicate()),
+            new Weight<>(35, GenomeMutators.insert()),
+            new Weight<>(15, GenomeMutators.duplicate()),
             new Weight<>(20, GenomeMutators.remove()),
             new Weight<>(10, GenomeMutators.decimate()),
             new Weight<>(5,  GenomeMutators.repeat()),
             //new Weight<>(10, GenomeMutators.symmetry()),
-            new Weight<>(40, GenomeMutators.add()),
+            new Weight<>(30, GenomeMutators.add()),
             new Weight<>(30, GenomeMutators.adjust()),
-            new Weight<>(20, GenomeMutators.makeDeterministic())
+            new Weight<>(20, GenomeMutators.transmute()),
+            new Weight<>(5, GenomeMutators.makeDeterministic())
         );
         if(m.bondMutations()) {
             mf.add(new Weight<GenomeMutator>(5, GenomeMutators.bond()));
@@ -121,6 +122,7 @@ public final class Genome {
         float mult = mf.alpha()/20f;
         int max = Math.max(1, (int) (mult*(1+mf.random().nextInt(Math.max(1,cs.size()/6)))));
         //System.err.println("applying "+max+" mutators");
+        if(mf.genomeMutator()!=null) max = 1;
         LOG.info("applying "+max+" mutators (alpha="+mf.alpha()+", mult="+mult+", size="+cs.size()+")");
         for(int i=0;i<max;i++) {
             final GenomeMutator m = mf.genomeMutator()!=null?mf.genomeMutator():mutators.random(mf.random());

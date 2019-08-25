@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.Predicate;
 import org.imgscalr.Scalr;
 
 
@@ -25,6 +26,10 @@ public class Pipeline {
 
     public static <T> Function<T,PipelineContext> context(String name, String id, Supplier<Long> identifier) {
         return (t)->new PipelineContext().with(name, t).with(id, identifier.get());
+    }
+
+    public static Predicate<PipelineContext> filterIdentifier(String i, long v) {
+        return (c)->c.<Long>get(i)==v;
     }
 
     public static Function<Plane,Plane> scalePlane(float scale) {

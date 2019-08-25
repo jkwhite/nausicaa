@@ -179,6 +179,42 @@ public class GenomeMutators extends Enloggened {
             };
     }
 
+    public static GenomeMutator transmute() {
+        return
+            (cs,im,gf,m)->{
+                boolean any = true;
+                boolean de = false;
+                int tries = 0;
+                LOG.debug("running transmute mutate");
+                while(++tries<100 && any && !de) {
+                    //System.err.print("#");
+                    //if(tries%10==0) System.err.println();
+                    any = false;
+                    int st = m.r().nextInt(cs.size());
+                    int en = st==0?cs.size():st-1;
+                    for(int i=st;i!=en;) {
+                        final Codon c = cs.get(i);
+                        if(c instanceof Transmutable
+                            && (! (c instanceof Codons.Chain) || m.intrabondMutations())) {
+                            any = true;
+                            Codon after = ((Transmutable)c).transmute(im,m.r());
+                            LOG.debug("transmutable before: "+c.code()+", after: "+after.code());
+                            cs.set(i, after);
+                            if(!c.code().equals(after.code())) {
+                                de = true;
+                                LOG.debug("found transmute");
+                                break;
+                            }
+                        }
+                        if(++i==cs.size()&&i!=en) {
+                            i=0;
+                        }
+                    }
+                }
+                LOG.debug("done transmute mutate");
+            };
+    }
+
     public static GenomeMutator bond() {
         return
             (cs,im,gf,m)->{
