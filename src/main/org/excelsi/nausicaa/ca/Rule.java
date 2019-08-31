@@ -10,6 +10,12 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 
+// ca image
+// sequence index
+// sequence time
+// start frame
+// start from mutation stage
+
 public interface Rule extends java.io.Serializable, Humanizable, Parameterized {
     Archetype archetype();
     Ruleset origin();

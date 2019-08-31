@@ -30,9 +30,9 @@ public interface Variables {
     public static Variables cascade(Variables... vars) {
         return new Variables() {
             @Override public Double weight() {
-                for(Variables v:vars) {
-                    if(v.weight()!=null) {
-                        return v.weight();
+                for(int i=0;i<vars.length;i++) {
+                    if(vars[i].weight()!=null) {
+                        return vars[i].weight();
                     }
                 }
                 return 1d;

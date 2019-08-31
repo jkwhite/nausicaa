@@ -79,7 +79,7 @@ public class GenomeParser {
                 for(Codon c:cs) {
                     tr.append(c.code()).append(" ");
                 }
-                s.s(seq.c, seq.weight, new ComputedPattern(_a,
+                s.s(seq.c, seq.weight[0], seq.weight[1], new ComputedPattern(_a,
                     new ComputedPattern.MachineElf(new Machine(new Implicate(_a, dm, universal), new Genome(tr.toString().trim().replace('+',' '), 2), _mf.trace()))));
             }
             else {
@@ -147,7 +147,7 @@ public class GenomeParser {
             final String gr = gs[i].trim();
             //String g = gr.trim();
             int c = 100;
-            Double w = null;
+            Double[] w = null;
             String n = null;
             if(gr.indexOf(':')>=0) {
                 String[] cg = gr.split(":");
@@ -157,7 +157,8 @@ public class GenomeParser {
                     int splk = pref.indexOf('/');
                     if(splk>0) {
                         c = Integer.parseInt(pref.substring(0, splk));
-                        w = Double.parseDouble(pref.substring(splk+1));
+                        //w = Double.parseDouble(pref.substring(splk+1));
+                        w = parseWeight(pref.substring(splk+1));
                         //System.err.println("C: "+c+", W: "+w);
                     }
                     else {
@@ -175,6 +176,19 @@ public class GenomeParser {
             }
         }
         return new Pair(ps,dm);
+    }
+
+    private static Double[] parseWeight(String w) {
+        Double[] ws = new Double[2];
+        if(w.indexOf(';')>=0) {
+            String[] wd = w.split(";");
+            ws[0] = Double.parseDouble(wd[0]);
+            ws[1] = Double.parseDouble(wd[1]);
+        }
+        else {
+            ws[0] = Double.parseDouble(w);
+        }
+        return ws;
     }
 
     private static String[] parseParams(String g) {
@@ -210,7 +224,7 @@ public class GenomeParser {
         SequencePattern.Sequence s = new SequencePattern.Sequence();
         for(S seq:ps) {
             if(seq.n==null) {
-                s.s(seq.c, seq.weight, new ComputedPattern(_a,
+                s.s(seq.c, seq.weight[0], seq.weight[1], new ComputedPattern(_a,
                     new ComputedPattern.MachineElf(
                         new Machine(
                             new Implicate(_a, dm, _lang, _mf!=null?_mf.vars():new Varmap()),
@@ -269,12 +283,12 @@ public class GenomeParser {
 
     private static class S {
         public final int c;
-        public final Double weight;
+        public final Double[] weight;
         public final String n;
         public final String g;
         public final String[] params;
 
-        public S(int c, Double w, String n, String g, String[] params) {
+        public S(int c, Double[] w, String n, String g, String[] params) {
             this.c = c;
             this.weight = w;
             this.n = n;
@@ -283,7 +297,7 @@ public class GenomeParser {
         }
 
         @Override public String toString() {
-            return "{c:"+c+"weight:"+weight+", n:"+n+", g:"+g+"}";
+            return "{c:"+c+"weight:"+Arrays.toString(weight)+", n:"+n+", g:"+g+"}";
         }
     };
 }

@@ -165,8 +165,8 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
         public Sequence() {
         }
 
-        public Sequence s(int t, Double weight, ComputedPattern p) {
-            _s.add(new SEntry(t, weight, p));
+        public Sequence s(int t, Double weight, Double decay, ComputedPattern p) {
+            _s.add(new SEntry(t, weight, decay, p));
             _t = _s.get(0).t;
             _i = 0;
             return this;
@@ -181,12 +181,16 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
             return _s.get(_i).p;
         }
 
+        public SEntry sentry() {
+            return _s.get(_i);
+        }
+
         public ComputedPattern next() {
             return _s.get((_i+1)%_s.size()).p;
         }
 
         public Double weight() {
-            return _s.get(_i).weight;
+            return _s.get(_i).weight();
         }
 
         public int peek() {
@@ -194,7 +198,8 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
         }
 
         public int tick() {
-            pattern().tick();
+            //pattern().tick();
+            sentry().tick();
             if(--_t==0) {
                 ++_i;
                 if(_i==_s.size()) {
@@ -205,6 +210,7 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                 //LOG.debug("switched to pattern "+_i+": "+s.p);
                 LOG.trace("switched to pattern "+_i);
                 _t = s.t;
+                s.reset();
                 return 0;
             }
             return _t;
@@ -237,7 +243,7 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
             }
             List<SEntry> ns = new ArrayList<>();
             for(SEntry s:_s) {
-                ns.add(new SEntry(s.t, s.weight, (ComputedPattern)s.p.copy(dm)));
+                ns.add(new SEntry(s.t, s.weight, s.decay, (ComputedPattern)s.p.copy(dm)));
             }
             return new Sequence(ns, nd);
         }
@@ -261,6 +267,7 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                         final SEntry s = _s.get(i);
                         ComputedPattern np;
                         Double nw = s.weight;
+                        Double ndec = s.decay;
                         if(m.stage()==-1 || i==m.stage()) {
                             //System.err.println("MUTATING "+i);
                             boolean typ = false;
@@ -278,31 +285,36 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                                 if(nw==null) {
                                     nw = m.random().nextDouble();
                                 }
+                                if(ndec==null) {
+                                    ndec = m.random().nextDouble();
+                                }
                                 nw = UpdateWeightTransform.mutateWeight(nw, m.random());
+                                ndec = UpdateWeightTransform.mutateDecay(ndec, m.random(), nw);
                             }
                             else {
                                 np = (ComputedPattern)s.p.mutate(m);
                                 nw = s.weight;
+                                ndec = s.decay;
                             }
                         }
                         else {
                             //System.err.println("COPYING "+i);
                             np = (ComputedPattern)s.p.copy(dm);
                         }
-                        ns.add(new SEntry(s.t, nw, np));
+                        ns.add(new SEntry(s.t, nw, ndec, np));
                     }
                     break;
                 case "add":
                     final Archetype a = _s.get(0).p.archetype();
                     for(SEntry s:_s) {
-                        ns.add(new SEntry(s.t, s.weight, (ComputedPattern)s.p.copy(dm)));
+                        ns.add(new SEntry(s.t, s.weight, s.decay, (ComputedPattern)s.p.copy(dm)));
                     }
-                    ns.add(new SEntry(m.random().nextInt(70)+70, 1d, new ComputedPattern(a, ComputedPattern.random(a, dm, m.random()))));
+                    ns.add(new SEntry(m.random().nextInt(70)+70, 1d, null, new ComputedPattern(a, ComputedPattern.random(a, dm, m.random()))));
                     break;
                 case "add_data":
                     final Archetype ar = _s.get(0).p.archetype();
                     for(SEntry s:_s) {
-                        ns.add(new SEntry(s.t, s.weight, (ComputedPattern)s.p.copy(dm)));
+                        ns.add(new SEntry(s.t, s.weight, s.decay, (ComputedPattern)s.p.copy(dm)));
                     }
                     final String nm = Datamap.randomName(m.random());
                     final Index idx = new IndexGenerator().build(ar, m.random(), nm);
@@ -313,7 +325,7 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                     for(int i=0;i<_s.size();i++) {
                         if(i!=m.stage()) {
                             Archetype a2 = _s.get(i).p.archetype();
-                            ns.add(new SEntry(m.random().nextInt(70)+70, _s.get(i).weight, (ComputedPattern)_s.get(i).p.copy(dm)));
+                            ns.add(new SEntry(m.random().nextInt(70)+70, _s.get(i).weight, _s.get(i).decay, (ComputedPattern)_s.get(i).p.copy(dm)));
                         }
                     }
                     break;
@@ -340,6 +352,9 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                 b.append(s.t);
                 if(s.weight!=null) {
                     b.append("/").append(s.weight);
+                }
+                if(s.decay!=null) {
+                    b.append(";").append(s.decay);
                 }
                 b.append(":");
                 b.append(s.p.toString()).append(",");
@@ -369,6 +384,9 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                 if(s.weight!=null) {
                     b.append("/").append(s.weight);
                 }
+                if(s.decay!=null) {
+                    b.append(";").append(s.decay);
+                }
                 b.append(":");
                 b.append(s.p.toString()).append(",");
             }
@@ -379,13 +397,35 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
 
     private static class SEntry {
         public final int t;
-        public final Double weight;
+        public final Double decay;
         public final ComputedPattern p;
+        public final Double weight;
+        public Double currentWeight;
 
-        public SEntry(int t, Double weight, ComputedPattern p) {
+        public SEntry(int t, Double weight, Double decay, ComputedPattern p) {
             this.t = t;
             this.weight = weight;
+            this.decay = decay;
             this.p = p;
+            this.currentWeight = weight;
+        }
+
+        public void tick() {
+            p.tick();
+            if(decay!=null&&weight!=null) {
+                currentWeight = currentWeight*decay;
+                if(currentWeight>1.0) {
+                    currentWeight = weight;
+                }
+            }
+        }
+
+        public void reset() {
+            currentWeight = weight;
+        }
+
+        public Double weight() {
+            return currentWeight;
         }
     }
 

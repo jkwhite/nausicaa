@@ -201,7 +201,7 @@ public class ClusteredGaussianInitializer implements Initializer {
     @Override public Mutatable mutate(MutationFactor m) {
         float nzw = m.r().nextFloat();
         int nmp = _params.maxPoints + m.r().nextInt(3)-1;
-        float nmr = _params.maxRadius + (m.r().nextFloat()-0.5f);
+        float nmr = Math.max(0.01f, _params.maxRadius + (m.r().nextFloat()-0.5f));
         float nd = _params.density + (m.r().nextFloat()-0.5f);
         return new ClusteredGaussianInitializer(null, _seed,
             new Params(

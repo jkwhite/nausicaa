@@ -160,9 +160,10 @@ top:        while(_state==State.animate) {
     }
 
     private class DisplayAnimator implements Runnable {
-        private Iterator<Plane> _frames;
-        private Planescape _d;
-        private int _parallel;
+        private final Iterator<Plane> _frames;
+        private final Planescape _d;
+        private final int _parallel;
+        private int _fn;
 
 
         public DisplayAnimator(Planescape d, ExecutorService pool, int parallel, float weight) {
@@ -201,6 +202,9 @@ top:        while(_state==State.animate) {
                 return;
             }
             final Plane frame = _frames.next();
+            if(++_fn%500==0) {
+                _log.info("frame "+_fn);
+            }
             frame.lockRead();
             if(isInterrupted()) {
                 if(!_d.delegateUnlock()) {

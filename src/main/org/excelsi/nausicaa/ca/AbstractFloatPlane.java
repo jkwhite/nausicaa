@@ -48,11 +48,14 @@ public abstract class AbstractFloatPlane extends AbstractPlane implements FloatP
 
 
             @Override public void setCell(int x, int y, int v) {
-                AbstractFloatPlane.this.setCell(x, y, v/_pal);
+                //System.err.println("setting "+x+","+y+" to "+v+"/"+_pal+"("+(v/_pal)+")");
+                //AbstractFloatPlane.this.setCell(x, y, v/_pal);
+                AbstractFloatPlane.this.setCell(x, y, v);
             }
 
             @Override public void setCell(int x, int y, int z, int v) {
-                AbstractFloatPlane.this.setCell(x, y, z, v/_pal);
+                //AbstractFloatPlane.this.setCell(x, y, z, v/_pal);
+                AbstractFloatPlane.this.setCell(x, y, z, v);
             }
 
             @Override public void setCell(int x, int y, int z, double v) {
