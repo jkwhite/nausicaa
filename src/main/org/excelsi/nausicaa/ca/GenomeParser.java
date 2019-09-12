@@ -163,7 +163,7 @@ public class GenomeParser {
                     }
                     else {
                         c = Integer.parseInt(pref);
-                        w = null;
+                        w = new Double[2];
                     }
                     String[] params = parseParams(grs);
                     ps.add(new S(c, w, null, grs, params));

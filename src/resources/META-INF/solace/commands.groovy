@@ -22,6 +22,14 @@ rules = { d, s, c, h=null ->
     Ruleset.create(new Archetype(d,s,c), h)
 }
 
+test_incant = { d,s,c ->
+    new ComputedRuleset(new Archetype(d,s,c))
+}
+
+incant = { d, s, c, i ->
+    new ComputedRuleset(new Archetype(d,s,c)).create(i)
+}
+
 rule = { rs, r ->
     GenomeParser.parse(r, rs)
 }
@@ -245,7 +253,4 @@ new_ca = { d=1, c=2, s=1, dims=[200,200,1], pal=null, init=null ->
 
 load_ca = { f ->
     CA.fromTextFile(f)
-}
-
-incant = { s ->
 }
