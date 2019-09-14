@@ -70,8 +70,20 @@ public class Patterns {
         final int np = a.totalPatterns();
         //System.err.println(index+" => "+s);
         byte[] p = new byte[np];
-        int i = p.length-1;
-        int j = s.length()-1;
+        //int i = p.length-1;
+        //int j = s.length()-1;
+        while(s.length()<p.length) {
+            s = "0"+s;
+        }
+        for(int i=0;i<p.length;i++) {
+            //if(i<s.length()) {
+                p[p.length-i-1] = (byte)(s.charAt(i)-'0');
+                //p[i] = (byte)(s.charAt(i)-'0');
+            //}
+        }
+        System.err.println("PAT: "+Arrays.toString(p));
+
+        /*
         for(;i>=0&&j>=0;i--) {
             //p[p.length-1-i] = (byte) (s.charAt(i)-'0');
             //p[i] = (byte) (s.charAt(i)-'0');
@@ -80,6 +92,7 @@ public class Patterns {
         while(i-->0) {
             p[i] = 0;
         }
+        */
         return new IndexedPattern(a, /*index*/ -1, plen-1, p);
     }
 
