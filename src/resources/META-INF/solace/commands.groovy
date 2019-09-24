@@ -1,4 +1,5 @@
 import org.excelsi.nausicaa.ca.*;
+import org.excelsi.solace.Jfx;
 import org.excelsi.solace.JfxRenderer;
 import org.excelsi.solace.JfxRendererRegistry;
 import org.excelsi.solace.Painter;
@@ -34,10 +35,29 @@ rule = { rs, r ->
     GenomeParser.parse(r, rs)
 }
 
-init_single = { Initializers.single.create() }
+init_single = { c=-1, x=-1, y=-1, z=-1 ->
+    //Initializers.single.create()
+    new SingleInitializer(c, x, y, z, 1)
+}
 
 init_random = { rnd=__random__, seed=19771026, zero=0 ->
     new RandomInitializer(rnd, seed, new RandomInitializer.Params(zero))
+}
+
+init_custom = { txt, w=0, h=0, x=0, y=0 ->
+    System.err.println("custom init with text '${txt}'")
+    if(x==-1) {
+        tmp = txt.trim()
+        idx = tmp.indexOf('\n')
+        if(idx==-1) idx = txt.length()
+        x = (int)(w/2-idx/2)
+    }
+    if(y==-1) {
+        cnt=0
+        for(int i=0;i<txt.length();i++) { if(txt.charAt(i)=='\n') cnt++ }
+        y = (int)(h/2 - cnt/2)
+    }
+    new CustomInitializer("i.draw(${x},${y},'''${txt}''')")
 }
 
 ca = { dims, rule, pal=null, init=null, prelude=0, weight=1d ->
@@ -80,8 +100,8 @@ org.excelsi.nausicaa.ca.CA.metaClass.scaled = { scale ->
     delegate.createPlane().scale(scale, scale<1?true:false).toJfxImage()
 }
 
-org.excelsi.nausicaa.ca.CA.metaClass.animate = {
-    new Animated(delegate)
+org.excelsi.nausicaa.ca.CA.metaClass.animate = { scale=1f, frames=-1, rate=250 ->
+    new Animated(delegate, scale, frames, rate)
 }
 
 org.excelsi.nausicaa.ca.CA.metaClass.evolve = { epicycles, cycles, subcycles, population, idealPm, idealNrsdev, idealNrmean ->
@@ -133,6 +153,18 @@ org.excelsi.nausicaa.ca.CA.metaClass.frame = { int nFrames ->
     fr
 }
 
+org.excelsi.nausicaa.ca.CA.metaClass.frames = { int nFrames ->
+    def pool = Executors.newFixedThreadPool(6);
+    def it = delegate.getRule().frameIterator(delegate.createPlane(), pool, new GOptions(false, 7, 0, 1d));
+
+    def fr = []
+    for(int i=1;i<nFrames;i++) {
+        fr << it.next();
+    }
+    pool.shutdown();
+    fr
+}
+
 org.excelsi.nausicaa.ca.CA.metaClass.generate = { fileTemplate, nFrames, scale ->
     def pool = Executors.newFixedThreadPool(4);
     if(scale==1f) {
@@ -174,21 +206,53 @@ $r.register(
     new JfxRenderer() {
         Node render(Object o, Painter p, JfxRendererRegistry renderers) {
             Plane init = o.getCA().createPlane();
-            Node img = renderers.render(init.toJfxImage(), p);
-            Iterator fr = o.getCA().getRule().frameIterator(init, Pools.adhoc(), new GOptions())
+            Node img
+            if(o.getScale()!=1f) {
+                img = renderers.render(init.scale((float)o.getScale(), o.getScale()<1?true:false).toJfxImage(), p)
+            }
+            else {
+                img = renderers.render(init.toJfxImage(), p);
+            }
+            /*if(o.getScale()!=1f) {
+                img.setFitWidth(o.getCA().getWidth()*o.getScale());
+                img.setFitHeight(o.getCA().getHeight()*o.getScale());
+                if(o.getScale()>1) {
+                    System.err.println("disabling smoothing")
+                    img.setSmooth(false)
+                }
+            }*/
+            ExecutorService execPool = Pools.named("exec", 1)
+            Iterator fr = o.getCA().getRule().frameIterator(init, execPool, new GOptions())
+            int nframes = 0
             Runnable r = new Runnable() {
                 public void run() {
-                    Thread.sleep(250)
+                    Thread.sleep(o.getRate())
                     Plane nxt = fr.next();
+                    ++nframes;
                     Platform.runLater(new Runnable() {
                         public void run() {
-                            //img.setImage(nxt.toJfxImage(img.getImage()))
-                            //nxt.toJfxImage(img.getImage())
-                            img.setImage(nxt.toJfxImage(img.getImage()))
+                            if(o.getScale()==1) {
+                                img.setImage(nxt.toJfxImage(img.getImage()))
+                            }
+                            else {
+                                img.setImage(nxt.scale((float)o.getScale(), o.getScale()<1?true:false).toJfxImage(img.getImage()))
+                            }
                         }
                     })
-                    if(img.isVisible()) {
+                    //try {
+                        //System.err.println("parent: "+img.getParent()+" root: "+Jfx.rootFor((Node)img.getParent()))
+                        //System.err.println("vis: "+img.isVisible()+", par: "+img.getParent().isVisible())
+                    //}
+                    //catch(Exception e) {
+                        //e.printStackTrace();
+                    //}
+                    if(img.getParent()==null||Jfx.rootFor(img)==null||!img.isVisible()||(nframes>=o.getFrames()&&o.getFrames()!=-1)) {
+                        System.err.println("shutting down animator")
+                        execPool.shutdownNow()
+                    }
+                    else {
                         Pools.adhoc().submit(this)
+                        //System.err.print(".")
                     }
                 }
             };
