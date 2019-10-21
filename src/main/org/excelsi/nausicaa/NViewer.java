@@ -200,7 +200,8 @@ public class NViewer extends JFrame implements UIActions {
                 EdgeMode.defaultMode(),
                 ExternalForce.nop(),
                 vm,
-                null);
+                null,
+                "Nameless");
         return ca;
     }
 

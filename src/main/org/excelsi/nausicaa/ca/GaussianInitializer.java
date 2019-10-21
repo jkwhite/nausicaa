@@ -58,7 +58,7 @@ public class GaussianInitializer implements Initializer {
             r = random;
         }
         final int[] colors = rule.colors();
-        final int maxrad = (int) (((plane.getWidth()+plane.getHeight())/2)*_params.maxRadius);
+        final int maxrad = Math.max(2, (int) (((plane.getWidth()+plane.getHeight())/2)*_params.maxRadius));
         final int[] pnt = new int[rule.dimensions()];
         final int[] ctr = new int[rule.dimensions()];
         final int[] max = new int[rule.dimensions()];

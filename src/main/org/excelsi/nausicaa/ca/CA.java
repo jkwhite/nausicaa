@@ -56,6 +56,7 @@ public final class CA {
     private ExternalForce _ef;
     private Varmap _vars;
     private CA _meta;
+    private String _name;
     private static final byte VERSION = 6;
 
 
@@ -76,7 +77,8 @@ public final class CA {
             EdgeMode emode,
             ExternalForce ef,
             Varmap vars,
-            CA meta) {
+            CA meta,
+            String name) {
         if(i==null) {
             throw new IllegalArgumentException("null initializer");
         }
@@ -97,6 +99,7 @@ public final class CA {
         _emode = emode;
         _ef = ef;
         _meta = meta;
+        _name = name;
         //System.err.println("rule: "+r);
         //System.err.println("rule vars: "+r.vars());
         //System.err.println("inherit vars: "+vars);
@@ -335,6 +338,10 @@ public final class CA {
         return _meta;
     }
 
+    public String getName() {
+        return _name;
+    }
+
     public void resize(int w, int h) {
         _w = w;
         _h = h;
@@ -349,30 +356,30 @@ public final class CA {
 
     public CA mutate(Rule r, Random om) {
         if(r instanceof IndexedRule) {
-            return new CA(r, _p.matchCapacity(r.colorCount(), om), _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta);
+            return new CA(r, _p.matchCapacity(r.colorCount(), om), _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name);
         }
         else {
-            return new CA(r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta);
+            return new CA(r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name);
         }
     }
 
     public CA size(int w, int h) {
         CA meta = _meta!=null?_meta.size(w,h):null;
-        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta);
+        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta, _name);
     }
 
     public CA size(int w, int h, int d) {
         CA meta = _meta!=null?_meta.size(w,h,d):null;
-        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta);
+        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta, _name);
     }
 
     public CA size(int w, int h, int d, int prelude) {
         CA meta = _meta!=null?_meta.size(w,h,d,prelude):null;
-        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d, prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta);
+        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d, prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta, _name);
     }
 
     public CA copy() {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta);
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name);
     }
 
     public CA seed() {
@@ -380,58 +387,62 @@ public final class CA {
     }
 
     public CA seed(long seed) {
-        return new CA(_r, _p, _i, branchRandom(), seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta);
+        return new CA(_r, _p, _i, branchRandom(), seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name);
     }
 
     public CA palette(Palette p) {
-        return new CA(_r, p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta);
+        return new CA(_r, p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name);
     }
 
     public CA initializer(Initializer i) {
-        return new CA(_r, _p, i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta);
+        return new CA(_r, _p, i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name);
     }
 
     public CA prelude(int pre) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, pre, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta);
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, pre, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name);
     }
 
     public CA coda(int coda) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta);
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name);
     }
 
     public CA weight(double weight) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta);
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name);
     }
 
     public CA computeMode(ComputeMode cmode) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, cmode, _mmode, _umode, _emode, _ef, _vars, _meta);
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name);
     }
 
     public CA metaMode(MetaMode mmode) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, mmode, _umode, _emode, _ef, _vars, _meta);
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, mmode, _umode, _emode, _ef, _vars, _meta, _name);
     }
 
     public CA updateMode(UpdateMode umode) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, umode, _emode, _ef, _vars, _meta);
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, umode, _emode, _ef, _vars, _meta, _name);
     }
 
     public CA edgeMode(EdgeMode emode) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, emode, _ef, _vars, _meta);
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, emode, _ef, _vars, _meta, _name);
     }
 
     public CA externalForce(ExternalForce ef) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, ef, _vars, _meta);
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, ef, _vars, _meta, _name);
     }
 
     public CA vars(Varmap v) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, v, _meta);
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, v, _meta, _name);
     }
 
     public CA meta(CA meta) {
         if(meta==this) {
             throw new IllegalArgumentException("strange loop");
         }
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta);
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta, _name);
+    }
+
+    public CA name(String name) {
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, name);
     }
 
     public Initializer getInitializer() {
@@ -527,7 +538,7 @@ public final class CA {
         Random rand = new Random();
         Rule rule = rs.random(rand).next();
         ImageInitializer init = new ImageInitializer(new File(filename));
-        CA ca = new CA(rule, p, init, rand, 0, w, h, d, 0, 1d, 0, ComputeMode.combined, MetaMode.depth, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null);
+        CA ca = new CA(rule, p, init, rand, 0, w, h, d, 0, 1d, 0, ComputeMode.combined, MetaMode.depth, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null, "Nameless");
         return ca;
     }
 
@@ -555,7 +566,7 @@ public final class CA {
             Palette p = Palette.read(dis);
             Initializer i = Initializers.read(dis);
             Rule r = new IndexedRuleReader(dis).read();
-            return new CA(r, p, i, new Random(), seed, w, h, 10, 10, 1d, 0, ComputeMode.combined, MetaMode.depth, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null);
+            return new CA(r, p, i, new Random(), seed, w, h, 10, 10, 1d, 0, ComputeMode.combined, MetaMode.depth, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null, "Nameless");
         }
         finally {
             if(in!=null) {
@@ -636,7 +647,7 @@ public final class CA {
         }
     }
 
-    private static CA fromJson(JsonElement e) throws IOException {
+    public static CA fromJson(JsonElement e) throws IOException {
         JsonObject o = (JsonObject) e;
         int version = Json.integer(o, "version", 6);
         int w = Json.integer(o, "width", 100);
@@ -656,7 +667,8 @@ public final class CA {
         Palette p = Palette.fromJson(o.get("palette"));
         ExternalForce ef = o.has("external_force") ? ExternalForce.fromJson(o.get("external_force")) : ExternalForce.nop();
         CA meta = o.has("meta") ? fromJson(o.get("meta")):null;
-        return new CA(r, p, i, new Random(), seed, w, h, d, pre, weight, coda, cmode, mmode, umode, emode, ef, vars, meta);
+        String name = Json.string(o, "name", "Nameless");
+        return new CA(r, p, i, new Random(), seed, w, h, d, pre, weight, coda, cmode, mmode, umode, emode, ef, vars, meta, name);
     }
 
     private static CA fromLegacyTextFile(String filename) throws IOException {
@@ -700,7 +712,7 @@ public final class CA {
             if(i==null) {
                 throw new IOException("missing initializer");
             }
-            return new CA(rule, p, i, new Random(), h.seed, h.w, h.h, h.d, h.prelude, h.weight, h.coda, ComputeMode.combined, MetaMode.depth, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null);
+            return new CA(rule, p, i, new Random(), h.seed, h.w, h.h, h.d, h.prelude, h.weight, h.coda, ComputeMode.combined, MetaMode.depth, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null, "Nameless");
         }
         finally {
             if(in!=null) {

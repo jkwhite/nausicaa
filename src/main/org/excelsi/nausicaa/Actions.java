@@ -306,7 +306,8 @@ public class Actions {
                         EdgeMode.defaultMode(),
                         ExternalForce.nop(),
                         new Varmap(),
-                        null);
+                        null,
+                        "Nameless");
                 v.setActiveCA(ca);
             }
         });
@@ -532,6 +533,7 @@ public class Actions {
         Rule r = ca.getRule();
         final JFrame i = new JFrame("Info");
         InfoPanel p = new InfoPanel();
+        p.addPair("Name", ca.getName());
         if(r instanceof IndexedRule) {
             final String b64 = ca.toBase64();
             p.addPair("Universe", chop(b64,80));
@@ -1907,7 +1909,7 @@ public class Actions {
 
     public void resizeCA(NViewer v) {
         final Config config = v.getConfig();
-        final JDialog d = new JDialog(v, "Size");
+        final JDialog d = new JDialog(v, "Parameters");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JPanel top = new JPanel(new GridLayout(5,2));
@@ -1948,14 +1950,14 @@ public class Actions {
         pp.add(new JLabel("steps"));
         top.add(pp);
 
-        top.add(new JLabel("Update weight"));
-        JPanel uw = new JPanel();
-        final JTextField updateWeight = new JTextField();
+        top.add(new JLabel("Name"));
+        JPanel nam = new JPanel();
+        final JTextField name = new JTextField();
         //updateWeight.setText(""+config.getFloatVariable("weight", 1f));
-        updateWeight.setText(""+v.getActiveCA().getWeight());
-        updateWeight.setColumns(6);
-        uw.add(updateWeight);
-        top.add(uw);
+        name.setText(v.getActiveCA().getName());
+        name.setColumns(20);
+        nam.add(name);
+        top.add(nam);
 
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
@@ -1967,7 +1969,11 @@ public class Actions {
         ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
-                config.setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(depth.getText()), Integer.parseInt(prelude.getText()), Float.parseFloat(updateWeight.getText()));
+                String nm = name.getText();
+                if(!nm.equals(v.getActiveCA().getName())) {
+                    v.setActiveCA(v.getActiveCA().name(nm));
+                }
+                config.setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(depth.getText()), Integer.parseInt(prelude.getText()) /*, Float.parseFloat(updateWeight.getText())*/);
             }
         });
         de.addActionListener(new AbstractAction() {

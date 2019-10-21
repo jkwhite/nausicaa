@@ -92,6 +92,7 @@ public class Codons {
     public static final String COORD_CIRC_REL = "ryo";
     public static final String MANDELBROT = "nya";
     public static final String LIFE = "life";
+    public static final String HODGE = "hodge";
 
 
     public static Codon codon(final String s, final Implicate im) {
@@ -299,6 +300,8 @@ public class Codons {
                     return new Mandelbrot();
                 case LIFE:
                     return new Life();
+                case HODGE:
+                    return new Hodge(im.archetype().colors());
                 case ABS:
                     return new Abs();
                 default:
@@ -2890,6 +2893,72 @@ public class Codons {
             t.push(z);
         }
     }
+
+    public static class Hodge implements Codon {
+        private static final PushS PUSHS = new PushS();
+        private final int _cols;
+
+        public Hodge(int cols) {
+            _cols = cols;
+        }
+
+        @Override public Codon copy() { return new Hodge(_cols); }
+
+        @Override public String code() { return HODGE; }
+
+        @Override public boolean usesPattern() { return true; }
+
+        @Override public boolean usesTape() { return true; }
+
+        @Override public boolean supports(Values v) { return v==Values.discrete; }
+
+        @Override public boolean deterministic() { return true; }
+
+        public void op(int[] p, IntTape t, Pattern.Ctx ctx) {
+            int k1 = Math.max(1,t.pop());
+            int k2 = Math.max(1,t.pop());
+            int g = t.pop();
+
+            int self = p[p.length/2];
+            int next;
+            if(self==0) {
+                int infected = 0;
+                int ill = 0;
+                for(int i=0;i<p.length;i++) {
+                    //if(i!=p.length/2) {
+                        if(p[i]>0&&p[i]<_cols-1) {
+                            infected++;
+                        }
+                        else if(p[i]==_cols-1) {
+                            ill++;
+                        }
+                    //}
+                }
+                next = infected/k1+ill/k2;
+            }
+            else if(self<_cols-1) {
+                int val=0;
+                int infected=0;
+                for(int i=0;i<p.length;i++) {
+                    //if(i!=p.length/2) {
+                        val += p[i];
+                        if(p[i]>0&&p[i]<_cols-1) {
+                            infected++;
+                        }
+                    //}
+                }
+                next = Math.min(g+val/infected, _cols-1);
+            }
+            else { // self==_cols-1
+                next = 0;
+            }
+            t.push(next);
+        }
+
+        @Override public void op(double[] p, FloatTape t, Pattern.Ctx ctx) {
+        }
+    }
+
 
     // ki mi a2 a3 u ki mi8 a3 ma ya ra
     public static class Life implements Codon {
