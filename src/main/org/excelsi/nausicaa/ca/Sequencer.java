@@ -25,8 +25,24 @@ public class Sequencer {
         }
     }
 
-    public String[] listSequences() {
+    public String[] listSequenceNames() {
         return _root.list();
+    }
+
+    public List<Sequence> listSequences() {
+        JsonParser p = new JsonParser();
+        List<Sequence> ss = new ArrayList<>();
+        for(String name:listSequenceNames()) {
+            File f = sequenceFile(_root, name);
+            try(BufferedReader r = new BufferedReader(new FileReader(f))) {
+                JsonElement e = p.parse(r);
+                ss.add(Sequence.fromJson(e));
+            }
+            catch(IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return ss;
     }
 
     public void setActive(Sequence s) {
@@ -44,8 +60,17 @@ public class Sequencer {
     }
 
     public File sequenceDir() {
-        File s = new File(_root, _seq.name());
+        return sequenceDir(_root, _seq.name());
+    }
+
+    private static File sequenceDir(File root, String seqname) {
+        File s = new File(root, seqname);
         return s;
+    }
+
+    private static File sequenceFile(File root, String seqname) {
+        File d = sequenceDir(root, seqname);
+        return new File(d, seqname+".seq");
     }
 
     public List<Action> sync() {
