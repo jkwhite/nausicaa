@@ -69,6 +69,7 @@ public class JfxSequencer extends Group {
                 @Override public void changed(ObservableValue<? extends Sequence> o, Sequence old, Sequence nv) {
                     System.err.println("new seq: "+nv);
                     if(nv!=null) {
+                        _seq.setActive(nv);
                         bp.setCenter(new SequenceView(nv));
                     }
                 }
@@ -143,11 +144,12 @@ public class JfxSequencer extends Group {
         }
     }
 
-    private static class SequenceView extends Group {
+    private class SequenceView extends Group {
         public SequenceView(Sequence s) {
             VBox segs = new VBox();
-            for(Segment seg:s.segments()) {
-                SegmentView segv = new SegmentView(seg);
+            Segment[] segments = s.segments();
+            for(int i=0;i<segments.length;i++) {
+                SegmentView segv = new SegmentView(segments[i], i);
                 segs.getChildren().add(segv);
             }
             Button addSeg = new Button("Add Segment");
@@ -156,8 +158,29 @@ public class JfxSequencer extends Group {
         }
     }
 
-    private static class SegmentView extends Group {
-        public SegmentView(Segment s) {
+    private class SegmentView extends Group {
+        public SegmentView(Segment s, int idx) {
+            SegmentInfo inf = _seq.readSegmentInfo(s, idx);
+
+            VBox v = new VBox();
+
+            HBox title = new HBox();
+            String name = s.ca().getName();
+            title.getChildren().add(new Label(name!=null?name:"Nameless"));
+            title.getChildren().add(new Label("Generations: "+s.gen()));
+            v.getChildren().add(title);
+
+            HBox fr = new HBox();
+            String[] frames = inf.frames();
+            for(int i=0;i<frames.length;i+=10) {
+                try(InputStream is=new BufferedInputStream(new FileInputStream(new File(inf.dir(), frames[i])))) {
+                    Image frame = new Image(is, 100, 100, true, true);
+                    fr.add(frame);
+                }
+                catch(IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

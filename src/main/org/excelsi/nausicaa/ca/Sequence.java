@@ -100,7 +100,7 @@ public class Sequence {
 
     public static class Segment {
         private final CA _ca;
-        private final long _gens;
+        private long _gens;
 
 
         public Segment(CA ca, long gens) {
@@ -110,6 +110,7 @@ public class Sequence {
 
         public CA ca() { return _ca; }
         public long gens() { return _gens; }
+        public void gens(long gens) { _gens = gens; }
 
         public JsonElement toJson() {
             JsonObject o = new JsonObject();

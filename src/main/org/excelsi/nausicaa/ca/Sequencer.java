@@ -63,6 +63,53 @@ public class Sequencer {
         return sequenceDir(_root, _seq.name());
     }
 
+    public List<Action> sync() {
+        List<Action> acts = new ArrayList<>();
+        if(_seq!=null) {
+            File s = sequenceDir();
+            Segment[] segs = _seq.segments();
+            for(int i=0;i<segs.length;i++) {
+                //File segDir = new File(s, ""+i);
+                File segDir = segmentDir(s, i);
+                SegmentInfo info = readSegmentInfo(segs[i], i);
+                if(!segDir.exists()) {
+                    acts.add(new Action(
+                        "Does not exist. Generate "+i+" for "+segs[i].gens()+": "+segs[i].ca().getName(),
+                        createCAGeneratorAction(segs[i], i)
+                        ));
+                }
+                else if(!info.generated()) {
+                    acts.add(new Action(
+                        "Not generated. Generate "+i+" for "+segs[i].gens()+": "+segs[i].ca().getName(),
+                        createCAGeneratorAction(segs[i], i)
+                        ));
+                }
+                else if(info.frames().length!=segs[i].gens()) {
+                    acts.add(new Action(
+                        "Wrong frame count. Generate "+i+" for "+segs[i].gens()+": "+segs[i].ca().getName(),
+                        createCAGeneratorAction(segs[i], i)
+                        ));
+                }
+            }
+        }
+        return acts;
+    }
+
+    public SegmentInfo readSegmentInfo(Segment s, int idx) {
+        //File segDir = new File(sequenceDir(), ""+idx);
+        File segDir = segmentDir(s, idx);
+        if(segDir.exists()) {
+            //File caFile = new File(segDir, s.ca().getName()+".ca");
+            String[] frames = segDir.list((d,f)->{ return f.endsWith(".png"); });
+            Arrays.sort(frames);
+            return new SegmentInfo(s, segDir, frames, idx);
+        }
+        return new SegmentInfo(s, segDir, new String[0], idx);
+    }
+
+    private static Runnable createCAGeneratorAction(Segment s, int idx) {
+    }
+
     private static File sequenceDir(File root, String seqname) {
         File s = new File(root, seqname);
         return s;
@@ -73,22 +120,9 @@ public class Sequencer {
         return new File(d, seqname+".seq");
     }
 
-    public List<Action> sync() {
-        List<Action> acts = new ArrayList<>();
-        if(_seq!=null) {
-            File s = sequenceDir();
-            Segment[] segs = _seq.segments();
-            for(int i=0;i<segs.length;i++) {
-                File segDir = new File(s, ""+i);
-                if(!segDir.exists()) {
-                    acts.add(new Action(
-                        "Generate "+i+" for "+segs[i].gens()+": "+segs[i].ca().getName(),
-                        ()->{}
-                        ));
-                }
-            }
-        }
-        return acts;
+    private File segmentDir(Segment s, int idx) {
+        File segDir = new File(sequenceDir(), ""+idx);
+        return segDir;
     }
 
     public static class Action {
@@ -103,5 +137,32 @@ public class Sequencer {
 
         public String desc() { return _desc; }
         public Runnable r() { return _r; }
+    }
+
+    public static class SegmentInfo {
+        private final File _dir;
+        private final String[] _frames;
+        private final Segment _seg;
+        private final int _idx;
+
+        public SegmentInfo(Segment seg, File dir, String[] frames, int idx) {
+            _seg = seg;
+            _dir = dir;
+            _frames = frames;
+            _idx = idx;
+        }
+
+        public File dir() { return _dir; }
+        public String[] frames() { return _frames; }
+        public int index() { return _idx; }
+        public Segment segment() { return _seg; }
+
+        public boolean exists() { return _frames.length>0; }
+        public long framesGeneratedTs() {
+            if(exists() && _frames.length>0) {
+                return new File(_dir, _frames[0]).lastModified();
+            }
+            return -1;
+        }
     }
 }
