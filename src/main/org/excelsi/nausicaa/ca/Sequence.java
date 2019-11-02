@@ -26,7 +26,7 @@ public class Sequence {
         _ord = ord;
     }
 
-    public Sequence add(CA ca, long gens) {
+    public Sequence add(CA ca, int gens) {
         _ord.add(new Segment(ca, gens));
         return this;
     }
@@ -34,6 +34,38 @@ public class Sequence {
     public String name() { return _name; }
     public void name(String name) { _name = name; }
     public Segment[] segments() { return _ord.toArray(new Segment[0]); }
+
+    public Iterator<Plane> frameIterator(int segment, ExecutorService pool, GOptions opt, SequenceRepo repo) throws IOException {
+        final Plane initial;
+        if(segment==0) {
+            initial = _ord.get(0).ca().createPlane(pool, opt);
+        }
+        else {
+            Segment prev = _ord.get(segment-1);
+            Plane p = repo.readPlane(prev, segment-1, prev.gens()-1, pool, opt);
+            initial = p;
+        }
+        final Iterator<Plane> it = _ord.get(segment).ca().compileRule().frameIterator(initial, pool, opt);
+        return new Iterator<Plane>() {
+            boolean first = true;
+
+            @Override public Plane next() {
+                if(first) {
+                    first = false;
+                    return initial;
+                }
+                else {
+                    return it.next();
+                }
+            }
+
+            @Override public boolean hasNext() {
+                return it.hasNext();
+            }
+
+            @Override public void remove() {}
+        };
+    }
 
     public Iterator<Plane> frameIterator(ExecutorService pool, GOptions opt) {
         Iterator<Segment> ss = _ord.iterator();
@@ -100,17 +132,17 @@ public class Sequence {
 
     public static class Segment {
         private final CA _ca;
-        private long _gens;
+        private int _gens;
 
 
-        public Segment(CA ca, long gens) {
+        public Segment(CA ca, int gens) {
             _ca = ca;
             _gens = gens;
         }
 
         public CA ca() { return _ca; }
-        public long gens() { return _gens; }
-        public void gens(long gens) { _gens = gens; }
+        public int gens() { return _gens; }
+        public void gens(int gens) { _gens = gens; }
 
         public JsonElement toJson() {
             JsonObject o = new JsonObject();
@@ -121,7 +153,7 @@ public class Sequence {
 
         public static Segment fromJson(JsonElement e) throws IOException {
             JsonObject o = (JsonObject) e;
-            long gens = Json.lng(o, "generations", 100);
+            int gens = Json.integer(o, "generations", 100);
             CA c = CA.fromJson(o.get("ca"));
             return new Segment(c, gens);
         }

@@ -54,7 +54,6 @@ public class ImageInitializer implements Initializer {
         }
         else {
             initDisc(plane, plane.pen(), rule, random);
-            //throw new UnsupportedOperationException("CONTINUOUS");
         }
     }
 

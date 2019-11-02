@@ -3,6 +3,8 @@ package org.excelsi.nausicaa.ca;
 
 import java.io.*;
 import java.util.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 import java.util.concurrent.ExecutorService;
 import com.google.gson.*;
 
@@ -11,7 +13,7 @@ import org.slf4j.Logger;
 import static org.excelsi.nausicaa.ca.Sequence.Segment;
 
 
-public class Sequencer {
+public class Sequencer implements SequenceRepo {
     private static final Logger LOG = LoggerFactory.getLogger(Sequencer.class);
 
     private final File _root;
@@ -70,7 +72,7 @@ public class Sequencer {
             Segment[] segs = _seq.segments();
             for(int i=0;i<segs.length;i++) {
                 //File segDir = new File(s, ""+i);
-                File segDir = segmentDir(s, i);
+                File segDir = segmentDir(segs[i], i);
                 SegmentInfo info = readSegmentInfo(segs[i], i);
                 if(!segDir.exists()) {
                     acts.add(new Action(
@@ -107,7 +109,17 @@ public class Sequencer {
         return new SegmentInfo(s, segDir, new String[0], idx);
     }
 
+    @Override public Plane readPlane(Segment seg, int ord, int gen, ExecutorService pool, GOptions opt) throws IOException {
+        File img = frameFile(ord, gen);
+        BufferedImage bi = ImageIO.read(img);
+        Plane dest = seg.ca().createPlane(pool, opt);
+        ImageInitializer ii = new ImageInitializer(bi);
+        ii.init(dest, seg.ca().compileRule(), null);
+        return dest;
+    }
+
     private static Runnable createCAGeneratorAction(Segment s, int idx) {
+        return null;
     }
 
     private static File sequenceDir(File root, String seqname) {
@@ -120,7 +132,19 @@ public class Sequencer {
         return new File(d, seqname+".seq");
     }
 
+    private File frameFile(int segment, int gen) {
+        File segDir = segmentDir(segment);
+        String frame = String.format("%6d.png", gen);
+        return new File(segDir, frame);
+    }
+
     private File segmentDir(Segment s, int idx) {
+        //File segDir = new File(sequenceDir(), ""+idx);
+        //return segDir;
+        return segmentDir(idx);
+    }
+
+    private File segmentDir(int idx) {
         File segDir = new File(sequenceDir(), ""+idx);
         return segDir;
     }
@@ -158,6 +182,7 @@ public class Sequencer {
         public Segment segment() { return _seg; }
 
         public boolean exists() { return _frames.length>0; }
+        public boolean generated() { return exists() && new File(_dir, _frames[_frames.length-1]).exists(); }
         public long framesGeneratedTs() {
             if(exists() && _frames.length>0) {
                 return new File(_dir, _frames[0]).lastModified();

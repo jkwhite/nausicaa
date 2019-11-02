@@ -3,12 +3,16 @@ package org.excelsi.nausicaa;
 
 import org.excelsi.nausicaa.ca.*;
 import static org.excelsi.nausicaa.ca.Sequence.Segment;
+import static org.excelsi.nausicaa.ca.Sequencer.SegmentInfo;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.concurrent.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import javafx.application.*;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -17,7 +21,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import javafx.scene.*;
 import javafx.scene.shape.*;
-import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -44,13 +48,17 @@ import javafx.beans.value.ObservableValue;
 
 
 public class JfxSequencer extends Group {
+    private final Window _window;
+    private final Config _config;
     private final Sequencer _seq;
     private final VBox _seqlist;
     private final ListView<Sequence> _sequences;
 
 
-    public JfxSequencer(Sequencer seq) {
+    public JfxSequencer(Window window, Sequencer seq, Config cfg) {
+        _window = window;
         _seq = seq;
+        _config = cfg;
         BorderPane bp = new BorderPane();
         getChildren().add(bp);
 
@@ -153,8 +161,21 @@ public class JfxSequencer extends Group {
                 segs.getChildren().add(segv);
             }
             Button addSeg = new Button("Add Segment");
+            addSeg.setOnAction((e)-> { addSegment(); });
             segs.getChildren().add(addSeg);
             getChildren().add(segs);
+        }
+    }
+
+    public void addSegment() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("A New World");
+        fileChooser.getExtensionFilters().addAll(
+                new ExtensionFilter("CAs", "*.ca"),
+                new ExtensionFilter("All Files", "*.*"));
+        File selectedFile = fileChooser.showOpenDialog(_window);
+        if (selectedFile != null) {
+            //loadCA(selectedFile);
         }
     }
 
@@ -167,7 +188,7 @@ public class JfxSequencer extends Group {
             HBox title = new HBox();
             String name = s.ca().getName();
             title.getChildren().add(new Label(name!=null?name:"Nameless"));
-            title.getChildren().add(new Label("Generations: "+s.gen()));
+            title.getChildren().add(new Label("Generations: "+s.gens()));
             v.getChildren().add(title);
 
             HBox fr = new HBox();
@@ -175,7 +196,7 @@ public class JfxSequencer extends Group {
             for(int i=0;i<frames.length;i+=10) {
                 try(InputStream is=new BufferedInputStream(new FileInputStream(new File(inf.dir(), frames[i])))) {
                     Image frame = new Image(is, 100, 100, true, true);
-                    fr.add(frame);
+                    fr.getChildren().add(new ImageView(frame));
                 }
                 catch(IOException e) {
                     e.printStackTrace();

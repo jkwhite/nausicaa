@@ -40,13 +40,15 @@ import javafx.embed.swing.SwingFXUtils;
 
 
 public class JfxNausicaa extends Application {
-    //private JfxWorld _w;
+    private Config _config;
     private Group _root;
     private BorderPane _border;
 
 
     @Override
     public void start(final Stage stage) {
+        _config = Config.load();
+
         Rectangle2D screen = Screen.getPrimary().getVisualBounds();
 
         //JfxWorld w = new JfxWorld(100, 100, 100, true);
@@ -72,7 +74,7 @@ public class JfxNausicaa extends Application {
         mwin.setPrefSize(screen.getWidth(), screen.getHeight());
         _root.getChildren().add(mwin);
 
-        Node main = createMain();
+        Node main = createMain(stage);
         mwin.setTop(main);
         //_root.getChildren().add(main);
 
@@ -101,9 +103,9 @@ public class JfxNausicaa extends Application {
         //}
     }
 
-    private Node createMain() {
+    private Node createMain(Stage stage) {
         Tab multi = new Tab("Multiverse", new Label("TODO"));
-        JfxSequencer jseq = new JfxSequencer(createSequencer());
+        JfxSequencer jseq = new JfxSequencer(stage, createSequencer(), _config);
         //BorderPane bp = new BorderPane();
         //bp.setCenter(jseq);
         Tab seq = new Tab("Sequencer", jseq);
