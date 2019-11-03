@@ -46,8 +46,12 @@ import javafx.collections.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public class JfxSequencer extends Group {
+    private static final Logger LOG = LoggerFactory.getLogger(JfxSequencer.class);
     private final Window _window;
     private final Config _config;
     private final Sequencer _seq;
@@ -75,7 +79,7 @@ public class JfxSequencer extends Group {
         seqs.setPlaceholder(new Label("(No sequences)"));
         seqs.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Sequence>() {
                 @Override public void changed(ObservableValue<? extends Sequence> o, Sequence old, Sequence nv) {
-                    System.err.println("new seq: "+nv);
+                    //System.err.println("new seq: "+nv);
                     if(nv!=null) {
                         _seq.setActive(nv);
                         bp.setCenter(new SequenceView(nv));
@@ -95,7 +99,8 @@ public class JfxSequencer extends Group {
     }
 
     private void newSequence() {
-        Sequence s = new Sequence("Nameless");
+        String uname = _seq.findUniqueName("Nameless");
+        Sequence s = new Sequence(uname);
         _sequences.getItems().add(s);
         Platform.runLater( ()->{
             _sequences.edit(_sequences.getItems().size()-1);
@@ -111,7 +116,7 @@ public class JfxSequencer extends Group {
         }
     }
 
-    private static class SequenceCell extends ListCell<Sequence> {
+    private class SequenceCell extends ListCell<Sequence> {
         @Override protected void updateItem(Sequence s, boolean empty) {
             super.updateItem(s, empty);
             if(isEditing()) {
@@ -149,6 +154,7 @@ public class JfxSequencer extends Group {
             Sequence m = getItem();
             setGraphic(null);
             setText(getItem().name());
+            _seq.saveActive();
         }
     }
 
@@ -175,7 +181,14 @@ public class JfxSequencer extends Group {
                 new ExtensionFilter("All Files", "*.*"));
         File selectedFile = fileChooser.showOpenDialog(_window);
         if (selectedFile != null) {
-            //loadCA(selectedFile);
+            try {
+                CA ca = CA.fromFile(selectedFile.toString(), "text");
+                _seq.getActive().add(ca, 100);
+                _seq.saveActive();
+            }
+            catch(IOException e) {
+                LOG.error("failed parsing '"+selectedFile.toString()+"': "+e.getMessage(), e);
+            }
         }
     }
 
@@ -202,6 +215,8 @@ public class JfxSequencer extends Group {
                     e.printStackTrace();
                 }
             }
+            v.getChildren().add(fr);
+            getChildren().add(v);
         }
     }
 }

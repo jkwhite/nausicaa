@@ -31,6 +31,15 @@ public class Sequencer implements SequenceRepo {
         return _root.list();
     }
 
+    public String findUniqueName(String base) {
+        Set<String> names = new HashSet<>(Arrays.asList(listSequenceNames()));
+        int id = 0;
+        while(names.contains(base+id)) {
+            id++;
+        }
+        return base+id;
+    }
+
     public List<Sequence> listSequences() {
         JsonParser p = new JsonParser();
         List<Sequence> ss = new ArrayList<>();
@@ -41,7 +50,7 @@ public class Sequencer implements SequenceRepo {
                 ss.add(Sequence.fromJson(e));
             }
             catch(IOException e) {
-                e.printStackTrace();
+                LOG.error(e.getMessage(), e);
             }
         }
         return ss;
@@ -57,6 +66,10 @@ public class Sequencer implements SequenceRepo {
         }
     }
 
+    public void saveActive() {
+        createSaveAction(_seq).run();
+    }
+
     public Sequence getActive() {
         return _seq;
     }
@@ -69,6 +82,11 @@ public class Sequencer implements SequenceRepo {
         List<Action> acts = new ArrayList<>();
         if(_seq!=null) {
             File s = sequenceDir();
+            File seqFile = sequenceFile(_root, _seq.name());
+            if(!seqFile.exists()) {
+                acts.add(new Action(
+                    "Save sequence file", createSaveAction(_seq)));
+            }
             Segment[] segs = _seq.segments();
             for(int i=0;i<segs.length;i++) {
                 //File segDir = new File(s, ""+i);
@@ -116,6 +134,24 @@ public class Sequencer implements SequenceRepo {
         ImageInitializer ii = new ImageInitializer(bi);
         ii.init(dest, seg.ca().compileRule(), null);
         return dest;
+    }
+
+    private Runnable createSaveAction(Sequence s) {
+        return new Runnable() {
+            @Override public void run() {
+                File seqFile = sequenceFile(_root, s.name());
+                seqFile.getParentFile().mkdirs();
+                try(BufferedWriter w=new BufferedWriter(new FileWriter(seqFile))) {
+                    Gson gson = new GsonBuilder()
+                        .setPrettyPrinting()
+                        .create();
+                    gson.toJson(s.toJson(), w);
+                }
+                catch(IOException e) {
+                    LOG.error(e.getMessage(), e);
+                }
+            }
+        };
     }
 
     private static Runnable createCAGeneratorAction(Segment s, int idx) {

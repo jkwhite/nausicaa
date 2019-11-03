@@ -804,6 +804,7 @@ public final class CA {
         o.addProperty("coda", _coda);
         o.addProperty("compute_mode", _cmode.toString());
         o.addProperty("meta_mode", _mmode.toString());
+        o.addProperty("name", _name);
         o.add("update_mode", _umode.toJson());
         o.add("edge_mode", _emode.toJson());
         o.add("external_force", _ef.toJson());
