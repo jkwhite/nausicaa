@@ -74,7 +74,7 @@ public class ClusteredGaussianInitializer implements Initializer {
         }
 
         for(int i=0;i<_params.maxPoints;i++) {
-            final int rad = r.nextInt(maxrad/2)+maxrad/2;
+            final int rad = r.nextInt(Math.max(2,maxrad/2))+maxrad/2;
             switch(rule.dimensions()) {
                 case 1:
                     ctr[0] = r.nextInt(plane.getWidth());

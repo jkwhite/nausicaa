@@ -328,7 +328,10 @@ public final class ComputedPattern implements Pattern, Mutatable {
         }
 
         protected int key(double[] p) {
-            int k = (f(p[0])<<24^f(p[1])<<16^f(p[2])<<8^f(p[3])^f(p[4])<<8);
+            int k = (f(p[0])<<24^f(p[1])<<16^f(p[2])<<8);
+            if(p.length>3) {
+                k = k^(f(p[3])^f(p[4])<<8);
+            }
             if(p.length>6) {
                 k = k^f(p[5])<<16^f(p[6])<<24;
             }
