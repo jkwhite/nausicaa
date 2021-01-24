@@ -2,6 +2,7 @@ package org.excelsi.nausicaa;
 
 
 import org.excelsi.nausicaa.ca.*;
+import static org.excelsi.nausicaa.JfxWorld.Render;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ import org.fxyz3d.shapes.primitives.TetrahedraMesh;
 
 
 public class JfxCA extends Group {
-    public enum Render { cells, bounds, mesh, single_mesh, cube_mesh, blob_mesh, best };
+    //public enum Render { cells, bounds, mesh, single_mesh, cube_mesh, blob_mesh, best };
     private enum Strategy { all, delta };
 
     private static final double DEFAULT_SCALE = 2f;

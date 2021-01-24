@@ -27,13 +27,15 @@ public class FunctionRunner extends JDialog {
             @Override public void setCurrent(int cur) { SwingUtilities.invokeLater(()->{prog.setValue(cur);}); }
             @Override public void setStatus(String status) { SwingUtilities.invokeLater(()->{task.setText(status);}); }
         };
+        final LinkedList cancelHack = new LinkedList();
         final Functions.API api = 
             new Functions.API() {
                 @Override public MutationFactor getMutationFactor() { return mf; }
                 @Override public ExecutorService getPool() { return pool; }
                 @Override public GOptions getOptions() { return opt; }
                 @Override public Rendering getRendering() { return rend; }
-                @Override public boolean getCancelled() { return Thread.currentThread().isInterrupted(); }
+                //@Override public boolean getCancelled() { return Thread.currentThread().isInterrupted(); }
+                @Override public boolean getCancelled() { return cancelHack.size()>0; }
                 @Override public Functions.Progress getProgress() { return progress; }
             };
 
@@ -66,6 +68,7 @@ public class FunctionRunner extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 task.setText("Canceling");
                 cancel.setEnabled(false);
+                cancelHack.add("Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn");
                 int tries = 0;
                 while(++tries<10 && !runner.isInterrupted()) {
                     runner.interrupt();

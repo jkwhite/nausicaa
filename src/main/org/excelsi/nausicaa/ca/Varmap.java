@@ -46,6 +46,11 @@ public class Varmap {
         return v==null?"":v;
     }
 
+    public String get(String name, String defaultValue) {
+        String v = _vars.get(name);
+        return v==null?defaultValue:v;
+    }
+
     public Varmap put(String name, String value) {
         _vars.put(name, value);
         if(!_names.contains(name)) {

@@ -47,8 +47,10 @@ public class JfxUniverse extends Application {
     public void start(final Stage stage) {
         Rectangle2D screen = Screen.getPrimary().getVisualBounds();
 
-        JfxWorld w = new JfxWorld(100, 100, 100, true);
-        //Scene scene = new Scene(root, 1280, 1024, true, SceneAntialiasing.BALANCED);
+        //JfxWorld w = new JfxCaWorld(100, 100, 100, true);
+        //JfxWorld w = new JfxIteratedFunction(800, 800, 800, true);
+        //System.err.println("bounds: "+screen);
+        JfxWorld w = new JfxIteratedFunction(1*(int)screen.getWidth(), 1*(int)screen.getHeight(), 400, true);
         w.initScene();
         Scene scene = w.getScene();
 
@@ -74,7 +76,7 @@ public class JfxUniverse extends Application {
         stage.show();
         final List<String> args = getParameters().getRaw();
         if(args.size()>0) {
-            loadCA(new File(args.get(0)));
+            load(new File(args.get(0)));
         }
     }
 
@@ -90,13 +92,13 @@ public class JfxUniverse extends Application {
 
         Menu rend = new Menu("Render");
         MenuItem smesh = new MenuItem("Scatter Mesh");
-        smesh.setOnAction((e)->{ w.setRender(JfxCA.Render.mesh); });
+        smesh.setOnAction((e)->{ w.setRender(JfxWorld.Render.mesh); });
         MenuItem bmesh = new MenuItem("Blob Mesh");
-        bmesh.setOnAction((e)->{ w.setRender(JfxCA.Render.blob_mesh); });
+        bmesh.setOnAction((e)->{ w.setRender(JfxWorld.Render.blob_mesh); });
         MenuItem cells = new MenuItem("Cells");
-        cells.setOnAction((e)->{ w.setRender(JfxCA.Render.cells); });
+        cells.setOnAction((e)->{ w.setRender(JfxWorld.Render.cells); });
         MenuItem best = new MenuItem("Auto");
-        best.setOnAction((e)->{ w.setRender(JfxCA.Render.best); });
+        best.setOnAction((e)->{ w.setRender(JfxWorld.Render.best); });
         rend.getItems().addAll(smesh, bmesh, cells, best);
 
         Menu anim = new Menu("Animation");
@@ -130,6 +132,12 @@ public class JfxUniverse extends Application {
         scaledown.setOnAction((e)->{ w.scaleDown(); });
         view.getItems().addAll(scaleup, scaledown);
 
+        Menu exp = new Menu("Experimental");
+        MenuItem iter = new MenuItem("Iterated Function");
+        iter.setAccelerator(KeyCombination.keyCombination("Shortcut+e"));
+        iter.setOnAction((e)->{ });
+        exp.getItems().add(iter);
+
         MenuBar mb = new MenuBar();
         mb.setUseSystemMenuBar(true);
         mb.getMenus().addAll(file, rend, anim, view);
@@ -141,10 +149,11 @@ public class JfxUniverse extends Application {
         fileChooser.setTitle("A New World");
         fileChooser.getExtensionFilters().addAll(
                 new ExtensionFilter("CAs", "*.ca"),
+                new ExtensionFilter("Functions", "*.it"),
                 new ExtensionFilter("All Files", "*.*"));
         File selectedFile = fileChooser.showOpenDialog(stage);
         if (selectedFile != null) {
-            loadCA(selectedFile);
+            load(selectedFile);
         }
     }
 
@@ -218,14 +227,15 @@ public class JfxUniverse extends Application {
 
     private void generate(final GeneratorConfig c) {
         final ExecutorService pool = Pools.named("compute", 3);
-        final Iterator<Plane> frames = _w.getRule().frameIterator(_w.getPlane(), pool, new GOptions(true, 3, 1, 1f));
+        final JfxCaWorld w = (JfxCaWorld) _w;
+        final Iterator<Plane> frames = w.getRule().frameIterator(w.getPlane(), pool, new GOptions(true, 3, 1, 1f));
         final Thread t = new Thread("coordinator") {
             @Override public void run() {
                 for(int i=0;i<c.frames();i++) {
                     final String file = c.file()+"-"+i+".png";
                     System.err.println("generating "+file);
                     final Plane p = frames.next();
-                    _w.setPlane(p);
+                    w.setPlane(p);
                     p.lockWrite();
                     System.err.println("writing");
                     snap(new File(file));
@@ -242,15 +252,17 @@ public class JfxUniverse extends Application {
         t.start();
     }
 
-    private void loadCA(final File selectedFile) {
-        try {
-            CA ca = CA.fromFile(selectedFile.toString(), "text");
-            System.err.println("PRELUDE: "+ca.getPrelude());
-            //ca = ca.prelude(10);
-            _w.setCA(ca);
-        }
-        catch(IOException e) {
-            e.printStackTrace();
+    private void load(final File selectedFile) {
+        if(selectedFile.getName().endsWith(".ca")) {
+            try {
+                CA ca = CA.fromFile(selectedFile.toString(), "text");
+                System.err.println("PRELUDE: "+ca.getPrelude());
+                //ca = ca.prelude(10);
+                ((JfxCaWorld)_w).setCA(ca);
+            }
+            catch(IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

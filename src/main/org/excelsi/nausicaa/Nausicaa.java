@@ -35,8 +35,8 @@ public class Nausicaa {
         final String[] dargs = files.toArray(new String[0]);
         try {
             if(jfx) {
-                //Application.launch(JfxUniverse.class, dargs);
-                Application.launch(JfxNausicaa.class, dargs);
+                Application.launch(JfxUniverse.class, dargs);
+                //Application.launch(JfxNausicaa.class, dargs);
             }
             else if(cmd) {
                 Cli.main(dargs);

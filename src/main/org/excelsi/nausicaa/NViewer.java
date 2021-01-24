@@ -264,6 +264,7 @@ public class NViewer extends JFrame implements UIActions {
         createRenderMenu(shortcut, bar);
         createFunctionsMenu(shortcut, bar);
         createViewMenu(shortcut, bar);
+        createExperimentalMenu(shortcut, bar);
         createWindowMenu(shortcut, bar);
         root().setJMenuBar(bar);
 
@@ -1799,6 +1800,23 @@ public class NViewer extends JFrame implements UIActions {
         render.add(viewh);
 
         bar.add(render);
+    }
+
+    private void createExperimentalMenu(int shortcut, JMenuBar bar) {
+        JMenu exp = new JMenu("Experimental");
+        final JMenuItem iter = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                JWindow w = new JWindow(NViewer.this);
+                w.add(new JIteratedFunction());
+                w.setLocation(0,20);
+                w.setSize(600,600);
+                w.setVisible(true);
+            }
+        });
+        iter.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, shortcut));
+        iter.setText("Iterated Function");
+        exp.add(iter);
+        bar.add(exp);
     }
 
     private void createWindowMenu(int shortcut, JMenuBar bar) {
