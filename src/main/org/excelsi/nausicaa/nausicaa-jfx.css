@@ -1,0 +1,13 @@
+Label {
+    -fx-font: normal normal 12pt "Helvetica";
+    -fx-text-fill: white;
+}
+
+VBox {
+    -fx-spacing: 10px;
+    -fx-background-color: #111111;
+}
+
+HBox {
+    -fx-spacing: 10px;
+}
