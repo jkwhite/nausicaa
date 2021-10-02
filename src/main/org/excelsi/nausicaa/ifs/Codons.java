@@ -10,6 +10,26 @@ public class Codons {
     private Codons() {}
 
 
+    public static Op createOp(String name, double[] args, boolean fork) {
+        Op op = createOp(name, args);
+        return op.withFork(fork);
+    }
+
+    private static Op createOp(String name, double[] args) {
+        switch(name) {
+            case "circ":
+                return new FillOval(args[0], args[1], args[2], args[3]);
+            case "tran":
+                return new Translate(args[0], args[1]);
+            case "rot":
+                return new Rotate(args[0]);
+            case "scl":
+                return new Scale(args[0], args[1]);
+            default:
+                throw new RuntimeException("unknown codon '"+name+"'");
+        }
+    }
+
     abstract static class Op implements TreeTape.Op {
         private boolean _fork;
         abstract void op(GraphicsContext g);
@@ -25,9 +45,25 @@ public class Codons {
         }
     }
 
+    static class StrokeLine extends Op {
+        private double _x1, _y1, _x2, _y2;
+        public StrokeLine(double x1, double y1, double x2, double y2) {
+            _x1 = x1;
+            _y1 = y1;
+            _x2 = x2;
+            _y2 = y2;
+        }
+        @Override public void op(TreeTape.TreeNode t) {
+            t.getTape().append(this);
+        }
+        @Override public void op(GraphicsContext g) {
+            g.strokeLine(_x1, _y1, _x2, _y2);
+        }
+    }
+
     static class FillOval extends Op {
-        private int _x, _y, _w, _h;
-        public FillOval(int x, int y, int w, int h) {
+        private double _x, _y, _w, _h;
+        public FillOval(double x, double y, double w, double h) {
             _x = x;
             _y = y;
             _w = w;
@@ -41,9 +77,25 @@ public class Codons {
         }
     }
 
+    static class FillRect extends Op {
+        private double _x, _y, _w, _h;
+        public FillRect(double x, double y, double w, double h) {
+            _x = x;
+            _y = y;
+            _w = w;
+            _h = h;
+        }
+        @Override public void op(TreeTape.TreeNode t) {
+            t.getTape().append(this);
+        }
+        @Override public void op(GraphicsContext g) {
+            g.fillRect(_x, _y, _w, _h);
+        }
+    }
+
     static class StrokeRect extends Op {
-        private int _x, _y, _w, _h;
-        public StrokeRect(int x, int y, int w, int h) {
+        private double _x, _y, _w, _h;
+        public StrokeRect(double x, double y, double w, double h) {
             _x = x;
             _y = y;
             _w = w;
@@ -58,8 +110,8 @@ public class Codons {
     }
 
     static class Translate extends Op {
-        private int _x, _y;
-        public Translate(int x, int y) {
+        private double _x, _y;
+        public Translate(double x, double y) {
             _x = x;
             _y = y;
         }
@@ -99,6 +151,7 @@ public class Codons {
 
     static class Scale extends Op {
         private double _sx, _sy;
+        public Scale(double sxy) { this(sxy, sxy); }
         public Scale(double sx, double sy) {
             _sx = sx;
             _sy = sy;

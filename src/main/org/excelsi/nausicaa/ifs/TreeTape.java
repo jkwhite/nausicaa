@@ -56,7 +56,8 @@ public class TreeTape {
         }
 
         public TreeNode fork() {
-            _childs.add(new TreeNode(_t.copy()));
+            //_childs.add(new TreeNode(_t.copy()));
+            _childs.add(new TreeNode(_t));
             TreeNode fork = new TreeNode(_t.copy());
             _childs.add(fork);
             return fork;

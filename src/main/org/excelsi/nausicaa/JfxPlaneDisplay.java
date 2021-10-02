@@ -2,6 +2,8 @@ package org.excelsi.nausicaa;
 
 
 import org.excelsi.nausicaa.ca.*;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -49,14 +51,18 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Sphere;
 import javafx.scene.shape.Box;
 import javafx.scene.SceneAntialiasing;
+import javafx.scene.Camera;
 import javafx.scene.PerspectiveCamera;
+import javafx.scene.ParallelCamera;
 import javafx.animation.RotateTransition;
 import javafx.util.Duration;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Translate;
 import javafx.application.ConditionalFeature;
 import javafx.geometry.Point3D;
 import javafx.event.EventHandler;
 import javafx.animation.*;
+import javafx.animation.Animation;
 
 import org.fxyz.cameras.CameraTransformer;
 import org.fxyz.cameras.AdvancedCamera;
@@ -64,6 +70,7 @@ import org.fxyz.cameras.controllers.FPSController;
 
 
 public class JfxPlaneDisplay extends PlaneDisplay {
+    private static final Logger LOG = LoggerFactory.getLogger(JfxPlaneDisplay.class);
     private static final boolean HANDLE_UNLOCK = false;
     private static final double SCALE = 0.1f;
     private static final float SCALE_MULT = 1f;
@@ -71,11 +78,14 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     private JLabel _label;
     private JFXPanel _img;
     private JScrollPane _show;
+    private List<Animation> _animations = new ArrayList<Animation>();
+    // private RotateTransition _animations;
     private boolean _shown = true;
     private Rule _r;
     private CA _c;
     private Plane _p;
     private GOptions _gopt;
+    private Sizer _sizer;
     private int _w;
     private int _h;
     private int _d;
@@ -83,14 +93,20 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     private Group _root;
     private Group _parent;
     private Group _rotParent;
+    private Group _rotParent2;
     private JfxCA _jfxCa;
+    private View3dOptions _opts;
     private volatile int _queue;
 
 
-    public JfxPlaneDisplay(int w, int h, int d) {
+    public JfxPlaneDisplay(Sizer sizer, int w, int h, int d, View3dOptions opts) {
+        _sizer = sizer;
         _w = w;
         _h = h;
         _d = d;
+        _opts = opts;
+        _scale = _opts.scale();
+        LOG.debug("CA size: "+_w+"x"+_h+"x"+_d);
         setLayout(new BorderLayout());
         JPanel p = new JPanel(new BorderLayout());
         setForeground(Color.BLACK);
@@ -101,48 +117,86 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         _label.setBackground(Color.BLACK);
         _label.setForeground(Color.BLACK);
         _img = new JFXPanel();
-        _img.setPreferredSize(new Dimension(w, h));
+        // _img.setPreferredSize(new Dimension(2*w, 2*h));
+        Dimension sd = cellSize();
+        _img.setPreferredSize(new Dimension(sd.width-50, sd.height-50));
         p.add(_img, BorderLayout.CENTER);
-        JScrollPane scr = new JScrollPane(p);
-        scr.setBackground(Color.BLACK);
-        scr.setForeground(Color.BLACK);
-        add(scr, BorderLayout.CENTER);
-        _show = scr;
+        // JScrollPane scr = new JScrollPane(p);
+        // scr.setBackground(Color.BLACK);
+        // scr.setForeground(Color.BLACK);
+        // add(scr, BorderLayout.CENTER);
+        // _show = scr;
+        add(p, BorderLayout.CENTER);
+        // _show = scr;
         Platform.runLater(()->{ initScene(); });
         Platform.setImplicitExit(false);
-        System.err.println("scheduled initScene");
+        LOG.debug("scheduled initScene");
     }
 
-    public JfxPlaneDisplay(CA ca, GOptions gopt) {
-        this(ca.getWidth(), ca.getHeight(), ca.getDepth());
+    public JfxPlaneDisplay(Sizer sizer, CA ca, GOptions gopt, View3dOptions opts) {
+        this(sizer, ca.getWidth(), ca.getHeight(), ca.getDepth(), opts);
         _gopt = gopt;
         setCA(ca);
     }
 
-    public JfxPlaneDisplay(Plane p) {
-        this(p.getWidth(), p.getHeight(), p.creator().getDepth());
+    public JfxPlaneDisplay(Sizer sizer, Plane p, View3dOptions opts) {
+        this(sizer, p.getWidth(), p.getHeight(), p.creator().getDepth(), opts);
         setCA(p.creator());
+    }
+
+    @Override public void setAnimationsEnabled(boolean e) {
+        if(e) {
+            for(Animation a:_animations) {
+                a.play();
+            }
+        }
+        else {
+            for(Animation a:_animations) {
+                a.pause();
+            }
+        }
+        _opts.animate(e);
+    }
+
+    @Override public boolean getAnimationsEnabled() {
+        return false;
+    }
+
+    private Dimension cellSize() {
+        Dimension d = _sizer.getAppSize();
+        if(!_opts.root()) {
+            return new Dimension(d.width/3, d.height/3);
+        }
+        return d;
     }
 
     private void initScene() {
         System.err.println("running initScene");
         final double INC = 5d;
         _root = new Group();
-        final int sz = 300;
-        Scene s = new Scene(_root, sz, sz, true, SceneAntialiasing.DISABLED);
+        // final int sz = 300;
+        final int sz = _opts.root()?900:300;
+        Dimension sd = cellSize(); //_sizer.getAppSize();
+        LOG.info("isRoot="+_opts.root());
+        Scene s = new Scene(_root, sd.width, sd.height, true, SceneAntialiasing.BALANCED);
         s.setFill(javafx.scene.paint.Color.BLACK);
         final PerspectiveCamera cam = new PerspectiveCamera(false);
-        cam.setFarClip(6000);
+        // final ParallelCamera cam = new ParallelCamera();
+        cam.setFarClip(12000);
         s.setCamera(cam);
 
-        //cam.setTranslateX(-600);
-        //cam.setTranslateY(-900);
+        // cam.setTranslateX(-600);
+        // cam.setTranslateY(-900);
         //cam.getTransforms().add(new Rotate(45, new Point3D(1,0,0)));
 
+        Group rotParent2 = new Group();
         Group rotParent = new Group();
         Group parent = new Group();
-        parent.setTranslateX((int)(sz*.8));
-        parent.setTranslateY((int)(sz*.4));
+        // parent.setTranslateX((int)(sz*.8));
+        // parent.setTranslateY((int)(sz*.4));
+        parent.setTranslateX(sd.width/2);
+        parent.setTranslateY(sd.height/2);
+        parent.setTranslateZ((int)(sz));
         parent.getTransforms().add(new Rotate(-45, new Point3D(1,0,0)));
 
         //_jfxCa = new JfxCA(_ca);
@@ -151,18 +205,33 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         //parent.getChildren().add(_jfxCa);
         _root.getChildren().add(parent);
         _parent = parent;
-        parent.getChildren().add(rotParent);
+        parent.getChildren().add(rotParent2);
+        rotParent2.getChildren().add(rotParent);
+        // parent.getChildren().add(rotParent);
         _rotParent = rotParent;
+
+        // Sphere sph = new Sphere(20);
+        // sph.setTranslateZ(20);
+        // sph.setTranslateX(sd.width/2);
+        // sph.setTranslateY(sd.height/2);
+        // _rotParent.getChildren().add(sph);
 
         RotateTransition t = new RotateTransition(Duration.millis(36000), rotParent);
         t.setByAngle(360);
         t.setCycleCount(t.INDEFINITE);
-        t.play();
+        _animations.add(t);
+        if(_opts.animate()) {
+            t.play();
+        }
 
-        //RotateTransition t2 = new RotateTransition(Duration.millis(76000), parent);
-        //t2.setByAngle(360);
-        //t2.setCycleCount(t.INDEFINITE);
-        //t2.play();
+        RotateTransition t2 = new RotateTransition(Duration.millis(76000), rotParent2);
+        t2.setAxis(Rotate.X_AXIS);
+        t2.setByAngle(360);
+        t2.setCycleCount(t.INDEFINITE);
+        _animations.add(t2);
+        if(_opts.animate()) {
+            t2.play();
+        }
 
         /*
         Group move = new Group();
@@ -344,8 +413,9 @@ public class JfxPlaneDisplay extends PlaneDisplay {
                 _rotParent.getChildren().remove(_jfxCa);
             }
             _jfxCa = new JfxCA(ca, _scale*SCALE_MULT, 40, JfxWorld.Render.best);
-            //_jfxCa.setTranslateX(-ca.getWidth()*_scale*SCALE_MULT/3);
-            _jfxCa.setTranslateZ(-ca.getHeight()*_scale*SCALE_MULT/2);
+            _jfxCa.setTranslateX(ca.getWidth()*_scale*SCALE_MULT/2);
+            _jfxCa.setTranslateY(ca.getDepth()*_scale*SCALE_MULT/1.5);
+            _jfxCa.setTranslateZ(-ca.getHeight()*_scale*SCALE_MULT/1.5);
             //_parent.getChildren().add(_jfxCa);
             _rotParent.getChildren().add(_jfxCa);
             //RotateTransition t = new RotateTransition(Duration.millis(36000), _jfxCa);
@@ -434,5 +504,30 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     public void generate(Initializer i) {
         _c.setInitializer(i);
         setPlane(_c.createPlane());
+    }
+
+    @Override public void save(String file, Rendering r) throws java.io.IOException {
+        if(!file.endsWith(".png")) {
+            file = file+".png";
+        }
+        JfxUtils.snap(new java.io.File(file), _img.getScene());
+    }
+
+    public void lookAt(Camera cam, Point3D cameraPosition, Point3D lookAtPos) {        
+        //Create direction vector
+        Point3D camDirection = lookAtPos.subtract(cameraPosition.getX(), cameraPosition.getY(), cameraPosition.getZ());
+        camDirection = camDirection.normalize();
+          
+        double xRotation = Math.toDegrees(Math.asin(-camDirection.getY()));
+        double yRotation =  Math.toDegrees(Math.atan2( camDirection.getX(), camDirection.getZ()));
+        
+        Rotate rx = new Rotate(xRotation, cameraPosition.getX(), cameraPosition.getY(), cameraPosition.getZ(), Rotate.X_AXIS);
+        Rotate ry = new Rotate(yRotation, cameraPosition.getX(), cameraPosition.getY(), cameraPosition.getZ(),  Rotate.Y_AXIS);
+        
+        cam.getTransforms().addAll( ry, rx, 
+                new Translate(
+                        cameraPosition.getX(), 
+                        cameraPosition.getY(), 
+                        cameraPosition.getZ()));
     }
 }

@@ -1,14 +1,31 @@
+buildscript {
+    repositories {
+        maven {
+            url uri('https://plugins.gradle.org/m2/')
+        }
+    }
+    dependencies {
+        apply from: 'https://raw.githubusercontent.com/i-net-software/SetupBuilder/master/scripts/SetupBuilderVersion.gradle'
+        classpath 'gradle.plugin.de.inetsoftware:SetupBuilder:' + setupBuilderVersion()
+    }
+}
+
 plugins {
     id 'java'
     id 'groovy'
-    id 'application'
-    id "edu.sc.seis.macAppBundle" version "2.3.0"
+    id 'application' // <1>
+    id 'distribution'
+    // id 'de.inetsoftware.appbundler' version "7.2.11"
+    // id "edu.sc.seis.macAppBundle" version "2.3.0"
+    id "com.scuilion.syntastic" version "0.3.9"
+    id 'org.openjfx.javafxplugin' version '0.0.10'
 }
 
-version='1.0'
-group='excelsiorg'
-applicationName='Nausicaa'
-mainClassName='org.excelsi.nausicaa.Nausicaa'
+apply plugin: 'de.inetsoftware.setupbuilder'
+
+// repositories {
+    // mavenCentral()
+// }
 
 repositories {
     //jcenter()
@@ -32,9 +49,15 @@ dependencies {
     implementation 'slf4j:slf4j-api:1.7.7'
     implementation 'slf4j:slf4j-log4j12:1.7.7'
     implementation 'apache:log4j:1.2.15'
+    implementation 'mrj:MRJToolkitStubs:1.0'
 
     testImplementation 'junit:junit:4.12'
+
+    // apply from: 'https://raw.githubusercontent.com/i-net-software/SetupBuilder/master/scripts/SetupBuilderVersion.gradle'
+    // classpath 'gradle.plugin.de.inetsoftware:SetupBuilder:' + setupBuilderVersion()
 }
+
+// apply plugin: "de.inetsoftware.appbundler"
 
 test {
     useJUnit()
@@ -52,29 +75,41 @@ sourceSets {
         }
     }
     test {
-        java {
-            srcDirs = ['src/test']
-        }
-        groovy {
-            srcDirs = ['src/test']
-        }
+        // java {
+            // srcDirs = ['src/test']
+        // }
+        // groovy {
+            // srcDirs = ['src/test']
+        // }
     }
+}
+
+javafx {
+    version = '11'
+    modules = [ 'javafx.base', 'javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.swing' ]
 }
 
 application {
     applicationDefaultJvmArgs = ["-Xmx12g","-Dapple.laf.useScreenMenuBar=true","-XX:-OmitStackTraceInFastThrow","-Dapp.root=HACK_FOR_GRADLE"]
     startScripts {
         doLast {
-            unixScript.text = unixScript.text.replace('HACK_FOR_GRADLE', '\$APP_HOME')
+            unixScript.text = unixScript.text.replace('HACK_FOR_GRADLE', '\'\$APP_HOME\'')
             unixScript.text = unixScript.text.replace('-classpath','\$GRADLE_OPTS -classpath')
             windowsScript.text = windowsScript.text.replace('HACK_FOR_GRADLE', '%~dp0..')
         }
     }
+    mainClass='org.excelsi.nausicaa.Nausicaa'
+    version='1.0'
+    group='excelsiorg'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
 
 distributions {
     main {
-        baseName='Nausicaa'
+        distributionBaseName='Nausicaa'
         contents {
         }
     }
@@ -84,6 +119,107 @@ applicationDistribution.from("src/etc/") {
     into "etc"
 }
 
+setupBuilder {
+    vendor          = "excelsiorg";
+    copyright       = "Copyright © 2021 excelsiorg"
+    description     = "Nausicaa";
+    
+    // optional, defaults to project name
+    // application     = "My Application";
+
+    version         = "1.0.0";
+    appIdentifier   = "org.excelsi.nausicaa";
+
+    // optional, defaults to {appIdentifier}-{version}
+    // archiveName     = "com.application.my-1.0.0";
+
+    icons           = "src/resources/nausicaa.icns";
+
+    mainClass       = "org.excelsi.nausicaa.Nausicaa";
+    
+    // main jar file in the installed structure, relative to root.
+    mainJar         = "libs/nausicaa-1.0.jar";
+
+    destinationDir  = "";
+
+    // optional, define the Java Runtime for the installation. See below
+    // bundleJre       = <JRE DEFINITION>;
+    
+    // optional, a directory in the installed structure (will be created)
+    // bundleJreTarget = "runtime";
+
+    // optional, will make the gradle job fail if not CopySpec source is given
+    failOnEmptyFrom = "true";
+}
+
+
+// System.err.println("#############")
+// System.err.println(java.util.Arrays.asList(project.class.methods))
+// System.err.println("#############")
+import org.gradle.api.tasks.Internal 
+
+/*
+Plugin is broken
+dmg {
+    // The user the services will be executed with, defaults to root
+    daemonUser = "root" 
+
+    // optional, sets an application identifier for the DMG builder.
+    // It is being used as ID in the Info.plist
+    applicationIdentifier = "org.excelsi.nausicaa.Nausicaa"
+
+    // a background image used for the `.dmg` file
+    // backgroundImage = "background.png"
+    
+    // the background image used in the `.pkg` installer file
+    // setupBackground = "setup.png"
+
+    // the background image used in the `.pkg` installer file for dark mode
+    // setupDarkBackground = "setup.png"
+    
+    // optional, the icon of the `.pkg` installer file
+    setupIcon = "setup.icns"
+    
+    // a Java java.awt.Color Object - used as background color in the `.dmg` image
+    backgroundColor = new java.awt.Color( 31, 31, 31);
+    
+    // optional, sets the `.dmg` window width
+    windowWidth = 400
+    
+    // optional, sets the `.dmg` window height
+    windowHeight = 300
+
+    // optional, width correction of the `.dmg` window
+    // this may be needed if there is a background-image
+    // set which does not take the borders of the window into account
+    windowWidthCorrection = 0
+    
+    // optional, height correction of the `.dmg` window
+    // this may be needed if there is a background-image
+    // set which does not take the borders of the window into account
+    windowHeightCorrection = 22
+
+    // optional, the size of the icons in the `.dmg`. Defaults to 128
+    iconSize = 128
+    
+    // optional, the fontSize of the `.dmg` file names displayed below the application items
+    fontSize = 14
+
+    // definition of the first page displayed in a package installer
+    // can be defined multiple times
+    // welcomePage { ... }
+    
+    // definition of the last page displayed in a package installer
+    // can be defined multiple times
+    // conclusionPage { ... }
+
+    // Code Signing information
+    codeSign { }
+}
+*/
+
+
+/*
 macAppBundle {
     appName='Nausicaa'
     mainClassName = project.mainClassName
@@ -93,18 +229,4 @@ macAppBundle {
     javaProperties.put("apple.laf.useScreenMenuBar", "true")
     appStyle='Oracle'
 }
-
-task fixupDist(type: Copy) {
-    from("$buildDir/install/Nausicaa/lib/") {
-        into("${project.macAppBundle.jarSubdir}")
-    }
-    from("$buildDir/install/Nausicaa/etc/") {
-        into("etc")
-    }
-    into("${project.buildDir}/${project.macAppBundle.appOutputDir}/${project.macAppBundle.appName}.app/Contents/")
-}
-
-project.tasks.getByName("createApp").dependsOn(project.tasks.getByName("installDist"))
-project.tasks.getByName("fixupDist").dependsOn(project.tasks.getByName("createApp"))
-project.tasks.getByName("fixupDist").dependsOn(project.tasks.getByName("installDist"))
-project.tasks.getByName("createDmg").dependsOn(project.tasks.getByName("fixupDist"))
+*/

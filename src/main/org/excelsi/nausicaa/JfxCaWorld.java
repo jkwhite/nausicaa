@@ -37,8 +37,25 @@ public class JfxCaWorld extends JfxWorld implements PlanescapeProvider, Planesca
     private volatile int _queue;
 
 
-    public JfxCaWorld(int w, int h, int d, boolean useBorder) {
-        super(w, h, d, useBorder);
+    public JfxCaWorld(int w, int h, int d, boolean useBorder, boolean useRegion) {
+        super(w, h, d, useBorder, useRegion);
+    }
+
+    @Override public void load(File selectedFile) {
+        if(selectedFile.getName().endsWith(".ca")) {
+            try {
+                CA ca = CA.fromFile(selectedFile.toString(), "text");
+                System.err.println("PRELUDE: "+ca.getPrelude());
+                //ca = ca.prelude(10);
+                setCA(ca);
+            }
+            catch(IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override public void save(File f) {
     }
 
     @Override public Plane getPlane() {

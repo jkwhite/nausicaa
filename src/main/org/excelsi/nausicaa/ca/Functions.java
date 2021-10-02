@@ -49,7 +49,10 @@ public class Functions {
     }
 
     public static void initAppRoot() {
-        if(System.getProperty("app.root")==null) {
+        if("HACK_FOR_GRADLE".equals(System.getProperty("app.root"))) {
+            System.setProperty("app.root", "./build/resources/main");
+        }
+        else if(System.getProperty("app.root")==null) {
             String jcp = System.getProperty("java.class.path");
             if(jcp.indexOf("Contents/")>0) {
                 jcp = jcp.substring(0, jcp.indexOf("Contents/"));
@@ -61,12 +64,32 @@ public class Functions {
                     abandon("not a directory or no such file '"+root+"'");
                 }
             }
+            else if(jcp.indexOf("Nausicaa-1.0")>0) {
+                jcp = jcp.substring(0, jcp.indexOf("Nausicaa-1.0"));
+                File root = new File(jcp+"/Nausicaa-1.0/");
+                if(root.isDirectory()) {
+                    System.setProperty("app.root", root.toString());
+                }
+                else {
+                    abandon("not a directory or no such file '"+root+"'");
+                }
+            }
             else {
-                abandon("Could not find 'Contents/' in '"+jcp+"'");
+                abandon("could not find 'Contents/' in '"+jcp+"'");
             }
         }
-        if(System.getProperty("app.root")==null) {
+        String root = System.getProperty("app.root");
+        if(root==null) {
             abandon("somehow app.root is still null");
+        }
+        if(root.charAt(0)=='$') {
+            String env = root.substring(1);
+            String resolved = System.getenv(env);
+            if(resolved==null) {
+                abandon("no such environment var '"+root+"'");
+            }
+            System.err.println("resolved '"+root+"' => '"+resolved+"'");
+            System.setProperty("app.root", resolved);
         }
         System.err.println("app.root='"+System.getProperty("app.root")+"'");
     }
@@ -75,7 +98,10 @@ public class Functions {
         initAppRoot();
         File funcs = new File(System.getProperty("app.root")+"/etc/functions");
         if(!funcs.exists() || !funcs.isDirectory()) {
-            abandon("bad function path '"+funcs+"'");
+            funcs = new File(System.getProperty("app.root")+"/functions");
+            if(!funcs.exists() || !funcs.isDirectory()) {
+                abandon("bad function path '"+funcs+"'");
+            }
         }
         for(File f:funcs.listFiles()) {
             if(!f.getName().startsWith(".")) {

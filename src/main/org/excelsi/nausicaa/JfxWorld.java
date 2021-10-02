@@ -9,6 +9,8 @@ import javafx.embed.swing.JFXPanel;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Sphere;
 import javafx.scene.shape.Box;
@@ -23,7 +25,11 @@ import javafx.application.ConditionalFeature;
 import javafx.geometry.Point3D;
 import javafx.event.EventHandler;
 import javafx.animation.*;
+import javafx.scene.layout.*;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.effect.Light;
 import javafx.scene.effect.Lighting;
 
@@ -46,19 +52,23 @@ public abstract class JfxWorld {
     protected Group _parent;
     protected Group _rotParent;
     protected Group _root;
+    protected StackPane _stack;
+    protected BorderPane _gui;
     private Scene _scene;
     //private JfxCA _jfxCa;
     private final boolean _useBorder;
+    private final boolean _useRegion;
     private BorderPane _border;
     private List<RotateTransition> _rots;
     //private volatile int _queue;
 
 
-    public JfxWorld(int w, int h, int d, boolean useBorder) {
+    public JfxWorld(int w, int h, int d, boolean useBorder, boolean useRegion) {
         _w = w;
         _h = h;
         _d = d;
         _useBorder = useBorder;
+        _useRegion = useRegion;
     }
 
     public Scene getScene() {
@@ -68,6 +78,14 @@ public abstract class JfxWorld {
     public BorderPane getBorder() {
         return _border;
     }
+
+    public BorderPane getGui() {
+        return _gui!=null?_gui:getBorder();
+    }
+
+    abstract public void load(File f);
+
+    abstract public void save(File f);
 
     abstract public void scaleUp();
 
@@ -93,11 +111,32 @@ public abstract class JfxWorld {
     public void initScene() {
         final double INC = 15d;
         Scene s;
-        if(_useBorder) {
+        if(_useRegion) {
+            _border = new BorderPane();
+            _border.setStyle("-fx-background-color: transparent;");
+            Group g = new Group();
+            _root = g;
+
+            _gui = new BorderPane();
+            _gui.setStyle("-fx-background-color: transparent;");
+            _stack = new StackPane();
+            _stack.setStyle("-fx-background-color: transparent;");
+            //_border.setCenter(new Rectangle(100,100,javafx.scene.paint.Color.BLUE));
+            //g.getChildren().add(new Rectangle(100,100,javafx.scene.paint.Color.BLUE));
+            _border.setCenter(g);
+            _stack.getChildren().addAll(_border, _gui);
+            s = new Scene(_stack, 2*_w, 2*_h, _d>0?true:false, SceneAntialiasing.BALANCED);
+        }
+        else if(_useBorder) {
             BorderPane bp = new BorderPane();
             bp.setStyle("-fx-background-color: transparent;");
             Group g = new Group();
             bp.setCenter(g);
+            Label lab = new Label("AWDPOKAWDOPKAWD");
+            lab.setStyle("-fx-text-fill: white;");
+            VBox vb = new VBox();
+            vb.getChildren().add(lab);
+            bp.setRight(vb);
             s = new Scene(bp, 2*_w, 2*_h, _d>0?true:false, SceneAntialiasing.BALANCED);
             _root = g;
             _border = bp;
@@ -132,13 +171,6 @@ public abstract class JfxWorld {
 
         Group parent = new Group();
         _root.getChildren().add(parent);
-
-        //Light.Point l = new Light.Point();
-        //Light.Distant l = new Light.Distant();
-        //Lighting li = new Lighting();
-        //li.setLight(l);
-        //li.setSurfaceScale(50.0);
-        //parent.setEffect(li);
 
         List<RotateTransition> trans = new ArrayList<>();
         RotateTransition tr = new RotateTransition(Duration.millis(36000), parent);

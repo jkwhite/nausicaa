@@ -23,6 +23,7 @@ import javafx.scene.transform.Affine;
 import javafx.application.ConditionalFeature;
 import javafx.geometry.Point3D;
 import javafx.event.EventHandler;
+import javafx.scene.effect.*;
 import javafx.animation.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.effect.Light;
@@ -46,24 +47,65 @@ public class JfxIteratedFunction extends JfxWorld {
     private IteratedFunction _ifs;
     private Animate _anim;
 
-    public JfxIteratedFunction(int w, int h, int d, boolean useBorder) {
-        super(w, h, d, useBorder);
+    public JfxIteratedFunction(int w, int h, int d, boolean useBorder, boolean useRegion) {
+        super(w, h, d, useBorder, useRegion);
     }
 
     @Override public void initScene() {
         super.initScene();
-        _c = new Canvas(3*_w, 3*_h);
+        _c = new Canvas(1*_w, 1*_h);
         _rotParent.getChildren().add(_c);
+        //_root.getChildren().add(_c);
         _g = _c.getGraphicsContext2D();
         _g.setStroke(javafx.scene.paint.Color.WHITE);
+        _g.setFill(javafx.scene.paint.Color.WHITE);
+        _g.fillRect(100, 100, 200, 200);
         Random r = new Random();
         //ifs1();
         //ifs4();
         //ifs3(2);
         //_ifs = createIfs3();
-        _ifs = new IteratedFunctionFactory("ifs3", "abcd")
+        _ifs = new IteratedFunctionFactory("ifs3", "16:circ(0,1,2,3):rot(90) tran(6,7)")
             .createIfs(new Varmap());
-        //new Animate().start();
+        //new Animate(_ifs).start();
+    }
+
+    @Override public void load(File selectedFile) {
+        if(selectedFile.getName().endsWith(".ifs")) {
+            //try {
+                //CA ca = CA.fromFile(selectedFile.toString(), "text");
+                //System.err.println("PRELUDE: "+ca.getPrelude());
+                //setCA(ca);
+            //}
+            //catch(IOException e) {
+                //e.printStackTrace();
+            //}
+        }
+    }
+
+    @Override public void save(File f) {
+    }
+
+    private volatile Thread _gen;
+    public boolean isGenerating() { return _gen!=null; }
+    public void setFunction(IteratedFunction ifs) {
+        _ifs = ifs;
+        _gen = new Thread() {
+            @Override public void run() {
+                LOG.info("starting iteration");
+                for(int i=0;i<_ifs.getMaxIter();i++) {
+                    _ifs.iterate();
+                }
+                Platform.runLater(()->{
+                    LOG.info("rendering...");
+                    _ifs.initialize(_g, _w, _h);
+                    _ifs.render(_g, _w, _h);
+                    LOG.info("done render");
+                    _gen = null;
+                });
+            }
+        };
+        _gen.start();
     }
 
     /*

@@ -312,6 +312,13 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         return _scale;
     }
 
+    @Override public void setAnimationsEnabled(boolean e) {
+    }
+
+    @Override public boolean getAnimationsEnabled() {
+        return false;
+    }
+
     @Override public Rendering getRendering() {
         return _rend;
     }
@@ -343,5 +350,9 @@ public class SwingPlaneDisplay extends PlaneDisplay {
     public void generate(Initializer i) {
         _c.setInitializer(i);
         setPlane(_c.createPlane(Pools.prelude(), _gopt));
+    }
+
+    @Override public void save(String file, Rendering r) throws java.io.IOException {
+        getPlane().save(file, r);
     }
 }

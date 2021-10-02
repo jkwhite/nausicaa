@@ -17,6 +17,8 @@ public abstract class PlaneDisplay extends JComponent implements Planescape {
     @Override abstract public void setPlane(Plane plane);
     abstract public void setScale(float scale);
     abstract public float getScale();
+    abstract public void setAnimationsEnabled(boolean e);
+    abstract public boolean getAnimationsEnabled();
     abstract public Rendering getRendering();
     abstract public int getCAWidth();
     abstract public int getCAHeight();
@@ -25,5 +27,6 @@ public abstract class PlaneDisplay extends JComponent implements Planescape {
     abstract public void reroll(Initializer i);
     abstract public void generate(Initializer i);
     abstract public void toggleShow();
+    abstract public void save(String file, Rendering r) throws java.io.IOException;
     @Override abstract public boolean delegateUnlock();
 }

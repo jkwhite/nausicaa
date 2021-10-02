@@ -65,7 +65,6 @@ public class GenomeFactory {
             weight(2, new Push(-1, a.sourceLength())),
             weight(2, new Constant(-1, -1)),
             weight(1, new Duplicate()),
-            weight(1, new Exclamatory()),
             weight(1, new Supersymmetry(a.colors()-1)),
             weight(1, new RotVecN(a.sourceLength())),
             weight(1, new GreaterThan()),
@@ -93,9 +92,13 @@ public class GenomeFactory {
         ));
         if(a.isContinuous()) {
             cs.add(weight(1,new HistoTroveFloat()));
+            weight(1, new Exclamatory()); // currently unimplemented
         }
         else {
             cs.add(weight(1,new HistoTroveInt()));
+            if(a.colors()<=10) {
+                weight(1, new Exclamatory());
+            }
         }
         if(true) {
             cs.add(weight(1,new Coord(-1)));

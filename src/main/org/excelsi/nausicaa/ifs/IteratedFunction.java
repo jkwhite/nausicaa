@@ -4,6 +4,7 @@ package org.excelsi.nausicaa.ifs;
 import java.util.*;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.transform.Affine;
+import javafx.scene.paint.*;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.excelsi.nausicaa.ifs.Codons.Op;
@@ -49,7 +50,15 @@ public class IteratedFunction {
     public void initialize(GraphicsContext g, int w, int h) {
         g.setFill(javafx.scene.paint.Color.WHITE);
         g.setStroke(javafx.scene.paint.Color.WHITE);
+        Stop[] stops = new Stop[] { new Stop(0, Color.WHITE), new Stop(1, Color.RED)};
+        LinearGradient lg1 = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, stops);
+        g.setFill(lg1);
+        
         Affine a = null;
+        a = g.getTransform(a);
+        a.setToIdentity();
+        g.setTransform(a);
+        g.clearRect(0, 0, w, h);
         a = g.getTransform(a);
         a.appendTranslation(w/2, h/2);
         g.setTransform(a);

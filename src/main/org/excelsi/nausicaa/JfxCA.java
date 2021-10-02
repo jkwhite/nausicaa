@@ -4,6 +4,9 @@ package org.excelsi.nausicaa;
 import org.excelsi.nausicaa.ca.*;
 import static org.excelsi.nausicaa.JfxWorld.Render;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedList;
@@ -36,6 +39,7 @@ import org.fxyz3d.shapes.primitives.TetrahedraMesh;
 
 
 public class JfxCA extends Group {
+    private static final Logger LOG = LoggerFactory.getLogger(JfxCA.class);
     //public enum Render { cells, bounds, mesh, single_mesh, cube_mesh, blob_mesh, best };
     private enum Strategy { all, delta };
 
@@ -233,7 +237,7 @@ public class JfxCA extends Group {
             blobs = new Blobs().blobs((IntPlane)p, Blobs.Mode.finite);
         }
         int count = 0;
-        System.err.println("creating "+blobs.size()+" blobs");
+        LOG.info("creating "+blobs.size()+" blobs");
         // TODO: autoselect best render
         // TODO: render local changes faster - relative to current pos
         for(Blobs.Blob blob:blobs) {
@@ -244,7 +248,7 @@ public class JfxCA extends Group {
             g.setTranslateZ(blob.z1*_scale);
             getChildren().add(g);
         }
-        System.err.println("created "+blobs.size()+" blobs, "+count+" points");
+        LOG.info("created "+blobs.size()+" blobs, "+count+" points");
     }
 
     private void renderBlobMesh(IntPlane p, List<Blobs.Blob> blobs) {
@@ -253,7 +257,7 @@ public class JfxCA extends Group {
             blobs = new Blobs().blobs(p, Blobs.Mode.finite);
         }
         int count = 0;
-        System.err.println("creating "+blobs.size()+" blobs");
+        LOG.info("creating "+blobs.size()+" blobs");
         for(Blobs.Blob blob:blobs) {
             Group g = createBlobMesh(blob);
             count += blob.points().size();
@@ -262,7 +266,7 @@ public class JfxCA extends Group {
             g.setTranslateZ(blob.z1*_scale);
             getChildren().add(g);
         }
-        System.err.println("created "+blobs.size()+" blobs, "+count+" points");
+        LOG.info("created "+blobs.size()+" blobs, "+count+" points");
     }
 
     private void renderSingleMesh(IntPlane p) {

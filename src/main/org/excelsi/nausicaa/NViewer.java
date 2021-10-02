@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 
-public class NViewer extends JFrame implements UIActions {
+public class NViewer extends JFrame implements UIActions, Sizer {
     private static final Logger LOG = LoggerFactory.getLogger(NViewer.class);
 
     private static int _width;
@@ -47,6 +47,10 @@ public class NViewer extends JFrame implements UIActions {
     }
 
     public static UIActions getUIActions() {
+        return instance();
+    }
+
+    public static NViewer instance() {
         return _instance;
     }
 
@@ -87,7 +91,7 @@ public class NViewer extends JFrame implements UIActions {
 
     @Override public void branch(CA c) {
         String name = ""+(1+_tabs.getTabCount());
-        Futures f = new Futures(_config, _timeline, c, new Random(), name);
+        Futures f = new Futures(this, _config, _timeline, c, new Random(), name);
         JPanel main = new JPanel(new BorderLayout());
         main.add(f, BorderLayout.CENTER);
         _tabs.addTab(name, main);
@@ -115,6 +119,11 @@ public class NViewer extends JFrame implements UIActions {
         return this;
     }
 
+    @Override public Dimension getAppSize() {
+        JRootPane p = getRootPane();
+        return p.getSize();
+    }
+
     public void init() {
         //final int w = 600, h = 600, d = 1;
         //final int w = 300, h = 300, d = 1, pre = 0;
@@ -134,7 +143,7 @@ public class NViewer extends JFrame implements UIActions {
 
         JPanel main = new JPanel(new BorderLayout());
 
-        Futures f = new Futures(_config, _timeline, ca, new Random(), "1");
+        Futures f = new Futures(this, _config, _timeline, ca, new Random(), "1");
         _futures = f;
         main.add(f, BorderLayout.CENTER);
 
@@ -352,6 +361,11 @@ public class NViewer extends JFrame implements UIActions {
                 _a.exportGenerated(NViewer.this, _config);
             }
         };
+        // AbstractAction snapScene = new AbstractAction() {
+            // public void actionPerformed(ActionEvent e) {
+                // _a.snapshotScene(NViewer.this, _config);
+            // }
+        // };
         JMenuItem ni = file.add(newCA);
         ni.setText("New ...");
         ni.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, shortcut));
@@ -611,6 +625,15 @@ public class NViewer extends JFrame implements UIActions {
         JMenuItem isepia = pal.add(sepia);
         isepia.setText("Sepia");
 
+        AbstractAction rwb = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
+                setActiveCA(getActiveCA().palette(applyPaletteOptions(Palette.rainbow(getActiveCA().getPalette().getColorCount(), false /*blackZero(_config)*/, new int[][]{ {255,0,0}, {255,255,255}, {0,0,255}, {255,0,0} }), _config)));
+            }
+        };
+        JMenuItem irwb = pal.add(rwb);
+        irwb.setText("Red White and Blue");
+
         pal.addSeparator();
 
         AbstractAction acbgreens = new AbstractAction() {
@@ -813,6 +836,22 @@ public class NViewer extends JFrame implements UIActions {
         zoomone.setText("Actual size");
         zoomone.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, shortcut));
 
+        auto.addSeparator();
+
+        AbstractAction rot = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        _futures.setAnimationsEnabled(!_futures.getAnimationsEnabled());
+                        //_futures.revalidate();
+                    }
+                });
+            }
+        };
+        JMenuItem rotate = auto.add(rot);
+        rotate.setText("Toggle animations");
+        rotate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, shortcut | InputEvent.SHIFT_DOWN_MASK));
+
         bar.add(auto);
     }
 
@@ -879,6 +918,25 @@ public class NViewer extends JFrame implements UIActions {
         ran.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, shortcut));
         ran.setState(_init==Initializers.random);
 
+        /*
+        AbstractAction fixa = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _init = Initializers.single;
+                _a.chooseSingle(NViewer.this, _config);
+                //_initializer = new SingleInitializer();
+                //setActiveCA(getActiveCA().initializer(_initializer));
+                hack[0].setState(false);
+                hack[1].setState(true);
+                hack[2].setState(false);
+                hack[3].setState(false);
+                hack[4].setState(false);
+                hack[5].setState(false);
+                hack[6].setState(false);
+                hack[7].setState(false);
+                //_a.generate(NViewer.this);
+            }
+        };
+        */
         JCheckBoxMenuItem fix = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _init = Initializers.single;
@@ -896,10 +954,10 @@ public class NViewer extends JFrame implements UIActions {
                 //_a.generate(NViewer.this);
             }
         });
-        auto.add(fix);
         fix.setText("Fixed initial state");
         fix.setSelected(_init==Initializers.single);
         fix.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcut));
+        auto.add(fix);
         hack[1] = fix;
 
         JCheckBoxMenuItem wrd = new JCheckBoxMenuItem(new AbstractAction() {
@@ -1776,6 +1834,7 @@ public class NViewer extends JFrame implements UIActions {
         render.add(view3d);
         vhack[0] = view3d;
         view3d.setText("View in 3D");
+        view3d.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, shortcut | InputEvent.SHIFT_DOWN_MASK));
         //view3d.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, shortcut));
 
         final JMenuItem eview3d = new JMenuItem(new AbstractAction() {
@@ -1788,7 +1847,6 @@ public class NViewer extends JFrame implements UIActions {
             }
         });
         eview3d.setText("View in 3D external");
-        eview3d.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, shortcut | InputEvent.SHIFT_DOWN_MASK));
         render.add(eview3d);
 
         final JMenuItem viewh = new JMenuItem(new AbstractAction() {

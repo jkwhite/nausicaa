@@ -1,7 +1,11 @@
 package org.excelsi.nausicaa;
 
 
+import org.excelsi.nausicaa.ifs.IteratedFunctionFactory;
+import org.excelsi.nausicaa.ifs.IteratedFunction;
 import org.excelsi.nausicaa.ca.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Optional;
@@ -14,6 +18,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
+import javafx.scene.effect.*;
 import javafx.scene.*;
 import javafx.scene.shape.*;
 import javafx.stage.Stage;
@@ -37,9 +42,12 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.input.KeyCombination;
 import javax.imageio.ImageIO;
 import javafx.embed.swing.SwingFXUtils;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 public class JfxUniverse extends Application {
+    private static final Logger LOG = LoggerFactory.getLogger(JfxUniverse.class);
     private JfxWorld _w;
 
 
@@ -50,12 +58,13 @@ public class JfxUniverse extends Application {
         //JfxWorld w = new JfxCaWorld(100, 100, 100, true);
         //JfxWorld w = new JfxIteratedFunction(800, 800, 800, true);
         //System.err.println("bounds: "+screen);
-        JfxWorld w = new JfxIteratedFunction(1*(int)screen.getWidth(), 1*(int)screen.getHeight(), 400, true);
+        JfxWorld w = new JfxIteratedFunction(1*(int)screen.getWidth(), 1*(int)screen.getHeight(), 400, true, true);
         w.initScene();
         Scene scene = w.getScene();
 
         Node menu = createMenu(stage, w);
-        w.getBorder().setTop(menu);
+        w.getGui().setTop(menu);
+        w.getGui().getStylesheets().add("/org/excelsi/nausicaa/nausicaa-jfx.css");
         //scene.getStylesheets().add("/org/excelsi/solace/solace-default.css");
         //String usercss = _mc.getShellFactory().getMetaShell().getUserStylesheetUrl();
         //if(usercss!=null) {
@@ -85,6 +94,9 @@ public class JfxUniverse extends Application {
         MenuItem openc = new MenuItem("Open ...");
         openc.setAccelerator(KeyCombination.keyCombination("Shortcut+O"));
         openc.setOnAction((e)->{ open(stage); });
+        MenuItem savec = new MenuItem("Save");
+        savec.setAccelerator(KeyCombination.keyCombination("Shortcut+S"));
+        savec.setOnAction((e)->{ save(stage); });
         MenuItem screens = new MenuItem("Screenshot ...");
         screens.setAccelerator(KeyCombination.keyCombination("Shortcut+T"));
         screens.setOnAction((e)->{ screenshot(stage); });
@@ -116,6 +128,17 @@ public class JfxUniverse extends Application {
         disk.setOnAction((e)->{ generateAnimation(stage); });
         anim.getItems().addAll(disk);
 
+        Menu func = new Menu("Functions");
+        MenuItem iter = new MenuItem("Iterated Function Demo");
+        iter.setAccelerator(KeyCombination.keyCombination("Shortcut+E"));
+        iter.setOnAction((e)->{ loadDemoIfs(); });
+
+        MenuItem params = new MenuItem("Iterated Function Demo");
+        params.setAccelerator(KeyCombination.keyCombination("Shortcut+I"));
+        params.setOnAction((e)->{ runParamDemo(); });
+
+        func.getItems().addAll(iter, params);
+
         Menu view = new Menu("View");
         MenuItem fullsc = new MenuItem("Full Screen");
         fullsc.setAccelerator(KeyCombination.keyCombination("Shortcut+ENTER"));
@@ -132,15 +155,9 @@ public class JfxUniverse extends Application {
         scaledown.setOnAction((e)->{ w.scaleDown(); });
         view.getItems().addAll(scaleup, scaledown);
 
-        Menu exp = new Menu("Experimental");
-        MenuItem iter = new MenuItem("Iterated Function");
-        iter.setAccelerator(KeyCombination.keyCombination("Shortcut+e"));
-        iter.setOnAction((e)->{ });
-        exp.getItems().add(iter);
-
         MenuBar mb = new MenuBar();
         mb.setUseSystemMenuBar(true);
-        mb.getMenus().addAll(file, rend, anim, view);
+        mb.getMenus().addAll(file, rend, anim, func, view);
         return mb;
     }
 
@@ -149,11 +166,24 @@ public class JfxUniverse extends Application {
         fileChooser.setTitle("A New World");
         fileChooser.getExtensionFilters().addAll(
                 new ExtensionFilter("CAs", "*.ca"),
-                new ExtensionFilter("Functions", "*.it"),
+                new ExtensionFilter("Functions", "*.ifs"),
                 new ExtensionFilter("All Files", "*.*"));
         File selectedFile = fileChooser.showOpenDialog(stage);
         if (selectedFile != null) {
             load(selectedFile);
+        }
+    }
+
+    public void save(Stage stage) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save");
+        //fileChooser.getExtensionFilters().addAll(
+                //new ExtensionFilter("CAs", "*.ca"),
+                //new ExtensionFilter("Functions", "*.ifs"),
+                //new ExtensionFilter("All Files", "*.*"));
+        File selectedFile = fileChooser.showSaveDialog(stage);
+        if (selectedFile != null) {
+            save(selectedFile);
         }
     }
 
@@ -252,7 +282,85 @@ public class JfxUniverse extends Application {
         t.start();
     }
 
+    private final IteratedFunctionFactory IFS_DEMO = new IteratedFunctionFactory(
+        "Demo 1",
+        "{iterations:16}:circ(0,0,{size:1},{size:1}):scl*({scale_x:-0.95},{scale_y:0.95}) tran({trans_x:50},{trans_y:0}) rot({rotation:170})");
+    private void loadDemoIfs() {
+        showVariablePane(IFS_DEMO);
+    }
+
+    private void runParamDemo() {
+        IteratedFunctionFactory f = new IteratedFunctionFactory(
+            "Demo 1",
+            "{iterations:16}:circ(0,0,{size:1},{size:1}):scl({scale_x:-0.5},{scale_y:0.5}) tran({trans_x:25},{trans_y:0}) rot({rotation:170})");
+            //"{iterations:16}:circ(0,0,2,2):scl({scale:-0.95}) tran(50,10) rot({rotation:170})");
+        final Varmap vars = f.getVarmap();
+        vars.put("size","0.5");
+        JfxIteratedFunction w = (JfxIteratedFunction) _w;
+        Thread p = new Thread("runParamDemo") {
+            @Override public void run() {
+                int i=0;
+                for(double rot=0;rot<360;rot+=0.25) {
+                    vars.put("rotation", Double.toString(rot));
+                    IteratedFunction it = f.createIfs(vars);
+                    w.setFunction(it);
+                    while(w.isGenerating()) {
+                        try {
+                            Thread.sleep(100);
+                        }
+                        catch(InterruptedException e) {
+                            break;
+                        }
+                    }
+                    File sav = new File("/Users/jkw/work/ifs/reorderdemo-"+i+".png");
+                    snap(sav);
+                    i++;
+                }
+            }
+        };
+        p.setDaemon(true);
+        p.start();
+    }
+
+    private void showVariablePane(IteratedFunctionFactory f) {
+        final Varmap vars = f.getVarmap();
+        LOG.info("showing var editor for "+vars);
+        BorderPane bp = new BorderPane();
+        VBox v = new VBox();
+        //bp.setTop(v);
+        v.getChildren().add(new Label("Variables"));
+        final Map<String,TextField> nvars = new HashMap<>();
+        for(String nm:vars.getNames()) {
+            Label lab = new Label(nm);
+            v.getChildren().add(lab);
+            TextField value = new TextField(vars.get(nm));
+            v.getChildren().add(value);
+            nvars.put(nm, value);
+        }
+        Button ok = new Button("Ok");
+        ok.setOnAction((ev)->{
+            for(Map.Entry<String,TextField> e:nvars.entrySet()) {
+                vars.put(e.getKey(), e.getValue().getText());
+            }
+            IteratedFunction ifs = f.createIfs(vars);
+            ((JfxIteratedFunction)_w).setFunction(ifs);
+            _w.getGui().setRight(null);
+        });
+        Button cancel = new Button("Cancel");
+        cancel.setOnAction((e)->{
+            _w.getGui().setRight(null);
+        });
+        HBox h = new HBox(ok, cancel);
+        v.getChildren().add(h);
+        v.setPrefWidth(400);
+        v.setMinWidth(400);
+        //_w.getBorder().setCenter(null);
+        _w.getGui().setRight(v);
+    }
+
     private void load(final File selectedFile) {
+        _w.load(selectedFile);
+        /*
         if(selectedFile.getName().endsWith(".ca")) {
             try {
                 CA ca = CA.fromFile(selectedFile.toString(), "text");
@@ -264,6 +372,11 @@ public class JfxUniverse extends Application {
                 e.printStackTrace();
             }
         }
+        */
+    }
+
+    private void save(final File selectedFile) {
+        _w.save(selectedFile);
     }
 
     private void snap(final File save) {

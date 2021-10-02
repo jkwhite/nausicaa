@@ -409,8 +409,9 @@ public class Actions {
         f.setDialogType(f.SAVE_DIALOG);
         f.setMultiSelectionEnabled(false);
         int ret = f.showSaveDialog(v.getRoot());
-        CA ca = v.getActiveCA();
-        Plane plane = v.getPlaneDisplayProvider().getActivePlane();
+        // CA ca = v.getActiveCA();
+        // Plane plane = v.getPlaneDisplayProvider().getActivePlane();
+        PlaneDisplay plane = v.getPlaneDisplayProvider().getActivePlaneDisplay();
         if(ret==f.APPROVE_OPTION) {
             try {
                 config.setImgDir(f.getSelectedFile().getParent());
@@ -467,14 +468,14 @@ public class Actions {
         }
     }
 
-    private final String VIEW3D_PROGRAM = System.getProperty("app.root")+"/bin/nausicaa";
     public void external3dView(NViewer v, Config c) {
+        final String view3dProgram = System.getProperty("app.root")+"/bin/nausicaa";
         final CA ca = v.getActiveCA();
         File f = null;
         try {
             f = File.createTempFile("ca_", ".ca");
             ca.save(f.toString(), "text");
-            final ProcessBuilder b = new ProcessBuilder(VIEW3D_PROGRAM, "-jfx", f.toString());
+            final ProcessBuilder b = new ProcessBuilder(view3dProgram, "-jfx", f.toString());
             b.redirectError(ProcessBuilder.Redirect.INHERIT);
             b.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             final Process p = b.start();
@@ -1091,7 +1092,9 @@ public class Actions {
         d.setVisible(true);
     }
 
+    private long _lastSingle = 0;
     public void chooseSingle(final NViewer v, Config config) {
+        if(_lastSingle>System.currentTimeMillis()-500) return; else _lastSingle = System.currentTimeMillis();
         final JDialog d = new JDialog(v, "Fixed initializer");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -1149,7 +1152,13 @@ public class Actions {
                 ));
             }
         });
+        de.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+            }
+        });
         bot.add(ne);
+        bot.add(de);
 
         p.add(bot, BorderLayout.SOUTH);
         d.getContentPane().add(p);
@@ -1160,7 +1169,9 @@ public class Actions {
         d.setVisible(true);
     }
 
+    private long _lastRandom = 0;
     public void chooseRandom(final NViewer v, Config config) {
+        if(_lastRandom>System.currentTimeMillis()-500) return; else _lastRandom = System.currentTimeMillis();
         final JDialog d = new JDialog(v, "Random initializer");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -1195,7 +1206,9 @@ public class Actions {
         d.setVisible(true);
     }
 
+    private long _lastCustom;
     public void chooseCustomInitializer(final NViewer v, Config config) {
+        if(_lastCustom>System.currentTimeMillis()-500) return; else _lastCustom = System.currentTimeMillis();
         final JDialog d = new JDialog(v, "Custom initializer");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -1237,7 +1250,9 @@ public class Actions {
         d.setVisible(true);
     }
 
+    private long _lastGaussion;
     public void chooseGaussian(final NViewer v, Config config) {
+        if(_lastGaussion>System.currentTimeMillis()-500) return; else _lastGaussion = System.currentTimeMillis();
         final JDialog d = new JDialog(v, "Gaussian initializer");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -1299,7 +1314,9 @@ public class Actions {
         d.setVisible(true);
     }
 
+    private long _lastClustered;
     public void chooseClusteredGaussian(final NViewer v, Config config) {
+        if(_lastClustered>System.currentTimeMillis()-500) return; else _lastClustered = System.currentTimeMillis();
         final JDialog d = new JDialog(v, "Clustered gaussian initializer");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -1369,7 +1386,9 @@ public class Actions {
         d.setVisible(true);
     }
 
+    private long _lastWord;
     public void chooseWord(final NViewer v) {
+        if(_lastWord>System.currentTimeMillis()-500) return; else _lastWord = System.currentTimeMillis();
         final JDialog d = new JDialog(v, "Choose word initializer");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -1418,7 +1437,9 @@ public class Actions {
         d.setVisible(true);
     }
 
+    private long _lastImage;
     public void chooseImage(final NViewer v, Config config) {
+        if(_lastImage>System.currentTimeMillis()-500) return; else _lastImage = System.currentTimeMillis();
         final String[] filehack = new String[1];
         final String[] methack = new String[1];
 
@@ -1524,7 +1545,9 @@ public class Actions {
         d.setVisible(true);
     }
 
+    private long _lastCAInit = 0;
     public void chooseCAInitializer(final NViewer v, Config config) {
+        if(_lastCAInit>System.currentTimeMillis()-500) return; else _lastCAInit = System.currentTimeMillis();
         final JDialog d = new JDialog(v, "CA initializer");
         final String[] filehack = new String[1];
         filehack[0] = config.getVariable("cainitializer_file", "");
@@ -1589,7 +1612,9 @@ public class Actions {
         d.setVisible(true);
     }
 
+    private long _lastSpectrum = 0;
     public void imageSpectrum(final NViewer v, Config config) {
+        if(_lastSpectrum>System.currentTimeMillis()-500) return; else _lastSpectrum = System.currentTimeMillis();
         final JFileChooser f = new JFileChooser(config.getImgDir());
         f.setDialogTitle("Spectrum source image");
         f.setDialogType(f.OPEN_DIALOG);
