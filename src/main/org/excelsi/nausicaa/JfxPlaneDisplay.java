@@ -55,6 +55,7 @@ import javafx.scene.Camera;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.ParallelCamera;
 import javafx.animation.RotateTransition;
+import javafx.animation.ScaleTransition;
 import javafx.util.Duration;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
@@ -106,7 +107,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         _d = d;
         _opts = opts;
         _scale = _opts.scale();
-        LOG.debug("CA size: "+_w+"x"+_h+"x"+_d);
+        LOG.debug("CA size: "+_w+"x"+_h+"x"+_d+", scale: "+_scale);
         setLayout(new BorderLayout());
         JPanel p = new JPanel(new BorderLayout());
         setForeground(Color.BLACK);
@@ -174,6 +175,9 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         System.err.println("running initScene");
         final double INC = 5d;
         _root = new Group();
+        _root.setScaleX(_scale);
+        _root.setScaleY(_scale);
+        _root.setScaleZ(_scale);
         // final int sz = 300;
         final int sz = _opts.root()?900:300;
         Dimension sd = cellSize(); //_sizer.getAppSize();
@@ -412,10 +416,13 @@ public class JfxPlaneDisplay extends PlaneDisplay {
                 //_parent.getChildren().remove(_jfxCa);
                 _rotParent.getChildren().remove(_jfxCa);
             }
-            _jfxCa = new JfxCA(ca, _scale*SCALE_MULT, 40, JfxWorld.Render.best);
-            _jfxCa.setTranslateX(ca.getWidth()*_scale*SCALE_MULT/2);
-            _jfxCa.setTranslateY(ca.getDepth()*_scale*SCALE_MULT/1.5);
-            _jfxCa.setTranslateZ(-ca.getHeight()*_scale*SCALE_MULT/1.5);
+            _jfxCa = new JfxCA(ca, /*_scale* */SCALE_MULT, 40, JfxWorld.Render.best);
+            // _jfxCa.setTranslateX(ca.getWidth()*_scale*SCALE_MULT/2);
+            // _jfxCa.setTranslateY(ca.getDepth()*_scale*SCALE_MULT/1.5);
+            // _jfxCa.setTranslateZ(-ca.getHeight()*_scale*SCALE_MULT/1.5);
+            _jfxCa.setTranslateX(ca.getWidth()*SCALE_MULT/2);
+            _jfxCa.setTranslateY(ca.getDepth()*SCALE_MULT/1.5);
+            _jfxCa.setTranslateZ(-ca.getHeight()*SCALE_MULT/1.5);
             //_parent.getChildren().add(_jfxCa);
             _rotParent.getChildren().add(_jfxCa);
             //RotateTransition t = new RotateTransition(Duration.millis(36000), _jfxCa);
@@ -428,7 +435,8 @@ public class JfxPlaneDisplay extends PlaneDisplay {
             //t.play();
 
             //Platform.runLater(()->{_jfxCa.clear();});
-            setPlane(_c.createPlane());
+            //PAR1
+            setPlane(_c.createPlane(pool, opt));
         }
         else {
             Platform.runLater(()->{setCA(ca, pool, opt);});
@@ -439,20 +447,24 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         _p = plane;
         _c = plane.creator();
         if(_queue<2) {
-            Runnable r = new Runnable() {
-                public void run() {
-                    try {
-                        _jfxCa.addPlane(plane);
-                        _queue--;
-                    }
-                    finally {
-                        if(HANDLE_UNLOCK) {
-                            plane.unlockRead();
+            Runnable compute = _jfxCa.precompute(plane,
+                new Runnable() {
+                    public void run() {
+                        try {
+                            // _jfxCa.addPlane(plane);
+                            // _jfxCa.renderPrecompute();
+                            _queue--;
+                        }
+                        finally {
+                            if(HANDLE_UNLOCK) {
+                                plane.unlockRead();
+                            }
                         }
                     }
-                }
-            };
-            Platform.runLater(r);
+                });
+            // LOG.debug("queuing setPlane", new Exception());
+            // Platform.runLater(r);
+            Pools.adhoc().submit(compute);
             _queue++;
         }
         else {
@@ -462,11 +474,33 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         }
     }
 
+    private ScaleTransition _scaler;
     public void setScale(float scale) {
         if(_scale!=scale) {
+            double signed = 0.5d * (_scale < scale ? 1d : -1d);
             _scale = scale;
-            setCA(_c);
+            // setCA(_c);
+            if(_scaler==null) {
+                _scaler = new ScaleTransition(Duration.millis(1000), _root);
+            }
+            if(_scaler.getStatus()==Animation.Status.RUNNING) {
+                _scaler.stop();
+            }
+            _scaler.setFromX(_root.getScaleX());
+            _scaler.setFromY(_root.getScaleY());
+            _scaler.setFromZ(_root.getScaleZ());
+            _scaler.setToX(_scale);
+            _scaler.setToY(_scale);
+            _scaler.setToZ(_scale);
+            // _scaler.setByX(signed);
+            // _scaler.setByY(signed);
+            // _scaler.setByZ(signed);
+            _scaler.play();
         }
+    }
+
+    private double computeScale() {
+        return 0.5 * _scale;
     }
 
     public float getScale() {
@@ -498,12 +532,12 @@ public class JfxPlaneDisplay extends PlaneDisplay {
             throw new IllegalArgumentException("null initializer");
         }
         _c.setInitializer(i);
-        setPlane(_c.createPlane());
+        setPlane(_c.createPlane(Pools.adhoc(), _gopt));
     }
 
     public void generate(Initializer i) {
         _c.setInitializer(i);
-        setPlane(_c.createPlane());
+        setPlane(_c.createPlane(Pools.adhoc(), _gopt));
     }
 
     @Override public void save(String file, Rendering r) throws java.io.IOException {

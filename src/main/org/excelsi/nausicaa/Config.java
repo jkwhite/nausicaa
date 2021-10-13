@@ -9,9 +9,12 @@ import java.io.*;
 import com.google.gson.*;
 import org.excelsi.nausicaa.ca.Json;
 import org.excelsi.nausicaa.ca.Varmap;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 public class Config {
+    private static final Logger LOG = LoggerFactory.getLogger(Config.class);
     public static final String CONFIG_FILE = System.getProperty("user.home")+"/.nausicaa";
     private List<ConfigListener> _listeners = new ArrayList<>();
     private int _w;
@@ -86,6 +89,7 @@ public class Config {
     }
 
     public void setScale(float s) {
+        LOG.info("updating config scale from "+_scale+" to "+s);
         _scale = s;
         notify("scale");
     }

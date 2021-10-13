@@ -429,6 +429,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             }
             _ca = _ca.size(width, height, depth, prelude).weight(_config.getWeight());
             PlaneDisplay d = createPlaneDisplay(_ca, true);
+            LOG.debug("setting scale "+_scale);
             d.setScale(_scale);
             futures.add(d);
             _displays[0] = d;
@@ -526,10 +527,10 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                                 //System.err.print(".");
                                 nca = mutate(ca);
                                 ++tries;
-                                if(tries%100==0) {
-                                    LOG.info("tried mutation "+tries+" times");
+                                if(true||tries%10==0) {
+                                    LOG.debug("tried mutation "+tries+" times");
                                 }
-                            } while(useHistory && History.named(_name).contains(nca) && tries<1000);
+                            } while(useHistory && History.named(_name).contains(nca) && tries<100);
                             //System.err.println();
                             if(reroll) {
                                 nca = nca.seed();

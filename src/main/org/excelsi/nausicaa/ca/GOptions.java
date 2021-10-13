@@ -1,7 +1,12 @@
 package org.excelsi.nausicaa.ca;
 
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
+
 public class GOptions {
+    private static final Logger LOG = LoggerFactory.getLogger(GOptions.class);
     private final boolean _doubleBuffer;
     private final int _parallel;
     private final int _stride;
@@ -41,6 +46,9 @@ public class GOptions {
         _compMode = comp;
         _vars = vars;
         _meta = meta;
+        if(_parallel==1) {
+            LOG.debug("GOptions with parallel 1", new Exception());
+        }
     }
 
     public boolean doubleBuffer() { return _doubleBuffer; }

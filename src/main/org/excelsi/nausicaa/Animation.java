@@ -122,6 +122,7 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         for(int i=0;i<ds.length;i++) {
             da[i] = new DisplayAnimator(ds[i], compute, ds.length==1?ccores:1, weight);
         }
+        int frames = 0;
         try {
 top:        while(_state==State.animate) {
                 long start = System.currentTimeMillis();
@@ -132,6 +133,7 @@ top:        while(_state==State.animate) {
                     render.submit(da[i]);
                 }
                 long end = System.currentTimeMillis();
+                frames++;
                 if(_steps>0&&--_steps==0) {
                     _state = State.die;
                     try {
@@ -157,6 +159,7 @@ top:        while(_state==State.animate) {
             compute.shutdownNow();
             render.shutdownNow();
         }
+        _log.info("ending animation after "+frames+" frames");
     }
 
     private class DisplayAnimator implements Runnable {

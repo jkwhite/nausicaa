@@ -65,8 +65,7 @@ public class MultiTransform implements Transform {
                 return runTransform(c);
             }
             catch(MutationFailedException e) {
-                System.err.println("transform failed: "+e);
-                e.printStackTrace();
+                LOG.error("transform failed: "+e, e);
             }
         }
         return c;

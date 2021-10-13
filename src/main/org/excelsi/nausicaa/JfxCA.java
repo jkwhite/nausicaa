@@ -31,6 +31,7 @@ import javafx.application.ConditionalFeature;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Material;
 import javafx.scene.paint.PhongMaterial;
+import javafx.application.Platform;
 
 import org.fxyz3d.shapes.primitives.ScatterMesh;
 import org.fxyz3d.geometry.Point3D;
@@ -63,6 +64,7 @@ public class JfxCA extends Group {
     private long _lastTime = 0;
     private Plane _lastPlane;
     private Strategy _strat = Strategy.delta;
+    private List<Runnable> _precomputeQueue = new LinkedList<>();
 
 
     public JfxCA(CA ca) {
@@ -133,6 +135,27 @@ public class JfxCA extends Group {
         clear(false);
     }
 
+    public Runnable precompute(Plane p, Runnable after) {
+        return new Runnable() {
+            @Override public void run() {
+                Runnable render = addPlane(p, false);
+                Platform.runLater(new Runnable() {
+                    @Override public void run() {
+                        render.run();
+                        after.run();
+                    }
+                });
+            }
+        };
+    }
+
+    public void renderPrecompute() {
+        if(_precomputeQueue.size()>0) {
+            Runnable r = _precomputeQueue.remove(0);
+            r.run();
+        }
+    }
+
     public void clear(boolean raze) {
         switch(_render) {
             case cells:
@@ -152,9 +175,10 @@ public class JfxCA extends Group {
                 }
                 break;
             default:
-                while(!getChildren().isEmpty()) {
-                    getChildren().remove(0);
-                }
+                // while(!getChildren().isEmpty()) {
+                    // getChildren().remove(0);
+                // }
+                getChildren().remove(0, getChildren().size());
                 break;
         }
         /*
@@ -167,55 +191,91 @@ public class JfxCA extends Group {
     }
 
     public void addPlane(Plane p) {
+        addPlane(p, true);
+    }
+
+    public Runnable addPlane(Plane p, boolean doRender) {
         _lastPlane = p;
         if(p.getDepth()>1 /*!_stack*/ /*p instanceof IntBlockPlane*/) {
-            IntBlockPlane bp = (IntBlockPlane) p;
+            final IntBlockPlane bp = (IntBlockPlane) p;
             List<Blobs.Blob> blobs = null;
             if(_render==Render.best) {
                 blobs = new Blobs().blobs(bp, Blobs.Mode.finite);
-                if(blobs.size()<10000) {
+                if(blobs.size()<40000) {
                     _render = Render.blob_mesh;
                 }
-                else if(blobs.size()<60000) {
+                else if(blobs.size()<100000) {
                     _render = Render.cells;
                 }
-                else if(blobs.size()<120000) {
-                    _render = Render.mesh;
-                }
+                // TODO: causes lockup in native JFX code
+                // else if(blobs.size()<120000) {
+                    // _render = Render.mesh;
+                // }
                 else {
                     _render = Render.bounds;
                 }
                 //_render = Render.blob_mesh;
             }
-            switch(_render) {
-                case cells:
-                    setBlocks(bp);
-                    break;
-                case bounds:
-                    renderBounds(bp);
-                    break;
-                case mesh:
-                    renderMesh(bp, blobs);
-                    break;
-                case single_mesh:
-                    renderSingleMesh(bp);
-                    break;
-                case blob_mesh:
-                    renderBlobMesh(bp, blobs);
-                    break;
-                case cube_mesh:
-                    renderCubeMesh(bp);
-                    break;
+            LOG.debug("chosen render mode "+_render+" for "+(blobs!=null?blobs.size():-1)+" blobs");
+            final List<Blobs.Blob> rblobs = blobs;
+            Runnable runRunder = new Runnable() {
+                @Override public void run() {
+                    List<Blobs.Blob> blobs2 = rblobs;
+                    switch(_render) {
+                        case cells:
+                            setBlocks(bp);
+                            break;
+                        case bounds:
+                            renderBounds(bp);
+                            break;
+                        case mesh:
+                            if(blobs2==null) {
+                                blobs2 = new Blobs().blobs((IntBlockPlane)p, Blobs.Mode.finite);
+                            }
+                            renderMesh(bp, blobs2);
+                            break;
+                        case single_mesh:
+                            renderSingleMesh(bp);
+                            break;
+                        case blob_mesh:
+                            if(blobs2==null) {
+                                blobs2 = new Blobs().blobs((IntBlockPlane)p, Blobs.Mode.finite);
+                            }
+                            renderBlobMesh(bp, blobs2);
+                            break;
+                        case cube_mesh:
+                            renderCubeMesh(bp);
+                            break;
+                    }
+                }
+            };
+            if(doRender) {
+                runRunder.run();
+                return null;
+            }
+            else {
+                return runRunder;
             }
         }
         else {
-            Layer layer = new Layer((IntPlane)p, _scale);
-            if(getChildren().size()>_depth) {
-                getChildren().remove(0);
-                retranslate();
+            Runnable runRunder = new Runnable() {
+                @Override public void run() {
+                    Layer layer = new Layer((IntPlane)p, _scale);
+                    if(getChildren().size()>_depth) {
+                        getChildren().remove(0);
+                        retranslate();
+                    }
+                    layer.setTranslateZ(-getChildren().size()*_scale);
+                    getChildren().add(layer);
+                }
+            };
+            if(doRender) {
+                runRunder.run();
+                return null;
             }
-            layer.setTranslateZ(-getChildren().size()*_scale);
-            getChildren().add(layer);
+            else {
+                return runRunder;
+            }
         }
     }
 

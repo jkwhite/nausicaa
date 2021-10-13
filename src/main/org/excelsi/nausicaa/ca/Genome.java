@@ -90,15 +90,21 @@ public final class Genome {
         }
         int tries = 0;
         Genome child;
+        boolean same = false;
         do {
             //System.err.print(".");
             //if(tries%10==0) System.err.println();
+            LOG.debug("replicate try "+tries);
             child = replicate(im, mf, gf, m);
             if(++tries==100) {
                 LOG.warn("failed to mutate "+this);
                 break;
             }
-        } while(child.equals(this));
+            same = child.equals(this);
+            if(same) {
+                LOG.warn("child same as orig: "+this);
+            }
+        } while(same);
         //System.err.println(this+" => "+child);
         return child;
     }
