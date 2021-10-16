@@ -51,7 +51,9 @@ dependencies {
     implementation 'apache:log4j:1.2.15'
     implementation 'mrj:MRJToolkitStubs:1.0'
 
-    testImplementation 'junit:junit:4.12'
+    // testImplementation 'junit:junit:4.12'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 
     // apply from: 'https://raw.githubusercontent.com/i-net-software/SetupBuilder/master/scripts/SetupBuilderVersion.gradle'
     // classpath 'gradle.plugin.de.inetsoftware:SetupBuilder:' + setupBuilderVersion()
@@ -60,7 +62,8 @@ dependencies {
 // apply plugin: "de.inetsoftware.appbundler"
 
 test {
-    useJUnit()
+    // useJUnit()
+    useJUnitPlatform()
 
     maxHeapSize = '1G'
 }
@@ -75,9 +78,9 @@ sourceSets {
         }
     }
     test {
-        // java {
-            // srcDirs = ['src/test']
-        // }
+        java {
+            srcDirs = ['src/test']
+        }
         // groovy {
             // srcDirs = ['src/test']
         // }
