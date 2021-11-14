@@ -416,7 +416,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
                 //_parent.getChildren().remove(_jfxCa);
                 _rotParent.getChildren().remove(_jfxCa);
             }
-            _jfxCa = new JfxCA(ca, /*_scale* */SCALE_MULT, 40, JfxWorld.Render.cells);
+            _jfxCa = new JfxCA(ca, /*_scale* */SCALE_MULT, 40, JfxWorld.Render.blob_mesh);
             // _jfxCa.setTranslateX(ca.getWidth()*_scale*SCALE_MULT/2);
             // _jfxCa.setTranslateY(ca.getDepth()*_scale*SCALE_MULT/1.5);
             // _jfxCa.setTranslateZ(-ca.getHeight()*_scale*SCALE_MULT/1.5);

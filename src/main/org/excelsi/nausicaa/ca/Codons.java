@@ -2985,7 +2985,7 @@ public class Codons {
                 z += posZ;
             }
             double d2 = (0.5 * Math.log(r) * r / dr);
-            return (int) (10d*d2);
+            return (int) (100d*d2);
             // System.err.println("res: "+d2);
             // boolean in = ((0.5 * Math.log(r) * r / dr) < d);
             // return in;
