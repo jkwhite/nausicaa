@@ -51,6 +51,11 @@ dependencies {
     implementation 'apache:log4j:1.2.15'
     implementation 'mrj:MRJToolkitStubs:1.0'
 
+    // console
+    implementation 'org.swinglabs.swingx:swingx-all:1.6.5-1'
+    implementation 'org.codehaus.griffon:swingxbuilder:0.3'
+
+
     // testImplementation 'junit:junit:4.12'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
@@ -89,11 +94,27 @@ sourceSets {
 
 javafx {
     version = '11'
-    modules = [ 'javafx.base', 'javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.swing' ]
+    modules = [ 'javafx.base', 'javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.swing', 'javafx.web' ]
 }
 
 application {
-    applicationDefaultJvmArgs = ["-Xmx12g","-Dapple.laf.useScreenMenuBar=true","-XX:-OmitStackTraceInFastThrow","-Dapp.root=HACK_FOR_GRADLE"]
+    applicationDefaultJvmArgs = [
+        "-Xmx12g",
+        "--add-opens","java.base/java.lang=ALL-UNNAMED",
+        "--add-opens","java.base/java.lang.reflect=ALL-UNNAMED",
+        "--add-opens","java.base/java.util=ALL-UNNAMED",
+        "--add-opens","java.base/java.util.concurrent=ALL-UNNAMED",
+        "--add-opens","java.desktop/java.awt=ALL-UNNAMED",
+        "--add-opens","java.desktop/javax.swing=ALL-UNNAMED",
+        "--add-opens","javafx.graphics/javafx.scene.image=ALL-UNNAMED",
+        "--add-opens","javafx.graphics/javafx.scene=ALL-UNNAMED",
+        "--add-opens","javafx.graphics/javafx.scene.layout=ALL-UNNAMED",
+        "--add-opens","javafx.graphics/javafx.scene.shape=ALL-UNNAMED",
+        "--add-opens","javafx.controls/javafx.scene.control=ALL-UNNAMED",
+        "-Dapple.laf.useScreenMenuBar=true",
+        "-XX:-OmitStackTraceInFastThrow",
+        "-Dapp.root=HACK_FOR_GRADLE"
+        ]
     startScripts {
         doLast {
             unixScript.text = unixScript.text.replace('HACK_FOR_GRADLE', '\'\$APP_HOME\'')

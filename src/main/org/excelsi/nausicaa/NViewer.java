@@ -62,6 +62,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             public void run() {
                 v.init();
                 v.invalidate();
+                loadWindow(v.getConfig(), v, "main");
                 v.setVisible(true);
             }
         });
@@ -153,6 +154,34 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         _tabs = tabs;
 
         //getContentPane().add(main);
+    }
+
+    public void saveUIState() {
+        saveWindow(_config, this, "main");
+        if(_console!=null) {
+            saveWindow(_config, _console, "console");
+        }
+    }
+
+    private static void saveWindow(Config c, Window w, String name) {
+        StringBuilder b = new StringBuilder();
+        b.append(w.getLocation().x).append(",").append(w.getLocation().y)
+            .append(",").append(w.getWidth()).append(",").append(w.getHeight());
+        c.setVariable("window_"+name, b.toString());
+    }
+
+    private static void loadWindow(Config c, Window w, String name) {
+        String s = c.<String>getVariable("window_"+name, null);
+        if(s!=null) {
+            String[] dims = s.split(",");
+            try {
+                w.setLocation(Integer.parseInt(dims[0]), Integer.parseInt(dims[1]));
+                w.setSize(Integer.parseInt(dims[2]), Integer.parseInt(dims[3]));
+            }
+            catch(Exception e) {
+                LOG.warn("ignoring malformed value for window_"+name+": '"+s+"'", e);
+            }
+        }
     }
 
     private Futures futures() {
@@ -1934,10 +1963,12 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
         final JMenuItem conso = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.openConsole(NViewer.this, _config);
+                // _a.openConsole(NViewer.this, _config);
+                toggleConsole();
             }
         });
-        conso.setText("Open console ...");
+        conso.setText("Toggle console ...");
+        conso.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, shortcut | InputEvent.SHIFT_DOWN_MASK));
         window.add(conso);
 
         //final JMenuItem closef = new JMenuItem(new AbstractAction() {
@@ -2005,6 +2036,25 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             });
         }
         _pehack.setText(_peditor!=null?"Hide palette editor":"Show palette editor");
+    }
+
+    private JFrame _console;
+    private void toggleConsole() {
+        if(_console==null) {
+            Dimension d = getSize();
+            _console = new JFrame("Console");
+            _console.setSize(d.width, d.height/3);
+            _console.getContentPane().add(new Console(_console));
+            _console.pack();
+            _console.setSize(d.width, d.height/3);
+            // _console.setLocationRelativeTo(this);
+            _console.setLocation(getLocation().x, 0);
+            loadWindow(getConfig(), _console, "console");
+            _console.setVisible(true);
+        }
+        else {
+            _console.setVisible(!_console.isVisible());
+        }
     }
 
     private void toggleRuleEditor() {
