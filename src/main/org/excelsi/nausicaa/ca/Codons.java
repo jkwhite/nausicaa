@@ -1123,6 +1123,7 @@ public class Codons {
         private final int _m;
 
         public Push(int p, int m) {
+            // if(p<0) throw new IllegalArgumentException("p must be >= 0: "+p);
             _p = p;
             _m = m;
         }

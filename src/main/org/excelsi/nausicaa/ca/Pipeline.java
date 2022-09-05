@@ -57,6 +57,10 @@ public class Pipeline {
         return (p)->p.with(d, p.<Plane>get(s).toBufferedImage());
     }
 
+    public static Function<PipelineContext,PipelineContext> toBufferedImage(String s, String d, Rendering rend) {
+        return (p)->p.with(d, p.<Plane>get(s).toBufferedImage(rend));
+    }
+
     public static Consumer<PipelineContext> write(String s, String i, String filename) {
         return (p)->{
             try {

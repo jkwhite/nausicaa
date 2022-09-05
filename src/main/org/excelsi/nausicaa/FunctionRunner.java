@@ -11,10 +11,14 @@ import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.excelsi.nausicaa.ca.*;
 
 
 public class FunctionRunner extends JDialog {
+    private static final Logger LOG = LoggerFactory.getLogger(FunctionRunner.class);
+
     public FunctionRunner(final JFrame root, final CA ca, final MutationFactor mf, final ExecutorService pool, final GOptions opt, final Rendering rend, final Varmap vars, final Functions.CAFunction fn) {
         super(root, "Executing "+fn.getName());
 
@@ -34,9 +38,9 @@ public class FunctionRunner extends JDialog {
                 @Override public ExecutorService getPool() { return pool; }
                 @Override public GOptions getOptions() { return opt; }
                 @Override public Rendering getRendering() { return rend; }
-                //@Override public boolean getCancelled() { return Thread.currentThread().isInterrupted(); }
                 @Override public boolean getCancelled() { return cancelHack.size()>0; }
                 @Override public Functions.Progress getProgress() { return progress; }
+                @Override public Logger getLog() { return LOG; }
             };
 
         JPanel main = new JPanel(new BorderLayout());

@@ -92,7 +92,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
     @Override public void branch(CA c) {
         String name = ""+(1+_tabs.getTabCount());
-        Futures f = new Futures(this, _config, _timeline, c, new Random(), name);
+        Futures f = new Futures(this, this, _config, _timeline, c, new Random(), name);
         JPanel main = new JPanel(new BorderLayout());
         main.add(f, BorderLayout.CENTER);
         _tabs.addTab(name, main);
@@ -134,7 +134,9 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         //_config = new Config(w, h, d, weight);
         _config = Config.load();
         _timeline = new Timeline();
-        createMenu();
+        if(root()!=null) {
+            createMenu();
+        }
         setSize(_width, _height);
         int dims = 2;
         int size = 1;
@@ -144,7 +146,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
         JPanel main = new JPanel(new BorderLayout());
 
-        Futures f = new Futures(this, _config, _timeline, ca, new Random(), "1");
+        Futures f = new Futures(this, this, _config, _timeline, ca, new Random(), "1");
         _futures = f;
         main.add(f, BorderLayout.CENTER);
 
@@ -154,6 +156,10 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         _tabs = tabs;
 
         //getContentPane().add(main);
+    }
+
+    public Futures getFutures() {
+        return _futures;
     }
 
     public void saveUIState() {

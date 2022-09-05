@@ -128,6 +128,7 @@ public class GenomeMutators extends Enloggened {
                 for(int i=st;i<en;i++) {
                     cs.add(o++, cs.get(i).copy());
                 }
+                LOG.debug("done repeat mutate");
             };
     }
 

@@ -119,6 +119,7 @@ public class Functions {
 
     public static interface CAFunction {
         String getName();
+        String getDesc();
         String[] buildArgs(CA ca);
         void run(CA ca, Varmap params, API api) throws Exception;
     }
@@ -130,6 +131,7 @@ public class Functions {
         Rendering getRendering();
         boolean getCancelled();
         Progress getProgress();
+        Logger getLog();
     }
 
     public static interface Progress {
@@ -140,6 +142,7 @@ public class Functions {
 
     private static class GroovyCAFunction implements CAFunction {
         private final String _name;
+        private final String _desc;
         //private final String[] _args;
 
         private final GroovyShell _s;
@@ -152,35 +155,24 @@ public class Functions {
             //_gs = new GShell();
             //_gs.init();
             Object res;
-            try(BufferedInputStream i = new BufferedInputStream(new FileInputStream(f))) {
+            try(InputStreamReader i = new InputStreamReader(new BufferedInputStream(new FileInputStream(f)))) {
                 _s.evaluate(i);
-                //_gs.evaluate(GShell.readFully(i));
                 res = _s.evaluate("meta()");
             }
-            //_gs.evalScript(f);
-            //res = _gs.evaluate("meta()");
             if(res instanceof Map) {
                 Map mr = (Map) res;
-                if(mr.containsKey("name")) {
-                    _name = mr.get("name").toString();
-                }
-                else {
-                    _name = "<"+f+">";
-                }
-                //if(mr.containsKey("args") && mr.get("args") instanceof List) {
-                    //_args = ((List<String>)mr.get("args")).toArray(new String[0]);
-                //}
-                //else {
-                    //_args = new String[0];
-                //}
+                _name = mr.containsKey("name") ? mr.get("name").toString() : "<"+f+">";
+                _desc = mr.containsKey("desc") ? mr.get("desc").toString() : "No description";
             }
             else {
                 _name = "<"+f+">";
-                //_args = new String[0];
+                _desc = "No description";
             }
         }
 
         @Override public String getName() { return _name; }
+
+        @Override public String getDesc() { return _desc; }
 
         @Override public String[] buildArgs(CA ca) {
             try {
@@ -189,12 +181,18 @@ public class Functions {
                 String[] args;
                 if(res instanceof Map) {
                     Map mr = (Map) res;
-                    if(mr.containsKey("args") && mr.get("args") instanceof List) {
-                        List as = (List) mr.get("args");
-                        //for(Object aso:as) {
-                            //System.err.println(aso.toString()+":"+aso.getClass().toString());
-                        //}
-                        args = ((List<String>)mr.get("args")).toArray(new String[0]);
+                    if(mr.containsKey("args")) {
+                        if(mr.get("args") instanceof List) {
+                            List as = (List) mr.get("args");
+                            args = ((List<String>)as).toArray(new String[0]);
+                        }
+                        else if(mr.get("args") instanceof Map) {
+                            Map as = (Map) mr.get("args");
+                            args = ((Map<String,String>)as).keySet().toArray(new String[0]);
+                        }
+                        else {
+                            args = new String[0];
+                        }
                     }
                     else {
                         args = new String[0];

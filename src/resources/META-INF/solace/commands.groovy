@@ -20,7 +20,12 @@ __random__ = new java.util.Random();
 //rules = new Rulespace1D( [ new Ruleset1D( [CA.randomColor(), CA.randomColor()].toArray(new Integer[0]) ) ].toArray(new Ruleset1D[0]) )
 
 rules = { d, s, c, h=null ->
-    Ruleset.create(new Archetype(d,s,c), h)
+    if(h!=null) {
+        Ruleset.create(new Archetype(d,s,c), h)
+    }
+    else {
+        Ruleset.create(new Archetype(d,s,c))
+    }
 }
 
 test_incant = { d,s,c ->

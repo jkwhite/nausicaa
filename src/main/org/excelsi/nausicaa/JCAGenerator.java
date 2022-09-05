@@ -263,12 +263,12 @@ public class JCAGenerator extends JDialog {
                                                 break;
                                             }
                                             if(rever||bb) {
-                                                BufferedImage orig = plane.toBufferedImage();
+                                                BufferedImage orig = plane.toBufferedImage(rend);
                                                 BufferedImage copy = new BufferedImage(orig.getColorModel(), orig.copyData(null), orig.isAlphaPremultiplied(), null);
                                                 frames.add(copy);
                                             }
                                             else {
-                                                age.addFrame(plane.toBufferedImage());
+                                                age.addFrame(plane.toBufferedImage(rend));
                                             }
                                             prog.setValue(i);
                                             for(int j=0;j<=skipFrames;j++) {
@@ -308,7 +308,7 @@ public class JCAGenerator extends JDialog {
                                                 .stream(c.createPlane(), pool, new GOptions(true, ccores, 1, frameWeight).metaMode(c.getMetaMode()))
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))
-                                                .map(Pipeline.toBufferedImage("p", "b"))
+                                                .map(Pipeline.toBufferedImage("p", "b", rend))
                                                 .forEach(Pipeline
                                                     .write("b", "i", selfile)
                                                     .andThen((p)->prog.setValue(p.<Long>get("i").intValue()))
@@ -320,7 +320,7 @@ public class JCAGenerator extends JDialog {
                                                 .stream(c.createPlane(), pool, new GOptions(true, ccores, 1, frameWeight).metaMode(c.getMetaMode()))
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))
-                                                .map(Pipeline.toBufferedImage("p", "b"))
+                                                .map(Pipeline.toBufferedImage("p", "b", rend))
                                                 .map(Pipeline.indexed2Rgb("b", "b"))
                                                 .map(Pipeline.scale("b", "b", scale))
                                                 .forEach(Pipeline

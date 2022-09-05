@@ -37,12 +37,14 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.input.KeyCombination;
 import javax.imageio.ImageIO;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.embed.swing.SwingNode;
 
 
 public class JfxNausicaa extends Application {
     private Config _config;
     private Group _root;
     private BorderPane _border;
+    private Actions2 _a = new Actions2();
 
 
     @Override
@@ -78,6 +80,7 @@ public class JfxNausicaa extends Application {
         mwin.setTop(main);
         //_root.getChildren().add(main);
 
+        scene.getStylesheets().add("/nausicaa-jfx.css");
         //scene.getStylesheets().add("/org/excelsi/solace/solace-default.css");
         //String usercss = _mc.getShellFactory().getMetaShell().getUserStylesheetUrl();
         //if(usercss!=null) {
@@ -104,7 +107,19 @@ public class JfxNausicaa extends Application {
     }
 
     private Node createMain(Stage stage) {
-        Tab multi = new Tab("Multiverse", new Label("TODO"));
+        // Tab multi = new Tab("Multiverse", new Label("TODO"));
+        NViewer v = new NViewer();
+        v.init();
+        v.invalidate();
+        java.awt.Dimension d = v.getAppSize();
+        v.setSize(800,800);
+        SwingNode sn = new SwingNode();
+        sn.setContent(v.getRootPane());
+        BorderPane snt = new BorderPane();
+        snt.setCenter(sn);
+        Tab multi = new Tab("Multiverse",
+            snt
+        );
         JfxSequencer jseq = new JfxSequencer(stage, createSequencer(), _config);
         //BorderPane bp = new BorderPane();
         //bp.setCenter(jseq);
@@ -121,16 +136,24 @@ public class JfxNausicaa extends Application {
         }
     }
 
-    private Node createMenu(final Stage stage /*, final JfxWorld w*/) {
+    private Menu createFileMenu(final Stage stage) {
         Menu file = new Menu("File");
+
+        MenuItem newca = new MenuItem("New ...");
+        newca.setOnAction((e)->{_a.newCA(_config);});
+
         MenuItem openc = new MenuItem("Open ...");
         openc.setAccelerator(KeyCombination.keyCombination("Shortcut+O"));
         openc.setOnAction((e)->{ open(stage); });
+
         MenuItem screens = new MenuItem("Screenshot ...");
         screens.setAccelerator(KeyCombination.keyCombination("Shortcut+T"));
         screens.setOnAction((e)->{ screenshot(stage); });
-        file.getItems().addAll(openc, screens);
+        file.getItems().addAll(newca, openc, screens);
+        return file;
+    }
 
+    private Menu createRenderMenu(final Stage stage) {
         Menu rend = new Menu("Render");
         MenuItem smesh = new MenuItem("Scatter Mesh");
         //smesh.setOnAction((e)->{ w.setRender(JfxCA.Render.mesh); });
@@ -141,7 +164,10 @@ public class JfxNausicaa extends Application {
         MenuItem best = new MenuItem("Auto");
         //best.setOnAction((e)->{ w.setRender(JfxCA.Render.best); });
         rend.getItems().addAll(smesh, bmesh, cells, best);
+        return rend;
+    }
 
+    private Menu createAnimationMenu(final Stage stage) {
         Menu anim = new Menu("Animation");
         MenuItem astart = new MenuItem("Toggle update");
         astart.setAccelerator(KeyCombination.keyCombination("Shortcut+A"));
@@ -156,6 +182,10 @@ public class JfxNausicaa extends Application {
         disk.setOnAction((e)->{ generateAnimation(stage); });
         anim.getItems().addAll(disk);
 
+        return anim;
+    }
+
+    private Menu createViewMenu(final Stage stage) {
         Menu view = new Menu("View");
         MenuItem fullsc = new MenuItem("Full Screen");
         fullsc.setAccelerator(KeyCombination.keyCombination("Shortcut+ENTER"));
@@ -171,6 +201,14 @@ public class JfxNausicaa extends Application {
         scaledown.setAccelerator(KeyCombination.keyCombination("Shortcut+-"));
         //scaledown.setOnAction((e)->{ w.scaleDown(); });
         view.getItems().addAll(scaleup, scaledown);
+        return view;
+    }
+
+    private Node createMenu(final Stage stage /*, final JfxWorld w*/) {
+        Menu file = createFileMenu(stage);
+        Menu anim = createAnimationMenu(stage);
+        Menu rend = createRenderMenu(stage);
+        Menu view = createViewMenu(stage);
 
         MenuBar mb = new MenuBar();
         mb.setUseSystemMenuBar(true);
@@ -179,14 +217,14 @@ public class JfxNausicaa extends Application {
     }
 
     public void open(Stage stage) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("A New World");
-        fileChooser.getExtensionFilters().addAll(
+        FileChooser f = new FileChooser();
+        f.setTitle("Open");
+        f.getExtensionFilters().addAll(
                 new ExtensionFilter("CAs", "*.ca"),
                 new ExtensionFilter("All Files", "*.*"));
-        File selectedFile = fileChooser.showOpenDialog(stage);
-        if (selectedFile != null) {
-            loadCA(selectedFile);
+        File sel = f.showOpenDialog(stage);
+        if (sel != null) {
+            loadCA(sel);
         }
     }
 

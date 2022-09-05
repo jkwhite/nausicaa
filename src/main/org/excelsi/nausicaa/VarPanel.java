@@ -11,15 +11,21 @@ import org.excelsi.nausicaa.ca.*;
 public class VarPanel extends JPanel {
     private final java.util.List<JComponent[]> _pairs = new ArrayList<JComponent[]>();
     private final Map<String,JTextField> _vals = new HashMap<>();
+    private final Map<String,Map<String,String>> _meta;
     private final Varmap _v;
 
 
     public VarPanel(Varmap v) {
+        this(v, new HashMap<>());
+    }
+
+    public VarPanel(Varmap v, Map<String,Map<String,String>> meta) {
+        _meta = meta;
+        _v = v;
         for(String n:v.names()) {
             addPair(n, v.get(n));
         }
         done();
-        _v = v;
     }
 
     public VarPanel addPair(String label, String value) {

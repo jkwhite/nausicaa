@@ -27,6 +27,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     private Random _random;
     private final String _name;
     private long _seed = 8;
+    private UIActions _ui;
     private Sizer _sizer;
     private Config _config;
     private Timeline _timeline;
@@ -36,7 +37,8 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
 
 
     //public Futures(int w, int h, Branch<World> b) {
-    public Futures(Sizer sizer, Config config, Timeline timeline, CA ca, Random rand, String name) {
+    public Futures(UIActions ui, Sizer sizer, Config config, Timeline timeline, CA ca, Random rand, String name) {
+        _ui = ui;
         _sizer = sizer;
         _config = config;
         _timeline = timeline;
@@ -238,7 +240,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                     NViewer.getUIActions().branch(d.getCA());
                 }
                 else {
-                    NViewer.getUIActions().doWait(new Runnable() {
+                    /*NViewer.getUIActions()*/_ui.doWait(new Runnable() {
                         public void run() {
                             if(mutate) {
                                 _ca = mutate(d.getCA());

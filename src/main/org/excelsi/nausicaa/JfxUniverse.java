@@ -64,7 +64,8 @@ public class JfxUniverse extends Application {
 
         Node menu = createMenu(stage, w);
         w.getGui().setTop(menu);
-        w.getGui().getStylesheets().add("/org/excelsi/nausicaa/nausicaa-jfx.css");
+        // w.getGui().getStylesheets().add("/org/excelsi/nausicaa/nausicaa-jfx.css");
+        w.getGui().getStylesheets().add("/nausicaa-jfx.css");
         //scene.getStylesheets().add("/org/excelsi/solace/solace-default.css");
         //String usercss = _mc.getShellFactory().getMetaShell().getUserStylesheetUrl();
         //if(usercss!=null) {
@@ -129,11 +130,11 @@ public class JfxUniverse extends Application {
         anim.getItems().addAll(disk);
 
         Menu func = new Menu("Functions");
-        MenuItem iter = new MenuItem("Iterated Function Demo");
+        MenuItem iter = new MenuItem("Iterated Function Demo 1");
         iter.setAccelerator(KeyCombination.keyCombination("Shortcut+E"));
         iter.setOnAction((e)->{ loadDemoIfs(); });
 
-        MenuItem params = new MenuItem("Iterated Function Demo");
+        MenuItem params = new MenuItem("Iterated Function Demo 2");
         params.setAccelerator(KeyCombination.keyCombination("Shortcut+I"));
         params.setOnAction((e)->{ runParamDemo(); });
 
