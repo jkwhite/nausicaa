@@ -68,14 +68,29 @@ public class RuleEditor extends JComponent implements TimelineListener {
         JButton testp = new JButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 MutationFactor mf = Actions.createMutationFactor(current, _ui.getConfig(), new Random(), true);
+                System.err.println("PAT TEXT: "+pat.getText());
                 String[] ptext = pat.getText().replace("\n", " ").split(" ");
                 Pattern p = ((ComputedRule2d)_rule.origin().create(rule.getText(), mf)).createPattern();
-                double[] ps = new double[ptext.length];
+                double[] psd = new double[ptext.length];
+                int[] psi = new int[ptext.length];
                 for(int i=0;i<ptext.length;i++) {
-                    ps[i] = Double.parseDouble(ptext[i]);
+                    if(p.archetype().isDiscrete()) {
+                        psi[i] = Integer.parseInt(ptext[i]);
+                        System.err.println("PARSE: '"+ptext[i]+"' TO "+psi[i]);
+                    }
+                    else {
+                        psd[i] = Double.parseDouble(ptext[i]);
+                        System.err.println("PARSE: '"+ptext[i]+"' TO "+psd[i]);
+                    }
                 }
-                double next = p.next(0, ps, new Pattern.Ctx());
-                System.err.println("Next: "+next);
+                if(p.archetype().isDiscrete()) {
+                    int next = p.next(0, psi, new Pattern.Ctx());
+                    System.err.println("Next: "+next);
+                }
+                else {
+                    double next = p.next(0, psd, new Pattern.Ctx());
+                    System.err.println("Next: "+next);
+                }
             }
         });
         testp.setText("Test");

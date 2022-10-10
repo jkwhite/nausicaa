@@ -54,6 +54,7 @@ public class Codons {
     public static final String ABORT = "ga";
     public static final String AVG = "gi";
     public static final String COUNT = "gu";
+    public static final String COUNT_FIXED = "pu";
     public static final String PUSH_ALL_ROT = "ge";
     public static final String PUSH_ALL = "go";
     public static final String JUMP = "ja";
@@ -95,6 +96,7 @@ public class Codons {
     public static final String BANDPASS = "cho";
     public static final String LIFE = "life";
     public static final String HODGE = "hodge";
+    public static final String SLIME = "slime";
 
 
     public static Codon codon(final String s, final Implicate im) {
@@ -282,6 +284,8 @@ public class Codons {
                     return new Tanh();
                 case COUNT:
                     return new Count();
+                case COUNT_FIXED:
+                    return new CountFixed();
                 case JUMP:
                     return new Jump();
                 case HALT:
@@ -308,6 +312,8 @@ public class Codons {
                     return new Life();
                 case HODGE:
                     return new Hodge(im.archetype().colors());
+                case SLIME:
+                    return new Slime();
                 case ABS:
                     return new Abs();
                 default:
@@ -2703,6 +2709,40 @@ public class Codons {
         }
     }
 
+    public static class CountFixed implements Codon {
+        @Override public Codon copy() { return new CountFixed(); }
+
+        @Override public String code() {
+            return COUNT_FIXED;
+        }
+
+        @Override public boolean usesPattern() {
+            return true;
+        }
+
+        @Override public boolean usesTape() { return true; }
+
+        @Override public boolean supports(Values v) { return true; }
+
+        @Override public void op(int[] p, IntTape t, Pattern.Ctx ctx) {
+            int v = t.pop();
+            int c = 0;
+            for(int i=0;i<p.length;i++) {
+                if(p[i]==v) c++;
+            }
+            t.push(c);
+        }
+
+        @Override public void op(double[] p, FloatTape t, Pattern.Ctx ctx) {
+            double v = t.pop();
+            int c = 0;
+            for(int i=0;i<p.length;i++) {
+                if(p[i]==v) c++;
+            }
+            t.push(c);
+        }
+    }
+
     public static class Jump implements Codon {
         @Override public Codon copy() { return new Jump(); }
 
@@ -3214,6 +3254,51 @@ public class Codons {
             }
             else { // self==_cols-1
                 next = 0;
+            }
+            t.push(next);
+        }
+
+        @Override public void op(double[] p, FloatTape t, Pattern.Ctx ctx) {
+        }
+    }
+
+    public static class Slime implements Codon {
+        private static final PushS PUSHS = new PushS();
+
+        public Slime() {
+        }
+
+        @Override public Codon copy() { return new Slime(); }
+
+        @Override public String code() { return SLIME; }
+
+        @Override public boolean usesPattern() { return true; }
+
+        @Override public boolean usesTape() { return true; }
+
+        @Override public boolean supports(Values v) { return v==Values.discrete; }
+
+        @Override public boolean deterministic() { return true; }
+
+        public void op(int[] p, IntTape t, Pattern.Ctx ctx) {
+            int self = p[p.length/2];
+            int next = 0;
+            switch(self) {
+                case 0:
+                    for(int i=0;i<p.length;i++) {
+                        if(p[i]==2||p[i]==1) {
+                            next = 2;
+                            break;
+                        }
+                    }
+                    break;
+                case 1:
+                case 4:
+                    next = self;
+                    break;
+                default:
+                    next = 1;
+                    break;
             }
             t.push(next);
         }
