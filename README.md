@@ -128,17 +128,115 @@ Syntax: `a*Value*`
 Pushes *Value* onto the stack, where *Value* is any integer or real value.
 **Note that discrete automata may only use integer values.**
 
+#### e (Avg N)
+
+Syntax: `e`
+
+Pushes the average of the last N values onto the stack, where N is the top
+value on the stack, and not included in the average. For example, if the stack
+consists of `4 2 1 3`, then N is 3 and `(4+2+1)/3` will be pushed.
+
+#### i (Pow)
+
+Syntax: `i`
+
+Pushes v1^v2^ onto the stack, where v1 and v2 are popped off the stack.
+**Note that for discrete automata, if v2 is less than 0 it will be replaced
+by 0.**
+
+#### ka (Bitwise Or)
+
+Syntax: `ka`
+
+Pushes the bitwise-or value of the top two stack values. **Note that this is
+only supported for discrete automata. For real automata, the top stack value
+will simply be pushed back on the stack.**
+
+#### ke (Greater)
+
+Syntax: `ke`
+
+Pushes 1 or 0, depending on whether `v1>=v2`, where v1 and v2 are the top two
+stack values.
+
 #### ki (Surrounding)
 
-Syntax: ```ki```
+Syntax: `ki`
 
 Pushes all surrounding cells values onto the stack. The definition of
 "surrounding" depends on two factors: (1) Neighborhood type (Moore, von Neumann,
 or Circular), and (2) Neighborhood size.
 
+#### ko (Bitwise Rotate Left)
+
+Syntax: `ko`
+
+Pushes the bitwise-left-rotated value of the top stack value rotated by the next
+top stack value. **Note that this is only supported for discrete automata.
+For real automata, the top stack value will simply be pushed back on the stack.**
+
+#### ku (Bitwise Rotate Right)
+
+Syntax: `ku`
+
+Pushes the bitwise-right-rotated value of the top stack value rotated by the next
+top stack value. **Note that this is only supported for discrete automata.
+For real automata, the top stack value will simply be pushed back on the stack.**
+
+#### ma (Equals)
+
+Syntax: `ma`
+
+Pushes 1 or 0, depending on whether `v1=v2`, where v1 and v2 are the top two
+stack values.
+
+#### me (Sum N)
+
+Syntax: `me`
+
+Pushes the sum of the top N values onto the stack, where N is the top
+value on the stack, and not included in the sum. For example, if the stack
+consists of `4 2 1 3`, then N is 3 and `4+2+1` will be pushed.
+
+#### mi (Sum)
+
+Syntax: `mi*Value*`
+
+Pushes the sum of the top *Value* values onto the stack. *Value* is optional;
+if not specified, all values on the stack are summed (i.e., the entire stack).
+
+#### mo (Modulo)
+
+Syntax: `mo`
+
+Pushes `v1%v2`, where v1 and v2 are the top two stack values. If v2 is 0,
+simply pushes v1.
+
+#### mu (Multiply)
+
+Syntax: `mu*Value*`
+
+Pushes the product of the top *Value* values onto the stack. *Value* is optional;
+if not specified, all values on the stack are multiplied (i.e., the entire stack).
+
+#### o (Push Neighbor)
+
+Syntax: `o*Neighbor*`
+
+Pushes *Neighbor* onto the stack, where *Neighbor* is the index of any cell
+in the set of neighboring cells. Index values wrap around, so attempts to push
+indeces greater than the size of the set of neighbors are "safe".
+
+#### u (Intersects)
+
+Syntax: `u`
+
+Tests if `low<=mid<=high`, where all three values are popped off the stack.
+Pushes 1 (true) or 0 (false).
+
 #### ya (Self)
 
-Syntax: ```ya```
+Syntax: `ya`
 
 Pushes the current cell value onto the stack.
 
