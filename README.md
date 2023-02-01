@@ -128,6 +128,14 @@ Syntax: `a*Value*`
 Pushes *Value* onto the stack, where *Value* is any integer or real value.
 **Note that discrete automata may only use integer values.**
 
+#### chi (Min)
+
+Syntax: `chi*Value*`
+
+Pushes the minimum value of the top *Value* values onto the stack. *Value*
+is optional; if not specified, all values on the stack are considered
+(i.e., the entire stack).
+
 #### e (Avg N)
 
 Syntax: `e`
@@ -135,6 +143,26 @@ Syntax: `e`
 Pushes the average of the last N values onto the stack, where N is the top
 value on the stack, and not included in the average. For example, if the stack
 consists of `4 2 1 3`, then N is 3 and `(4+2+1)/3` will be pushed.
+
+#### ga (Halt)
+
+Syntax: `ga`
+
+Pushes Self and stops evaluation.
+
+#### gi (Avg)
+
+Syntax: `gi*Value*`
+
+Pushes the average of the top *Value* values onto the stack. If *Value* is not
+specified, then the entire stack is considered.
+
+#### gu (Count **DEPRECATED - BROKEN - Use `pu` instead**)
+
+Syntax: `gu`
+
+Counts the number of values in the pattern that are equal to the top stack
+value and pushes the count. **Note: Does not actually do this, use `pu` instead.**
 
 #### i (Pow)
 
@@ -159,7 +187,7 @@ Syntax: `ke`
 Pushes 1 or 0, depending on whether `v1>=v2`, where v1 and v2 are the top two
 stack values.
 
-#### ki (Surrounding)
+#### ki (Push Surrounding)
 
 Syntax: `ki`
 
@@ -219,6 +247,39 @@ Syntax: `mu*Value*`
 Pushes the product of the top *Value* values onto the stack. *Value* is optional;
 if not specified, all values on the stack are multiplied (i.e., the entire stack).
 
+#### na (Lesser)
+
+Syntax: `na`
+
+Pushes 1 or 0, depending on whether `v1<=v2`, where v1 and v2 are the top two
+stack values.
+
+#### ne (Not Equals)
+
+Syntax: `ne`
+
+Pushes 1 or 0, depending on whether `v1!=v2`, where v1 and v2 are the top two
+stack values.
+
+#### ni (Square Root)
+
+Syntax: `ni`
+
+Pushes the square root of the absolute value of the top of the stack.
+
+#### no (Push N)
+
+Syntax: `no`
+
+Pushes the Nth pattern value, where N is determined by the top value on the
+stack. The pattern contains both neighbor cells and self.
+
+#### nu (Cube Root)
+
+Syntax: `nu`
+
+Pushes the cube root of the top of the stack.
+
 #### o (Push Neighbor)
 
 Syntax: `o*Neighbor*`
@@ -226,6 +287,78 @@ Syntax: `o*Neighbor*`
 Pushes *Neighbor* onto the stack, where *Neighbor* is the index of any cell
 in the set of neighboring cells. Index values wrap around, so attempts to push
 indeces greater than the size of the set of neighbors are "safe".
+
+#### pu (Count - Fixed)
+
+Syntax: `pu`
+
+Counts the number of values in the pattern that are equal to the top stack
+value and pushes the count.
+
+#### sa (Stop)
+
+Syntax: `sa`
+
+The top of the stack is popped, and if 0 stops evaluation.
+
+#### se (Not)
+
+Syntax: `se`
+
+Pushes 1 if the top stack value is 0, otherwise pushes 0.
+
+#### shi (Position)
+
+Syntax: `shi`
+
+Pushes the current position (i.e., size) of the stack. For example,
+if the stack is "5 3 3 1", then pushes 4.
+
+#### so (Not Intersects)
+
+Syntax: `so`
+
+Tests if `mid<low || mid>high`, where all three values are popped off the stack
+in the order high, low, mid. Pushes 1 (true) or 0 (false).
+
+#### su (Subtract)
+
+Syntax: `su`
+
+Pushes `v1-v2`, where v1 and v2 are the top two stack values.
+
+#### ta (Max)
+
+Syntax: `ta*Value*`
+
+Pushes the maximum value of the top *Value* values onto the stack. *Value*
+is optional; if not specified, all values on the stack are considered
+(i.e., the entire stack).
+
+#### te (Time)
+
+Syntax: `te`
+
+Pushes the current iteration count, starting from 0. **Note that for animated
+automata, this value will only be consistent over the duration of a single
+animation execution. If the animation is stopped and started again, time will
+reset to 0. For step animation, the value will always be 0.**
+
+#### to (Bitwise And)
+
+Syntax: `to`
+
+Pushes the bitwise-and value of the top two stack values. **Note that this is
+only supported for discrete automata. For real automata, the top stack value
+will simply be pushed back on the stack.**
+
+#### tsu (Bitwise Xor)
+
+Syntax: `tsu`
+
+Pushes the bitwise-xor value of the top two stack values. For real automata,
+real values are converted bitwise to integers, then bitwise back to reals
+after the xor operation.
 
 #### u (Intersects)
 
@@ -239,6 +372,23 @@ Pushes 1 (true) or 0 (false).
 Syntax: `ya`
 
 Pushes the current cell value onto the stack.
+
+#### yo (Intersects Self)
+
+Syntax: `yo`
+
+Tests if `low<=mid<=high`, where all three values are popped off the stack.
+Pushes `mid` if true, or 0 if false.
+
+#### yu (Fork)
+
+Syntax: `yu*Value*`
+
+Fork skips over a variable number of stack values based on a Neighbor value,
+specified by index using the optional *Value*. If *Value* is not specified,
+Self is used. This can also be used to effectively branch evaluation within
+the incantation if used in tandem with Stop codons for each branch. Further
+description TBD as this works in mysterious ways and I'm tired.
 
 
 ## Example automata
