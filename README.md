@@ -136,6 +136,26 @@ Pushes the minimum value of the top *Value* values onto the stack. *Value*
 is optional; if not specified, all values on the stack are considered
 (i.e., the entire stack).
 
+#### da (Data Block)
+
+Syntax: `da*Data*`
+
+TBD.
+
+#### de (Hyperpolic Tangent)
+
+Syntax: `de`
+
+Pushes the hyperbolic tangent of the top stack value. **This codon only
+works with continuous automata. For discrete automata, it does nothing.**
+
+#### do (Duplicate)
+
+Syntax: `do`
+
+Peeks at the top stack value and pushes it again. For example, if the
+stack is `1 2 3 4`, then the result is `1 2 3 4 4`.
+
 #### e (Avg N)
 
 Syntax: `e`
@@ -150,6 +170,14 @@ Syntax: `ga`
 
 Pushes Self and stops evaluation.
 
+#### ge (Push All Rotate)
+
+Syntax: `ge`
+
+Pushes all Neighbor cell values including Self onto the stack, "rotated"
+by the top stack value. For example, if the top value is 4, pushes cells
+beginning at index 4.
+
 #### gi (Avg)
 
 Syntax: `gi*Value*`
@@ -157,12 +185,28 @@ Syntax: `gi*Value*`
 Pushes the average of the top *Value* values onto the stack. If *Value* is not
 specified, then the entire stack is considered.
 
+#### go (Push All)
+
+Syntax: `go`
+
+Pushes all Neighbor cell values including Self onto the stack. Self is
+always pushed last.
+
 #### gu (Count **DEPRECATED - BROKEN - Use `pu` instead**)
 
 Syntax: `gu`
 
 Counts the number of values in the pattern that are equal to the top stack
 value and pushes the count. **Note: Does not actually do this, use `pu` instead.**
+
+#### ha (Exclamatory)
+
+Syntax: `ha`
+
+Pushes `N!`, where N is determined by the top stack value. **Note 1: This
+can be quite expensive to compute for large values. There are no guardrails
+and no overflow check.**
+**Note 2: For continuous automata, this does nothing.**
 
 #### i (Pow)
 
@@ -172,12 +216,38 @@ Pushes v1^v2^ onto the stack, where v1 and v2 are popped off the stack.
 **Note that for discrete automata, if v2 is less than 0 it will be replaced
 by 0.**
 
+#### ja (Jump)
+
+Syntax: `ja`
+
+"Jumps" forward or backward a number of codons determined by the top stack value.
+This can allow evaluations to loop (by jumping backward), or to skip (by jumping
+forward). There is a maximum number of codon evaluations allowed per cell, so
+infinite loops are impossible. This is currently set to 1000. In such cases, the
+evaluation is forcibly terminated, with the evaluation result being whatever value
+was at the top when the loop was broken.
+
+#### ji (Skip N)
+
+Syntax: `ji`
+
+Pops N values off the stack, where N is determined by the top stack value (which
+is popped before the skip and thus not counted as part of the skip).
+
+#### jo (Min N)
+
+Syntax: `jo`
+
+Pushes the minimum of the last N values onto the stack, where N is the top
+value on the stack, and not included in the minimum. For example, if the stack
+consists of `4 2 1 3`, then N is 3 and `1` will be pushed.
+
 #### ka (Bitwise Or)
 
 Syntax: `ka`
 
 Pushes the bitwise-or value of the top two stack values. **Note that this is
-only supported for discrete automata. For real automata, the top stack value
+only supported for discrete automata. For continuous automata, the top stack value
 will simply be pushed back on the stack.**
 
 #### ke (Greater)
@@ -201,7 +271,7 @@ Syntax: `ko`
 
 Pushes the bitwise-left-rotated value of the top stack value rotated by the next
 top stack value. **Note that this is only supported for discrete automata.
-For real automata, the top stack value will simply be pushed back on the stack.**
+For continuous automata, the top stack value will simply be pushed back on the stack.**
 
 #### ku (Bitwise Rotate Right)
 
@@ -209,7 +279,7 @@ Syntax: `ku`
 
 Pushes the bitwise-right-rotated value of the top stack value rotated by the next
 top stack value. **Note that this is only supported for discrete automata.
-For real automata, the top stack value will simply be pushed back on the stack.**
+For continuous automata, the top stack value will simply be pushed back on the stack.**
 
 #### ma (Equals)
 
@@ -295,6 +365,42 @@ Syntax: `pu`
 Counts the number of values in the pattern that are equal to the top stack
 value and pushes the count.
 
+#### ra (If)
+
+Syntax: `ra`
+
+Pops the top three stack values as *cond*, *tr*, and *fl* (condition, true case,
+and false case). If *cond* is non-zero, pushes *tr*, otherwise pushes *fl*.
+
+#### ri (Max N)
+
+Syntax: `jo`
+
+Pushes the maximum of the last N values onto the stack, where N is the top
+value on the stack, and not included in the maximum. For example, if the stack
+consists of `4 2 1 3`, then N is 3 and `4` will be pushed.
+
+#### re (Sine)
+
+Syntax: `re`
+
+Pushes the sine of the top stack value. **This codon only works with continuous
+automata. For discrete automata, it does nothing.**
+
+#### ro (Skip)
+
+Syntax: `ro*Value*`
+
+Pops *Value* values off the stack.
+
+#### ru (Sigmoid)
+
+Syntax: `ru`
+
+Pushes the sigmoid of the top stack value. Specifically, 1/(1+e^-*v*^), where
+*v* is the top stack value. **This codon only works with continuous automata.
+For discrete automata, it does nothing.**
+
 #### sa (Stop)
 
 Syntax: `sa`
@@ -349,14 +455,14 @@ reset to 0. For step animation, the value will always be 0.**
 Syntax: `to`
 
 Pushes the bitwise-and value of the top two stack values. **Note that this is
-only supported for discrete automata. For real automata, the top stack value
+only supported for discrete automata. For continuous automata, the top stack value
 will simply be pushed back on the stack.**
 
 #### tsu (Bitwise Xor)
 
 Syntax: `tsu`
 
-Pushes the bitwise-xor value of the top two stack values. For real automata,
+Pushes the bitwise-xor value of the top two stack values. For continuous automata,
 real values are converted bitwise to integers, then bitwise back to reals
 after the xor operation.
 
@@ -390,6 +496,29 @@ Self is used. This can also be used to effectively branch evaluation within
 the incantation if used in tandem with Stop codons for each branch. Further
 description TBD as this works in mysterious ways and I'm tired.
 
+#### za (Halt)
+
+Syntax: `za`
+
+Stops evaluation. The evaluation result is whatever value is currently the
+top stack value.
+
+#### ze (Random)
+
+Syntax: `ze`
+
+Pushes a random value between 1 and N, where N is determined by the top stack
+value. If N is negative, pushes a random value between -1 and N. If N is 0,
+pushes 0.
+
+#### zu (Non-zero)
+
+Syntax: `za*Value*`
+
+Filters all non-positive values from the stack for the top *Value* values.
+If *Value* is not specified, the entire stack is considered.
+
+Bug: This should probably not filter negative values, but alas.
 
 ## Example automata
 
