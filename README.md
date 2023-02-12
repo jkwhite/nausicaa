@@ -128,6 +128,33 @@ Syntax: `a*Value*`
 Pushes *Value* onto the stack, where *Value* is any integer or real value.
 **Note that discrete automata may only use integer values.**
 
+#### ba (Bitwise Left Rotate)
+
+Syntax: `ba`
+
+Pushes the bitwise-left-rotated value of the top stack value rotated by the next
+top stack value. **Note that this is only supported for discrete automata.
+For continuous automata, the top stack value will simply be pushed back on the stack.**
+
+#### be (Greater Than)
+
+Syntax: `be`
+
+Pushes `1` if `v1>v2`, else `0`. where v1 and v2 are the top two stack values.
+
+#### bo (Negate)
+
+Syntax: `bo`
+
+Pushes the negation of the top stack value. For example, if the stack is
+[5 3 1], the new stack will be [5 3 -1].
+
+#### bu (Less Than)
+
+Syntax: `bu`
+
+Pushes `1` if `v1<v2`, else `0`. where v1 and v2 are the top two stack values.
+
 #### chi (Min)
 
 Syntax: `chi*Value*`
@@ -135,6 +162,14 @@ Syntax: `chi*Value*`
 Pushes the minimum value of the top *Value* values onto the stack. *Value*
 is optional; if not specified, all values on the stack are considered
 (i.e., the entire stack).
+
+#### cho (Bandpass)
+
+Syntax: `cho`
+
+Uses the top three stack values as `up`, `low`, and `mid` to determine if
+`mid` falls between `low` and `up`, inclusive. If true, pushes `mid`, otherwise
+pushes `0`.
 
 #### da (Data Block)
 
@@ -208,6 +243,36 @@ can be quite expensive to compute for large values. There are no guardrails
 and no overflow check.**
 **Note 2: For continuous automata, this does nothing.**
 
+#### he (Convolve)
+
+Syntax: `he`
+
+Pushes a value computed by summing and multiplying parts of the pattern and
+the stack.
+
+#### hi (Histogram)
+
+Syntax: `hi`
+
+Computes a histogram of all values in Pattern and pushes it to the stack
+in size order. For example, if the pattern is `1 5 7 2 5 7 7 7 1`, then
+it will push `1 2 2 4`.
+
+#### ho (Divide)
+
+Syntax: `ho`
+
+Pushes the division of the top two values onto the stack. In the case of division
+by zero, simply pushes the top value back.
+
+#### hu (Supersymmetry)
+
+Syntax: `hu`
+
+Pushes the value that is "opposite" to the top stack value and the middle value,
+based on the number of colors in the automata. For example, if the automata
+has 4 colors, then color 1 is opposite color 2, and color 0 is opposite color 3.
+
 #### i (Pow)
 
 Syntax: `i`
@@ -241,6 +306,17 @@ Syntax: `jo`
 Pushes the minimum of the last N values onto the stack, where N is the top
 value on the stack, and not included in the minimum. For example, if the stack
 consists of `4 2 1 3`, then N is 3 and `1` will be pushed.
+
+#### jya (Relative Coordinate)
+
+Syntax: `jya[0|1|2]`
+
+For continuous automata, pushes either the relative `x`, `y`, or `z` cell
+coordinate, depending on which numeric argument is used. If no numeric
+argument is specified, pushes all available coordinates, depending on the
+dimensionality of the automata. Relative coordinates range from -1.0 to 1.0,
+with 0.0 at the center of the lattice. For discrete automata, functions
+the same as `kya`.
 
 #### ka (Bitwise Or)
 
@@ -281,6 +357,14 @@ Pushes the bitwise-right-rotated value of the top stack value rotated by the nex
 top stack value. **Note that this is only supported for discrete automata.
 For continuous automata, the top stack value will simply be pushed back on the stack.**
 
+#### kya (Coordinate)
+
+Syntax: `kya[0|1|2]`
+
+Pushes either the `x`, `y`, or `z` cell coordinate, depending on which numeric
+argument is used. If no numeric argument is specified, pushes all available
+coordinates, depending on the dimensionality of the automata.
+
 #### ma (Equals)
 
 Syntax: `ma`
@@ -317,6 +401,17 @@ Syntax: `mu*Value*`
 Pushes the product of the top *Value* values onto the stack. *Value* is optional;
 if not specified, all values on the stack are multiplied (i.e., the entire stack).
 
+#### mya (Mandelbulb)
+
+Syntax: `nya`
+
+Pushes the Mandelbulb Set value using the top five values on the stack, defined
+in order as `scl` (scaling factor), `z` (iterations), `x`, and `y`, and `z`
+(coordinates). For safety, iterations is capped at 100. While this codon is
+intended to be used with 3D automata, it can be used with any dimensionality
+since the coordinate values are popped from the stack. Note that this produces
+a *discrete approximation* of the fractal, as lattices are discrete in nature.
+
 #### na (Lesser)
 
 Syntax: `na`
@@ -350,6 +445,17 @@ Syntax: `nu`
 
 Pushes the cube root of the top of the stack.
 
+#### nya (Mandelbrot)
+
+Syntax: `nya`
+
+Pushes the Mandelbrot Set value using the top four values on the stack, defined
+in order as `scl` (scaling factor), `z` (iterations), `x`, and `y` (coordinates).
+For safety, iterations is capped at 100. While this codon is
+intended to be used with 2D automata, it can be used with any dimensionality
+since the coordinate values are popped from the stack. Note that this produces
+a *discrete approximation* of the fractal, as lattices are discrete in nature.
+ 
 #### o (Push Neighbor)
 
 Syntax: `o*Neighbor*`
@@ -357,6 +463,31 @@ Syntax: `o*Neighbor*`
 Pushes *Neighbor* onto the stack, where *Neighbor* is the index of any cell
 in the set of neighboring cells. Index values wrap around, so attempts to push
 indeces greater than the size of the set of neighbors are "safe".
+
+#### pa (Push Cardinal)
+
+Syntax: `pa`
+
+Pushes all cells lying in cardinal directions from the main cell.
+
+#### pe (Absolute Value)
+
+Syntax: `pe`
+
+Pushes the absolute value of the top stack value.
+
+#### pi (Filter)
+
+Syntax: `pi*Value*`
+
+**Bugged**
+
+#### po (Equals Array)
+
+Syntax: `po*Value*`
+
+If an entire array up to length *Value* is equivalent to a compared array,
+returns 1, else 0.
 
 #### pu (Count - Fixed)
 
@@ -465,6 +596,18 @@ Syntax: `tsu`
 Pushes the bitwise-xor value of the top two stack values. For continuous automata,
 real values are converted bitwise to integers, then bitwise back to reals
 after the xor operation.
+
+#### wa (Most)
+
+Syntax: `wa*Value*`
+
+Pushes the value that occurs the most of times in the pattern.
+
+#### wo (Least)
+
+Syntax: `wo*Value*`
+
+Pushes the value that occurs the least of times in the pattern.
 
 #### u (Intersects)
 
