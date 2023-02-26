@@ -271,6 +271,8 @@ in different ways. For example, here is the same 400x400x40 2D automata
 with prelude 20 rendered first with ``Render | Composition mode | Nearest only``
 and then as ``Render | Composition mode | Weighted average``:
 
+![Nearest only screenshot](assets/images/nearestonly.png) ![Weighted avg screenshot](assets/images/weightedavg.png)
+
 ## A Few Important Commands
 
 Here is a brief list of a few of the more often-used GUI commands.
