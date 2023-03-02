@@ -1857,7 +1857,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         final JMenuItem view3d = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 final ViewType vt = _futures!=null ? _futures.getViewType() : ViewType.view2d;
-                vhack[0].setText(vt==ViewType.view2d?"View in 2D":"View in 3D internal");
+                vhack[0].setText(vt==ViewType.view2d?"View in 2D":"View in 3D");
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         _futures.setViewType(vt==ViewType.view2d?ViewType.view3d:ViewType.view2d);
@@ -1870,27 +1870,27 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         vhack[0] = view3d;
         view3d.setText("View in 3D");
         view3d.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, shortcut | InputEvent.SHIFT_DOWN_MASK));
-        //view3d.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, shortcut));
 
-        final JMenuItem eview3d = new JMenuItem(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        _a.external3dView(NViewer.this, _config);
-                    }
-                });
-            }
-        });
-        eview3d.setText("View in 3D external");
-        render.add(eview3d);
+        //TODO
+        // final JMenuItem eview3d = new JMenuItem(new AbstractAction() {
+            // public void actionPerformed(ActionEvent e) {
+                // SwingUtilities.invokeLater(new Runnable() {
+                    // public void run() {
+                        // _a.external3dView(NViewer.this, _config);
+                    // }
+                // });
+            // }
+        // });
+        // eview3d.setText("View in 3D external");
+        // render.add(eview3d);
 
-        final JMenuItem viewh = new JMenuItem(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _a.view3d(NViewer.this);
-            }
-        });
-        viewh.setText("View from higher dimension");
-        render.add(viewh);
+        // final JMenuItem viewh = new JMenuItem(new AbstractAction() {
+            // public void actionPerformed(ActionEvent e) {
+                // _a.view3d(NViewer.this);
+            // }
+        // });
+        // viewh.setText("View from higher dimension");
+        // render.add(viewh);
 
         bar.add(render);
     }

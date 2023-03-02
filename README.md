@@ -32,6 +32,10 @@ the various concepts that NausiCAä uses to create visualizations. Second,
 we cover how to use the GUI application. Third, we provide a reference guide
 and example automata.
 
+(Note: In this guide, we use the Mac syntax "⌘" when denoting the meta key
+in keyboard shortcuts for GUI commands. Substitute this with whatever meta key
+is appropriate for your OS.)
+
 ## Automata
 
 *Automata* are a collection of various parameters that are used to generate
@@ -216,7 +220,7 @@ mutations are generated.
 This allows you to arrive at interesting automata by making repeated slight
 modifications to automata.
 
-The command ``Window | Hide mutations (⌘ Y)`` allows you to hide (or show)
+The command ``Window | Hide mutations (⌘Y)`` allows you to hide (or show)
 mutations so you can focus on the current automata. Continuing the above
 example, after hiding mutations the main window will appear as:
 
@@ -224,14 +228,42 @@ example, after hiding mutations the main window will appear as:
 
 ## Info Window
 
-The info window at ``Automata | Info (⌘ I)`` displays a summary of the
+The info window at ``Automata | Info (⌘I)`` displays a summary of the
 current automata.
 
 ![Info Window screenshot](assets/images/infowindow.png)
 
+## Basic Parameters Window
+
+Basic automata parameters are set with ``Automata | Configure parameters ... (⌘ K)``.
+This can be used to set lattice *width*, *height*, and *depth* (if appropriate).
+It can also set *prelude*, which is the number of iterations to evaluate
+before rendering the initial visualization.
+
+![Basic Params Window screenshot](assets/images/caparameters.png)
+
+Depth is interpreted differently depending on the dimensionality of the
+automaton and the configured rendering mode.
+
+For 2D automata, depth is used to retain some number of prior lattice
+states. Then, if the main window is in 2D view mode, the current and
+all prior states of each lattice cell are projected into a single pixel
+in the visualization based on the rendering mode (see Rendering Modes
+for details). If instead the main window is in 3D mode, then the current and
+all prior states are rendered as a 3D rectangle, with current state at
+the "top" of the Y (vertical) axis.
+
+For 3D automata, depth is simply the 3rd dimension of the automata's lattice
+space, rather than a collection of prior states as with 2D automata. Other
+than that difference, view rendering follows the same process as with 2D
+automata.
+
+This window also allows you to set a "name" for the automaton. This is arbitrary
+descriptive text and does not in any way affect computation or visualization.
+
 ## Rule Editor Window
 
-The rule editor window at ``Window | Show rule editor (⌘ G)`` displays
+The rule editor window at ``Window | Show rule editor (⌘G)`` displays
 (or hides) the current automata's rules, as described in [Rules](#rules).
 **Implementation Note:** Be sure the cursor is positioned at the end of
 the rule(s) before hitting *enter* to set the new rules, otherwise rule(s)
@@ -239,11 +271,89 @@ will be truncated (this window will be improved in a future release).
 
 ![Rule Editor Window screenshot](assets/images/ruleeditor.png)
 
+## Palette Editor Window
+
+The palette editor window at ``Window | Show palette editor`` displays
+(or hides) the current automata's color palette. **Implementation note:**
+The palette editor should only be used with small numbers of colors; there
+is no hard limit, but selecting invididual colors by hand only really scales
+when there are less than, say, 100 colors. For larger palettes, use one
+of the commands under the ``Palette`` menu instead, which are designed to
+deal with huge palettes.
+
+![Palette Editor Window screenshot](assets/images/paletteeditor.png)
+
+## Update Mode
+
+*Update mode* determines how and when values in the lattice are updated.
+
+* Synchronous: All cell updates occur as a single, atomic operation.
+* Asynchronous: Cell updates occur at the specified probability in range (0.0-1.0),
+with 1.0 being equivalent to Synchronous update mode.
+* Local Asynchronous: 
+* Energy Asynchronous: 
+* Variable: 
+
+## Edge Mode
+
+* Toroidal: The edge "wraps around", that is, the top/bottom and left/right
+edges are considered to be contiguous to each other.
+* Zero: All cells outside the visible area are considered to be 0.
+* Constant: All cells outside the visible area are considered to be the
+specified value.
+
+## External Force
+
+* None: Lattice cell values are determined solely by the update rule.
+* Random: Randomly-valued "snow" is introduced to the lattice at the specified
+frequency.
+
+## Animation
+
+Animation for both 2D and 3D automata can be started/stopped with the
+``Animation | Animate (⌘A)`` command. Animation iterates through successive
+evaluations of the automaton's rule. (1D automata cannot be animated because
+successive rule evaluations are simply displayed on the vertical axis.)
+
+The amount of resources consumed by animation is configurable with the
+``Animation | Configure animation ...`` command. At present, only the
+``Compute cores`` option is used; ``Render cores`` is unused but may be used
+in the future.
+
+**Generate to disk**
+
+The ``Animation | Generate to disk (⌘D)`` command can write individual
+animation frames to a directory as separate PNG files, or it can generate
+an entire animation as a single animated GIF file.
+
+![Generate to Disk Window screenshot](assets/images/generatedisk.png)
+* Width & Height: Override currently-configured automata size values. (TODO:
+add similar for depth.)
+* Animate: If checked, each individual frame, or an animated GIF, will be
+written to disk.
+* Framerate: Framerate for GIFs. Has no effect on frames.
+* Scaling: Scale factor for frames, e.g., setting this to 0.5 will downscale
+generated frames by 50%.
+* Cores: Number of compute threads to use in animation pipeline.
+* Skip frames: Skip over some number of frames during generation. The frames
+are still computed, but are not written to disk. This can be useful to reduce
+the size of generated data for slowly-evolving automata. Affects both frame
+generation and animated GIFs.
+* Create GIF: If checked, output will be a single animated GIF file.
+* Reverse: Generate frames in reverse (i.e., if generating 100 frames, then
+frame 0 will be numbered 99, 1 will be 98, etc.).
+* Big Bounce: Generate frames from the middle out. This results in a
+wrap-around kind of effect.
+
+(Note: for the tasks of GIF post-processing and making movies from frames,
+the author recommends the excellent ``gifsicle`` and ``ffmpeg``. Of course
+you can use whatever programs work for you.)
+
 ## Making Mutations
 
 Mutations can be applied in several ways:
 * By selecting one of the randomly-generated mutations in the main window
-(shown with ⌘ Y).
+(shown with ⌘Y).
 * By using the ``Mutations`` menu to specifically select a type of
 incantation mutation.
 * By enabling other kinds of mutations like *Weight variations*,
@@ -266,58 +376,79 @@ then all stages will be subject to mutation.
 
 ## Rendering Modes
 
-Depending on how rendering is configured, the same automata may be visualized
-in different ways. For example, here is the same 400x400x40 2D automata
+**Composition Modes**
+
+Depending on how composition is configured, the same automata may be visualized
+in different ways. For example, here is the same 200x200x40 2D automata
 with prelude 20 rendered first with ``Render | Composition mode | Nearest only``
 and then as ``Render | Composition mode | Weighted average``:
 
 ![Nearest only screenshot](assets/images/nearestonly.png) ![Weighted avg screenshot](assets/images/weightedavg.png)
+
+These and other *composition modes* affect how the "depth" dimension is rendered
+to the two-dimensional visualization.
+
+* Nearest only: Use only the first non-zero cell value in range (depth-1,0).
+* Farthest only: Use only the first non-zero cell value in range (0,depth-1).
+* Weighted average: Use an average of all cell values, weighting those with higher
+depth (i.e., more recent iterations) higher.
+* Weighted average reverse: Use an average of all cell values, weighting those with
+lower depth (i.e., less recent iterations) higher.
+* Average: Use an average of all cell values, weighed equally.
+* Channel: Depth must be set to 3 or 4. With depth 3, renders packed RGB
+values using depths (0,1,2). With depth 4, renders packed RGBA values using
+depths (0,1,2,3).
+* Multiply: Uses a value computed from cells at all depths multiplied together,
+normalized between (0,255).
+* Difference: Uses a value computed from the total difference between each
+successive cell value at all depths, normalized by depth.
+* True Nearest: Uses only the cell value at the highest depth.
 
 ## A Few Important Commands
 
 Here is a brief list of a few of the more often-used GUI commands.
 
 **File menu: Handling automata files**
-* ⌘ N - Create a new automata
-* ⌘ S - Save current automata
-* ⌘ O - Open a previously-saved automata
+* ⌘N - Create a new automata
+* ⌘S - Save current automata
+* ⌘O - Open a previously-saved automata
 
 **Automata menu: Basic automata parameters**
-* ⌘ K - Set lattice width, height, and depth (if appropriate).
+* ⌘K - Set lattice width, height, and depth (if appropriate).
 Also sets prelude, which is the number of iterations to go
 through before rendering the initial visualization.
-* ⌘ I - Display an informational window describing the current automata.
+* ⌘I - Display an informational window describing the current automata.
 
 **Automata menu: Setting initial lattice state**
-* ⌘ B - Use a random initial state; the lattice is set to random
+* ⌘B - Use a random initial state; the lattice is set to random
 values within the value space weighted toward 0 based on the zero
 weight as set between (0.0,1.0).
-* ⌘ F - Use a "fixed" initial state; the specified coordinate is
+* ⌘F - Use a "fixed" initial state; the specified coordinate is
 set to the specified value (or -1,-1,... for center) and all other
 coordinates are set to 0.
-* ⌘ G - Gaussian initial state; one or more clusters of values are
+* ⌘G - Gaussian initial state; one or more clusters of values are
 created based on specified attributes.
-* ⌘ L - Clustered Gaussian initial state; similar to Gaussian initial
+* ⌘L - Clustered Gaussian initial state; similar to Gaussian initial
 state, but values for each cluster are pulled from different value
 ranges; i.e., with 2 clusters, one cluster may have value ranges
 0-9 and the other may have value ranges 10-19.
 
 **Animation menu: Animating 2D and 3D automata**
-* ⌘ A - Start/stop iteration animation.
-* ⌘ D - Write animation frames to disk so they can be used within
+* ⌘A - Start/stop iteration animation.
+* ⌘D - Write animation frames to disk so they can be used within
 a video editor, or write an animated GIF to disk.
 
 **Render menu: Configuring visualization rendering**
-* ⌘⇧ V - Toggle between 2D and 3D rendering modes
+* ⌘⇧V - Toggle between 2D and 3D rendering modes
 
 **View menu: Viewing visualizations**
-* ⌘ = - Zoom in
-* ⌘ - - Zoom out
-* ⌘ 0 - Actual size
+* ⌘= - Zoom in
+* ⌘- - Zoom out
+* ⌘0 - Actual size
 
 **Window menu: Automata windows**
-* ⌘ Y - Show/hide mutations in main window
-* ⌘ G - Show/hide incantation editor window
+* ⌘Y - Show/hide mutations in main window
+* ⌘G - Show/hide incantation editor window
 
 # Reference Guide
 

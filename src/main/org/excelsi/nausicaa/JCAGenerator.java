@@ -35,7 +35,8 @@ public class JCAGenerator extends JDialog {
             gl = new GridLayout(2,2);
         }
         else {
-            gl = new GridLayout(13,2);
+            // gl = new GridLayout(13,2);
+            gl = new GridLayout(11,2);
         }
         JPanel top = new JPanel(gl);
         top.add(new JLabel("Width"));
@@ -118,14 +119,16 @@ public class JCAGenerator extends JDialog {
             mp4 = new JCheckBox("Create MP4");
             JPanel p4 = new JPanel();
             p4.add(mp4);
-            top.add(p4);
-            top.add(new JLabel(""));
+            //TODO
+            // top.add(p4);
+            // top.add(new JLabel(""));
 
             webm = new JCheckBox("Create WebM");
             JPanel ebm = new JPanel();
             ebm.add(webm);
-            top.add(ebm);
-            top.add(new JLabel(""));
+            //TODO
+            // top.add(ebm);
+            // top.add(new JLabel(""));
 
             gif = new JCheckBox("Create GIF");
             JPanel jg = new JPanel();
