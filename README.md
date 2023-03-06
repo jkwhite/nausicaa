@@ -80,7 +80,7 @@ multiplied to rule output value. Can be used to decrease or increase the
 * Decay: Optional weight decay (default 1.0). A real value that if set will
 change the weight value with each iteration, i.e. weight' = weight * decay.
 * Incantation: A kind of genome-like set of codons, written as syllables in
-the *Machine Elvish* language, which is described the
+the *Machine Elvish* language, which is described in the
 [Machine Elvish](#machine-elvish) section below.
 
 ## Sequences
@@ -199,6 +199,24 @@ This compound codon, slightly more complex, generates a series of circles:
 ```
 kya0+kya0+mu2+kya1+kya1+mu2+mi2+ni
 ```
+
+Listing the codons out one by one:
+
+```
+    kya0    Coord
+    kya0    Coord
+    mu2     Muln
+    kya1    Coord
+    kya1    Coord
+    mu2     Muln
+    mi2     Sumn
+    ni      Sqrt
+```
+
+One might recognize this as an encoding of Pythagoras's distance formula, and results in
+the visualization:
+
+![Circular rings](assets/images/circularrings.png)
 
 ### Variables
 
@@ -398,7 +416,8 @@ and then as ``Render | Composition mode | Weighted average``:
 ![Nearest only screenshot](assets/images/nearestonly.png) ![Weighted avg screenshot](assets/images/weightedavg.png)
 
 These and other *composition modes* affect how the "depth" dimension is rendered
-to the two-dimensional visualization.
+to the two-dimensional visualization. (TODO: Not all composition modes are
+currented supported at all dimensions.)
 
 * Nearest only: Use only the first non-zero cell value in range (depth-1,0).
 * Farthest only: Use only the first non-zero cell value in range (0,depth-1).
