@@ -200,20 +200,21 @@ This compound codon, slightly more complex, generates a series of circles:
 kya0+kya0+mu2+kya1+kya1+mu2+mi2+ni
 ```
 
-Listing the codons out one by one:
+Listing the codons, metadata, and stack state out one by one:
 
 ```
-    kya0    Coord
-    kya0    Coord
-    mu2     Muln
-    kya1    Coord
-    kya1    Coord
-    mu2     Muln
-    mi2     Sumn
-    ni      Sqrt
+    syllbl  codon    description           stack state
+    kya0    Coord    (x cell coordinate)   x
+    kya0    Coord    (x cell coordinate)   x x
+    mu2     Muln     (multiply top 2)      x*x
+    kya1    Coord    (y cell coordinate)   x*x y
+    kya1    Coord    (y cell coordinate)   x*x y y
+    mu2     Muln     (multiply top 2)      x*x y*y
+    mi2     Sumn     (sum top 2)           x*x+y*y
+    ni      Sqrt     (square root)         sqrt(x*x+y*y)
 ```
 
-One might recognize this as an encoding of Pythagoras's distance formula, and results in
+You might recognize this as an encoding of Pythagoras's distance formula, and results in
 the visualization:
 
 ![Circular rings](assets/images/circularrings.png)
@@ -320,9 +321,13 @@ deal with huge palettes.
 * Synchronous: All cell updates occur as a single, atomic operation.
 * Asynchronous: Cell updates occur at the specified probability in range (0.0-1.0),
 with 1.0 being equivalent to Synchronous update mode.
-* Local Asynchronous: 
-* Energy Asynchronous: 
-* Variable: 
+* Local Asynchronous: Like Asynchronous mode, except cell update probability
+is determined by inverse distance from the center of the lattice.
+* Energy Asynchronous: Like Asynchronous mode, except cell update probability
+is determined by the color value of the current cell. Cells whose values are
+closer to the maximum possible value are more likely to update.
+* Variable: Similar to Energy Asynchronous, but uses values drawn from adjacent
+planes instead of current cell value. Requires a 2D automata with depth > 1.
 
 ## Edge Mode
 
