@@ -1019,13 +1019,13 @@ top stack value.
 
 Syntax: `ze`
 
-Pushes a random value between 1 and N, where N is determined by the top stack
-value. If N is negative, pushes a random value between -1 and N. If N is 0,
-pushes 0.
+Pushes a random value between 0 and N, where N is determined by the top stack
+value. If N is negative, pushes a random negative value between 0 and N.
+If N is 0, pushes 0.
 
 ### zu (Non-zero)
 
-Syntax: `za*Value*`
+Syntax: `zu*Value*`
 
 Filters all non-positive values from the stack for the top *Value* values.
 If *Value* is not specified, the entire stack is considered.
@@ -1042,4 +1042,98 @@ Incantation:
 ki mi a2 a3 u ki mi8 a3 ma ya ra
 ```
 
-This is the classic Game of Life (Conway's Life) automata.
+This is the classic Game of Life (Conway's Life) automata, which has
+two colors and a Moore neighborhood of size 1.
+
+![Game of Life](assets/images/ca/o_life2d1.gif)
+
+We can go through the incantation to understand how it operates.
+
+```
+ki	PushO
+mi	Sum
+a2	Constant
+a3	Constant
+u	Intersects
+ki	PushO
+mi8	Sumn
+a3	Constant
+ma	Equals
+ya	PushS
+ra	If
+```
+
+The first two syllables, `ki mi`, computes the total number
+of "living" cells (value of 1) in the surrounding neighborhood,
+excepting the self cell, which we'll call N. The next two syllables,
+`a2 a3`, pushes those the two constant values 2 and 3 onto the stack as well.
+So our stack now consists of `3 2 N`. Next, we apply an intersection
+test with `u`, and push 1 or 0 depending on whether 2 <= N <= 3. (This
+could also be done with a combination of conditionals and boolean logic
+syllables.) The stack is now `[0|1]`, depending on the result of the test.
+
+Next, we repeat the first two syllables with `ki mi8`, with
+the '8' value being necessary to avoid consuming the entire stack. (This
+could have alternately been done with a `du` (duplicate) syllable earlier
+in the incantation, which would have been more efficient because it avoids
+a second memory copy, but I'll leave that as an exercise for another time.)
+The next two syllables, `a3 ma`, determine whether exactly 3 cells are alive
+and push either 1 or 0. Next we push the self cell with `ya`.
+
+The two branches of the conditional and the condition itself are now all set
+up on the stack, and finally, with `ra` (If), we branch to the final result
+based on the self cell value, in accordance with the Life rule. This isn't
+a particularly efficient implementation, but it is straightforward. There are
+other possible implementations that would be more efficient, like I mentioned
+above with the `du` syllable, and we could also avoid computing the unused
+branch by using `ja` (jump) and `za` (halt) syllables instead.
+
+### Circular neighborhoods
+
+Selected examples of 2D circular neighborhoods of sizes 3-5.
+
+"Slippery"
+
+```88/0.5;0.9:jya0 pa wo o30 ke ke ki```
+
+![Slippery](assets/images/ca/ex1.png)
+
+"Nitelite"
+
+```0.62;1.21:bu ki kya0 bo pa wo ke ke ki o30 ta2```
+
+![Nitelite](assets/images/ca/ex2.png)
+
+"Ringu"
+
+```0.16;0.95:ma chi1 chi1 sa pa ko ma o16 o14 ru sa bo pa jya jya0 pe gi pe chi mi```
+![Ringu](assets/images/ca/ex5.png)
+
+### Mandelbulb
+
+A discrete mapping of the Mandelbulb fractal. It might be good now, maybe later.
+
+"Mandelbulb"
+![Mandulbulb](assets/images/ca/mandelbulb1-1.png)
+
+
+# Bugs
+
+* There are way too few sanity checks around reasonable limits. For example,
+can you create a 3D automata in 1024^3 size? Maybe, maybe not. Or an automata
+with 1MM palette colors? I honestly don't know. The only sanity check that
+exists currently is with the Machine Elvish execution--where it's limited to
+a certain number of evaluations per cell. So it's not possible to consume
+infinite processing time, but it is possible to consume infinite memory.
+
+* Speaking of limits, the JavaFX 3D renderer dies above a few hundred thousand
+points. Arranging points into arbitrary shapes helps somewhat, but there's a
+lot more that can be done.
+
+* Updates in the GUI that fail get reported through the console logger rather than
+proprer GUI reporting.
+
+* 3D mode is quite brittle. It works fine at low limits, but pretty much anything
+can set it off. I am looking at alternatives to JavaFX screengraphs.
+
++++ATH0
