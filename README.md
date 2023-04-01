@@ -772,7 +772,7 @@ if not specified, all values on the stack are multiplied (i.e., the entire stack
 
 ### mya (Mandelbulb)
 
-Syntax: `nya`
+Syntax: `mya`
 
 Pushes the Mandelbulb Set value using the top five values on the stack, defined
 in order as `scl` (scaling factor), `z` (iterations), `x`, and `y`, and `z`
