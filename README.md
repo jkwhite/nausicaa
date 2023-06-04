@@ -112,6 +112,8 @@
   - [Example automata](#example-automata)
     - [The Game of Life](#the-game-of-life)
     - [Circular neighborhoods](#circular-neighborhoods)
+    - [Mandelbulb](#mandelbulb)
+- [Bugs](#bugs)
 
 # Introduction to NausiCAä
 
@@ -1218,19 +1220,20 @@ Selected examples of 2D circular neighborhoods of sizes 3-5.
 
 "Slippery"
 
-```88/0.5;0.9:jya0 pa wo o30 ke ke ki```
+``88/0.5;0.9:jya0 pa wo o30 ke ke ki``
 
 ![Slippery](assets/images/ca/ex1.png)
 
 "Nitelite"
 
-```0.62;1.21:bu ki kya0 bo pa wo ke ke ki o30 ta2```
+``0.62;1.21:bu ki kya0 bo pa wo ke ke ki o30 ta2``
 
 ![Nitelite](assets/images/ca/ex2.png)
 
 "Ringu"
 
-```0.16;0.95:ma chi1 chi1 sa pa ko ma o16 o14 ru sa bo pa jya jya0 pe gi pe chi mi```
+``0.16;0.95:ma chi1 chi1 sa pa ko ma o16 o14 ru sa bo pa jya jya0 pe gi pe chi mi``
+
 ![Ringu](assets/images/ca/ex5.png)
 
 ### Mandelbulb
