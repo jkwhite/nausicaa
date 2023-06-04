@@ -252,8 +252,10 @@ public class JCAGenerator extends JDialog {
                                     //Iterator<CA> cas = ((Multirule2D)_r).frames(c);
                                     if(createGif) {
                                         Plane plane = c.createPlane();
-                                        ExecutorService pool = Executors.newFixedThreadPool(1);
-                                        Iterator<Plane> cas = c.compileRule().frameIterator(plane, pool, new GOptions(true, 1, 1, frameWeight).metaMode(c.getMetaMode()));
+                                        // ExecutorService pool = Executors.newFixedThreadPool(1);
+                                        System.err.println("using "+ccores+" cores");
+                                        ExecutorService pool = Executors.newFixedThreadPool(ccores);
+                                        Iterator<Plane> cas = c.compileRule().frameIterator(plane, pool, new GOptions(true, ccores, 1, frameWeight).metaMode(c.getMetaMode()));
                                         AnimatedGifEncoder age = new AnimatedGifEncoder();
                                         age.start(selfile.endsWith(".gif")?selfile:(selfile+".gif"));
                                         age.setRepeat(0);

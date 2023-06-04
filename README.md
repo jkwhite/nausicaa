@@ -1,31 +1,117 @@
 # Table of contents
 
-- [Table of contents](#table-of-contents)
 - [Introduction to NausiCAä](#introduction-to-nausica)
   - [Automata](#automata)
   - [Rules](#rules)
   - [Sequences](#sequences)
   - [Neighborhoods](#neighborhoods)
+    - [Moore](#moore)
+    - [von Neumann](#von-neumann)
+    - [Circular](#circular)
   - [Value Kinds](#value-kinds)
-  - [Machine Elvish](#machine-elvish)
-  - [Evaluation](#evaluation)
+    - [Discrete](#discrete)
+    - [RGB](#rgb)
+    - [RGBA](#rgba)
+    - [Continuous](#continuous)
+  - [Machine Elvish Language](#machine-elvish-language)
+    - [Incantation evaluation](#incantation-evaluation)
+    - [Compound codons](#compound-codons)
+    - [Variables](#variables)
 - [Using the NausiCAä GUI](#using-the-nausica-gui)
   - [Main Window](#main-window)
   - [Info Window](#info-window)
   - [Basic Parameters Window](#basic-parameters-window)
   - [Rule Editor Window](#rule-editor-window)
   - [Palette Editor Window](#palette-editor-window)
-  - [Update Mode](#update-mode)
-  - [Edge Mode](#edge-mode)
-  - [External Force](#external-force)
-  - [Animation](#animation)
-  - [Making Mutations](#making-mutations)
+  - [Automata Menu](#automata-menu)
+    - [Update Mode](#update-mode)
+    - [Edge Mode](#edge-mode)
+    - [External Force](#external-force)
+  - [Animation Menu](#animation-menu)
+    - [Generate to disk](#generate-to-disk)
+  - [Mutation Menu](#mutation-menu)
   - [Sequences, Stages, and Mutations](#sequences-stages-and-mutations)
-  - [Rendering Modes](#rendering-modes)
+  - [Render Menu](#render-menu)
+    - [Composition Mode](#composition-mode)
   - [A Few Important Commands](#a-few-important-commands)
 - [Reference Guide](#reference-guide)
   - [Codon Catalog](#codon-catalog)
+    - [a (Constant)](#a-constant)
+    - [ba (Bitwise Left Rotate)](#ba-bitwise-left-rotate)
+    - [be (Greater Than)](#be-greater-than)
+    - [bo (Negate)](#bo-negate)
+    - [bu (Less Than)](#bu-less-than)
+    - [chi (Min)](#chi-min)
+    - [cho (Bandpass)](#cho-bandpass)
+    - [da (Data Block)](#da-data-block)
+    - [de (Hyperpolic Tangent)](#de-hyperpolic-tangent)
+    - [do (Duplicate)](#do-duplicate)
+    - [e (Avg N)](#e-avg-n)
+    - [ga (Halt)](#ga-halt)
+    - [ge (Push All Rotate)](#ge-push-all-rotate)
+    - [gi (Avg)](#gi-avg)
+    - [go (Push All)](#go-push-all)
+    - [gu (Count **DEPRECATED - BROKEN - Use `pu` instead**)](#gu-count-deprecated---broken---use-pu-instead)
+    - [ha (Exclamatory)](#ha-exclamatory)
+    - [he (Convolve)](#he-convolve)
+    - [hi (Histogram)](#hi-histogram)
+    - [ho (Divide)](#ho-divide)
+    - [hu (Supersymmetry)](#hu-supersymmetry)
+    - [i (Pow)](#i-pow)
+    - [ja (Jump)](#ja-jump)
+    - [ji (Skip N)](#ji-skip-n)
+    - [jo (Min N)](#jo-min-n)
+    - [jya (Relative Coordinate)](#jya-relative-coordinate)
+    - [ka (Bitwise Or)](#ka-bitwise-or)
+    - [ke (Greater)](#ke-greater)
+    - [ki (Push Surrounding)](#ki-push-surrounding)
+    - [ko (Bitwise Rotate Left)](#ko-bitwise-rotate-left)
+    - [ku (Bitwise Rotate Right)](#ku-bitwise-rotate-right)
+    - [kya (Coordinate)](#kya-coordinate)
+    - [ma (Equals)](#ma-equals)
+    - [me (Sum N)](#me-sum-n)
+    - [mi (Sum)](#mi-sum)
+    - [mo (Modulo)](#mo-modulo)
+    - [mu (Multiply)](#mu-multiply)
+    - [mya (Mandelbulb)](#mya-mandelbulb)
+    - [na (Lesser)](#na-lesser)
+    - [ne (Not Equals)](#ne-not-equals)
+    - [ni (Square Root)](#ni-square-root)
+    - [no (Push N)](#no-push-n)
+    - [nu (Cube Root)](#nu-cube-root)
+    - [nya (Mandelbrot)](#nya-mandelbrot)
+    - [o (Push Neighbor)](#o-push-neighbor)
+    - [pa (Push Cardinal)](#pa-push-cardinal)
+    - [pe (Absolute Value)](#pe-absolute-value)
+    - [pi (Filter)](#pi-filter)
+    - [po (Equals Array)](#po-equals-array)
+    - [pu (Count - Fixed)](#pu-count---fixed)
+    - [ra (If)](#ra-if)
+    - [ri (Max N)](#ri-max-n)
+    - [re (Sine)](#re-sine)
+    - [ro (Skip)](#ro-skip)
+    - [ru (Sigmoid)](#ru-sigmoid)
+    - [sa (Stop)](#sa-stop)
+    - [se (Not)](#se-not)
+    - [shi (Position)](#shi-position)
+    - [so (Not Intersects)](#so-not-intersects)
+    - [su (Subtract)](#su-subtract)
+    - [ta (Max)](#ta-max)
+    - [te (Time)](#te-time)
+    - [to (Bitwise And)](#to-bitwise-and)
+    - [tsu (Bitwise Xor)](#tsu-bitwise-xor)
+    - [wa (Most)](#wa-most)
+    - [wo (Least)](#wo-least)
+    - [u (Intersects)](#u-intersects)
+    - [ya (Self)](#ya-self)
+    - [yo (Intersects Self)](#yo-intersects-self)
+    - [yu (Fork)](#yu-fork)
+    - [za (Halt)](#za-halt)
+    - [ze (Random)](#ze-random)
+    - [zu (Non-zero)](#zu-non-zero)
   - [Example automata](#example-automata)
+    - [The Game of Life](#the-game-of-life)
+    - [Circular neighborhoods](#circular-neighborhoods)
 
 # Introduction to NausiCAä
 
@@ -151,13 +237,13 @@ directly stored in the lattice.
 
 Continues lattices contain real values (i.e., Java double type).
 
-## Machine Elvish
+## Machine Elvish Language
 
 Machine Elvish is a simple language for expressing computations. It is
 structured as a sequence of syllables (aka codons) which forms an "incantation"
 and evaluates over a state which is represented as a stack. Values are pushed
-to or popped from the stack by each syllable, and the stack may be
-manipulated in other ways as well.
+to or popped from the stack by each syllable in the incantation. Machine Elvish
+may manipulate the stack in other ways as well.
 
 Let's look at a very simple example incantation:
 
@@ -167,9 +253,9 @@ ya
 
 This incantation consists of one syllable, "ya". The "ya" syllable represents
 a computation where the current value of the lattice at the coordinate being
-evaluated is pushed onto the stack.
+evaluated is pushed onto the stack. In other words, it is the identity computation.
 
-## Evaluation
+### Incantation evaluation
 
 An incantation is evaluated for each cell in the lattice. During evaluation,
 the incantation may store temporary state in a "stack" via push, pop, and
@@ -264,6 +350,26 @@ current automata.
 
 ![Info Window screenshot](assets/images/infowindow.png)
 
+Most of the displayed values should be self-explanatory. The most useful
+display here is the "Codons" value. This value shows an expanded list of
+the automata's incantation as it will be executed in-order from top to
+bottom. In the above example, this should be interpreted as
+
+```
+Syll  Codon      Meaning
+go    PushA      Push all cells onto the stack
+u     Intersects Pop top 3 values and push 1/0 if/not middle value is between
+do    Duplicate  Duplicate top values
+ro3   Skip       Pop and discard top 3 values
+ko    Rotleft    Bitwise-rotate using top 2 values, i.e. v1<<v2
+ki    PushO      Push all surrounding cells
+zu    Nonzero    Remove all 0 values from the stack
+ri    MaxN       Push the greatest value of the top N stack values
+```
+
+It should be noted that this particular incantation was generated at random,
+so doesn't have any specific meaning.
+
 ## Basic Parameters Window
 
 Basic automata parameters are set with ``Automata | Configure parameters ... (⌘ K)``.
@@ -296,25 +402,42 @@ descriptive text and does not in any way affect computation or visualization.
 
 The rule editor window at ``Window | Show rule editor (⌘G)`` displays
 (or hides) the current automata's rules, as described in [Rules](#rules).
-**Implementation Note:** Be sure the cursor is positioned at the end of
+
+![Rule Editor Window screenshot](assets/images/ruleeditor.png)
+
+To commit to using the edited rule, **position the cursor at the end of the
+rule** and hit enter. To discard any changes, simply close the window.
+
+**Important:** Be sure the cursor is positioned at the end of
 the rule(s) before hitting *enter* to set the new rules, otherwise rule(s)
 will be truncated (this window will be improved in a future release).
 
-![Rule Editor Window screenshot](assets/images/ruleeditor.png)
+The ``Test`` area allows you to enter a pattern to see how the edited rule
+will interpret it. Enter each cell value in the pattern space row-by-row, with
+each value separated by a space. For example, for a discrete two-value
+automata with a Von Neumann neighborhood of size 1, you might specify
+
+```
+0 1 0 1 1 1 1 0 0
+```
 
 ## Palette Editor Window
 
 The palette editor window at ``Window | Show palette editor`` displays
-(or hides) the current automata's color palette. **Implementation note:**
-The palette editor should only be used with small numbers of colors; there
-is no hard limit, but selecting invididual colors by hand only really scales
-when there are less than, say, 100 colors. For larger palettes, use one
-of the commands under the ``Palette`` menu instead, which are designed to
-deal with huge palettes.
+(or hides) the current automata's color palette. Click on a color to
+change it.
 
 ![Palette Editor Window screenshot](assets/images/paletteeditor.png)
 
-## Update Mode
+**Implementation note:** The palette editor should only be used with a
+small numbers of colors; there is no hard limit, but selecting invididual
+colors by hand only really scales when there are less than, say, 100 colors.
+For larger palettes, use one of the commands under the ``Palette`` menu
+instead, which are designed to deal with huge palettes.
+
+## Automata Menu
+
+### Update Mode
 
 *Update mode* determines how and when values in the lattice are updated.
 
@@ -329,7 +452,7 @@ closer to the maximum possible value are more likely to update.
 * Variable: Similar to Energy Asynchronous, but uses values drawn from adjacent
 planes instead of current cell value. Requires a 2D automata with depth > 1.
 
-## Edge Mode
+### Edge Mode
 
 * Toroidal: The edge "wraps around", that is, the top/bottom and left/right
 edges are considered to be contiguous to each other.
@@ -337,13 +460,13 @@ edges are considered to be contiguous to each other.
 * Constant: All cells outside the visible area are considered to be the
 specified value.
 
-## External Force
+### External Force
 
 * None: Lattice cell values are determined solely by the update rule.
 * Random: Randomly-valued "snow" is introduced to the lattice at the specified
 frequency.
 
-## Animation
+## Animation Menu
 
 Animation for both 2D and 3D automata can be started/stopped with the
 ``Animation | Animate (⌘A)`` command. Animation iterates through successive
@@ -355,7 +478,7 @@ The amount of resources consumed by animation is configurable with the
 ``Compute cores`` option is used; ``Render cores`` is unused but may be used
 in the future.
 
-**Generate to disk**
+### Generate to disk
 
 The ``Animation | Generate to disk (⌘D)`` command can write individual
 animation frames to a directory as separate PNG files, or it can generate
@@ -384,8 +507,9 @@ wrap-around kind of effect.
 the author recommends the excellent ``gifsicle`` and ``ffmpeg``. Of course
 you can use whatever programs work for you.)
 
-## Making Mutations
+## Mutation Menu
 
+**Making Mutations**
 Mutations can be applied in several ways:
 * By selecting one of the randomly-generated mutations in the main window
 (shown with ⌘Y).
@@ -409,9 +533,9 @@ configured under ``Mutate | Parameters...`` (*Mutation stage*), with the
 first stage being numbered 0. If the *mutation stage* is set to -1,
 then all stages will be subject to mutation.
 
-## Rendering Modes
+## Render Menu
 
-**Composition Modes**
+### Composition Mode
 
 Depending on how composition is configured, the same automata may be visualized
 in different ways. For example, here is the same 200x200x40 2D automata
@@ -1111,10 +1235,19 @@ Selected examples of 2D circular neighborhoods of sizes 3-5.
 
 ### Mandelbulb
 
-A discrete mapping of the Mandelbulb fractal. It might be good now, maybe later.
+Simple discrete mappings of the Mandelbulb fractal.
 
 "Mandelbulb"
+
+```98:kya0 kya1 kya2 a100 a100 mya```
+
 ![Mandulbulb](assets/images/ca/mandelbulb1-1.png)
+
+"Mandelbulb Animated"
+
+```98:kya0 kya1 kya2 a10 a100 mya a-1000 a0 cho```
+
+![Mandulbulb](assets/images/ca/o_mandelbulb2-1.gif)
 
 
 # Bugs
@@ -1123,11 +1256,13 @@ A discrete mapping of the Mandelbulb fractal. It might be good now, maybe later.
 can you create a 3D automata in 1024^3 size? Maybe, maybe not. Or an automata
 with 1MM palette colors? I honestly don't know. The only sanity check that
 exists currently is with the Machine Elvish execution--where it's limited to
-a certain number of evaluations per cell. So it's not possible to consume
-infinite processing time, but it is possible to consume infinite memory.
+a certain number of evaluations per cell. This is a simplistic way of avoiding
+infinite loops. So it's not possible to consume infinite processing time,
+but it is possible to (try to) consume infinite memory.
 
 * Speaking of limits, the JavaFX 3D renderer dies above a few hundred thousand
-points. Arranging points into arbitrary shapes helps somewhat, but there's a
+points. The renderer uses an algorithm to combine cells into larger blocks to
+minimize the vertex and face counts, and this helps somewhat, but there's a
 lot more that can be done.
 
 * Updates in the GUI that fail get reported through the console logger rather than

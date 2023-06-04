@@ -2,7 +2,7 @@ import org.excelsi.nausicaa.ca.*
 import java.util.Random
 
 
-class var {
+class vr {
     float val
     float max
     float min
@@ -42,7 +42,7 @@ run = { ca, args, api ->
     def vals = [:]
     def nargs = ca.vars.names()
     nargs.each { a ->
-        def var = new var()
+        def var = new vr()
         var.max = args["${a} max"] as Float 
         var.min = args["${a} min"] as Float
         var.val = var.min + rnd.nextFloat() * var.max

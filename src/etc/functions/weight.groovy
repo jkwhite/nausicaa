@@ -20,7 +20,7 @@ run = { ca, args, api ->
     for(i=start;i<=end;i+=inc) {
         api.progress.current = ((i-start)/inc) as Integer
         def genome = ca.rule.genome()
-        def ngenome = genome.replaceFirst(/\/\d+(\.\d+)?/, "/${i}:")
+        def ngenome = genome.replaceFirst(/\/\d+(\.\d+)?/, "/${i}")
         // def ngenome = genome.replaceFirst(/\/\d+(\.\d+)?(;.*)?:/, "/${i}:")
         api.log.info("iter ${i}: orig: ${genome}, new: ${ngenome}")
         def rnd = new Random()

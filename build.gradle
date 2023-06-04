@@ -101,7 +101,7 @@ javafx {
 
 application {
     applicationDefaultJvmArgs = [
-        "-Xmx12g",
+        "-Xmx32g",
         "--add-opens","java.base/java.lang=ALL-UNNAMED",
         "--add-opens","java.base/java.lang.reflect=ALL-UNNAMED",
         "--add-opens","java.base/java.util=ALL-UNNAMED",
