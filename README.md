@@ -612,6 +612,11 @@ a video editor, or write an animated GIF to disk.
 * ⌘Y - Show/hide mutations in main window
 * ⌘G - Show/hide incantation editor window
 
+# Using NausiCAä as a library
+
+NausiCAä can also be used as a Java library completely independent from the GUI.
+All relevant classes are under the `org.excelsi.nausicaa.ca` package. 
+
 # Reference Guide
 
 ## Codon Catalog

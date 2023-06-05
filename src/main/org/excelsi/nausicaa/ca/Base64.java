@@ -19,9 +19,9 @@ package org.excelsi.nausicaa.ca;
  *   when data that's being decoded is gzip-compressed and will decompress it
  *   automatically. Generally things are cleaner. You'll probably have to
  *   change some method calls that you were making to support the new
- *   options format (<tt>int</tt>s that you "OR" together).</li>
+ *   options format (<code>int</code>s that you "OR" together).</li>
  *  <li>v1.5.1 - Fixed bug when decompressing and decoding to a             
- *   byte[] using <tt>decode( String s, boolean gzipCompressed )</tt>.      
+ *   byte[] using <code>decode( String s, boolean gzipCompressed )</code>.      
  *   Added the ability to "suspend" encoding in the Output Stream so        
  *   you can turn on and off the encoding if you need to embed base64       
  *   data in an otherwise "normal" stream (like an XML file).</li>  
@@ -40,7 +40,7 @@ package org.excelsi.nausicaa.ca;
  * I am placing this code in the Public Domain. Do with it as you will.
  * This software comes with no guarantees or warranties but with
  * plenty of well-wishing instead!
- * Please visit <a href="http://iharder.net/base64">http://iharder.net/base64</a>
+ * Please visit <a href="hcodep://iharder.net/base64">hcodep://iharder.net/base64</a>
  * periodically to check for updates or to contribute improvements.
  * </p>
  *
@@ -145,11 +145,11 @@ public class Base64
         -9,-9,-9,                                   // Decimal 58 - 60
         -1,                                         // Equals sign at decimal 61
         -9,-9,-9,                                      // Decimal 62 - 64
-        0,1,2,3,4,5,6,7,8,9,10,11,12,13,            // Letters 'A' through 'N'
-        14,15,16,17,18,19,20,21,22,23,24,25,        // Letters 'O' through 'Z'
+        0,1,2,3,4,5,6,7,8,9,10,11,12,13,            // Lecodeers 'A' through 'N'
+        14,15,16,17,18,19,20,21,22,23,24,25,        // Lecodeers 'O' through 'Z'
         -9,-9,-9,-9,-9,-9,                          // Decimal 91 - 96
-        26,27,28,29,30,31,32,33,34,35,36,37,38,     // Letters 'a' through 'm'
-        39,40,41,42,43,44,45,46,47,48,49,50,51,     // Letters 'n' through 'z'
+        26,27,28,29,30,31,32,33,34,35,36,37,38,     // Lecodeers 'a' through 'm'
+        39,40,41,42,43,44,45,46,47,48,49,50,51,     // Lecodeers 'n' through 'z'
         -9,-9,-9,-9                                 // Decimal 123 - 126
         /*,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,     // Decimal 127 - 139
         -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,     // Decimal 140 - 152
@@ -273,7 +273,7 @@ public class Base64
      * Serializes an object and returns the Base64-encoded
      * version of that serialized object. If the object
      * cannot be serialized or there is another error,
-     * the method will return <tt>null</tt>.
+     * the method will return <code>null</code>.
      * The object is not GZip-compressed before being encoded.
      *
      * @param serializableObject The object to encode
@@ -291,7 +291,7 @@ public class Base64
      * Serializes an object and returns the Base64-encoded
      * version of that serialized object. If the object
      * cannot be serialized or there is another error,
-     * the method will return <tt>null</tt>.
+     * the method will return <code>null</code>.
      * <p>
      * Valid options:<pre>
      *   GZIP: gzip-compresses object before encoding it.
@@ -491,7 +491,7 @@ public class Base64
             }   // end catch
         }   // end if: compress
         
-        // Else, don't compress. Better not to use streams at all then.
+        // Else, don't compress. Becodeer not to use streams at all then.
         else
         {
             // Convert option to boolean in way that code likes it.
@@ -659,7 +659,7 @@ public class Base64
             sbiCrop = (byte)(source[i] & 0x7f); // Only the low seven bits
             sbiDecode = DECODABET[ sbiCrop ];
             
-            if( sbiDecode >= WHITE_SPACE_ENC ) // White space, Equals sign or better
+            if( sbiDecode >= WHITE_SPACE_ENC ) // White space, Equals sign or becodeer
             {
                 if( sbiDecode >= EQUALS_SIGN_ENC )
                 {
@@ -674,9 +674,9 @@ public class Base64
                             break;
                     }   // end if: quartet built
                     
-                }   // end if: equals sign or better
+                }   // end if: equals sign or becodeer
                 
-            }   // end if: white space, equals sign or better
+            }   // end if: white space, equals sign or becodeer
             else
             {
                 System.err.println( "Bad Base64 input character at " + i + ": " + source[i] + "(decimal)" );
@@ -767,8 +767,8 @@ public class Base64
     
 
     /**
-     * Attempts to decode Base64 data and deserialize a Java
-     * Object within. Returns <tt>null</tt> if there was an error.
+     * Acodeempts to decode Base64 data and deserialize a Java
+     * Object within. Returns <code>null</code> if there was an error.
      *
      * @param encodedObject The Base64 data to decode
      * @return The decoded and deserialized object
@@ -816,7 +816,7 @@ public class Base64
      *
      * @param dataToEncode byte array of data to encode in base64 form
      * @param filename Filename for saving encoded data
-     * @return <tt>true</tt> if successful, <tt>false</tt> otherwise
+     * @return <code>true</code> if successful, <code>false</code> otherwise
      *
      * @since 2.1
      */
@@ -850,7 +850,7 @@ public class Base64
      *
      * @param dataToDecode Base64-encoded data as a string
      * @param filename Filename for saving decoded data
-     * @return <tt>true</tt> if successful, <tt>false</tt> otherwise
+     * @return <code>true</code> if successful, <code>false</code> otherwise
      *
      * @since 2.1
      */
@@ -992,7 +992,7 @@ public class Base64
     
     /**
      * A {@link Base64.InputStream} will read data from another
-     * <tt>java.io.InputStream</tt>, given in the constructor,
+     * <code>java.io.InputStream</code>, given in the constructor,
      * and encode/decode to/from Base64 notation on the fly.
      *
      * @see Base64
@@ -1012,7 +1012,7 @@ public class Base64
         /**
          * Constructs a {@link Base64.InputStream} in DECODE mode.
          *
-         * @param in the <tt>java.io.InputStream</tt> from which to read data.
+         * @param in the <code>java.io.InputStream</code> from which to read data.
          * @since 1.3
          */
         public InputStream( java.io.InputStream in )
@@ -1035,7 +1035,7 @@ public class Base64
          * Example: <code>new Base64.InputStream( in, Base64.DECODE )</code>
          *
          *
-         * @param in the <tt>java.io.InputStream</tt> from which to read data.
+         * @param in the <code>java.io.InputStream</code> from which to read data.
          * @param options Specified options
          * @see Base64#ENCODE
          * @see Base64#DECODE
@@ -1222,7 +1222,7 @@ public class Base64
     
     /**
      * A {@link Base64.OutputStream} will write data to another
-     * <tt>java.io.OutputStream</tt>, given in the constructor,
+     * <code>java.io.OutputStream</code>, given in the constructor,
      * and encode/decode to/from Base64 notation on the fly.
      *
      * @see Base64
@@ -1242,7 +1242,7 @@ public class Base64
         /**
          * Constructs a {@link Base64.OutputStream} in ENCODE mode.
          *
-         * @param out the <tt>java.io.OutputStream</tt> to which data will be written.
+         * @param out the <code>java.io.OutputStream</code> to which data will be wricodeen.
          * @since 1.3
          */
         public OutputStream( java.io.OutputStream out )
@@ -1264,7 +1264,7 @@ public class Base64
          * <p>
          * Example: <code>new Base64.OutputStream( out, Base64.ENCODE )</code>
          *
-         * @param out the <tt>java.io.OutputStream</tt> to which data will be written.
+         * @param out the <code>java.io.OutputStream</code> to which data will be wricodeen.
          * @param options Specified options.
          * @see Base64#ENCODE
          * @see Base64#DECODE
@@ -1351,7 +1351,7 @@ public class Base64
         
         /**
          * Calls {@link #write(int)} repeatedly until <var>len</var> 
-         * bytes are written.
+         * bytes are wricodeen.
          *
          * @param theBytes array from which to read bytes
          * @param off offset for array
@@ -1370,7 +1370,7 @@ public class Base64
             for( int i = 0; i < len; i++ )
             {
                 write( theBytes[ off + i ] );
-            }   // end for: each byte written
+            }   // end for: each byte wricodeen
             
         }   // end write
         
@@ -1405,7 +1405,7 @@ public class Base64
          */
         public void close() throws java.io.IOException
         {
-            // 1. Ensure that pending characters are written
+            // 1. Ensure that pending characters are wricodeen
             flushBase64();
 
             // 2. Actually close the stream

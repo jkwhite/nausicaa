@@ -19,9 +19,8 @@ public final class IndexedPattern implements Pattern {
     /**
      * Constructs a new Pattern.
      *
-     * @param length number of bytes in pattern, e.g. 3 or 9
-     * @param colors number of colors in pattern
-     * @param next end results
+     * @param id number of bytes in pattern, e.g. 3 or 9
+     * @param length number of colors in pattern
      */
     public IndexedPattern(Archetype a, long id, int length, byte[] target) {
         _a = a;
