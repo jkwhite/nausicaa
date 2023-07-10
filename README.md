@@ -509,7 +509,7 @@ wrap-around kind of effect.
 the author recommends the excellent ``gifsicle`` and ``ffmpeg``. Of course
 you can use whatever programs work for you.)
 
-## Mutation Menu
+## Mutate Menu
 
 **Making Mutations**
 Mutations can be applied in several ways:
@@ -523,7 +523,7 @@ which are found under the ``Mutations`` menu. When enabled, these
 mutations will also show up as randomly-generated mutations in the main
 window.
 
-## Sequences, Stages, and Mutations
+### Sequences, Stages, and Mutations
 
 Recall that a [Sequence](#sequences) is a series of Stages composed of Rules
 which execute one after the other, then repeat from the beginning.
