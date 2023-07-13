@@ -17,6 +17,10 @@
     - [Incantation evaluation](#incantation-evaluation)
     - [Compound codons](#compound-codons)
     - [Variables](#variables)
+- [Running NausiCAä](#running-nausica)
+  - [Prerequisites](#prerequisites)
+  - [From Binary](#from-binary)
+  - [From Source](#from-source)
 - [Using the NausiCAä GUI](#using-the-nausica-gui)
   - [Main Window](#main-window)
   - [Info Window](#info-window)
@@ -29,11 +33,12 @@
     - [External Force](#external-force)
   - [Animation Menu](#animation-menu)
     - [Generate to disk](#generate-to-disk)
-  - [Mutation Menu](#mutation-menu)
-  - [Sequences, Stages, and Mutations](#sequences-stages-and-mutations)
+  - [Mutate Menu](#mutate-menu)
+    - [Sequences, Stages, and Mutations](#sequences-stages-and-mutations)
   - [Render Menu](#render-menu)
     - [Composition Mode](#composition-mode)
   - [A Few Important Commands](#a-few-important-commands)
+- [Using NausiCAä as a library](#using-nausica-as-a-library)
 - [Reference Guide](#reference-guide)
   - [Codon Catalog](#codon-catalog)
     - [a (Constant)](#a-constant)
@@ -318,6 +323,62 @@ a{var1}
 
 Represents a Constant codon whose value is whatever the value of ```var1```
 is set to. Variables are set at execution time and fixed throughout the run.
+
+# Running NausiCAä
+
+## Prerequisites
+
+* JVM 11: You should be able to obtain this for your OS somehow, or it might already
+be installed. It seems to be a bit of a mess right now. Should be forward-compatible
+with, say, JVM 18, but haven't tested that. If you run ``java -version`` and it looks
+like something 11.x or greater, then you're probably good.
+* JavaFX 11: Also a mess. Hopefully you can figure it out. I've only tested on macOS.
+It might "just work". Oddly, seems to be getting more difficult to package with each
+successive version.
+
+## From Binary
+
+The link in the most recent stable binary release contains a zipfile with the
+entire release.
+
+* v1.0: https://github.com/jkwhite/nausicaa/releases/tag/v1.0
+
+Depending on the host OS, this can then be executed however your OS normally executes
+programs. Typically that would be through one of the batch files in the `bin`
+dir. This is clearly non-ideal, but works non-ideally. That means running either
+
+```
+Nausicaa-1.0/bin/nausicaa
+```
+
+or
+
+```
+Nausicaa-1.0/bin/nausicaa.bat
+```
+
+depending on your OS.
+
+
+## From Source
+
+NausiCAä uses Gradle for builds. It's currently difficult to build from source
+because it has some dependencies on libraries that were never published to
+maven central or any other well-known shared location. That's because it
+previously used a build system called 'mu' which had its own publishing system.
+
+So, if you want to build from source, the easist way is probably to follow
+these steps:
+
+1. Download and unpack the binary as described above
+2. Edit the `build.gradle` file and add the location of the unpacked binary's
+`lib` directory to the `repositories` `flatDir` section.
+3. At this point, gradle should work as usual.
+
+I realize this obviously isn't completely from source, but it's the only way
+to make it work until I can get the dependencies properly into
+the shared gradle/maven ecosystem.
+
 
 # Using the NausiCAä GUI
 
@@ -1259,6 +1320,15 @@ Simple discrete mappings of the Mandelbulb fractal.
 
 
 # Bugs
+
+* This documentation is exceptionally incomplete.
+
+* Building from source is probably not possible right now for anyone but me.
+The problem is with dependencies on other projects that I own that are not on
+github or in maven central etc. I need to get this worked out ASAP. I don't think
+it will take a lot of engineering effort, it's mostly about mapping projects
+hosted on a private SVN server for many years to something that works for the
+public modern world.
 
 * There are way too few sanity checks around reasonable limits. For example,
 can you create a 3D automata in 1024^3 size? Maybe, maybe not. Or an automata
