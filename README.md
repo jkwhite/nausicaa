@@ -1,4 +1,4 @@
-# Table of contents
+ Table of contents
 
 - [Introduction to NausiCAä](#introduction-to-nausica)
   - [Automata](#automata)
@@ -17,11 +17,11 @@
     - [Incantation evaluation](#incantation-evaluation)
     - [Compound codons](#compound-codons)
     - [Variables](#variables)
-- [Running NausiCAä](#running-nausica)
+- [Running NausiCAä](#running-nausicaä)
   - [Prerequisites](#prerequisites)
   - [From Binary](#from-binary)
   - [From Source](#from-source)
-- [Using the NausiCAä GUI](#using-the-nausica-gui)
+- [Using the NausiCAä GUI](#using-the-nausicaä-gui)
   - [Main Window](#main-window)
   - [Info Window](#info-window)
   - [Basic Parameters Window](#basic-parameters-window)
@@ -38,7 +38,7 @@
   - [Render Menu](#render-menu)
     - [Composition Mode](#composition-mode)
   - [A Few Important Commands](#a-few-important-commands)
-- [Using NausiCAä as a library](#using-nausica-as-a-library)
+- [Using NausiCAä as a library](#using-nausicaä-as-a-library)
 - [Reference Guide](#reference-guide)
   - [Codon Catalog](#codon-catalog)
     - [a (Constant)](#a-constant)
