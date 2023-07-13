@@ -121,9 +121,9 @@ public class GenomeMutators extends Enloggened {
     public static GenomeMutator repeat() {
         return
             (cs,im,gf,m)->{
-                LOG.debug("running repeat mutate");
                 int st = m.r().nextInt(cs.size());
                 int en = st+m.r().nextInt(cs.size()-st);
+                LOG.debug("running repeat mutate from "+st+" to "+en);
                 int o = en;
                 for(int i=st;i<en;i++) {
                     cs.add(o++, cs.get(i).copy());

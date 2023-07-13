@@ -1214,12 +1214,9 @@ public class Codons {
 
         @Override public void op(int[] p, IntTape t, Pattern.Ctx c) {
             long s = t.pop();
-            long s2 = s;
-            if(s2>=p.length) {
-                s2 = s2%p.length;
-            }
-            else if(s2<0) {
-                s2 = (-s2)%p.length;
+            long s2 = s%p.length;
+            if(s2<0) {
+                s2 = -s2;
             }
             if(s2<0) {
                 throw new IllegalArgumentException("how did s get to "+s2+" from "+s+" and "+p.length);
@@ -1229,12 +1226,9 @@ public class Codons {
 
         @Override public void op(double[] p, FloatTape t, Pattern.Ctx c) {
             long s = (long) t.pop();
-            long s2 = s;
-            if(s2>=p.length) {
-                s2 = s2%p.length;
-            }
-            else if(s2<0) {
-                s2 = (-s2)%p.length;
+            long s2 = s%p.length;
+            if(s2<0) {
+                s2 = -s2;
             }
             if(s2<0) {
                 throw new IllegalArgumentException("how did s get to "+s2+" from "+s+" and "+p.length);

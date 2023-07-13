@@ -89,23 +89,22 @@ public final class Genome {
             mf.add(new Weight<GenomeMutator>(5, GenomeMutators.unbond()));
         }
         int tries = 0;
-        Genome child;
+        Genome child = this;
         boolean same = false;
         do {
-            //System.err.print(".");
-            //if(tries%10==0) System.err.println();
-            LOG.debug("replicate try "+tries);
-            child = replicate(im, mf, gf, m);
-            if(++tries==100) {
-                LOG.warn("failed to mutate "+this);
+            if(tries==10) {
+                LOG.warn("failed to mutate "+this+" after "+tries+" tries");
                 break;
             }
+            tries++;
+            LOG.debug("genome mutate try "+tries);
+            child = replicate(im, mf, gf, m);
             same = child.equals(this);
             if(same) {
                 LOG.warn("child same as orig: "+this);
             }
         } while(same);
-        //System.err.println(this+" => "+child);
+        LOG.debug("genome mutate succeeded after "+tries+" tries");
         return child;
     }
 
