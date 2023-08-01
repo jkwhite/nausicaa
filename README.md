@@ -28,6 +28,9 @@
   - [Rule Editor Window](#rule-editor-window)
   - [Palette Editor Window](#palette-editor-window)
   - [Automata Menu](#automata-menu)
+    - [Setting initial state](#Setting-initial-state)
+        * Random:
+        * Fixed:
     - [Update Mode](#update-mode)
     - [Edge Mode](#edge-mode)
     - [External Force](#external-force)
@@ -37,7 +40,7 @@
     - [Sequences, Stages, and Mutations](#sequences-stages-and-mutations)
   - [Render Menu](#render-menu)
     - [Composition Mode](#composition-mode)
-  - [A Few Important Commands](#a-few-important-commands)
+  - [Cheat Sheet: A Few Important Commands](#a-few-important-commands)
 - [Using NausiCAä as a library](#using-nausicaä-as-a-library)
 - [Reference Guide](#reference-guide)
   - [Codon Catalog](#codon-catalog)
@@ -382,6 +385,12 @@ the shared gradle/maven ecosystem.
 
 # Using the NausiCAä GUI
 
+## Configuration File
+
+Note that, beside whatever CAs or images you choose to export, NausiCAä will
+write to one file in your home directory called `.nausicaa`. This is a JSON
+file that contains all configuration options you've set through the GUI.
+
 ## Main Window
 
 By default, the main window shows 9 subwindows arranged in a 3x3 grid. The
@@ -500,6 +509,101 @@ instead, which are designed to deal with huge palettes.
 
 ## Automata Menu
 
+The Automata menu provides options for configuring the current automaton.
+
+### Initial State
+
+*Initial state* is the starting values of the lattice at time step 0, before
+any updates are applied. There are several different modes of setting initial
+state, described below.
+
+#### Random Initial State
+
+This mode sets each value of the lattice to a random value. Options:
+
+* Zero weight: Value between 0 (completely random) and 1 (all values set to 0)
+that determines how often a lattice value is set to 0 rather than a random
+value. Can be used to create "sparse" lattices. For example, a value of `0.5`
+causes approximately half of all lattice values to be set to 0 rather than
+a random value.
+
+#### Fixed Initial State
+
+This mode sets a single block of lattice values to a specified value. Options:
+
+* Color: Value to set
+* X, Y, Z: Lattice coordinate to set. Use `-1` to indicate center.
+* Size: Size of block to set values, with `1` indicating a single coordinate.
+
+#### Word Initial State
+
+This mode should not be used at present; it needs to be rewritten or removed.
+
+#### Image Initial State
+
+This mode sets lattice values from an image. Options:
+
+* Image: PNG file to use
+* Method: "Center" centers the image on the lattice. "Tile" repeats the image
+across the lattice. "None" simply places the image in the upper-left corner.
+* Scale: If set, the image will be scaled to the lattice dimensions.
+
+#### Gaussian Initial State
+
+This mode creates one or more points and sets lattice values around them in
+a Gaussian distribution. Options:
+
+* Zero weight: Similar to Random Initial State, determines how often a value
+is set to `0` rather than a random value.
+* Max points: Maximum number of points to create distributions around.
+* Max radius: Maximum size of distributions around points.
+* Density: Real-valued coefficient that determines number of values to set
+within each point. For example, 0.5 would cut the number of values in half,
+while 2 would double it.
+
+#### Clustered Gaussian Initial State
+
+Similar to Gaussian Initial State, this mode creates one or more points and
+sets lattice values around them in a Gaussian distribution. However, it also
+"skews" values created around each point such that each point is "clustered"
+around part of the automata's value range. For example, if the automata
+has 100 value colors and there are 3 points, then point 1 would have values
+0-33, point 2 would have values 34-66, and point 3 would have values 67-99.
+
+* Zero weight: Similar to Random Initial State, determines how often a value
+is set to `0` rather than a random value.
+* Max points: Maximum number of points to create distributions around.
+* Max radius: Maximum size of distributions around points.
+* Density: Real-valued coefficient that determines number of values to set
+within each point. For example, 0.5 would cut the number of values in half,
+while 2 would double it.
+* Skew: Currently unused. Might be used in the future to provide some sort
+of overlap so that value ranges are not entirely exclusive to each point.
+
+#### CA Initial State
+
+This mode sets the initial state based on a lattice produced by another
+automata. The automata must be compatible with the current automata in
+terms of value space (i.e., number of colors). The purpose of this mode
+is to allow automata to be "chained" together. This is currently only
+supported for discrete (indexed) automata, not continuous (real) automata.
+Options:
+
+* Automata: Automata `.ca` file to use
+* Iterations: Number of iterations to run to produce the lattice that will
+be used to set the initial state
+
+#### Custom Initial State
+
+This mode allows the initial state to be defined using a script written in the
+Groovy language. The following pre-populated variables are available:
+
+* a: An instance of an org.excelsi.nausicaa.ca.Archetype for the automata
+* i: An instance of an org.excelsi.nausicaa.ca.Painter
+* r: An instance of a java.util.Random
+
+Lattice values can be set using methods on `i`.
+
 ### Update Mode
 
 *Update mode* determines how and when values in the lattice are updated.
@@ -529,6 +633,18 @@ specified value.
 * Random: Randomly-valued "snow" is introduced to the lattice at the specified
 frequency.
 
+### Other Options
+
+* Reroll: Sets a new seed value for this automata's random source and resets
+the lattice.
+* Configure parameters: Displays a dialog for setting lattice width, height,
+depth, and prelude (number of iterations to run before displaying initial lattice)
+* Variables: Displays a dialog for setting variables, if any have been defined.
+See [Variables](#variables) for details about how to use variables.
+* Translate to Universal: If the automata's language (as chosen at creation)
+was not `Universal`, then this translates the automata's genome into the universal
+language. It's not very useful, really, and might be removed in the future.
+
 ## Animation Menu
 
 Animation for both 2D and 3D automata can be started/stopped with the
@@ -541,6 +657,11 @@ The amount of resources consumed by animation is configurable with the
 ``Compute cores`` option is used; ``Render cores`` is unused but may be used
 in the future.
 
+"Compute cores" is the number of concurrent threads used to compute successive
+lattice values. It should be set somewhere between 1 and the number of cores
+on your machine, depending on how much CPU you want NausiCAä to be able to
+consume.
+
 ### Generate to disk
 
 The ``Animation | Generate to disk (⌘D)`` command can write individual
@@ -551,8 +672,9 @@ an entire animation as a single animated GIF file.
 * Width & Height: Override currently-configured automata size values. (TODO:
 add similar for depth.)
 * Animate: If checked, each individual frame, or an animated GIF, will be
-written to disk.
-* Framerate: Framerate for GIFs. Has no effect on frames.
+written to disk. Otherwise only the final frame will be written.
+* Framerate: Framerate for GIFs. Has no effect when individual frames
+are written.
 * Scaling: Scale factor for frames, e.g., setting this to 0.5 will downscale
 generated frames by 50%.
 * Cores: Number of compute threads to use in animation pipeline.
@@ -569,6 +691,28 @@ wrap-around kind of effect.
 (Note: for the tasks of GIF post-processing and making movies from frames,
 the author recommends the excellent ``gifsicle`` and ``ffmpeg``. Of course
 you can use whatever programs work for you.)
+
+## Palette Menu
+
+The Palette menu provides a number of pre-configured palette options, as well
+as an option for defining a custom palette, and an option for creating a
+palette from a source image.
+
+### Using a custom palette
+
+The ``Palette | Custom Spectrum ...`` command creates a random palette based
+on the configured options. Note that the exact colors used in the spectrum
+change on successive uses of this command. The spectrum is constructed around
+some number of "anchor colors". Colors between each anchor color and its
+neighbors are then linearly interpolated to create a smooth transition.
+Options:
+
+* Number of colors: Number of anchor colors to use
+* Density: Currently unused
+* Black zero: Always use black for lattice value `0`
+* Invisible %: Set this percentage of anchor colors to RGBA value `(0,0,0,0)`
+* Wrap: Make the spectrum "wrap-around". That is, the left-most anchor color
+is equal to the right-most anchor color.
 
 ## Mutate Menu
 
@@ -597,6 +741,12 @@ first stage being numbered 0. If the *mutation stage* is set to -1,
 then all stages will be subject to mutation.
 
 ## Render Menu
+
+### RGB compute mode
+
+
+### Meta compute mode
+
 
 ### Composition Mode
 
@@ -627,7 +777,46 @@ normalized between (0,255).
 successive cell value at all depths, normalized by depth.
 * True Nearest: Uses only the cell value at the highest depth.
 
-## A Few Important Commands
+## Functions Menu
+
+NausiCAä is packaged with a number of custom functions written in the
+Groovy language. These functions operate as a kind of scripting language.
+Brief descriptions of the currently packaged functions follows.
+
+## View Menu
+
+Most options on the View menu should be self-evident. The one which
+requires some explanation is `Toggle animations`. This option only applies
+to 3D render mode, and toggles whether or not the rendered lattice is
+spun about or shown from a static angle.
+
+## Experimental Menu
+
+This menu is a repository for incomplete features.
+
+## Window Menu
+
+This menu controls which windows are displayed and their display modes.
+
+* Show/hide mutations: Controls whether or not mutations are displayed in
+the [Main Window](#main-window). Refer to that section for more information
+about how to use mutations.
+* Show/hide palette editor: The palette editor can be used to modify
+individual colors in the current palette. Note that this is only feasible
+when the automata contains a small number of colors. When the colorspace
+is large, it is more effective to modify the palette using one of the
+options on the [Palette Menu](#palette-menu). See
+[Palette Editor Window](#palette-editor-window) for more information on
+using the palette editor.
+* Show/hide rule editor: The rule editor can be used to modify all aspects
+of the automata's generation process, including the sequence, weights,
+and incantations. See [Rule Editor Window](#rule-editor-window) for
+more information.
+* Show/hide language editor: The author needs to refamiliarize himself
+with this part of NausiCAä before writing documentation on it.
+* Toggle console: Toggles the interactive Groovy console window.
+
+## Cheat Sheet: A Few Important Commands
 
 Here is a brief list of a few of the more often-used GUI commands.
 
