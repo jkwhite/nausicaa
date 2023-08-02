@@ -507,6 +507,39 @@ colors by hand only really scales when there are less than, say, 100 colors.
 For larger palettes, use one of the commands under the ``Palette`` menu
 instead, which are designed to deal with huge palettes.
 
+## File Menu
+
+### New
+
+Creates a new automata. The current automata is discarded.
+
+![New automata dialog](assets/images/newautomata.png)
+
+* Dimensions: 1, 2, or 3 depending on number of lattice dimensions (i.e.,
+a line, a square, or a cube).
+* Neighborhood Size: Size of surrounding lattice cells that are considered
+"neighbors" and therefore available during incantation computation.
+* Compute: "Machine Elf" allows rules to be expressed in the Machine Elvish
+language. "Full Target" is the traditional indexed method of referencing
+automata rules.
+* Language: Defines the syllabary for incantations. "Universal" contains
+all known syllables. "Classic" only contains those syllables necessary
+to build automata that can be defined by the "Full Target" compute type
+(e.g., no coordinates, randomness, etc). "Circular" is universal and also
+includes some compound syllables for building lattices with circular
+characteristics. "Symmetric2d" should not be used at this time.
+* Neighborhood: Type of neighborhood. See [Neighborhoods](#neighborhoods)
+for details.
+* Kind: Type of lattice to use. See [Value Kinds](#value-kinds) for details.
+* Value Colors: Number of allowable values for the lattice. For discrete
+automata, this is the color count, i.e. a value of `2` corresponds to an
+automata that creates lattices with values in [0,1]. For continuous
+automata, this is the upper bound for the value range. For RGB and RGBA
+automata, this is fixed at 16777216.
+* Palette Colors: For Continuous automata, number of colors in the palette.
+Has no effect on other kinds of automata.
+
+
 ## Automata Menu
 
 The Automata menu provides options for configuring the current automaton.
@@ -744,9 +777,21 @@ then all stages will be subject to mutation.
 
 ### RGB compute mode
 
+When an automata has been defined as either of type RGB or RGBA, this option
+can be used to determine the way lattice cell values are interpreted during
+next-value computation. For indexed (discrete) or real (continuous) automatons,
+this option doesn't make sense, though it can still be toggled.
+
+* Combined: The incantation is computed on the lattice cell value. Mapping
+the value to a palette color occurs elsewhere.
+* By channel: Each lattice cell is presumed to hold an RGBA value. Each channel
+(R, G, B, and optionally A) is extracted from the value and the incantation is
+computed for each channel, then all values are recombined into the new RGBA
+lattice cell value.
 
 ### Meta compute mode
 
+TBD.
 
 ### Composition Mode
 

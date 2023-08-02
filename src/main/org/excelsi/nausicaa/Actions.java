@@ -39,7 +39,7 @@ public class Actions {
         alpha.setColumns(3);
         top.add(alpha);
 
-        top.add(new JLabel("Size"));
+        top.add(new JLabel("Neighborhood Size"));
         final JTextField siz = new JTextField();
         siz.setText(config.getVariable("default_size", "1"));
         siz.setColumns(3);
@@ -66,7 +66,9 @@ public class Actions {
         };
         JRadioButton rspars = new JRadioButton(compspars);
         rspars.setText("Sparse Target");
-        comp.add(rspars);
+        // Temporarily removing sparse target as it isn't implemented
+        // and may not ever be.
+        // comp.add(rspars);
 
         AbstractAction compelf = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -77,9 +79,9 @@ public class Actions {
         relf.setText("Machine Elf");
         comp.add(relf);
 
-        JPanel comps = new JPanel();
+        JPanel comps = new JPanel(new FlowLayout(FlowLayout.LEFT));
         comps.add(rcomparr);
-        comps.add(rspars);
+        // comps.add(rspars);
         comps.add(relf);
         relf.setSelected(true);
         comphack[0] = "machineelf";
@@ -120,7 +122,7 @@ public class Actions {
         rmoo.setSelected(true);
         neihack[0] = Archetype.Neighborhood.moore;
         */
-        JPanel neis = new JPanel();
+        JPanel neis = new JPanel(new FlowLayout(FlowLayout.LEFT));
         String defNei = config.getVariable("default_neighborhood", Archetype.Neighborhood.moore.name());
         for(Archetype.Neighborhood neighbor:EnumSet.allOf(Archetype.Neighborhood.class)) {
             AbstractAction von = new AbstractAction() {
@@ -145,19 +147,6 @@ public class Actions {
         final JComponent[] idxhack = new JComponent[4];
         top.add(new JLabel("Kind"));
         ButtonGroup kind = new ButtonGroup();
-
-        AbstractAction real = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                colhack[0] = "real";
-                idxhack[0].setEnabled(true);
-                idxhack[1].setEnabled(true);
-                idxhack[2].setEnabled(true);
-                idxhack[3].setEnabled(true);
-            }
-        };
-        JRadioButton rreal = new JRadioButton(real);
-        rreal.setText("Real");
-        kind.add(rreal);
 
         AbstractAction rgb = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -185,6 +174,19 @@ public class Actions {
         rrgba.setText("RGBA");
         kind.add(rrgba);
 
+        AbstractAction real = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                colhack[0] = "real";
+                idxhack[0].setEnabled(true);
+                idxhack[1].setEnabled(true);
+                idxhack[2].setEnabled(true);
+                idxhack[3].setEnabled(true);
+            }
+        };
+        JRadioButton rreal = new JRadioButton(real);
+        rreal.setText("Continuous");
+        kind.add(rreal);
+
         AbstractAction indexed = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 colhack[0] = "indexed";
@@ -195,7 +197,7 @@ public class Actions {
             }
         };
         JRadioButton rindexed = new JRadioButton(indexed);
-        rindexed.setText("Indexed");
+        rindexed.setText("Discrete");
         rindexed.setSelected(true);
         kind.add(rindexed);
 
@@ -215,11 +217,11 @@ public class Actions {
                 break;
         }
 
-        JPanel kinds = new JPanel();
+        JPanel kinds = new JPanel(new FlowLayout(FlowLayout.LEFT));
         kinds.add(rindexed);
+        kinds.add(rreal);
         kinds.add(rrgb);
         kinds.add(rrgba);
-        kinds.add(rreal);
         top.add(kinds);
 
         idxhack[0] = new JLabel("Value Colors");
