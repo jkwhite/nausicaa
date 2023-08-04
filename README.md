@@ -1,4 +1,4 @@
- Table of contents
+# Table of contents
 
 - [Introduction to NausiCAä](#introduction-to-nausica)
   - [Automata](#automata)
@@ -17,31 +17,41 @@
     - [Incantation evaluation](#incantation-evaluation)
     - [Compound codons](#compound-codons)
     - [Variables](#variables)
-- [Running NausiCAä](#running-nausicaä)
+- [Running NausiCAä](#running-nausica)
   - [Prerequisites](#prerequisites)
   - [From Binary](#from-binary)
   - [From Source](#from-source)
-- [Using the NausiCAä GUI](#using-the-nausicaä-gui)
+- [Using the NausiCAä GUI](#using-the-nausica-gui)
+  - [Configuration File](#configuration-file)
   - [Main Window](#main-window)
   - [Info Window](#info-window)
   - [Basic Parameters Window](#basic-parameters-window)
   - [Rule Editor Window](#rule-editor-window)
   - [Palette Editor Window](#palette-editor-window)
+  - [File Menu](#file-menu)
+    - [New](#new)
   - [Automata Menu](#automata-menu)
-    - [Setting initial state](#Setting-initial-state)
-        * Random:
-        * Fixed:
+    - [Initial State](#initial-state)
     - [Update Mode](#update-mode)
     - [Edge Mode](#edge-mode)
     - [External Force](#external-force)
+    - [Other Options](#other-options)
   - [Animation Menu](#animation-menu)
     - [Generate to disk](#generate-to-disk)
+  - [Palette Menu](#palette-menu)
+    - [Using a custom palette](#using-a-custom-palette)
   - [Mutate Menu](#mutate-menu)
     - [Sequences, Stages, and Mutations](#sequences-stages-and-mutations)
   - [Render Menu](#render-menu)
+    - [RGB compute mode](#rgb-compute-mode)
+    - [Meta compute mode](#meta-compute-mode)
     - [Composition Mode](#composition-mode)
-  - [Cheat Sheet: A Few Important Commands](#a-few-important-commands)
-- [Using NausiCAä as a library](#using-nausicaä-as-a-library)
+  - [Functions Menu](#functions-menu)
+  - [View Menu](#view-menu)
+  - [Experimental Menu](#experimental-menu)
+  - [Window Menu](#window-menu)
+  - [Cheat Sheet: A Few Important Commands](#cheat-sheet-a-few-important-commands)
+- [Using NausiCAä as a library](#using-nausica-as-a-library)
 - [Reference Guide](#reference-guide)
   - [Codon Catalog](#codon-catalog)
     - [a (Constant)](#a-constant)
@@ -509,6 +519,16 @@ instead, which are designed to deal with huge palettes.
 
 ## File Menu
 
+Most of the options on the File menu should be self-explanatory.
+
+* New, Open, Save: Operate on automata and automata serialized as `.ca`
+JSON files. More details on the New option are provided below.
+* New from image: Creates a new automata based on characteristics in the
+chosen PNG or JPEG file, including size, palette, etc.
+* Export generated image: Saves the currently-displayed lattice as a PNG file.
+* Export generated data: Saves the currently-displayed lattice as a JSON file
+containing a Base64-encoded string of raw lattice values.
+
 ### New
 
 Creates a new automata. The current automata is discarded.
@@ -535,10 +555,11 @@ for details.
 automata, this is the color count, i.e. a value of `2` corresponds to an
 automata that creates lattices with values in [0,1]. For continuous
 automata, this is the upper bound for the value range. For RGB and RGBA
-automata, this is fixed at 16777216.
-* Palette Colors: For Continuous automata, number of colors in the palette.
-Has no effect on other kinds of automata.
-
+automata, this is fixed at 16777216 (2^24^).
+* Palette Colors: For continuous automata, number of colors in the palette.
+Has no effect on other kinds of automata, because in discrete automata the
+palette colors are equal to the value colors, and in RGB[A] automata the
+palette is implicit in the cell value itself.
 
 ## Automata Menu
 
@@ -826,7 +847,23 @@ successive cell value at all depths, normalized by depth.
 
 NausiCAä is packaged with a number of custom functions written in the
 Groovy language. These functions operate as a kind of scripting language.
-Brief descriptions of the currently packaged functions follows.
+Sources for all functions can be found in the `etc/functions` directory
+under the application's root directory. New functions can be added here
+as well (and eventually a location outside the distribution will be
+supported).
+
+Brief descriptions of the currently-packaged functions follows.
+
+* Directory Index: Builds a visual index from a directory of CA source files
+* Weight Walk: Generates a series of images by linear adjustments to the
+chosen CA's weight parameter.
+* Random Walk: Generates a series of images by randomly modulating variables
+defined for the current automata.
+* Jfx Screen Capture: Periodically captures screenshots of the current
+JFX scenegraph.
+* Directory Visualizer: Use Directory Index instead
+* Param Generator: Generates a series of images by linearly modulating a
+single variable between arbitrary starting and ending values.
 
 ## View Menu
 

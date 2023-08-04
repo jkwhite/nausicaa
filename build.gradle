@@ -96,7 +96,7 @@ sourceSets {
 
 javafx {
     version = '11'
-    modules = [ 'javafx.base', 'javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.swing' /*, 'javafx.web'*/ ]
+    modules = [ 'javafx.base', 'javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.swing', 'javafx.web' ]
 }
 
 application {
