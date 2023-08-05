@@ -125,7 +125,7 @@ application {
         }
     }
     mainClass='org.excelsi.nausicaa.Nausicaa'
-    version='1.0'
+    version='1.1'
     group='excelsiorg'
 }
 
@@ -147,13 +147,13 @@ applicationDistribution.from("src/etc/") {
 
 setupBuilder {
     vendor          = "excelsiorg";
-    copyright       = "Copyright © 2022 excelsiorg"
+    copyright       = "Copyright © 2023 excelsiorg"
     description     = "Nausicaa";
     
     // optional, defaults to project name
     // application     = "My Application";
 
-    version         = "1.0.0";
+    version         = "1.1.0";
     appIdentifier   = "org.excelsi.nausicaa";
 
     // optional, defaults to {appIdentifier}-{version}
@@ -164,7 +164,7 @@ setupBuilder {
     mainClass       = "org.excelsi.nausicaa.Nausicaa";
     
     // main jar file in the installed structure, relative to root.
-    mainJar         = "libs/nausicaa-1.0.jar";
+    mainJar         = "libs/nausicaa-1.1.jar";
 
     destinationDir  = "";
 
