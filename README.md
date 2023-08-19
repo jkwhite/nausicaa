@@ -32,6 +32,14 @@
     - [New](#new)
   - [Automata Menu](#automata-menu)
     - [Initial State](#initial-state)
+      - [Random Initial State](#random-initial-state)
+      - [Fixed Initial State](#fixed-initial-state)
+      - [Word Initial State](#word-initial-state)
+      - [Image Initial State](#image-initial-state)
+      - [Gaussian Initial State](#gaussian-initial-state)
+      - [Clustered Gaussian Initial State](#clustered-gaussian-initial-state)
+      - [CA Initial State](#ca-initial-state)
+      - [Custom Initial State](#custom-initial-state)
     - [Update Mode](#update-mode)
     - [Edge Mode](#edge-mode)
     - [External Force](#external-force)
@@ -65,7 +73,7 @@
     - [de (Hyperpolic Tangent)](#de-hyperpolic-tangent)
     - [do (Duplicate)](#do-duplicate)
     - [e (Avg N)](#e-avg-n)
-    - [ga (Halt)](#ga-halt)
+    - [ga (Abort)](#ga-abort)
     - [ge (Push All Rotate)](#ge-push-all-rotate)
     - [gi (Avg)](#gi-avg)
     - [go (Push All)](#go-push-all)
@@ -1031,7 +1039,7 @@ Pushes the average of the last N values onto the stack, where N is the top
 value on the stack, and not included in the average. For example, if the stack
 consists of `4 2 1 3`, then N is 3 and `(4+2+1)/3` will be pushed.
 
-### ga (Halt)
+### ga (Abort)
 
 Syntax: `ga`
 

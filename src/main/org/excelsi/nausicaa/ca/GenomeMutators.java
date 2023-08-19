@@ -119,16 +119,24 @@ public class GenomeMutators extends Enloggened {
     }
 
     public static GenomeMutator repeat() {
+        final int SAFETY_LIMIT = 10000; // prevent genomes from growing infinitely
         return
             (cs,im,gf,m)->{
-                int st = m.r().nextInt(cs.size());
-                int en = st+m.r().nextInt(cs.size()-st);
-                LOG.debug("running repeat mutate from "+st+" to "+en);
-                int o = en;
-                for(int i=st;i<en;i++) {
-                    cs.add(o++, cs.get(i).copy());
+                if(cs.size()>SAFETY_LIMIT) {
+                    LOG.info("redirecting repeat mutate to decimate because genome size "
+                        +cs.size()+" is greater than "+SAFETY_LIMIT);
+                    decimate().mutate(cs, im, gf, m);
                 }
-                LOG.debug("done repeat mutate");
+                else {
+                    int st = m.r().nextInt(cs.size());
+                    int en = st+m.r().nextInt(cs.size()-st);
+                    LOG.debug("running repeat mutate from "+st+" to "+en);
+                    int o = en;
+                    for(int i=st;i<en;i++) {
+                        cs.add(o++, cs.get(i).copy());
+                    }
+                    LOG.debug("done repeat mutate");
+                }
             };
     }
 
