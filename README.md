@@ -293,7 +293,7 @@ at this point, if it was specified in the incantation.)
 
 ### Compound codons
 
-Codons may also be "fused" together to create compound codons which will be
+Codons may also be "bonded" together to create compound codons which will be
 mutated as an atomic unit using the "+" connector. For example:
 
 ```
@@ -789,6 +789,45 @@ incantation mutation.
 which are found under the ``Mutations`` menu. When enabled, these
 mutations will also show up as randomly-generated mutations in the main
 window.
+
+### Kinds of Mutators
+
+* Decimate: Removes approximately 33% of codons in the incantation at random.
+* Jumble: Randomly shuffles some number of codons in the incantation.
+* MakeDeterministic: Removes all non-deterministic codons from the incantation.
+As of this writing, the only non-deterministic codon is `ze`, which produces
+random values.
+* Symmetry: Currently unimplemented; does nothing.
+* Transmute: "Transmutes" some number of random *transmutable* codons in the incantation,
+if there are any. Certain sets of codons are transmutable into each other. For example,
+`mu` (multiply) and `ho` (divide) are such a pair. The full list of transmutable
+sets is:
+  * `be` (greater than), `bu` (less than)
+  * `bi` (cos), `de` (tanh), `re` (sin), `ru` (sigmoid)
+  * `kya` (coordinate), `jya` (relative coordinate)
+  * `mu` (multiply), `ho` (divide)
+  * `ni` (square root), `nu` (cube root)
+* Bond: Randomly takes an adjacent set of codons in the incantation and bonds
+them into a [compound codon](#compound-codons). Note that `Allow bond mutations`
+on the `Mutate | Parameters...` option must be set to enable bond mutations.
+* Unbond: If the incantation contains any compound codons, has a chance
+of unbonding one or more such codons. Note that `Allow bond mutations` on
+the `Mutate | Parameters...` option must be set to enable bond mutations.
+* Adjust: "Destabilizes" some number of random *unstable* codons in the
+incantation, if there are any. An unstable codon is one that can be modified
+in some way without changing the codon syllable itself. Any codon whose
+syllable includes a numeric suffix can be modified. For example, the
+`a` (constant) codon could be modified from `a8` to `a42`.
+* Add: Adds a new random codon to the end of the incantation.
+* Remove: Removes a codon from the incantation at random.
+* Replace: Replaces a codon in the incantation at random, with a new random codon.
+* Repeat: Copies a random portion of the incantation and adds it onto the
+end. For example, given the incantation `go mi ya mu`, a repeat mutation
+might copy the `ya mu` portion, resulting in the new incantation `go mi ya mu ya mu`.
+* Insert: Inserts a new random codon at a random location in the incantation.
+* Duplicate: Duplicates a codon in the incantation at random. The duplicate is
+inserted adjacent to the original codon.
+* Swap: Swaps the locations of two codons in the incantation, at random.
 
 ### Sequences, Stages, and Mutations
 
