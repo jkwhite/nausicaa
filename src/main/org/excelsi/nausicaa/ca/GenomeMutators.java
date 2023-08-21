@@ -13,36 +13,6 @@ public class GenomeMutators extends Enloggened {
     private static final Logger LOG = LoggerFactory.getLogger(GenomeMutators.class);
 
 
-    public static GenomeMutator makeDeterministic() {
-        return
-            (cs,im,gf,m)->{
-                LOG.debug("running makeDeterministic mutate");
-                boolean hasUnd = false;
-                for(Codon c:cs) {
-                    if(!c.deterministic()) {
-                        hasUnd = true;
-                        break;
-                    }
-                }
-                if(hasUnd) {
-                    int st = m.r().nextInt(cs.size());
-                    int en = st==0?cs.size():st-1;
-                    for(int i=st;i!=en&&cs.size()>1;) {
-                        if(!cs.get(i).deterministic()) {
-                            cs.remove(i);
-                            break;
-                        }
-                        if(++i==cs.size()&&i!=en) {
-                            i=0;
-                        }
-                    }
-                }
-                else {
-                    replace().mutate(cs,im,gf,m);
-                }
-            };
-    }
-
     public static GenomeMutator jumble() {
         return
             (cs,im,gf,m)->{
@@ -114,6 +84,17 @@ public class GenomeMutators extends Enloggened {
                     int idx = m.r().nextInt(cs.size());
                     cs.remove(idx);
                     first = false;
+                }
+            };
+    }
+
+    public static GenomeMutator chomp() {
+        return
+            (cs,im,gf,m)->{
+                int cull = cs.size()/3;
+                LOG.debug("running chomp mutate to cull "+cull+" codons");
+                while(cull-->0) {
+                    cs.remove(0);
                 }
             };
     }
@@ -274,6 +255,36 @@ public class GenomeMutators extends Enloggened {
                 LOG.debug("unbond res:  "+ncs);
                 cs.clear();
                 cs.addAll(ncs);
+            };
+    }
+
+    public static GenomeMutator makeDeterministic() {
+        return
+            (cs,im,gf,m)->{
+                LOG.debug("running makeDeterministic mutate");
+                boolean hasUnd = false;
+                for(Codon c:cs) {
+                    if(!c.deterministic()) {
+                        hasUnd = true;
+                        break;
+                    }
+                }
+                if(hasUnd) {
+                    int st = m.r().nextInt(cs.size());
+                    int en = st==0?cs.size():st-1;
+                    for(int i=st;i!=en&&cs.size()>1;) {
+                        if(!cs.get(i).deterministic()) {
+                            cs.remove(i);
+                            break;
+                        }
+                        if(++i==cs.size()&&i!=en) {
+                            i=0;
+                        }
+                    }
+                }
+                else {
+                    replace().mutate(cs,im,gf,m);
+                }
             };
     }
 

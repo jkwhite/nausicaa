@@ -82,7 +82,8 @@ public final class Genome {
             new Weight<>(30, GenomeMutators.add()),
             new Weight<>(30, GenomeMutators.adjust()),
             new Weight<>(20, GenomeMutators.transmute()),
-            new Weight<>(5, GenomeMutators.makeDeterministic())
+            new Weight<>(5, GenomeMutators.makeDeterministic()),
+            new Weight<>(8, GenomeMutators.chomp())
         );
         if(m.bondMutations()) {
             mf.add(new Weight<GenomeMutator>(5, GenomeMutators.bond()));

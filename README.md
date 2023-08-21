@@ -792,8 +792,11 @@ window.
 
 ### Kinds of Mutators
 
-* Decimate: Removes approximately 33% of codons in the incantation at random.
 * Jumble: Randomly shuffles some number of codons in the incantation.
+* Decimate: Removes approximately 33% of codons in the incantation at random.
+* Chomp: Removes the entire first third of codons in the incantation. This can
+be useful in reducing computational cost by identifying "junk" sections of
+the incantation that no longer have an impact on the final produced value.
 * MakeDeterministic: Removes all non-deterministic codons from the incantation.
 As of this writing, the only non-deterministic codon is `ze`, which produces
 random values.

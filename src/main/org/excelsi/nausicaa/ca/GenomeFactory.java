@@ -109,6 +109,7 @@ public class GenomeFactory {
             cs.add(weight(1,new CoordRel(0)));
             cs.add(weight(1,new CoordRel(1)));
             cs.add(weight(1,new Mandelbrot()));
+            cs.add(weight(1,new Mandelbulb()));
         }
         for(Iterator<Weight<Codon>> it=cs.iterator();it.hasNext();) {
             final Weight<Codon> wc = it.next();

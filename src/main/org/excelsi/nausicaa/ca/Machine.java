@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 
-public class Machine {
+public class Machine implements Humanizable {
     private static final Logger LOG = LoggerFactory.getLogger(Machine.class);
     private static final int TAPE_LENGTH = 65535*2;
     private static final int MAX_INSTRUCTIONS = 1000;
@@ -206,6 +206,10 @@ public class Machine {
         _e = 0;
         if(_ti!=null) _ti.reset();
         if(_tf!=null) _tf.reset();
+    }
+
+    @Override public String humanize() {
+        return toString()+" ["+_prg.length+"]";
     }
 
     @Override public String toString() {

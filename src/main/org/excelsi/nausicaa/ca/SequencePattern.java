@@ -248,7 +248,6 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
             return new Sequence(ns, nd);
         }
 
-        //public Sequence mutate(Random r) {
         public Sequence mutate(MutationFactor m) {
             List<SEntry> ns = new ArrayList<>();
             List<DEntry> nd = new ArrayList<>();
@@ -261,7 +260,6 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
             m = m.withDatamap(dm);
             switch(m.mode()) {
                 case "normal":
-                    //System.err.println("stage mutate: "+m.stage()+" of max "+_s.size());
                     LOG.debug("stage mutate: "+m.stage()+" of max "+(_s.size()-1));
                     for(int i=0;i<_s.size();i++) {
                         final SEntry s = _s.get(i);
@@ -269,7 +267,6 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                         Double nw = s.weight;
                         Double ndec = s.decay;
                         if(m.stage()==-1 || i==m.stage()) {
-                            //System.err.println("MUTATING "+i);
                             boolean typ = false;
                             if(m.rule() && m.updateWeight()) {
                                 typ = m.random().nextBoolean();
@@ -298,7 +295,6 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                             }
                         }
                         else {
-                            //System.err.println("COPYING "+i);
                             np = (ComputedPattern)s.p.copy(dm);
                         }
                         ns.add(new SEntry(s.t, nw, ndec, np));
@@ -331,7 +327,6 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                     break;
             }
             Sequence news = new Sequence(ns, nd);
-            //System.err.println("GOT NEWS: "+news.humanize());
             return news;
         }
 
@@ -373,7 +368,6 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
 
         @Override public Varmap vars() {
             Varmap m = GenomeParser.createVarmap(genome());
-            //System.err.println("## seq varmap: "+m+" for "+genome());
             return m;
         }
 
@@ -388,7 +382,7 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                     b.append(";").append(s.decay);
                 }
                 b.append(":");
-                b.append(s.p.toString()).append(",");
+                b.append(s.p.humanize()).append(",");
             }
             b.setLength(b.length()-1);
             return b.toString();

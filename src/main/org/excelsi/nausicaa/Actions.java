@@ -581,7 +581,7 @@ public class Actions {
             p.addPair("Edge", ca.getEdgeMode().humanize());
             p.addPair("External Force", ca.getExternalForce().humanize());
             p.addPair("Language", ((AbstractComputedRuleset)cr.origin()).language().name());
-            p.addPair("Genome", cr.prettyGenome());
+            p.addPair("Genome", cr.humanize());
             p.addPair("Codons",
                 createText(new GenomeParser(r.archetype(), ((ComputedRuleset)r.origin()).language()).info(cr.archetype(), cr.genome()).toString(), 10, true));
         }
@@ -2174,6 +2174,7 @@ public class Actions {
             null,
             createMutationFactor(ca, config, rand)
                 .withGenomeMutator(m)
+                .withUpdateWeight(false) // otherwise weight xform might be chosen over genome mutator
             ).transform(ca));
     }
 
@@ -2262,7 +2263,7 @@ public class Actions {
         a.setLineWrap(true);
         a.setWrapStyleWord(false);
         Font f = a.getFont();
-        //a.setFont(f.deriveFont(Font.ITALIC, f.getSize()-2));
+        a.setFont(new Font(Font.MONOSPACED, Font.PLAIN, f.getSize()));
         return scroll ? new JScrollPane(a) : a;
     }
 

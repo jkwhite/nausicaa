@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 
-public final class ComputedPattern implements Pattern, Mutatable {
+public final class ComputedPattern implements Pattern, Mutatable, Humanizable {
     private static final Logger LOG = LoggerFactory.getLogger(ComputedPattern.class);
     private static final boolean ENABLE_CACHE = true;
     private final Archetype _a;
@@ -71,7 +71,6 @@ public final class ComputedPattern implements Pattern, Mutatable {
     }
 
     @Override public byte next(int pattern, final byte[] p2) {
-        //return _logic.next(p2);
         throw new UnsupportedOperationException();
     }
 
@@ -101,23 +100,16 @@ public final class ComputedPattern implements Pattern, Mutatable {
         protected final int _csize;
         private final int _bsize;
         private final int[] _c;
-        //private final int[][] _p;
         protected final int[] _p;
         private final int[] _hot;
 
         public PCache(int csize, int psize) {
             _c = new int[csize];
             _hot = new int[csize];
-            //_p = new int[csize][];
             _csize = csize;
             _psize = psize;
             _bsize = _psize + 1;
-            //_p = new int[csize*psize];
             _p = new int[_bsize*csize];
-            //System.err.println("plen: "+_p.length);
-            //for(int i=0;i<_p.length;i++) {
-                //_p[i] = new int[psize];
-            //}
         }
 
         public int find(int[] p) {
@@ -126,36 +118,26 @@ public final class ComputedPattern implements Pattern, Mutatable {
             i=0;
             h = true;
             int j = 0;
-            //if(i<0) throw new IllegalStateException("negative i: "+i);
             int idx = i*_psize;
             if(_p[idx++]==0) {
                 h = false;
                 return 0;
             }
             for(;idx<=(i+1)*_psize;idx++) {
-                //if(j<0) throw new IllegalStateException("negative j: "+j+" idx: "+idx+" i: "+i+" psize: "+_psize);
-                //if(idx<0) throw new IllegalStateException("negative idx: "+idx+" j: "+j+" i: "+i+" psize: "+_psize);
                 if(p[j++]!=_p[idx]) {
                     h = false;
                     break;
                 }
             }
-            //h = Arrays.equals(p, _p[i]);
-            //if(Arrays.equals(ZEROS, p)) System.err.println("** PCACHE FIND: "+fmt(p)+"h: "+h+" r: "+_c[i]);
             return _c[i];
-            //return _p[idx];
         }
 
         public void put(int[] p, int r) {
-            //if(Arrays.equals(ZEROS, p)) System.err.println("*** PCACHE PUT: "+fmt(p)+" => "+r);
-            //final int i = key(p);
             final int i = lk;
             _hot[i]++;
-            //System.arraycopy(p, 0, _p, i*_psize, p.length);
             _p[i*_bsize] = 1;
             System.arraycopy(p, 0, _p, 1+i*_bsize, p.length);
             _c[i] = r;
-            //_p[i*_bsize+p.length] = r;
         }
 
         public void dump() {
@@ -173,12 +155,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
                         mb = i;
                     }
                     if(min>_hot[i]) min = _hot[i];
-                    //System.err.print(i+": "+_hot[i]);
-                    //System.err.print(" ");
                 }
-                //if(i%10==0) {
-                    //System.err.println();
-                //}
             }
             LOG.info("total writes: "+w+" total buckets in use: "+b+" / "+_hot.length+" max: "+max+"("+mb+") min: "+min);
         }
@@ -187,20 +164,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
             int k = (p[0]<<24^p[1]<<16^p[2]<<8^p[3]^p[4]<<8^p[5]<<16^p[6]<<24);
             k = k^(p[7]<<24^p[8]); //<<16^p[9]<<8^p[10]^p[11]<<8^p[12]<<16^p[13]<<24);
             k = k % _p.length;
-            //if(k<0) k=-k;
-            //return k;
-            //int k = p[0];
-            //final int l = p.length;
-            //for(int i=1;i<l;i+=4) {
-                //k = 7*k + p[i];
-            //}
-            //int k = 7*p[0]+31*p[1]+113*p[2]+7*p[3]+31*p[4]+113*p[5]+11*p[6];
-            //k = k * 7*p[7]+31*p[8]+113*p[9]+7*p[10]+31*p[11]+113*p[12]+11*p[13];
-            //k = k * 7*p[14]+31*p[15]+113*p[16]+7*p[17]+31*p[18]+113*p[19]+11*p[20];
-            //k = k * 7*p[21]+31*p[22]+113*p[23]+7*p[24]+31*p[25]+113*p[26]+11*p[27];
             if(k<0) k=-k;
-            //k = k % _p.length;
-            //k = k % _csize;
             k = k % _csize;
             return k;
         }
@@ -213,23 +177,16 @@ public final class ComputedPattern implements Pattern, Mutatable {
         protected final int _csize;
         private final int _bsize;
         private final double[] _c;
-        //private final int[][] _p;
         protected final double[] _p;
         private final int[] _hot;
 
         public FPCache(int csize, int psize) {
             _c = new double[csize];
             _hot = new int[csize];
-            //_p = new int[csize][];
             _csize = csize;
             _psize = psize;
             _bsize = _psize + 1;
-            //_p = new int[csize*psize];
             _p = new double[_bsize*csize];
-            //System.err.println("plen: "+_p.length);
-            //for(int i=0;i<_p.length;i++) {
-                //_p[i] = new int[psize];
-            //}
         }
 
         public double find(double[] p) {
@@ -238,36 +195,26 @@ public final class ComputedPattern implements Pattern, Mutatable {
             i=0;
             h = true;
             int j = 0;
-            //if(i<0) throw new IllegalStateException("negative i: "+i);
             int idx = i*_psize;
             if(_p[idx++]==0d) {
                 h = false;
                 return 0d;
             }
             for(;idx<=(i+1)*_psize;idx++) {
-                //if(j<0) throw new IllegalStateException("negative j: "+j+" idx: "+idx+" i: "+i+" psize: "+_psize);
-                //if(idx<0) throw new IllegalStateException("negative idx: "+idx+" j: "+j+" i: "+i+" psize: "+_psize);
                 if(p[j++]!=_p[idx]) {
                     h = false;
                     break;
                 }
             }
-            //h = Arrays.equals(p, _p[i]);
-            //if(Arrays.equals(ZEROS, p)) System.err.println("** PCACHE FIND: "+fmt(p)+"h: "+h+" r: "+_c[i]);
             return _c[i];
-            //return _p[idx];
         }
 
         public void put(double[] p, double r) {
-            //if(Arrays.equals(ZEROS, p)) System.err.println("*** PCACHE PUT: "+fmt(p)+" => "+r);
-            //final int i = key(p);
             final int i = lk;
             _hot[i]++;
-            //System.arraycopy(p, 0, _p, i*_psize, p.length);
             _p[i*_bsize] = 1f;
             System.arraycopy(p, 0, _p, 1+i*_bsize, p.length);
             _c[i] = r;
-            //_p[i*_bsize+p.length] = r;
         }
 
         public void dump() {
@@ -285,12 +232,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
                         mb = i;
                     }
                     if(min>_hot[i]) min = _hot[i];
-                    //System.err.print(i+": "+_hot[i]);
-                    //System.err.print(" ");
                 }
-                //if(i%10==0) {
-                    //System.err.println();
-                //}
             }
             LOG.info("total writes: "+w+" total buckets in use: "+b+" / "+_hot.length+" max: "+max+"("+mb+") min: "+min);
         }
@@ -303,20 +245,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
             int k = (f(p[0])<<24^f(p[1])<<16^f(p[2])<<8^f(p[3])^f(p[4])<<8^f(p[5])<<16^f(p[6])<<24);
             k = k^(f(p[7])<<24^f(p[8])); //<<16^p[9]<<8^p[10]^p[11]<<8^p[12]<<16^p[13]<<24);
             k = k % _p.length;
-            //if(k<0) k=-k;
-            //return k;
-            //int k = p[0];
-            //final int l = p.length;
-            //for(int i=1;i<l;i+=4) {
-                //k = 7*k + p[i];
-            //}
-            //int k = 7*p[0]+31*p[1]+113*p[2]+7*p[3]+31*p[4]+113*p[5]+11*p[6];
-            //k = k * 7*p[7]+31*p[8]+113*p[9]+7*p[10]+31*p[11]+113*p[12]+11*p[13];
-            //k = k * 7*p[14]+31*p[15]+113*p[16]+7*p[17]+31*p[18]+113*p[19]+11*p[20];
-            //k = k * 7*p[21]+31*p[22]+113*p[23]+7*p[24]+31*p[25]+113*p[26]+11*p[27];
             if(k<0) k=-k;
-            //k = k % _p.length;
-            //k = k % _csize;
             k = k % _csize;
             return k;
         }
@@ -371,12 +300,9 @@ public final class ComputedPattern implements Pattern, Mutatable {
         _io.ctx = ctx;
         _logic.next(_io);
         r = _io.io;
-        //if(_cache.lk!=0) {
         if(ENABLE_CACHE && _cache!=null) {
             _cache.put(p2, r);
         }
-        //}
-        //dumpres(p2, r);
         return r;
     }
 
@@ -392,7 +318,6 @@ public final class ComputedPattern implements Pattern, Mutatable {
                         //_cache.dump();
                     //}
                 }
-                //dumpres(p2, r);
                 return r;
             }
         }
@@ -404,7 +329,6 @@ public final class ComputedPattern implements Pattern, Mutatable {
         if(ENABLE_CACHE && _fcache!=null) {
             _fcache.put(p2, r);
         }
-        //System.err.println("computed next: "+r+" for "+p2[p2.length/2]);
         return r;
     }
 
@@ -452,8 +376,6 @@ public final class ComputedPattern implements Pattern, Mutatable {
             LOG.error("!!!!!!!!! BUG!!!!!!!!!!"+key+"=> said: "+r+" real: "+rp);
             Thread.dumpStack();
         }
-        //b.append("=> ").append(r);
-        //System.err.println(b.toString());
     }
 
     @Override public void tick() {
@@ -465,8 +387,7 @@ public final class ComputedPattern implements Pattern, Mutatable {
         return new ComputedPattern(_a, _logic.mutate(new Implicate(_a, m.datamap(), m.language(), m.vars()), gf, m));
     }
 
-    public interface RuleLogic {
-        //int next(int[] pattern);
+    public interface RuleLogic extends Humanizable {
         void next(IO io);
         RuleLogic copy(Datamap dm);
         default RuleLogic mutate(Implicate im, GenomeFactory gf, MutationFactor mf) {
@@ -492,17 +413,15 @@ public final class ComputedPattern implements Pattern, Mutatable {
         }
 
         @Override public void next(IO io) {
-            //System.err.print("pat: "+Patterns.formatPattern(pattern));
-            //final byte b1 = _r.reduce(pattern);
-            //System.err.print("\tred: "+(int)b1);
-            //final byte b2 = _a.activate(b1);
-            //System.err.println("\tact: "+(int)b2);
-            //return _a.activate(_r.reduce(pattern));
             io.io = _a.activate(_r.reduce(io.ii));
         }
 
         @Override public RARule copy(Datamap dm) {
             return new RARule(_n, _r.copy(), _a.copy());
+        }
+
+        @Override public String humanize() {
+            return toString();
         }
 
         @Override public String toString() {
@@ -532,7 +451,6 @@ public final class ComputedPattern implements Pattern, Mutatable {
         }
 
         @Override public void next(IO io) {
-            //if(++_c%1000000==0) _m.dump();
             _m.compute(io);
         }
 
@@ -548,9 +466,17 @@ public final class ComputedPattern implements Pattern, Mutatable {
             _m.tick();
         }
 
+        @Override public String humanize() {
+            return _m.humanize();
+        }
+
         @Override public String toString() {
             return _m.toString();
         }
+    }
+
+    @Override public String humanize() {
+        return _logic.humanize();
     }
 
     @Override public String toString() {

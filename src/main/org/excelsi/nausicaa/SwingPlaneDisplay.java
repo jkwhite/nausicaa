@@ -51,7 +51,6 @@ public class SwingPlaneDisplay extends PlaneDisplay {
     private JScrollPane _show;
     private boolean _shown = true;
     private Rule _r;
-    //private Branch<World> _b;
     private CA _c;
     private Plane _p;
     private GOptions _gopt;
@@ -75,7 +74,6 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         _h = h;
         setLayout(new BorderLayout());
         JPanel p = new JPanel(new BorderLayout());
-        //p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
         setForeground(Color.BLACK);
         setBackground(Color.BLACK);
         p.setBackground(Color.BLACK);
@@ -85,7 +83,6 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         _label.setForeground(Color.BLACK);
         if(useNew) {
             _img = new JCA(w, h);
-            //_img.setPreferredSize(new java.awt.Dimension(w,h));
             _img.setAlignmentX(0.5f);
             _img.setAlignmentY(0.5f);
             p.add(_img, BorderLayout.CENTER);
@@ -100,7 +97,6 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         p.add(_meta, BorderLayout.SOUTH);
         p.add(_hyper, BorderLayout.EAST);
 
-        //JScrollPane scr = new JScrollPane(_label);
         JScrollPane scr = new JScrollPane(p);
         scr.setBackground(Color.BLACK);
         scr.setForeground(Color.BLACK);
@@ -108,46 +104,15 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         _show = scr;
     }
 
-    //public PlaneDisplay(CA ca) {
-        //this(ca.getWidth(), ca.getHeight());
-        //_scale = ca.getScale();
-        //setCA(ca);
-    //}
-
     private SwingPlaneDisplay(Plane p) {
         this(p.getWidth(), p.getHeight());
         setCA(p.creator());
-        //setPlane(p);
-        //_p = p;
     }
 
     private SwingPlaneDisplay(int w, int h, Rule r) {
         this(w, h);
         _r = r;
     }
-
-    //public PlaneDisplay(int w, int h, Branch<World> b) {
-        //this(w, h);
-        //_b = b;
-        //_label.requestFocus();
-    //}
-
-    //public Branch<World> getBranch() {
-        //return _b;
-    //}
-//
-    //public Rule getRule() {
-        //return getBranch()!=null?getBranch().data().getRule():_r;
-    //}
-//
-    //public void setBranch(Branch<World> b) {
-        //_b = b;
-    //}
-//
-    //public void setRule(Rule r) {
-        //_b = null;
-        //_r = r;
-    //}
 
     public boolean delegateUnlock() {
         return false;
@@ -166,11 +131,9 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         if(_shown) {
             _oldIcon = _label.getIcon();
             _label.setIcon(null);
-            //remove(_show);
         }
         else {
             _label.setIcon(_oldIcon);
-            //add(_show);
         }
         _shown = ! _shown;
         invalidate();
@@ -202,30 +165,16 @@ public class SwingPlaneDisplay extends PlaneDisplay {
 
     public void setCA(CA ca, ExecutorService pool, GOptions opt) {
         _c = ca;
-        //Rendering.Composition comp = _config.getVariable("composite_mode","front").equals("firstonly")?Rendering.Composition.front:Rendering.Composition.avg;
         _rend = new Rendering()
             .composition(Rendering.Composition.from(_config.getVariable("composite_mode","front")));
         setPlane(_c.createPlane(pool, opt));
         Info i = new Info(_c);
         Rule r = ca.getRule();
         String text = r.humanize();
-        //System.err.println("******** RULE: "+System.identityHashCode(r)+" SET RULE: "+text);
-        if(text.length()>56) {
-            text = "..."+text.substring(text.length()-56,text.length());
+        if(text.length()>42) {
+            text = "..."+text.substring(text.length()-42,text.length());
         }
         _meta.setText(text);
-        /*
-        if(r.dimensions()==1) {
-            if(r.getHyperrule()!=null) {
-                final RulePattern rp = new RulePattern(r, r.getHyperrule());
-                Plane p = rp.generate(_c.getHeight(), _c.getPalette());
-                _hyper.setIcon(new ImageIcon(p.toImage((int)(p.getWidth()*_scale), (int) (p.getHeight()*_scale))));
-            }
-            else {
-                _hyper.setIcon(null);
-            }
-        }
-        */
     }
 
     public void setPlane(Plane plane) {
@@ -267,7 +216,6 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         if(FAIL3D && plane instanceof BlockPlane) {
             r = new Runnable() {
                 public void run() {
-                    //_label.setIcon(icon);
                     _label.setForeground(Color.WHITE);
                     _label.setText("Cannot display BlockPlane");
                     invalidate();

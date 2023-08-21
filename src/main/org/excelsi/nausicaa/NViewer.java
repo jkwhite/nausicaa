@@ -1408,37 +1408,8 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         _repeat.setEnabled(false);
         _repeat.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcut));
 
-        /*
-        AbstractAction rand = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _a.randomMutation(NViewer.this);
-            }
-        };
-        final JMenuItem random = mutate.add(rand);
-        random.setText("Random mutation");
-        random.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcut));
-        */
         mutate.addSeparator();
 
-        /*
-        for(final Mutator m:MutatorFactory.defaultMutators().getAll()) {
-            AbstractAction mut = new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    _repeat.setEnabled(true);
-                    _repeat.setText("Repeat "+m.name());
-                    try {
-                        _a.mutate(NViewer.this, _config, _random, m);
-                    }
-                    catch(MutationFailedException ex) {
-                        System.err.println(m.name()+" failed: "+ex.getMessage());
-                    }
-                }
-            };
-            JMenuItem mutat = mutate.add(mut);
-            mutat.setText(m.name());
-        }
-        mutate.addSeparator();
-        */
         for(final java.lang.reflect.Method m:GenomeMutators.class.getDeclaredMethods()) {
             final String mname = Character.toUpperCase(m.getName().charAt(0))+m.getName().substring(1);
             if(!mname.startsWith("Lambda$")) {
@@ -1447,13 +1418,11 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                         _repeat.setEnabled(true);
                         _repeat.setText("Repeat "+mname);
                         try {
-                            //_a.mutate(NViewer.this, _config, _random, m);
                             GenomeMutator gm = (GenomeMutator) m.invoke(null, new Object[0]);
                             _a.mutate(NViewer.this, _config, _random, gm);
                         }
                         catch(Exception ex) {
                             LOG.error(mname+" failed: "+ex.getMessage(), ex);
-                            //System.err.println(mname+" failed: "+ex.getMessage());
                         }
                     }
                 };
