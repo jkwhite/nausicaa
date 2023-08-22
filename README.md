@@ -49,6 +49,8 @@
   - [Palette Menu](#palette-menu)
     - [Using a custom palette](#using-a-custom-palette)
   - [Mutate Menu](#mutate-menu)
+    - [Making Mutations](#making-mutations)
+    - [Kinds of Mutators](#kinds-of-mutators)
     - [Sequences, Stages, and Mutations](#sequences-stages-and-mutations)
   - [Render Menu](#render-menu)
     - [RGB compute mode](#rgb-compute-mode)
@@ -778,7 +780,8 @@ is equal to the right-most anchor color.
 
 ## Mutate Menu
 
-**Making Mutations**
+### Making Mutations
+
 Mutations can be applied in several ways:
 * By selecting one of the randomly-generated mutations in the main window
 (shown with ⌘Y).
