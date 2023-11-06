@@ -171,7 +171,9 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         Info i = new Info(_c);
         Rule r = ca.getRule();
         String text = r.humanize();
+        _meta.setToolTipText("");
         if(text.length()>42) {
+            _meta.setToolTipText(text);
             text = "..."+text.substring(text.length()-42,text.length());
         }
         _meta.setText(text);

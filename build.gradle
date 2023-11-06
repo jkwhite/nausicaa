@@ -41,7 +41,7 @@ dependencies {
     implementation 'excelsiorg:gimmal:1.0'
     // implementation 'groovy:groovy-all:1.8.9'
     // implementation 'groovy:groovy-all:2.4.14'
-    implementation 'org.apache.groovy:groovy-all:4.0.4'
+    implementation 'org.apache.groovy:groovy-all:4.0.15'
     implementation 'imgscalr:imgscalr-lib:4.2'
     implementation 'Fxyz:Fxyz-Core:1.0'
     implementation 'Fxyz:Fxyz-lib:1.0'

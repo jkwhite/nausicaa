@@ -404,9 +404,8 @@ public class Config {
             }
             return c;
         }
-        catch(IOException e) {
-            System.err.println("failed reading "+CONFIG_FILE+", using default: "+e);
-            e.printStackTrace();
+        catch(Exception e) {
+            LOG.error("failed reading or parsing "+CONFIG_FILE+", using default: "+e, e);
         }
         return new Config();
     }
