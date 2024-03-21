@@ -2996,7 +2996,6 @@ public class Codons {
             int i = 0;
             for (i = 0; i < 10; i++) {
                 r = Math.sqrt(x * x + y * y + z * z);
-                // if (r > 10000)
                 if (r > d)
                     break;
 
@@ -3021,10 +3020,43 @@ public class Codons {
             }
             double d2 = (0.5 * Math.log(r) * r / dr);
             return (int) (100d*d2);
-            // System.err.println("res: "+d2);
-            // boolean in = ((0.5 * Math.log(r) * r / dr) < d);
-            // return in;
-            // return in ? 0 : i;
+        }
+
+        public double isInFractalReal(double x, double y, double z, double d, int max) {
+            double posX = x;
+            double posY = y;
+            double posZ = z;
+
+            double dr = 1.0;
+            double r = 0.0;
+
+            int i = 0;
+            for (i = 0; i < 10; i++) {
+                r = Math.sqrt(x * x + y * y + z * z);
+                if (r > d)
+                    break;
+
+                // convert to polar coordinates
+                double theta = Math.acos(z / r);
+                double phi = Math.atan2(y, x);
+                dr = Math.pow(r, 8 - 1.0) * 8 * dr + 1.0;
+
+                // scale and rotate the point
+                double zr = Math.pow(r, 8);
+                theta = theta * 8;
+                phi = phi * 8;
+
+                // convert back to cartesian coordinates
+                x = zr * Math.sin(theta) * Math.cos(phi);
+                y = zr * Math.sin(phi) * Math.sin(theta);
+                z = zr * Math.cos(theta);
+
+                x += posX;
+                y += posY;
+                z += posZ;
+            }
+            double d2 = (0.5 * Math.log(r) * r / dr);
+            return d2;
         }
 
         @Override public void op(int[] p, IntTape t, Pattern.Ctx ctx) {
@@ -3034,57 +3066,20 @@ public class Codons {
             double cy = t.pop()/scl;
             double cx = t.pop()/scl;
 
-            // boolean res = isInFractal(cx, cy, cz, 4d, z);
-            // z = res ? 1:0;
             z = isInFractal(cx, cy, cz, 2d, z);
 
             t.push(z);
         }
 
         @Override public void op(double[] p, FloatTape t, Pattern.Ctx ctx) {
-            System.err.println("========================================================");
             double scl = t.pop();
             int z = Math.min((int)t.pop(), SAFETY);
             double cz = t.pop()/scl;
             double cy = t.pop()/scl;
             double cx = t.pop()/scl;
-            // System.err.println("cx="+cx+", cy="+cy+", cz="+cz);
+            double d2 = isInFractalReal(cx, cy, cz, 2d, z);
 
-            double x1 = 0;
-            double y1 = 0;
-            double z1 = 0;
-            // double x1 = cx;
-            // double y1 = cy;
-            // double z1 = cz;
-            //if(z>100) System.err.println("Z"+z);
-            //System.err.println("cx: "+cx+", cy: "+cy+", z: "+z+", scl: "+scl);
-            while(z>0 && x1*x1+y1*y1+z1*z1<2) {
-                // System.err.println("z="+z+", x1="+x1+", y1="+y1+", z1="+z1);
-                z--;
-                // double xx = x1*x1 - y1*y1 + cx;
-                // y1 = 2 * x1 * y1 + cy;
-                // x1 = xx;
-                double r = Math.sqrt(z1*z1+y1*y1+x1*x1);
-                double yAng = Math.atan2(Math.sqrt(x1*x1+y1*y1), z1);
-                double zAng = Math.atan2(y1, x1);
-                // System.err.println("r="+r+", yAng="+yAng+", zAng="+zAng);
-
-                double newx = (r*r) * Math.sin(2*yAng + 0.5*Math.PI) * Math.cos(2*zAng + Math.PI);
-                double newy = (r*r) * Math.sin(2*yAng + 0.5*Math.PI) * Math.sin(2*zAng + Math.PI);
-                double newz = (r*r) * Math.cos(2*yAng + 0.5*Math.PI);
-                // System.err.println("newx="+newx+", newy="+newy+", newz="+newz);
-
-                double xx = newx + cx;
-                double yy = newy + cx;
-                double zz = newz + cx;
-
-                x1 = xx;
-                y1 = yy;
-                z1 = zz;
-                // System.err.println("nx1="+x1+", ny1="+y1+", nz1="+z1);
-            }
-            //System.err.println("fz: "+z);
-            t.push(z);
+            t.push(d2);
         }
     }
 
@@ -3145,13 +3140,13 @@ public class Codons {
         }
 
         @Override public void op(double[] p, FloatTape t, Pattern.Ctx ctx) {
-            System.err.println("========================================================");
+            // System.err.println("========================================================");
             double scl = t.pop();
             int z = Math.min((int)t.pop(), SAFETY);
             double cz = t.pop()/scl;
             double cy = t.pop()/scl;
             double cx = t.pop()/scl;
-            System.err.println("cx="+cx+", cy="+cy+", cz="+cz);
+            // System.err.println("cx="+cx+", cy="+cy+", cz="+cz);
 
             double x1 = 0;
             double y1 = 0;
