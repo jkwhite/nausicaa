@@ -5,8 +5,12 @@ import java.util.Random;
 import java.security.SecureRandom;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public class WorkerDiscrete implements Worker {
+    private static final Logger LOG = LoggerFactory.getLogger(WorkerDiscrete.class);
     private final int _x1;
     private final int _y1;
     private final int _x2;
@@ -36,6 +40,8 @@ public class WorkerDiscrete implements Worker {
         _y2 = y2;
         _wp = p;
         _vars = vars;
+        _usesSource = _wp.usesSource();
+        LOG.info("usesSource: "+_usesSource);
         _size = _wp.archetype().size();
         final int colors = _wp.archetype().colors();
         _prev = new int[_wp.archetype().sourceLength()];
@@ -91,7 +97,9 @@ public class WorkerDiscrete implements Worker {
                             _weight = _vars.weight(p1, j, i, 0);
                         }
                         _oWeight = 1d - _weight;
-                        _neighbors.getNeighborhood(p1, _pattern, j, i, k, 0);
+                        if(_usesSource) {
+                            _neighbors.getNeighborhood(p1, _pattern, j, i, k, 0);
+                        }
                         if(_channels) {
                             p2.setCell(j, i, k, channels());
                         }
@@ -169,7 +177,9 @@ public class WorkerDiscrete implements Worker {
                     _pctx.c[0] = j-p1.getWidth()/2;
                     _pctx.cr[0] = _pctx.c[0]/(double)p1.getWidth();
                     counts++;
-                    _neighbors.getNeighborhood(p1, _pattern, j, i, 0);
+                    if(_usesSource) {
+                        _neighbors.getNeighborhood(p1, _pattern, j, i, 0);
+                    }
                     if(_channels) {
                         p2.setCell(j, i, channels());
                     }

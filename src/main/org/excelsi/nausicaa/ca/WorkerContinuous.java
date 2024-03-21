@@ -5,13 +5,18 @@ import java.util.Random;
 import java.security.SecureRandom;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public class WorkerContinuous implements Worker {
+    private static final Logger LOG = LoggerFactory.getLogger(WorkerContinuous.class);
     private final int _x1;
     private final int _y1;
     private final int _x2;
     private final int _y2;
     private final Pattern _wp;
+    private final boolean _usesSource;
     private final int _size;
     private final Variables _vars;
     private final double[] _prev;
@@ -36,6 +41,8 @@ public class WorkerContinuous implements Worker {
         _y2 = y2;
         _wp = p;
         _vars = vars;
+        _usesSource = _wp.usesSource();
+        LOG.info("usesSource: "+_usesSource);
         //_weight = weight;
         //_oWeight = 1f - weight;
         _size = _wp.archetype().size();
@@ -99,7 +106,10 @@ public class WorkerContinuous implements Worker {
                         //else {
                             //p1.getCardinal(_pattern, j, i, k, /*dx*/ _size, /*dy*/ _size, /*dz*/ _size, 0);
                         //}
-                        _neighbors.getNeighborhood(p1, _pattern, j, i, k, 0);
+                        if(_usesSource) {
+                            // only fetch neighbors if pattern uses them
+                            _neighbors.getNeighborhood(p1, _pattern, j, i, k, 0);
+                        }
                         if(_channels) {
                             //p2.setCell(j, i, k, channels());
                         }
@@ -185,7 +195,9 @@ public class WorkerContinuous implements Worker {
                     //else {
                         //p1.getCardinal(_pattern, j, i, _size, _size, 0);
                     //}
-                    _neighbors.getNeighborhood(p1, _pattern, j, i, 0);
+                    if(_usesSource) {
+                        _neighbors.getNeighborhood(p1, _pattern, j, i, 0);
+                    }
                     if(_channels) {
                         //p2.setCell(j, i, channels());
                     }
@@ -213,7 +225,7 @@ public class WorkerContinuous implements Worker {
         _oWeight = 1d - _weight;
 
         double[] prev = new double[2*size+1];
-        double[] pattern = new double[prev.length];
+        final double[] pattern = new double[prev.length];
 
         //final Pattern p = createPattern(pool);
         //System.err.println("created pattern: "+p);
