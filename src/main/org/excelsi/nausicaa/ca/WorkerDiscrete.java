@@ -16,6 +16,7 @@ public class WorkerDiscrete implements Worker {
     private final int _x2;
     private final int _y2;
     private final Pattern _wp;
+    private final boolean _usesSource;
     private final int _size;
     private final int[] _prev;
     private final int[] _pattern;
