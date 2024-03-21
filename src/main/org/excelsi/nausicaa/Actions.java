@@ -374,9 +374,11 @@ public class Actions {
             try {
                 config.setSaveDir(f.getSelectedFile().getParent());
                 final CA ca = CA.fromFile(f.getSelectedFile().toString(), "text");
-                config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth());
-                config.setWeight(ca.getWeight());
-                v.setActiveCA(ca);
+                config.transact(()->{
+                    config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth(),
+                        ca.getPrelude(), ca.getWeight());
+                    v.setActiveCA(ca);
+                });
             }
             catch(IOException e) {
                 showError(v, "Failed to load "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);
@@ -2321,7 +2323,7 @@ public class Actions {
         }
         if(r instanceof ComputedRule2d) {
             ComputedRule2d cr = (ComputedRule2d) r;
-            capt += "\n\nRule Genome:\n"+cr.prettyGenome();
+            capt += "\n\nIncantation:\n"+cr.prettyGenome();
         }
         else {
             capt += "\n\nRule:\n\n"+r.humanize();

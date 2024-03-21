@@ -37,6 +37,7 @@ public class Config {
     private String _langDir = System.getProperty("user.home");
     private String _imgDir = System.getProperty("user.home");
     private String _genDir = System.getProperty("user.home");
+    private boolean _notificationsEnabled = true;
 
 
     public Config() {
@@ -295,8 +296,21 @@ public class Config {
     }
 
     public void notify(final String p) {
-        for(ConfigListener l:new ArrayList<>(_listeners)) {
-            l.configChanged(this, p);
+        if(_notificationsEnabled) {
+            for(ConfigListener l:new ArrayList<>(_listeners)) {
+                l.configChanged(this, p);
+            }
+            save();
+        }
+    }
+
+    public synchronized void transact(Runnable r) {
+        try {
+            _notificationsEnabled = false;
+            r.run();
+        }
+        finally {
+            _notificationsEnabled = true;
         }
         save();
     }
