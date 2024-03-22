@@ -112,12 +112,11 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
             throw new IllegalArgumentException("null plane");
         }
         final Iterator<Plane> metarator = _meta!=null?_meta.frameIterator(c,pool, opt):null;
-        //final int block = 300;
         final int block = c.getHeight() / opt.parallel();
         int nworkers = c.getHeight()/block + (c.getHeight()%block>0?1:0);
         final Worker[] workers = new Worker[nworkers];
         final Pattern[] patterns = new Pattern[nworkers];
-        LOG.info("rule compute using "+workers.length+" workers on blocksize "+block);
+        LOG.info("rule compute using "+workers.length+" workers on blocksize "+block+" with db "+opt.doubleBuffer());
         final Variables vars = new Variables() {
             @Override public Double weight() { return c.creator().getWeight(); }
         };
@@ -222,12 +221,10 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
     }
 
     @Override public Plane generate(final Plane c, final int start, final int end, final ExecutorService pool, final boolean stopOnSame, final boolean overwrite, final Updater u, final GOptions opt) {
-        Plane ret = null;
+        Plane ret = c;
         switch(_p.archetype().dims()) {
             case 1:
                 Plane p1 = c;
-                //Plane p2 = c.copy();
-                //Plane tmp;
                 final Pattern pat = createPattern(pool);
                 Variables vars = new Variables() {
                     @Override public Double weight() { return c.creator().getWeight(); }
@@ -240,40 +237,19 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                     vars,
                     c.creator().getComputeMode(), c.creator().getUpdateMode(),
                     c.creator().getExternalForce(), c.creator().getRandom());
-                //for(int frames=start;frames<end;frames++) {
                 w.frame(p1);
                 ret = p1;
-                    //tmp = p1;
-                    //p1 = p2;
-                    //p2 = tmp;
-                    //p.tick();
-                //}
                 break;
             case 2:
             case 3:
             default:
-                //System.err.println("**** Generating ****");
+                LOG.info("generating prelude from "+start+" to "+end);
                 final Iterator<Plane> ps = frameIterator(c, pool, opt);
                 for(int i=start;i<end;i++) {
                     ret = ps.next();
-                    //System.err.println("ret: "+ret);
                 }
                 break;
         }
-        /*
-        Plane p1 = c;
-        Plane p2 = c.copy();
-        Plane tmp;
-        final Pattern p = createPattern(pool);
-        Worker w = new Worker(p, 0, 0, c.getWidth(), c.getHeight());
-        for(int frames=start;frames<end;frames++) {
-            w.frame(p1, p2);
-            tmp = p1;
-            p1 = p2;
-            p2 = tmp;
-            p.tick();
-        }
-        */
         return ret;
     }
 

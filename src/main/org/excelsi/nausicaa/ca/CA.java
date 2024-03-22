@@ -234,33 +234,26 @@ public final class CA {
     }
 
     private Plane populatePlane1(Plane p, ExecutorService pool, GOptions opt) {
-        //_rand.setSeed(_seed);
-        //_i.init(p, _r, _rand);
         Rule r = compileRule();
+        LOG.debug("prelude generating for "+_prelude);
+        final long st = System.currentTimeMillis();
         switch(r.dimensions()) {
             case 1:
                 r.generate(p, 1, _h, pool, false, true, null, opt);
                 break;
             case 3:
-                LOG.debug("prelude generating for "+_prelude);
-                final long st = System.currentTimeMillis();
-                r.generate(p, 1, _prelude, pool, false, true, null, opt);
-                final long en = System.currentTimeMillis();
-                LOG.debug("prelude generation took "+(en-st)+" millis");
+                p = r.generate(p, 0, _prelude, pool, false, true, null, opt);
                 break;
             case 2:
             default:
-                LOG.debug("prelude generating for "+_prelude);
-                final long st2 = System.currentTimeMillis();
-                r.generate(p, 1, _prelude, pool, false, true, null, opt);
+                p = r.generate(p, 0, _prelude, pool, false, true, null, opt);
                 if(_d>1) {
-                    p = r.generate(p, 1, _d, pool, false, true, null, opt.higherDim(_d));
-                    //System.err.println("****** expanding dimension result: "+p);
+                    p = r.generate(p, 0, _d, pool, false, true, null, opt.higherDim(_d));
                 }
-                final long en2 = System.currentTimeMillis();
-                LOG.debug("prelude generation took "+(en2-st2)+" millis");
                 break;
         }
+        final long en = System.currentTimeMillis();
+        LOG.debug("prelude generation took "+(en-st)+" millis");
         return p;
     }
 
