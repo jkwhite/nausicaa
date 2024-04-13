@@ -55,7 +55,7 @@ public class GenomeFactory {
             weight(1, new Intersects()),
             weight(1, new IntersectsSelf()),
             weight(1, new If()),
-            //weight(1, new Time()),
+            weight(1, new Time()),
             weight(1, new Nonzero(-1)),
             weight(2, new Push((a.sourceLength()-1)/2, a.sourceLength())),
             weight(2, new PushN()),

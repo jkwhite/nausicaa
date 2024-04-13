@@ -96,13 +96,15 @@ sourceSets {
 }
 
 javafx {
-    version = '11'
+    version = '21'
     modules = [ 'javafx.base', 'javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.swing', 'javafx.web' ]
 }
 
 application {
     applicationDefaultJvmArgs = [
-        "-Xmx32g",
+        "-Xmx48g",
+        "-Xdock:name=Nausicaa",
+        "-Xdock:icon=build/resources/nausicaa.icns",
         "--add-opens","java.base/java.lang=ALL-UNNAMED",
         "--add-opens","java.base/java.lang.reflect=ALL-UNNAMED",
         "--add-opens","java.base/java.util=ALL-UNNAMED",
@@ -114,6 +116,7 @@ application {
         "--add-opens","javafx.graphics/javafx.scene.layout=ALL-UNNAMED",
         "--add-opens","javafx.graphics/javafx.scene.shape=ALL-UNNAMED",
         "--add-opens","javafx.controls/javafx.scene.control=ALL-UNNAMED",
+        "-Dprism.verbose=true",
         "-Dapple.laf.useScreenMenuBar=true",
         "-XX:-OmitStackTraceInFastThrow",
         "-Dapp.root=HACK_FOR_GRADLE"

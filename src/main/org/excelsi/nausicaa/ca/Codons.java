@@ -1108,6 +1108,10 @@ public class Codons {
             return false;
         }
 
+        @Override public boolean usesTape() {
+            return true;
+        }
+
         @Override public boolean supports(Values v) { return true; }
         @Override public boolean reversible() { return false; }
 
@@ -1763,8 +1767,17 @@ public class Codons {
         }
 
         @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public boolean usesContext() {
+            // while Time does not technically use context,
+            // it effectively does as that is what _t represents.
+            // eventually Time should migrate to using Pattern.Context's
+            // time tracker instead of keeping its own.
             return true;
         }
+
         @Override public boolean supports(Values v) { return true; }
 
         @Override public void op(int[] p, IntTape t, Pattern.Ctx c) {

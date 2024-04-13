@@ -539,6 +539,7 @@ public class Actions {
         final JFrame i = new JFrame("Info");
         InfoPanel p = new InfoPanel();
         p.addPair("Name", ca.getName());
+        final StringBuilder additional = new StringBuilder();
         if(r instanceof IndexedRule) {
             final String b64 = ca.toBase64();
             p.addPair("Universe", chop(b64,80));
@@ -584,11 +585,13 @@ public class Actions {
             p.addPair("External Force", ca.getExternalForce().humanize());
             p.addPair("Language", ((AbstractComputedRuleset)cr.origin()).language().name());
             p.addPair("Genome", cr.humanize());
+            String expanded = new GenomeParser(r.archetype(), ((ComputedRuleset)r.origin()).language()).info(cr.archetype(), cr.genome()).toString();
             p.addPair("Codons",
-                createText(new GenomeParser(r.archetype(), ((ComputedRuleset)r.origin()).language()).info(cr.archetype(), cr.genome()).toString(), 10, true));
+                createText(expanded, 10, true));
+            additional.append("\n\nExpanded form:\n\n").append(expanded);
         }
         p.addPair("Colors", createColorPanel(ca.getPalette()));
-        p.addPair("Caption", createText(createCaption(ca), 10, true));
+        p.addPair("Caption", createText(createCaption(ca, additional.toString()), 10, true));
         p.done();
         i.getContentPane().add(p);
         int shortcut = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -2304,7 +2307,7 @@ public class Actions {
         }
     }
 
-    private static String createCaption(CA ca) {
+    private static String createCaption(CA ca, String additional) {
         Rule r = ca.getRule();
         String fmt = "%s, %d colors, %s neighborhood of %s %d, %s values, %s updates, %s edge, initialized with %s";
         String capt = String.format(fmt,
@@ -2328,8 +2331,11 @@ public class Actions {
         else {
             capt += "\n\nRule:\n\n"+r.humanize();
         }
+        if(additional!=null&&additional.length()>0) {
+            capt += additional;
+        }
         if(ca.getMeta()!=null) {
-            capt = capt+"\n\nWith meta "+createCaption(ca.getMeta());
+            capt = capt+"\n\nWith meta "+createCaption(ca.getMeta(), null);
         }
         return capt;
     }

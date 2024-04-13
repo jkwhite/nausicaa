@@ -99,6 +99,7 @@ public final class IntTape {
     public void push(int v) {
         if(_i<_t.length-1) {
             //d("push %d", v);
+            // TODO: this can cause OOB via integer overflow
             _t[++_i] = v;
         }
         else {

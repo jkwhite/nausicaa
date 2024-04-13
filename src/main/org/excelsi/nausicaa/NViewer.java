@@ -159,7 +159,8 @@ public class NViewer extends JFrame implements UIActions, Sizer {
     }
 
     public Futures getFutures() {
-        return _futures;
+        // return _futures;
+        return futures();
     }
 
     public void saveUIState() {
@@ -877,7 +878,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             public void actionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        _futures.setAnimationsEnabled(!_futures.getAnimationsEnabled());
+                        futures().setAnimationsEnabled(!futures().getAnimationsEnabled());
                         //_futures.revalidate();
                     }
                 });
@@ -1825,11 +1826,11 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         final JMenuItem[] vhack = new JMenuItem[1];
         final JMenuItem view3d = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                final ViewType vt = _futures!=null ? _futures.getViewType() : ViewType.view2d;
+                final ViewType vt = futures()!=null ? futures().getViewType() : ViewType.view2d;
                 vhack[0].setText(vt==ViewType.view2d?"View in 2D":"View in 3D");
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        _futures.setViewType(vt==ViewType.view2d?ViewType.view3d:ViewType.view2d);
+                        futures().setViewType(vt==ViewType.view2d?ViewType.view3d:ViewType.view2d);
                         //_futures.revalidate();
                     }
                 });
@@ -1886,7 +1887,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         final JMenuItem[] fhack = new JMenuItem[1];
         final JMenuItem full = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                boolean cval = _futures!=null ? _futures.getShow() : false;
+                boolean cval = futures()!=null ? futures().getShow() : false;
                 final boolean nval = !cval;
                 fhack[0].setText(nval?"Hide mutations":"Show mutations");
                 SwingUtilities.invokeLater(new Runnable() {
@@ -2041,6 +2042,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         }
         else {
             _reditor = new JFrame("Rule Editor");
+            _reditor.setLocation(_root.getLocation().x, _root.getLocation().y);
             _ruleEditor = new RuleEditor(_reditor, this, _timeline,
                 Actions.createMutationFactor(getActiveCA(), _config, _random));
             _reditor.getContentPane().add(_ruleEditor);
@@ -2053,8 +2055,9 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             JMenu file = new JMenu("File");
             AbstractAction close = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
-                    _reditor.setVisible(false);
-                    _reditor = null;
+                    // _reditor.setVisible(false);
+                    // _reditor = null;
+                    toggleRuleEditor();
                 }
             };
             JMenuItem cl = file.add(close);
