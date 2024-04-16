@@ -588,7 +588,7 @@ public class Actions {
             String expanded = new GenomeParser(r.archetype(), ((ComputedRuleset)r.origin()).language()).info(cr.archetype(), cr.genome()).toString();
             p.addPair("Codons",
                 createText(expanded, 10, true));
-            additional.append("\n\nExpanded form:\n\n").append(expanded);
+            additional.append("\n\nExpanded form:\n").append(expanded);
         }
         p.addPair("Colors", createColorPanel(ca.getPalette()));
         p.addPair("Caption", createText(createCaption(ca, additional.toString()), 10, true));

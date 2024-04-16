@@ -14,7 +14,8 @@ public class Languages {
             "Universal",
             "Classic",
             "Circular",
-            "Symmetric2d"
+            "Symmetric2d",
+            "Fractal"
             //"Symmetric3d",
             //"Menagerie"
         };
@@ -30,6 +31,8 @@ public class Languages {
                 return circular();
             case "Symmetric2d":
                 return simpleSymmetry();
+            case "Fractal":
+                return fractal();
             case "Menagerie":
                 return menagerie();
             case "Symmetric3d":
@@ -46,7 +49,8 @@ public class Languages {
         return new Language("Classic")
             .deterministic(true)
             .nondeterministic(false)
-            .contextual(false);
+            .contextual(false)
+            .positioning(false);
     }
 
     public static Language circular() {
@@ -58,6 +62,16 @@ public class Languages {
             .add("blitx","jya0+a200+mu2+re+a5+mu2")
             .add("blity","jya1+a200+mu2+re+a5+mu2")
             .add("blitxy","jya0+a200+mu2+re+a5+mu2+jya1+a200+mu2+re+a5+mu2+mi3")
+            ;
+    }
+
+    public static Language fractal() {
+        return new Language("Fractal")
+            .deterministic(true)
+            .nondeterministic(true)
+            .contextual(true)
+            .add("mandelbrot","kya0+kya1+a100+a100+nya")
+            .add("mandelbulb","kya0+kya1+kya2+a100+a100+mya")
             ;
     }
 

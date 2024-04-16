@@ -120,6 +120,9 @@ public class Animation extends Thread implements TimelineListener, ConfigListene
         ExecutorService compute = Pools.named("compute", ccores);
         ExecutorService render = Pools.named("render", rcores);
         for(int i=0;i<ds.length;i++) {
+            // TODO: when mutations are visible, compute cores is hardcoded
+            // to 1 per mutation. Safe when ccores <= 9, but otherwise is
+            // underusing CPU.
             da[i] = new DisplayAnimator(ds[i], compute, ds.length==1?ccores:1, weight);
         }
         int frames = 0;
