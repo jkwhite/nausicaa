@@ -33,6 +33,7 @@ public class WorkerContinuous implements Worker {
     private final Pattern.Ctx _pctx;
     private double _weight;
     private double _oWeight;
+    private final Stats _stats;
 
     public WorkerContinuous(Pattern p, int x1, int y1, int x2, int y2, Variables vars, ComputeMode cmode, UpdateMode umode, ExternalForce ef, Random r) {
         _x1 = x1;
@@ -61,6 +62,7 @@ public class WorkerContinuous implements Worker {
         _pctx.c = new int[3];
         _pctx.cr = new double[3];
         _pctx.r = r;
+        _stats = new Stats();
 
         //_pow = new int[_wp.archetype().sourceLength()];
         //for(int i=0;i<_pow.length;i++) {
@@ -68,7 +70,7 @@ public class WorkerContinuous implements Worker {
         //}
     }
 
-    public Stats getStats() { return new Stats(); }
+    public Stats getStats() { return _stats; }
 
     private void validate(IntPlane p) {
         for(int i=0;i<p.getWidth();i++) {
@@ -151,10 +153,14 @@ public class WorkerContinuous implements Worker {
     }
 
     public void frame(final Plane ip1, final Plane ip2) {
+        final long startTime = System.currentTimeMillis();
         _weight = _vars.weight();
         _oWeight = 1d - _weight;
         if(_useDepth) {
             frame3d((FloatBlockPlane)ip1, (FloatBlockPlane)ip2);
+            final long endTime = System.currentTimeMillis();
+            _stats.timeMsec += (endTime-startTime);
+            _stats.frames++;
             return;
         }
         final FloatPlane p1 = (FloatPlane) ip1;
@@ -208,6 +214,9 @@ public class WorkerContinuous implements Worker {
             }
         }
         _ef.apply(p2, _r);
+        final long endTime = System.currentTimeMillis();
+        _stats.timeMsec += (endTime-startTime);
+        _stats.frames++;
         //mutateRule();
         //System.err.println("set "+counts+" cells");
     }

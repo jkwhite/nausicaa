@@ -18,6 +18,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.util.EnumSet;
 import java.util.Random;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import java.util.concurrent.Executors;
@@ -87,10 +88,22 @@ public class Actions {
         comphack[0] = "machineelf";
         top.add(comps);
 
-        top.add(new JLabel("Language"));
+        top.add(new JLabel("Language Variants"));
+        /*
         final JComboBox lang = new JComboBox(Languages.catalog());
         lang.setSelectedItem(config.getVariable("default_language", "Universal"));
         top.add(lang);
+        */
+        JPanel langp = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final java.util.List<JCheckBox> langs = new ArrayList<>();
+
+        for(String lang:Languages.catalog()) {
+            JCheckBox lc = new JCheckBox(lang);
+            lc.setSelected("true".equals(config.getVariable("language_"+lang, "false")));
+            langs.add(lc);
+            langp.add(lc);
+        }
+        top.add(langp);
 
         // Neighborhood
         final Archetype.Neighborhood[] neihack = new Archetype.Neighborhood[1];
@@ -252,13 +265,18 @@ public class Actions {
                 Integer colors = Integer.parseInt(mc.getText());
                 Integer pcolors = Integer.parseInt(pmc.getText());
                 Integer size = Integer.parseInt(siz.getText());
-                String lng = lang.getSelectedItem().toString();
+                // String lng = lang.getSelectedItem().toString();
+                //LANGTODO
+                for(JCheckBox l:langs) {
+                    config.setVariable("language_"+l.getText(), l.isSelected()?"true":"false");
+                }
+                // String lng = "Universal";
                 config.setVariable("default_dimensions", alpha.getText());
                 config.setVariable("default_colors", mc.getText());
                 config.setVariable("default_palettecolors", pmc.getText());
                 config.setVariable("default_size", siz.getText());
                 config.setVariable("default_kind", colhack[0]);
-                config.setVariable("default_language", lng);
+                // config.setVariable("default_language", lng);
                 config.setVariable("default_neighborhood", neihack[0].name());
                 Random rand = new Random();
                 Palette pal;
@@ -287,7 +305,13 @@ public class Actions {
                 switch(comphack[0]) {
                     case "machineelf":
                     default:
-                        rs = new ComputedRuleset(a, Languages.named(lng));
+                        final java.util.List<String> lnames = new ArrayList<>();
+                        for(JCheckBox l:langs) {
+                            if(l.isSelected()) {
+                                lnames.add(l.getText());
+                            }
+                        }
+                        rs = new ComputedRuleset(a, lnames.isEmpty()?new Language():Languages.union(lnames.toArray(new String[0])));
                         break;
                     case "sparse":
                     case "array":

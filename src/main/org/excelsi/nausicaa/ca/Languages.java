@@ -11,8 +11,8 @@ public class Languages {
 
     public static String[] catalog() {
         return new String[]{
-            "Universal",
             "Classic",
+            "Universal",
             "Circular",
             "Symmetric2d",
             "Fractal"
@@ -41,6 +41,14 @@ public class Languages {
         throw new IllegalArgumentException("no such language '"+name+"'");
     }
 
+    public static Language union(String... names) {
+        List<Language> ls = new ArrayList<>();
+        for(String n:names) {
+            ls.add(named(n));
+        }
+        return Language.union(ls.toArray(new Language[0]));
+    }
+
     public static Language universal() {
         return new Universal();
     }
@@ -50,7 +58,8 @@ public class Languages {
             .deterministic(true)
             .nondeterministic(false)
             .contextual(false)
-            .positioning(false);
+            .positioning(false)
+            .tape(false);
     }
 
     public static Language circular() {

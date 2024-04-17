@@ -10,11 +10,17 @@ public class Language {
     private final String _name;
     private final Map<String,String> _lang;
     private final Map<String,String> _rev;
-    private boolean _deterministic = true;
-    private boolean _nondeterministic = true;
-    private boolean _context = true;
-    private boolean _positioning = true;
+    private boolean _deterministic = false;
+    private boolean _nondeterministic = false;
+    private boolean _context = false;
+    private boolean _positioning = false;
+    private boolean _tape = false;
 
+
+    public Language() {
+        this("Default");
+        deterministic(true);
+    }
 
     public Language(String name) {
         _name = name;
@@ -72,17 +78,45 @@ public class Language {
         return this;
     }
 
+    public boolean tape() {
+        return _tape;
+    }
+
+    public Language tape(boolean t) {
+        _tape = t;
+        return this;
+    }
+
     public boolean accept(Codon c) {
         if(!_deterministic && c.deterministic()) return false;
         if(!_nondeterministic && !c.deterministic()) return false;
         if(!_context && c.usesContext()) return false;
         if(!_positioning && c.positioning()) return false;
+        if(!_tape && c.tape()) return false;
 
         return true;
     }
 
     public String[] chains() {
         return _rev.keySet().toArray(new String[0]);
+    }
+
+    public static Language union(Language... ls) {
+        final StringBuilder n = new StringBuilder();
+        for(Language l:ls) {
+            n.append(l.name()).append("+");
+        }
+        n.setLength(n.length()-1);
+        final Language u = new Language(n.toString());
+        for(Language l:ls) {
+            u.positioning(u.positioning()||l.positioning())
+            .contextual(u.contextual()||l.contextual())
+            .deterministic(u.deterministic()||l.deterministic())
+            .nondeterministic(u.nondeterministic()||l.nondeterministic());
+            u._lang.putAll(l._lang);
+            u._rev.putAll(l._rev);
+        }
+        return u;
     }
 
     /*

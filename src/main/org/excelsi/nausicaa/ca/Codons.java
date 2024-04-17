@@ -957,10 +957,9 @@ public class Codons {
             return FORK;
         }
 
-        @Override public boolean usesPattern() {
-            return true;
-        }
-
+        @Override public boolean usesPattern() { return true; }
+        @Override public boolean usesTape() { return true; }
+        @Override public boolean positioning() { return true; }
         @Override public boolean supports(Values v) { return true; }
         @Override public boolean reversible() { return false; }
 
