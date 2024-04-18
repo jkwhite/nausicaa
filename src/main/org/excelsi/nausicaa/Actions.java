@@ -214,22 +214,6 @@ public class Actions {
         rindexed.setSelected(true);
         kind.add(rindexed);
 
-        colhack[0] = config.getVariable("default_kind", "indexed");
-        switch(colhack[0]) {
-            case "indexed":
-                rindexed.setSelected(true);
-                break;
-            case "real":
-                rreal.setSelected(true);
-                break;
-            case "rgb":
-                rrgb.setSelected(true);
-                break;
-            case "rgba":
-                rrgba.setSelected(true);
-                break;
-        }
-
         JPanel kinds = new JPanel(new FlowLayout(FlowLayout.LEFT));
         kinds.add(rindexed);
         kinds.add(rreal);
@@ -252,6 +236,32 @@ public class Actions {
         pmc.setText(config.getVariable("default_palettecolors", "2"));
         pmc.setColumns(3);
         top.add(pmc);
+
+        colhack[0] = config.getVariable("default_kind", "indexed");
+        switch(colhack[0]) {
+            case "indexed":
+                rindexed.setSelected(true);
+                idxhack[2].setEnabled(false);
+                idxhack[3].setEnabled(false);
+                break;
+            case "real":
+                rreal.setSelected(true);
+                break;
+            case "rgb":
+                rrgb.setSelected(true);
+                idxhack[0].setEnabled(false);
+                idxhack[1].setEnabled(false);
+                idxhack[2].setEnabled(false);
+                idxhack[3].setEnabled(false);
+                break;
+            case "rgba":
+                rrgba.setSelected(true);
+                idxhack[0].setEnabled(false);
+                idxhack[1].setEnabled(false);
+                idxhack[2].setEnabled(false);
+                idxhack[3].setEnabled(false);
+                break;
+        }
 
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
@@ -599,7 +609,7 @@ public class Actions {
         else if(r instanceof ComputedRule2d) {
             ComputedRule2d cr = (ComputedRule2d) r;
             p.addPair("Dimensions", r.archetype().dims());
-            p.addPair("Colors", r.archetype().colors());
+            p.addPair("Value Colors", r.archetype().colors());
             p.addPair("Neighborhood", r.archetype().neighborhood());
             p.addPair("Size", r.archetype().size());
             p.addPair("Values", r.archetype().values());
@@ -607,14 +617,14 @@ public class Actions {
             p.addPair("Update", ca.getUpdateMode().humanize());
             p.addPair("Edge", ca.getEdgeMode().humanize());
             p.addPair("External Force", ca.getExternalForce().humanize());
-            p.addPair("Language", ((AbstractComputedRuleset)cr.origin()).language().name());
+            p.addPair("Language", ((AbstractComputedRuleset)cr.origin()).language().toDescription());
             p.addPair("Genome", cr.humanize());
             String expanded = new GenomeParser(r.archetype(), ((ComputedRuleset)r.origin()).language()).info(cr.archetype(), cr.genome()).toString();
             p.addPair("Codons",
                 createText(expanded, 10, true));
             additional.append("\n\nExpanded form:\n").append(expanded);
         }
-        p.addPair("Colors", createColorPanel(ca.getPalette()));
+        p.addPair("Palette", createColorPanel(ca.getPalette()));
         p.addPair("Caption", createText(createCaption(ca, additional.toString()), 10, true));
         p.done();
         i.getContentPane().add(p);
@@ -2365,15 +2375,25 @@ public class Actions {
     }
 
     private static JComponent createColorPanel(Palette palette) {
-        JPanel colors = new JPanel();
+        FlowLayout fl = new FlowLayout(FlowLayout.LEFT);
+        fl.setAlignOnBaseline(true);
+        JPanel colors = new JPanel(new WrapLayout(FlowLayout.LEFT));
         colors.setAlignmentY(0);
-        colors.add(new JLabel(""+palette.getColorCount()+": "));
-        if(palette.getColorCount()<=100) {
+        if(palette.getColorCount()<=200) {
+            colors.add(new JLabel(palette.getColorCount()+": "));
             for(int col:palette.getColors()) {
-                colors.add(new CAEditor.Cell(col));
-                colors.add(new JLabel(Colors.toColorString(col)));
+                // colors.add(new CAEditor.Cell(col));
+                // colors.add(new JLabel(Colors.toColorString(col)));
+                colors.add(new JLabel(Colors.toColorString(col), new CAEditor.ColorIcon(col, 8),
+                    SwingConstants.LEFT));
             }
         }
-        return colors;
+        else {
+            colors.add(new JLabel(""+palette.getColorCount()+" colors (elided)"));
+        }
+        JScrollPane sp = new JScrollPane(colors, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        sp.setMaximumSize(new Dimension(1000, 100));
+        return sp;
     }
 }

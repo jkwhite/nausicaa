@@ -14,7 +14,7 @@ public class Languages {
             "Classic",
             "Universal",
             "Circular",
-            "Symmetric2d",
+            // "Symmetric2d",
             "Fractal"
             //"Symmetric3d",
             //"Menagerie"
@@ -50,7 +50,13 @@ public class Languages {
     }
 
     public static Language universal() {
-        return new Universal();
+        // return new Universal();
+        return new Language("Universal")
+            .deterministic(true)
+            .nondeterministic(true)
+            .contextual(true)
+            .positioning(true)
+            .tape(true);
     }
 
     public static Language classic() {
@@ -64,9 +70,10 @@ public class Languages {
 
     public static Language circular() {
         return new Language("Circular")
-            .deterministic(true)
-            .nondeterministic(true)
+            // .deterministic(true)
+            // .nondeterministic(true)
             .contextual(true)
+            // .tape(true)
             .add("circle","kya0+kya0+mu2+kya1+kya1+mu2+mi2+ni")
             .add("blitx","jya0+a200+mu2+re+a5+mu2")
             .add("blity","jya1+a200+mu2+re+a5+mu2")
@@ -76,8 +83,8 @@ public class Languages {
 
     public static Language fractal() {
         return new Language("Fractal")
-            .deterministic(true)
-            .nondeterministic(true)
+            // .deterministic(true)
+            // .nondeterministic(true)
             .contextual(true)
             .add("mandelbrot","kya0+kya1+a100+a100+nya")
             .add("mandelbulb","kya0+kya1+kya2+a100+a100+mya")
@@ -171,48 +178,5 @@ public class Languages {
 
     private static String[] s(String p) {
         return p.split(" ");
-    }
-
-    public static class Universal extends Language {
-        public Universal() {
-            super("Universal");
-        }
-
-        @Override public boolean accept(Codon c) {
-            return true;
-        }
-
-        @Override public String[] chains() {
-            return new String[0];
-        }
-
-        public String[] phonemes(String word) {
-            return new String[]{word};
-        }
-
-        public String word(String phonemes) {
-            return phonemes;
-        }
-
-        public String expand(String word) {
-            return word;
-        }
-
-        public Genome generate(final Archetype a, final Random r) {
-            GenomeFactory f = new GenomeFactory();
-            //return f.generate(a, r);
-            return f.generate(new Implicate(a, new Datamap(), this), r);
-        }
-
-        public String randomCodon(Archetype a, Random r) {
-            GenomeFactory f = new GenomeFactory();
-            return f.randomCodon(new Implicate(a, null, null), r).code();
-        }
-
-        public JsonElement toJson() {
-            JsonObject o = new JsonObject();
-            o.addProperty("name", "Universal");
-            return o;
-        }
     }
 }

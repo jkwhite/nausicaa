@@ -3644,6 +3644,7 @@ public class Codons {
         private final boolean _deterministic;
         private final boolean _usesContext;
         private final boolean _unstable;
+        private final boolean _positioning;
 
         public Chain(Codon... cs) {
             _cs = cs;
@@ -3652,6 +3653,7 @@ public class Codons {
             boolean det = true;
             boolean uctx = false;
             boolean unst = false;
+            boolean pos = false;
             for(Codon c:cs) {
                 if(c.usesPattern()) {
                     up = true;
@@ -3665,6 +3667,9 @@ public class Codons {
                 if(c.usesContext()) {
                     uctx = true;
                 }
+                if(c.positioning()) {
+                    pos = true;
+                }
                 if(c instanceof Unstable) {
                     unst = true;
                 }
@@ -3674,6 +3679,7 @@ public class Codons {
             _deterministic = det;
             _usesContext = uctx;
             _unstable = unst;
+            _positioning = pos;
         }
 
         @Override public Codon copy() {
@@ -3698,6 +3704,7 @@ public class Codons {
         @Override public boolean usesTape() { return _usesTape; }
         @Override public boolean deterministic() { return _deterministic; }
         @Override public boolean supports(Values v) { return true; }
+        @Override public boolean positioning() { return _positioning; }
 
         @Override public void op(int[] p, IntTape t, Pattern.Ctx ctx) {
             for(int i=0;i<_cs.length;i++) {

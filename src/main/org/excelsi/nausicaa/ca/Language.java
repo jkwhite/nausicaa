@@ -92,7 +92,7 @@ public class Language {
         if(!_nondeterministic && !c.deterministic()) return false;
         if(!_context && c.usesContext()) return false;
         if(!_positioning && c.positioning()) return false;
-        if(!_tape && c.tape()) return false;
+        if(!_tape && c.usesTape()) return false;
 
         return true;
     }
@@ -193,6 +193,18 @@ public class Language {
         return f.randomCodon(new Implicate(a, new Datamap(), this), r).code();
     }
 
+    public String toDescription() {
+        StringBuilder b = new StringBuilder(name()).append(" (");
+        if(deterministic()) b.append("deterministic, ");
+        if(nondeterministic()) b.append("nondeterministic, ");
+        if(contextual()) b.append("contextual, ");
+        if(positioning()) b.append("positioning, ");
+        if(tape()) b.append("tape, ");
+        b.setLength(b.length()-2);
+        b.append(")");
+        return b.toString();
+    }
+
     //public Genome generate(final Archetype a, final Random r) {
         //return new Genome(randomCodon(a, r)+" "
                 //+randomCodon(a, r)+" "
@@ -208,6 +220,7 @@ public class Language {
         o.addProperty("nondeterministic", _nondeterministic);
         o.addProperty("context", _context);
         o.addProperty("positioning", _positioning);
+        o.addProperty("tape", _tape);
         JsonObject dict = new JsonObject();
         o.add("dict", dict);
         for(Map.Entry<String,String> e:_lang.entrySet()) {
@@ -232,29 +245,27 @@ public class Language {
     public static Language fromJson(JsonElement el) {
         JsonObject o = (JsonObject) el;
         final String name = Json.string(o, "name", "Unknown");
-        if("Universal".equals(name)) {
-            return new Languages.Universal();
+        Language lang = new Language(name);
+        lang._deterministic = Json.bool(o, "deterministic", true);
+        lang._nondeterministic = Json.bool(o, "nondeterministic", true);
+        lang._context = Json.bool(o, "context", true);
+        lang._positioning = Json.bool(o, "positioning", true);
+        lang._tape = Json.bool(o, "tape", true);
+        JsonObject dict = (JsonObject) o.get("dict");
+        for(Map.Entry<String,JsonElement> e:dict.entrySet()) {
+            lang.add(e.getKey(), Json.string(e.getValue()));
         }
-        else {
-            Language lang = new Language(name);
-            lang._deterministic = Json.bool(o, "deterministic", true);
-            lang._nondeterministic = Json.bool(o, "nondeterministic", true);
-            lang._context = Json.bool(o, "context", true);
-            lang._positioning = Json.bool(o, "positioning", true);
-            JsonObject dict = (JsonObject) o.get("dict");
-            for(Map.Entry<String,JsonElement> e:dict.entrySet()) {
-                lang.add(e.getKey(), Json.string(e.getValue()));
-            }
-            return lang;
-        }
+        return lang;
     }
 
     private static String combine(String... phonemes) {
-        StringBuilder b = new StringBuilder(12);
+        StringBuilder b = new StringBuilder();
         for(String ph:phonemes) {
             b.append(ph).append('+');
         }
-        b.setLength(b.length()-1);
+        if(b.length()>0) {
+            b.setLength(b.length()-1);
+        }
         return b.toString();
     }
 }

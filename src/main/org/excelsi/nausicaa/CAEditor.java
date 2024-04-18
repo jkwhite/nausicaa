@@ -233,12 +233,18 @@ public class CAEditor extends JComponent /*implements ViewerListener*/ {
     }
 
     static class ColorIcon implements Icon {
-        public int getIconWidth() { return 16; }
-        public int getIconHeight() { return 16; }
+        public int getIconWidth() { return _size; }
+        public int getIconHeight() { return _size; }
         private java.awt.Color _color;
+        private final int _size;
 
 
         public ColorIcon(int color) {
+            this(color, 16);
+        }
+
+        public ColorIcon(int color, int size) {
+            _size = size;
             setColor(color);
         }
 
@@ -248,7 +254,7 @@ public class CAEditor extends JComponent /*implements ViewerListener*/ {
 
         public void paintIcon(Component c, Graphics g, int x, int y) {
             g.setColor(_color);
-            g.fillRoundRect(x, y, 16, 16, 4, 4);
+            g.fillRoundRect(x, y, _size, _size, 4, 4);
         }
     }
 }
