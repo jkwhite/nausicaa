@@ -1,6 +1,7 @@
 # Table of contents
 
-- [Introduction to NausiCAä](#introduction-to-nausica)
+- [Introduction to NausiCAä](#introduction-to-nausicaä)
+- [Concepts](#concepts)
   - [Automata](#automata)
   - [Rules](#rules)
   - [Sequences](#sequences)
@@ -10,18 +11,19 @@
     - [Circular](#circular)
   - [Value Kinds](#value-kinds)
     - [Discrete](#discrete)
+    - [Continuous](#continuous)
     - [RGB](#rgb)
     - [RGBA](#rgba)
-    - [Continuous](#continuous)
   - [Machine Elvish Language](#machine-elvish-language)
     - [Incantation evaluation](#incantation-evaluation)
     - [Compound codons](#compound-codons)
+    - [Language variants](#language-variants)
     - [Variables](#variables)
-- [Running NausiCAä](#running-nausica)
+- [Running NausiCAä](#running-nausicaä)
   - [Prerequisites](#prerequisites)
   - [From Binary](#from-binary)
   - [From Source](#from-source)
-- [Using the NausiCAä GUI](#using-the-nausica-gui)
+- [Using the NausiCAä GUI](#using-the-nausicaä-gui)
   - [Configuration File](#configuration-file)
   - [Main Window](#main-window)
   - [Info Window](#info-window)
@@ -61,7 +63,7 @@
   - [Experimental Menu](#experimental-menu)
   - [Window Menu](#window-menu)
   - [Cheat Sheet: A Few Important Commands](#cheat-sheet-a-few-important-commands)
-- [Using NausiCAä as a library](#using-nausica-as-a-library)
+- [Using NausiCAä as a library](#using-nausicaä-as-a-library)
 - [Reference Guide](#reference-guide)
   - [Codon Catalog](#codon-catalog)
     - [a (Constant)](#a-constant)
@@ -164,6 +166,8 @@ and example automata.
 in keyboard shortcuts for GUI commands. Substitute this with whatever meta key
 is appropriate for your OS.)
 
+# Concepts
+
 ## Automata
 
 *Automata* are a collection of various parameters that are used to generate
@@ -249,6 +253,10 @@ the lattice.
 
 Discrete lattices contain integer values (i.e., Java int type).
 
+### Continuous
+
+Continues lattices contain real values (i.e., Java double type).
+
 ### RGB
 
 RGB lattices contain (red, green, blue) colorspace values in the range
@@ -262,10 +270,6 @@ RGBA lattices contain (red, green, blue, alpha) colorspace values
 in the range of 0-255 packed into integer values. Note that these
 lattices have no configurable palette, since the RGBA value is
 directly stored in the lattice.
-
-### Continuous
-
-Continues lattices contain real values (i.e., Java double type).
 
 ## Machine Elvish Language
 
@@ -334,6 +338,54 @@ You might recognize this as an encoding of Pythagoras's distance formula, and re
 the visualization:
 
 ![Circular rings](assets/images/circularrings.png)
+
+### Language variants
+
+The set of codons that may appear in Machine Elvish incantations can be
+controlled by the use of language variants. Variants constrain the set
+of codons based on one or more of the following criteria:
+
+* Deterministic: A codon that, given a particular Pattern, will always
+evaluate to the same value. For example, `a8` always evaluates to `8`,
+or `ya` which always evaluates to the self cell value.
+* Nondeterministic: A codon that, given a particular Pattern, may not
+always evaluate to the same value. For example, `ze` uses the RNG to
+evaluate to a random value.
+* Contextual: A codon that uses the supplemental context during evaluation.
+This context provides access to cell coordinates, the RNG, and time step.
+For example, `kya0` evaluates to the X coordinate of the current cell.
+* Positioning: A codon that can affect the execution order of the incantation.
+For example, `ja` can skip forward over some number of codons, causing them
+not to be evaluated, or it can jump backward, causing some number of codons
+to be evaluated multiple times (e.g., a loop).
+* Tape: A codon that accesses values on the state stack (tape), or uses other
+properties of the stack. For example, `mu2`, which multiplies the top two values
+on the stack, or `shi`, which pushes the current stack size onto the stack.
+
+Language variants can also introduce compound codons. There are currently
+four language variants: Classic, Universal, Circular, and Fractal.
+
+#### Classic
+
+The Classic variant limits the set of codons to include only those associated
+with deterministic cellular automata. 
+
+#### Universal
+
+The Universal variant sets no limits on codons, meaning that all codons may be
+used in the incantation.
+
+#### Circular
+
+The Circular variant introduces several compound codons that create circles,
+ellipses, arcs, and other kinds of curves based on both relative and absolute
+cell coordinates.
+
+#### Fractal
+
+The Fractal variant introduces several compound codons based on the Mandelbrot
+and Mandelbulb fractals. These compound codons use cell coordinates in various
+ways to plot either or both fractal sets.
 
 ### Variables
 
@@ -552,12 +604,15 @@ a line, a square, or a cube).
 * Compute: "Machine Elf" allows rules to be expressed in the Machine Elvish
 language. "Full Target" is the traditional indexed method of referencing
 automata rules.
-* Language: Defines the syllabary for incantations. "Universal" contains
+* Language Variants: Defines the syllabary for incantations. "Universal" contains
 all known syllables. "Classic" only contains those syllables necessary
 to build automata that can be defined by the "Full Target" compute type
 (e.g., no coordinates, randomness, etc). "Circular" is universal and also
 includes some compound syllables for building lattices with circular
-characteristics. "Symmetric2d" should not be used at this time.
+characteristics. "Fractal" contains syllables that can be used to generate
+fractals. Multiple variants may be selected, and doing so includes the union
+of all selected variants in the automata. See [Language variants](#language-variants) 
+for more details.
 * Neighborhood: Type of neighborhood. See [Neighborhoods](#neighborhoods)
 for details.
 * Kind: Type of lattice to use. See [Value Kinds](#value-kinds) for details.
