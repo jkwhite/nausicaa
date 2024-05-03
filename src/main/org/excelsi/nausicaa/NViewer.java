@@ -2051,16 +2051,29 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
             int shortcut = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
             JMenuBar bar = new JMenuBar();
-            JMenu file = new JMenu("File");
+
+            JMenu genome = new JMenu("Genome");
+            AbstractAction set = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    _ruleEditor.commit();
+                }
+            };
+            JMenuItem st = genome.add(set);
+            st.setText("Set");
+            st.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, shortcut));
+            bar.add(genome);
+
+            JMenu window = new JMenu("Window");
             AbstractAction close = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     toggleRuleEditor();
                 }
             };
-            JMenuItem cl = file.add(close);
+            JMenuItem cl = window.add(close);
             cl.setText("Close");
             cl.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));
-            bar.add(file);
+            bar.add(window);
+
             _reditor.setJMenuBar(bar);
 
             _reditor.setVisible(true);

@@ -211,7 +211,7 @@ public class GenomeMutators extends Enloggened {
                 LOG.debug("running bond mutate");
                 LinkedList<Codon> ncs = new LinkedList<>();
                 int s = m.r().nextInt(cs.size());
-                int e = s+1+m.r().nextInt(Math.max(1,cs.size()-s-1));
+                int e = Math.min(cs.size()-1,s+1+m.r().nextInt(Math.max(1,cs.size()-s-1)));
                 if(s>0) ncs.addAll(cs.subList(0,s));
                 LinkedList<Codon> ch = new LinkedList<>();
                 for(int i=s;i<=e;i++) {

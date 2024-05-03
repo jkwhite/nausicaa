@@ -20,8 +20,9 @@ import org.excelsi.nausicaa.ca.MutationFactor;
 public class RuleEditor extends JComponent implements TimelineListener {
     private UIActions _ui;
     private Rule _rule;
+    private JTextArea _ruleText;
     private JFrame _root;
-    private int[] _colors;
+    // private int[] _colors;
     private final Timeline _timeline;
     private final MutationFactor _f;
 
@@ -43,6 +44,18 @@ public class RuleEditor extends JComponent implements TimelineListener {
         _timeline.removeTimelineListener(this);
     }
 
+    public void commit() {
+        _ui.doWait(new Runnable() {
+            public void run() {
+                String g = _ruleText.getText();
+                final CA current = _ui.getActiveCA();
+                _ui.setActiveCA(current.mutate(_rule.origin().create(g, _f), _ui.getActiveCA().getRandom()));
+                // rule.setText(g);
+                _ruleText.requestFocus();
+            }
+        }, 1000);
+    }
+
     public void futureChanged() {
         removeAll();
         setLayout(new BorderLayout());
@@ -56,8 +69,8 @@ public class RuleEditor extends JComponent implements TimelineListener {
 
         scr.add(new JLabel("Genome"));
 
-        //final JTextField rule = new JTextField(50);
         final JTextArea rule = new JTextArea(10,80);
+        _ruleText = rule;
         if(_rule instanceof Genomic) {
             rule.setText(((Genomic)_rule).prettyGenome());
         }
@@ -95,6 +108,7 @@ public class RuleEditor extends JComponent implements TimelineListener {
         });
         testp.setText("Test");
         scr.add(testp);
+        /*
         rule.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 if(e.getModifiers()!=0) {
@@ -113,6 +127,7 @@ public class RuleEditor extends JComponent implements TimelineListener {
                 }
             }
         });
+        */
         /*
         scr.setLayout(new BoxLayout(scr, BoxLayout.Y_AXIS));
         final int[] colors = current.getPalette().getColors();

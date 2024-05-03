@@ -208,7 +208,7 @@ top:        while(_state==State.animate) {
                 return;
             }
             final Plane frame = _frames.next();
-            if(++_fn%500==0) {
+            if(++_fn%200==0) {
                 _log.info("frame "+_fn);
             }
             frame.lockRead();

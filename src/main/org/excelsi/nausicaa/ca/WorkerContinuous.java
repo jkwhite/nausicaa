@@ -178,9 +178,7 @@ public class WorkerContinuous implements Worker {
             _pctx.c[1] = i-p1.getHeight()/2;
             _pctx.cr[1] = _pctx.c[1]/(double)p1.getHeight();
             for(int j=_x1;j<_x2;j++) {
-                //if(RAND.nextInt(1000)>=100) {
                 final int self = i*j;
-                //if(RAND.nextInt(mx)>=self) {
                 if(_umode!=null&&!_umode.update(p1, j, i, 0, _vars)) {
                     p2.setCell(j,i,p1.getCell(j,i));
                 }
@@ -195,16 +193,11 @@ public class WorkerContinuous implements Worker {
                         _weight = _vars.weight(p1, j, i, 0);
                     }
                     _oWeight = 1d - _weight;
-                    //if(_moore) {
-                        //p1.getBlock(_pattern, j-_size, i-_size, /*dx*/ d, /*dy*/ d, 0);
-                    //}
-                    //else {
-                        //p1.getCardinal(_pattern, j, i, _size, _size, 0);
-                    //}
                     if(_usesSource) {
                         _neighbors.getNeighborhood(p1, _pattern, j, i, 0);
                     }
                     if(_channels) {
+                        //TODO: why is this commented out?
                         //p2.setCell(j, i, channels());
                     }
                     else {

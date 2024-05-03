@@ -15,7 +15,7 @@ public class HueTransform implements Transform {
     public String name() { return "Hue"; }
 
     public CA transform(CA c) {
-        if(_rand.nextInt(100)<=20) {
+        if(c.getPalette().getColorCount()<100&&_rand.nextInt(100)<=20) {
             return c.palette(Palette.random(c.getPalette().getColorCount(), _rand));
         }
         else {
