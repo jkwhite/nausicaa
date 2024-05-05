@@ -1837,7 +1837,37 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         comphack[7] = compdiff;
         comphack[8] = comptf;
 
-        comphack[0].setState(true);
+        int compidx = 0;
+        switch(_config.getVariable("composite_mode", "front")) {
+            case "front":
+                compidx=0;
+                break;
+            case "back":
+                compidx=1;
+                break;
+            case "wavg":
+                compidx=2;
+                break;
+            case "revwavg":
+                compidx=3;
+                break;
+            case "avg":
+                compidx=4;
+                break;
+            case "channel":
+                compidx=5;
+                break;
+            case "multiply":
+                compidx=6;
+                break;
+            case "difference":
+                compidx=7;
+                break;
+            case "truefront":
+                compidx=8;
+                break;
+        }
+        comphack[compidx].setState(true);
 
         render.add(compopt);
 

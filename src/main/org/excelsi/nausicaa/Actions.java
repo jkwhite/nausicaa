@@ -47,10 +47,9 @@ public class Actions {
         top.add(desc);
 
         top.add(new JLabel("Dimensions"));
-        final JTextField alpha = new JTextField();
-        alpha.setText(config.getVariable("default_dimensions", "2"));
-        alpha.setColumns(3);
-        top.add(alpha);
+        final JComboBox dimens = new JComboBox(new String[]{"1","2","3"});
+        dimens.setSelectedItem(config.getVariable("default_dimensions", "1"));
+        top.add(dimens);
 
         top.add(new JLabel("Neighborhood Size"));
         final JTextField siz = new JTextField();
@@ -285,7 +284,7 @@ public class Actions {
                 d.dispose();
                 final String caname = name.getText();
                 final String cadesc = desc.getText();
-                final Integer dims = Integer.parseInt(alpha.getText());
+                final Integer dims = Integer.parseInt(dimens.getSelectedItem().toString());
                 final Integer colors = Integer.parseInt(mc.getText());
                 final Integer pcolors = Integer.parseInt(pmc.getText());
                 final Integer size = Integer.parseInt(siz.getText());
@@ -295,7 +294,7 @@ public class Actions {
                     config.setVariable("language_"+l.getText(), l.isSelected()?"true":"false");
                 }
                 // String lng = "Universal";
-                config.setVariable("default_dimensions", alpha.getText());
+                config.setVariable("default_dimensions", dimens.getSelectedItem().toString());
                 config.setVariable("default_colors", mc.getText());
                 config.setVariable("default_palettecolors", pmc.getText());
                 config.setVariable("default_size", siz.getText());
@@ -696,7 +695,7 @@ public class Actions {
             p.addPair("Dimensions", r.archetype().dims());
             p.addPair("Value Colors", r.archetype().colors());
             p.addPair("Neighborhood", r.archetype().neighborhood());
-            p.addPair("Size", r.archetype().size());
+            p.addPair("Neighbor Size", r.archetype().size());
             p.addPair("Values", r.archetype().values());
             p.addPair("Initializer", ca.getInitializer().humanize());
             p.addPair("Update", ca.getUpdateMode().humanize());

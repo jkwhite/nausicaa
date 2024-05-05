@@ -236,6 +236,14 @@ public class IntBlockPlane extends AbstractIntPlane implements Sliceable {
             _i.setRGB(i,j,Colors.pack(_rgb[2]/mx, _rgb[1]/mx, _rgb[0]/mx));
         }
     };
+    private final Composer COMP_TRUEFRONT = new Composer() {
+        @Override public void compose(final int i, final int j) {
+            int mx = 0;
+            int idx = getCell(i,j,0);
+            //System.err.println("setting "+i+","+j+" "+idx+" => "+_p.color(idx));
+            _i.setRGB(i,j,_p.color(idx));
+        }
+    };
     private final Composer COMP_WAVG = new Composer() {
         @Override public void compose(final int i, final int j) {
             int mx = 0;
@@ -324,6 +332,9 @@ public class IntBlockPlane extends AbstractIntPlane implements Sliceable {
                     break;
                 case front:
                     composer = COMP_FRONT;
+                    break;
+                case truefront:
+                    composer = COMP_TRUEFRONT;
                     break;
                 case wavg:
                     composer = COMP_WAVG;

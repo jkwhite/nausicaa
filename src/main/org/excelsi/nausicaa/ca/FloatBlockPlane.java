@@ -313,38 +313,42 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
                             //Colors.dump(pkd, "double1");
                             _i.setRGB(i,j,pkd);
                         }
-                        /*
                         else if(comp==Rendering.Composition.back||comp==Rendering.Composition.revwavg) {
                             for(int k=_d-1;k>=0;k--) {
-                                int idx = getCell(i,j,k);
-                                final int[] u = _p.unpack(idx, _unpack);
+                                double idx = getCell(i,j,k);
+                                int packed = computeColor2(idx);
+                                final int[] u = Colors.unpack(packed, _unpack);
                                 double mult = ((1+k)/(double)_d);
-                                rgb[0] += (int)(mult*u[0]);
-                                rgb[1] += (int)(mult*u[1]);
-                                rgb[2] += (int)(mult*u[2]);
+                                // double mult = ((_d-k)/(double)_d);
+                                irgb[0] += (int)(mult*u[0]);
+                                irgb[1] += (int)(mult*u[1]);
+                                irgb[2] += (int)(mult*u[2]);
                                 //if(u[0]>0) System.err.println("k: "+k+", u: "+u[0]+","+u[1]+","+u[2]+", mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
                                 mx += (_d-k);
                                 if(rend.composition()==Rendering.Composition.back&&(u[0]>0||u[1]>0||u[2]>0)) break;
                             }
                             mx = 1;
-                            _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
+                            int pkd = Colors.pack(irgb[2], irgb[1], irgb[0]);
+                            // _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
+                            _i.setRGB(i,j,pkd);
                         }
                         else if(comp==Rendering.Composition.avg) {
                             for(int k=0;k<_d;k++) {
-                                int idx = getCell(i,j,k);
-                                final int[] u = _p.unpack(idx, _unpack);
+                                double idx = getCell(i,j,k);
+                                int packed = computeColor2(idx);
+                                final int[] u = Colors.unpack(packed, _unpack);
                                 //double mult = ((1+k)/(double)_d);
-                                rgb[0] += u[0];
-                                rgb[1] += u[1];
-                                rgb[2] += u[2];
+                                irgb[0] += u[0];
+                                irgb[1] += u[1];
+                                irgb[2] += u[2];
                                 //if(u[0]>0) System.err.println("k: "+k+", u: "+u[0]+","+u[1]+","+u[2]+", mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
                                 mx += (_d-k);
-                                //if(rend.composition()==Rendering.Composition.back&&(u[0]>0||u[1]>0||u[2]>0)) break;
                             }
                             mx = _d;
-                            _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
+                            int pkd = Colors.pack(irgb[2]/mx, irgb[1]/mx, irgb[0]/mx);
+                            // _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
+                            _i.setRGB(i,j,pkd);
                         }
-                        */
                     }
                 }
             }
