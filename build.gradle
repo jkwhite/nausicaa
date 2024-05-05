@@ -151,7 +151,7 @@ applicationDistribution.from("src/etc/") {
 
 setupBuilder {
     vendor          = "excelsiorg";
-    copyright       = "Copyright © 2023 excelsiorg"
+    copyright       = "Copyright © 2024 excelsiorg"
     description     = "Nausicaa";
     
     // optional, defaults to project name

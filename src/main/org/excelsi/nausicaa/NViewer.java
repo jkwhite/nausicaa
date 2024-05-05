@@ -8,6 +8,8 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 import org.excelsi.nausicaa.ca.*;
 
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
     private Initializer _initializer;
     private Futures _futures;
     private Config _config;
+    private Temporary _temporary;
     private Timeline _timeline;
     private JFrame _peditor;
     private JFrame _reditor;
@@ -75,6 +78,10 @@ public class NViewer extends JFrame implements UIActions, Sizer {
     @Override
     public Config getConfig() {
         return _config;
+    }
+
+    public Temporary getTemporary() {
+        return _temporary;
     }
 
     public Random getRandom() {
@@ -133,6 +140,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         final int w = 300, h = 300, d = 1, pre=0;
         //_config = new Config(w, h, d, weight);
         _config = Config.load();
+        _temporary = new EphemeralTemporary();
         _timeline = new Timeline();
         if(root()!=null) {
             createMenu();
@@ -226,7 +234,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         ComputeMode cmode = ComputeMode.combined;
         //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
         Varmap vm = new Varmap();
-        CA ca = new org.excelsi.nausicaa.ca.CA(
+        CA ca = new CA(
                 rule,
                 pal,
                 Initializers.random.create(),
@@ -245,7 +253,8 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 ExternalForce.nop(),
                 vm,
                 null,
-                "Nameless");
+                "Nameless",
+                "");
         return ca;
     }
 
@@ -382,8 +391,12 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         };
         AbstractAction close = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //_a.close(NViewer.this);
                 closeFutures();
+            }
+        };
+        AbstractAction editMeta = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.editMetadata(NViewer.this);
             }
         };
         AbstractAction exportImg = new AbstractAction() {
@@ -402,7 +415,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             // }
         // };
         JMenuItem ni = file.add(newCA);
-        ni.setText("New ...");
+        ni.setText("New CA ...");
         ni.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, shortcut));
 
 
@@ -410,7 +423,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         //JMenuItem niimg = file.add(newCAImage);
         //niimg.setText("New from image...");
 
-        JMenu newimg = new JMenu("New from image");
+        JMenu newimg = new JMenu("New CA from image");
         file.add(newimg);
 
         JMenuItem niimgrgb = newimg.add(newCAImageRGB);
@@ -434,6 +447,12 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         JMenuItem cl = file.add(close);
         cl.setText("Close");
         cl.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));
+
+        file.addSeparator();
+        JMenuItem em = file.add(editMeta);
+        em.setText("Edit metadata ...");
+        em.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcut | InputEvent.SHIFT_DOWN_MASK));
+
         file.addSeparator();
         JMenuItem expImg = file.add(exportImg);
         expImg.setText("Export generated image ...");
@@ -2189,5 +2208,29 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             b.append((char) (p+'0'));
         }
         return b.toString();
+    }
+
+    private static class EphemeralTemporary implements Temporary {
+        private final Map<String,String> _data = new HashMap<>();
+
+
+        @Override public void associate(String key, String value) {
+            LOG.info("associating '"+key+"' to '"+value+"'");
+            _data.put(key, value);
+        }
+
+        @Override public String resolve(String key) {
+            return resolve(key, null);
+        }
+
+        @Override public String resolve(String key, String def) {
+            LOG.info("resolving '"+key+"'");
+            return _data.containsKey(key)?_data.get(key):def;
+        }
+
+        @Override public void clear(String key) {
+            LOG.info("removing '"+key+"'");
+            _data.remove(key);
+        }
     }
 }

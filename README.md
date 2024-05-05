@@ -403,13 +403,9 @@ is set to. Variables are set at execution time and fixed throughout the run.
 
 ## Prerequisites
 
-* JVM 11: You should be able to obtain this for your OS somehow, or it might already
-be installed. It seems to be a bit of a mess right now. Should be forward-compatible
-with, say, JVM 18, but haven't tested that. If you run ``java -version`` and it looks
-like something 11.x or greater, then you're probably good.
-* JavaFX 11: Also a mess. Hopefully you can figure it out. I've only tested on macOS.
-It might "just work". Oddly, seems to be getting more difficult to package with each
-successive version.
+* JVM 21: You should be able to obtain this for your OS somehow, or it might already
+be installed. On MacOS, it can be installed via the Homebrew package openjdk.
+* JavaFX 21: You should be able to obtain this for your OS somehow.
 
 ## From Binary
 

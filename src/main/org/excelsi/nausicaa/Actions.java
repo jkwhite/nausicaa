@@ -32,7 +32,19 @@ public class Actions {
 
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(8,2));
+        JPanel top = new JPanel(new GridLayout(10,2));
+
+        top.add(new JLabel("Name"));
+        final JTextField name = new JTextField();
+        name.setText(config.getVariable("default_name", "Nameless"));
+        name.setColumns(40);
+        top.add(name);
+
+        top.add(new JLabel("Description"));
+        final JTextField desc = new JTextField();
+        desc.setText(config.getVariable("default_description", ""));
+        desc.setColumns(40);
+        top.add(desc);
 
         top.add(new JLabel("Dimensions"));
         final JTextField alpha = new JTextField();
@@ -271,10 +283,12 @@ public class Actions {
         ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
-                Integer dims = Integer.parseInt(alpha.getText());
-                Integer colors = Integer.parseInt(mc.getText());
-                Integer pcolors = Integer.parseInt(pmc.getText());
-                Integer size = Integer.parseInt(siz.getText());
+                final String caname = name.getText();
+                final String cadesc = desc.getText();
+                final Integer dims = Integer.parseInt(alpha.getText());
+                final Integer colors = Integer.parseInt(mc.getText());
+                final Integer pcolors = Integer.parseInt(pmc.getText());
+                final Integer size = Integer.parseInt(siz.getText());
                 // String lng = lang.getSelectedItem().toString();
                 //LANGTODO
                 for(JCheckBox l:langs) {
@@ -343,7 +357,8 @@ public class Actions {
                         ExternalForce.nop(),
                         new Varmap(),
                         null,
-                        "Nameless");
+                        caname,
+                        cadesc);
                 v.setActiveCA(ca);
             }
         });
@@ -413,6 +428,7 @@ public class Actions {
                         ca.getPrelude(), ca.getWeight());
                     v.setActiveCA(ca);
                 });
+                v.getTemporary().associate(ca.getName()+"_file", f.getSelectedFile().toString());
             }
             catch(IOException e) {
                 showError(v, "Failed to load "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);
@@ -421,16 +437,37 @@ public class Actions {
     }
 
     public void save(NViewer v, Config config) {
+        final CA ca = v.getActiveCA();
         JFileChooser f = new JFileChooser(config.getSaveDir());
         f.setDialogTitle("Save automata");
         f.setDialogType(f.SAVE_DIALOG);
         f.setMultiSelectionEnabled(false);
+        final String resfile = ca.getName()+"_file";
+        String curfile = v.getTemporary().resolve(resfile);
+        if(curfile!=null) {
+            f.setSelectedFile(new File(curfile));
+        }
+        else {
+            f.setSelectedFile(new File(config.getSaveDir(), autogenFilename(ca)));
+        }
         int ret = f.showSaveDialog(v.getRoot());
-        CA ca = v.getActiveCA();
         if(ret==f.APPROVE_OPTION) {
             try {
                 config.setSaveDir(f.getSelectedFile().getParent());
-                ca.save(f.getSelectedFile().toString(), "text");
+                // TODO: pretty ugly
+                File file = f.getSelectedFile();
+                if(!file.getName().endsWith(".ca")&&!file.getName().endsWith(".ca.gz")) {
+                    file = new File(file.toString()+".ca");
+                }
+                if(file.exists()) {
+                    int confirm = JOptionPane.showConfirmDialog(v.getRoot(), file.getName()+" already exists. Overwrite?",
+                            "Confirm overwrite", JOptionPane.YES_NO_OPTION);
+                    if(confirm==JOptionPane.NO_OPTION) {
+                        return;
+                    }
+                }
+                ca.save(file.toString(), "text");
+                v.getTemporary().associate(ca.getName()+"_file", file.toString());
             }
             catch(IOException e) {
                 showError(v, "Failed to save "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);
@@ -439,6 +476,51 @@ public class Actions {
     }
 
     public void close(NViewer v) {
+    }
+
+    public void editMetadata(NViewer v) {
+        final CA ca = v.getActiveCA();
+        // final JFrame m = new JFrame("Edit metadata");
+        final JDialog d = new JDialog(v, "Metadata");
+
+        InfoPanel p = new InfoPanel();
+        final JTextField name = new JTextField(ca.getName(), 40);
+        p.addPair("Name", name);
+        final JTextArea desc = new JTextArea(ca.getDescription(), 4, 40);
+        p.addPair("Description", desc);
+        p.done();
+
+        JPanel r = new JPanel(new BorderLayout());
+        r.add(p, BorderLayout.NORTH);
+
+        JPanel bs = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                // TODO: technically if the name changes then any
+                // old keys in v.getTemporary() should be cleared,
+                // but practically this doesn't matter.
+                v.setActiveCA(ca.name(name.getText()).description(desc.getText()));
+            }
+        });
+        de.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+            }
+        });
+        bs.add(ne);
+        bs.add(de);
+        r.add(bs, BorderLayout.SOUTH);
+        d.getContentPane().add(r);
+        Dimension dim = r.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
     }
 
     public void exportImage(NViewer v, Config config) {
@@ -500,9 +582,11 @@ public class Actions {
 
     public void debug(NViewer v) {
         final Plane p = v.getPlaneDisplayProvider().getActivePlane();
-        final java.util.List<Blobs.Blob> blobs = new Blobs().blobs((IntPlane)p, Blobs.Mode.finite);
-        for(Blobs.Blob b:blobs) {
-            System.err.println(b.toString());
+        if(p instanceof IntPlane) {
+            final java.util.List<Blobs.Blob> blobs = new Blobs().blobs((IntPlane)p, Blobs.Mode.finite);
+            for(Blobs.Blob b:blobs) {
+                System.err.println(b.toString());
+            }
         }
     }
 
@@ -573,6 +657,7 @@ public class Actions {
         final JFrame i = new JFrame("Info");
         InfoPanel p = new InfoPanel();
         p.addPair("Name", ca.getName());
+        p.addPair("Description", ca.getDescription().length()>0?ca.getDescription():"(No description)");
         final StringBuilder additional = new StringBuilder();
         if(r instanceof IndexedRule) {
             final String b64 = ca.toBase64();
@@ -1991,7 +2076,7 @@ public class Actions {
         final JDialog d = new JDialog(v, "Parameters");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(5,2));
+        JPanel top = new JPanel(new GridLayout(4,2));
 
         top.add(new JLabel("Width"));
         final JTextField width = new JTextField();
@@ -2029,15 +2114,6 @@ public class Actions {
         pp.add(new JLabel("steps"));
         top.add(pp);
 
-        top.add(new JLabel("Name"));
-        JPanel nam = new JPanel();
-        final JTextField name = new JTextField();
-        //updateWeight.setText(""+config.getFloatVariable("weight", 1f));
-        name.setText(v.getActiveCA().getName());
-        name.setColumns(20);
-        nam.add(name);
-        top.add(nam);
-
         p.add(top, BorderLayout.NORTH);
         JPanel bot = new JPanel();
         JButton ne = new JButton("Ok");
@@ -2048,10 +2124,6 @@ public class Actions {
         ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
-                String nm = name.getText();
-                if(!nm.equals(v.getActiveCA().getName())) {
-                    v.setActiveCA(v.getActiveCA().name(nm));
-                }
                 config.setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(depth.getText()), Integer.parseInt(prelude.getText()) /*, Float.parseFloat(updateWeight.getText())*/);
             }
         });
@@ -2395,5 +2467,9 @@ public class Actions {
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         sp.setMaximumSize(new Dimension(1000, 100));
         return sp;
+    }
+
+    private static String autogenFilename(final CA ca) {
+        return ca.getName().replace(' ', '_');
     }
 }
