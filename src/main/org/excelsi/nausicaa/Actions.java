@@ -655,7 +655,8 @@ public class Actions {
         Rule r = ca.getRule();
         final JFrame i = new JFrame("Info");
         InfoPanel p = new InfoPanel();
-        p.addPair("Name", ca.getName());
+        String filename = v.getTemporary().resolve(ca.getName()+"_file", "No file");
+        p.addPair("Name", ca.getName()+" ["+filename+"]");
         p.addPair("Description", ca.getDescription().length()>0?ca.getDescription():"(No description)");
         final StringBuilder additional = new StringBuilder();
         if(r instanceof IndexedRule) {

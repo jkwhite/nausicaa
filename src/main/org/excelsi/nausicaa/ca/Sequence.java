@@ -125,7 +125,7 @@ public class Sequence {
         JsonArray a = (JsonArray) o.get("segments");
         List<Segment> segs = new ArrayList<>();
         for(int i=0;i<a.size();i++) {
-            segs.add(Segment.fromJson(a.get(i)));
+            segs.add(Segment.fromJson(a.get(i), name+"_"+i));
         }
         return new Sequence(name, segs);
     }
@@ -151,10 +151,10 @@ public class Sequence {
             return o;
         }
 
-        public static Segment fromJson(JsonElement e) throws IOException {
+        public static Segment fromJson(JsonElement e, String name) throws IOException {
             JsonObject o = (JsonObject) e;
             int gens = Json.integer(o, "generations", 100);
-            CA c = CA.fromJson(o.get("ca"));
+            CA c = CA.fromJson(o.get("ca"), name);
             return new Segment(c, gens);
         }
     }

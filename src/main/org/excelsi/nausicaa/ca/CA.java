@@ -644,14 +644,14 @@ public final class CA {
             }
             BufferedReader r = new BufferedReader(new InputStreamReader(in));
             JsonElement e = new JsonParser().parse(r);
-            return fromJson(e);
+            return fromJson(e, new File(filename).getName());
         }
         finally {
             try { in.close(); } catch(IOException e) {}
         }
     }
 
-    public static CA fromJson(JsonElement e) throws IOException {
+    public static CA fromJson(JsonElement e, String defaultName) throws IOException {
         JsonObject o = (JsonObject) e;
         int version = Json.integer(o, "version", 6);
         int w = Json.integer(o, "width", 100);
@@ -670,8 +670,8 @@ public final class CA {
         Rule r = ComputedRuleReader.fromJson(o.get("rule"), vars);
         Palette p = Palette.fromJson(o.get("palette"));
         ExternalForce ef = o.has("external_force") ? ExternalForce.fromJson(o.get("external_force")) : ExternalForce.nop();
-        CA meta = o.has("meta") ? fromJson(o.get("meta")):null;
-        String name = Json.string(o, "name", "Nameless");
+        CA meta = o.has("meta") ? fromJson(o.get("meta"), defaultName+"_meta"):null;
+        String name = Json.string(o, "name", defaultName);
         String desc = Json.string(o, "description", "");
         return new CA(r, p, i, new Random(), seed, w, h, d, pre, weight, coda, cmode, mmode, umode, emode, ef, vars, meta, name, desc);
     }
@@ -717,7 +717,7 @@ public final class CA {
             if(i==null) {
                 throw new IOException("missing initializer");
             }
-            return new CA(rule, p, i, new Random(), h.seed, h.w, h.h, h.d, h.prelude, h.weight, h.coda, ComputeMode.combined, MetaMode.depth, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null, "Nameless", "");
+            return new CA(rule, p, i, new Random(), h.seed, h.w, h.h, h.d, h.prelude, h.weight, h.coda, ComputeMode.combined, MetaMode.depth, new UpdateMode.SimpleSynchronous(), EdgeMode.defaultMode(), ExternalForce.nop(), new Varmap(), null, new File(filename).getName(), "");
         }
         finally {
             if(in!=null) {

@@ -48,10 +48,11 @@ public class RuleEditor extends JComponent implements TimelineListener {
         _ui.doWait(new Runnable() {
             public void run() {
                 String g = _ruleText.getText();
+                int caret = _ruleText.getCaretPosition();
                 final CA current = _ui.getActiveCA();
                 _ui.setActiveCA(current.mutate(_rule.origin().create(g, _f), _ui.getActiveCA().getRandom()));
-                // rule.setText(g);
                 _ruleText.requestFocus();
+                _ruleText.setCaretPosition(caret);
             }
         }, 1000);
     }
