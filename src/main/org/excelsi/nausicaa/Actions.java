@@ -903,7 +903,7 @@ public class Actions {
         final JDialog d = new JDialog(v, "Mutation parameters");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(9,2));
+        JPanel top = new JPanel(new GridLayout(10+2,2));
 
         top.add(new JLabel("Alpha"));
         final JTextField alpha = new JTextField();
@@ -917,11 +917,27 @@ public class Actions {
         mc.setColumns(3);
         top.add(mc);
 
-        top.add(new JLabel("Mutation stage"));
+        top.add(new JLabel(""));
+        top.add(new JLabel(""));
+        top.add(new JLabel("Mutate all stages"));
+        JCheckBox mutall = new JCheckBox();
+        mutall.setSelected("-1".equals(config.getVariable("mutator_stage", "0")));
+        top.add(mutall);
+
+        final JLabel mutstage = new JLabel("Mutation stage");
+        top.add(mutstage);
         final JTextField ms = new JTextField();
         ms.setText(config.getVariable("mutator_stage", "0"));
         ms.setColumns(3);
         top.add(ms);
+        mutall.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                mutstage.setEnabled(!mutall.isSelected());
+                ms.setEnabled(!mutall.isSelected());
+            }
+        });
+        top.add(new JLabel(""));
+        top.add(new JLabel(""));
 
         top.add(new JLabel("Transition factor"));
         final JTextField tf = new JTextField();
@@ -964,7 +980,12 @@ public class Actions {
                 d.dispose();
                 config.setVariable("mutator_alpha", alpha.getText());
                 config.setVariable("mutator_maxcolors", mc.getText());
-                config.setVariable("mutator_stage", ms.getText());
+                if(mutall.isSelected()) {
+                    config.setVariable("mutator_stage", "-1");
+                }
+                else {
+                    config.setVariable("mutator_stage", ms.getText());
+                }
                 config.setVariable("mutator_transition", tf.getText());
                 config.setVariable("mutator_symmetry", ""+as.isSelected());
                 config.setVariable("mutator_meta", ""+meta.isSelected());
@@ -2124,7 +2145,10 @@ public class Actions {
         ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
-                config.setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(depth.getText()), Integer.parseInt(prelude.getText()) /*, Float.parseFloat(updateWeight.getText())*/);
+                config.setSize(Integer.parseInt(width.getText()),
+                    Math.max(1, Integer.parseInt(height.getText())),
+                    Math.max(1, Integer.parseInt(depth.getText())),
+                    Math.max(0, Integer.parseInt(prelude.getText())));
             }
         });
         de.addActionListener(new AbstractAction() {
@@ -2136,7 +2160,7 @@ public class Actions {
             public void actionPerformed(ActionEvent e) {
                 width.setText((Integer.parseInt(width.getText())*2)+"");
                 height.setText((Integer.parseInt(height.getText())*2)+"");
-                int dep = Integer.parseInt(depth.getText());
+                final int dep = Integer.parseInt(depth.getText());
                 if(dep>1) {
                     depth.setText((dep*2)+"");
                 }
@@ -2146,7 +2170,7 @@ public class Actions {
             public void actionPerformed(ActionEvent e) {
                 width.setText((Integer.parseInt(width.getText())/2)+"");
                 height.setText((Integer.parseInt(height.getText())/2)+"");
-                int dep = Integer.parseInt(depth.getText());
+                final int dep = Integer.parseInt(depth.getText());
                 if(dep>1) {
                     depth.setText((dep/2)+"");
                 }
@@ -2218,8 +2242,11 @@ public class Actions {
         final Rule r = ca.getRule();
         if(r instanceof Mutatable) {
             v.setActiveCA(ca.mutate((Rule)((Mutatable)r).mutate(createMutationFactor(ca, config, rand).withMode("add")), rand));
-            int nstage = 1+Integer.parseInt(config.getVariable("mutator_stage", "0"));
-            config.setVariable("mutator_stage", ""+nstage);
+            final int cstage = Integer.parseInt(config.getVariable("mutator_stage", "0"));
+            if(cstage>=0) {
+                final int nstage = 1+cstage;
+                config.setVariable("mutator_stage", ""+nstage);
+            }
         }
     }
 
@@ -2238,8 +2265,10 @@ public class Actions {
         final Rule r = ca.getRule();
         if(r instanceof Mutatable) {
             v.setActiveCA(ca.mutate((Rule)((Mutatable)r).mutate(createMutationFactor(ca, config, rand).withMode("remove")), rand));
-            int stage = Integer.parseInt(config.getVariable("mutator_stage", "0"));
-            config.setVariable("mutator_stage", ""+(stage-1));
+            final int stage = Integer.parseInt(config.getVariable("mutator_stage", "0"));
+            if(stage>0) {
+                config.setVariable("mutator_stage", ""+(stage-1));
+            }
         }
     }
 
@@ -2414,9 +2443,12 @@ public class Actions {
     }
 
     private static String createCaption(CA ca, String additional) {
-        Rule r = ca.getRule();
-        String fmt = "%s, %d colors, %s neighborhood of %s %d, %s values, %s updates, %s edge, initialized with %s";
-        String capt = String.format(fmt,
+        final Rule r = ca.getRule();
+        String capt = String.format("\"%s\"\n\n%s\n\n",
+            ca.getName(),
+            ca.getDescription().length()>0?ca.getDescription():"No description.");
+        final String fmt = "%s, %d colors, %s neighborhood of %s %d, %s values, %s updates, %s edge, initialized with %s";
+        capt += String.format(fmt,
             dimension2Text(r.archetype().dims()),
             r.archetype().colors(),
             r.archetype().neighborhood().getName(),

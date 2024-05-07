@@ -256,7 +256,6 @@ public class IntBlockPlane extends AbstractIntPlane implements Sliceable {
                 _rgb[2] += (int)(mult*u[2]);
                 //if(u[0]>0) System.err.println("k: "+k+", u: "+u[0]+","+u[1]+","+u[2]+", mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
                 mx += (_d-k);
-                // if(rend.composition()==Rendering.Composition.front&&(u[0]>0||u[1]>0||u[2]>0)) break;
             }
             mx = 1;
             _i.setRGB(i,j,Colors.pack(_rgb[2]/mx, _rgb[1]/mx, _rgb[0]/mx));
@@ -360,53 +359,6 @@ public class IntBlockPlane extends AbstractIntPlane implements Sliceable {
                     }
                     else {
                         composer.compose(i,j);
-                        /*
-                        if(comp==Rendering.Composition.front||comp==Rendering.Composition.wavg) {
-                            for(int k=0;k<_d;k++) {
-                                int idx = getCell(i,j,k);
-                                final int[] u = _p.unpack(idx, _unpack);
-                                float mult = ((_d-k)/(float)_d);
-                                rgb[0] += (int)(mult*u[0]);
-                                rgb[1] += (int)(mult*u[1]);
-                                rgb[2] += (int)(mult*u[2]);
-                                //if(u[0]>0) System.err.println("k: "+k+", u: "+u[0]+","+u[1]+","+u[2]+", mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
-                                mx += (_d-k);
-                                if(rend.composition()==Rendering.Composition.front&&(u[0]>0||u[1]>0||u[2]>0)) break;
-                            }
-                            mx = 1;
-                            _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
-                        }
-                        else if(comp==Rendering.Composition.back||comp==Rendering.Composition.revwavg) {
-                            for(int k=_d-1;k>=0;k--) {
-                                int idx = getCell(i,j,k);
-                                final int[] u = _p.unpack(idx, _unpack);
-                                float mult = ((1+k)/(float)_d);
-                                rgb[0] += (int)(mult*u[0]);
-                                rgb[1] += (int)(mult*u[1]);
-                                rgb[2] += (int)(mult*u[2]);
-                                //if(u[0]>0) System.err.println("k: "+k+", u: "+u[0]+","+u[1]+","+u[2]+", mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
-                                mx += (_d-k);
-                                if(rend.composition()==Rendering.Composition.back&&(u[0]>0||u[1]>0||u[2]>0)) break;
-                            }
-                            mx = 1;
-                            _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
-                        }
-                        else if(comp==Rendering.Composition.avg) {
-                            for(int k=0;k<_d;k++) {
-                                int idx = getCell(i,j,k);
-                                final int[] u = _p.unpack(idx, _unpack);
-                                //float mult = ((1+k)/(float)_d);
-                                rgb[0] += u[0];
-                                rgb[1] += u[1];
-                                rgb[2] += u[2];
-                                //if(u[0]>0) System.err.println("k: "+k+", u: "+u[0]+","+u[1]+","+u[2]+", mult: "+mult+", rgb: "+rgb[0]+","+rgb[1]+","+rgb[2]);
-                                mx += (_d-k);
-                                //if(rend.composition()==Rendering.Composition.back&&(u[0]>0||u[1]>0||u[2]>0)) break;
-                            }
-                            mx = _d;
-                            _i.setRGB(i,j,Colors.pack(rgb[2]/mx, rgb[1]/mx, rgb[0]/mx));
-                        }
-                        */
                     }
                 }
             }

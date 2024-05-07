@@ -1429,6 +1429,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
         mutate.addSeparator();
 
+        JMenu specifics = new JMenu("Apply");
         for(final java.lang.reflect.Method m:GenomeMutators.class.getDeclaredMethods()) {
             final String mname = Character.toUpperCase(m.getName().charAt(0))+m.getName().substring(1);
             if(!mname.startsWith("Lambda$")) {
@@ -1445,10 +1446,11 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                         }
                     }
                 };
-                JMenuItem mutat = mutate.add(mut);
+                JMenuItem mutat = specifics.add(mut);
                 mutat.setText(mname);
             }
         }
+        mutate.add(specifics);
         mutate.addSeparator();
 
         JMenuItem addseg = new JMenuItem(new AbstractAction() {

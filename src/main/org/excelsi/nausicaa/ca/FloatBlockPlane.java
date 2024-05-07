@@ -248,7 +248,7 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
         //return _p.color(pcp);
     }
 
-    @Override public java.awt.Image toImage(Rendering rend) {
+    @Override public java.awt.Image toImage(final Rendering rend) {
         final Rendering.Composition comp = rend.composition();
         if(false) {
             return _i;
@@ -265,7 +265,7 @@ public class FloatBlockPlane extends AbstractFloatPlane implements Sliceable {
                     irgb[1]=0;
                     irgb[2]=0;
                     int mx = 0;
-                    if(_d==1) {
+                    if(_d==1||comp==Rendering.Composition.truefront) {
                         double idx = getCell(i,j,0);
                         _i.setRGB(i,j,computeColor2(idx));
                         //_i.setRGB(i,j,_p.color(idx));
