@@ -455,9 +455,9 @@ the shared gradle/maven ecosystem.
 
 ## Configuration File
 
-Note that, beside whatever CAs or images you choose to export, NausiCAä will
-write to one file in your home directory called `.nausicaa`. This is a JSON
-file that contains all configuration options you've set through the GUI.
+NausiCAä stores its configuration in a file in your home directory
+called `.nausicaa`. This is a JSON file that contains all configuration
+options you've set through the GUI.
 
 ## Main Window
 
@@ -512,7 +512,7 @@ so doesn't have any specific meaning.
 
 ## Basic Parameters Window
 
-Basic automata parameters are set with ``Automata | Configure parameters ... (⌘ K)``.
+Basic automata parameters are set with ``Automata | Parameters ... (⌘ K)``.
 This can be used to set lattice *width*, *height*, and *depth* (if appropriate).
 It can also set *prelude*, which is the number of iterations to evaluate
 before rendering the initial visualization.
@@ -535,8 +535,14 @@ space, rather than a collection of prior states as with 2D automata. Other
 than that difference, view rendering follows the same process as with 2D
 automata.
 
-This window also allows you to set a "name" for the automaton. This is arbitrary
-descriptive text and does not in any way affect computation or visualization.
+# Metadata Window
+
+Automata metadata is set with ``Automata | Metadata ... (⌘⇧K)``.
+This window also allows you to set a "name" and "description" for the
+automaton. This is arbitrary, optional descriptive text and does not
+in any way affect computation or visualization. If provided, they will
+be included in the auto-generated text in the Info window. Name is also
+used to autogen a filename on save if one has not been provided.
 
 ## Rule Editor Window
 

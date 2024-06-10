@@ -13,8 +13,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import org.excelsi.nausicaa.ca.*;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public class JCAGenerator extends JDialog {
+    private static final Logger LOG = LoggerFactory.getLogger(JCAGenerator.class);
+
     public JCAGenerator(final JFrame root, final CA ca, final Config config) {
         super(root, "Generate automata to disk");
         final Rule rule = ca.compileRule();
@@ -250,10 +255,11 @@ public class JCAGenerator extends JDialog {
                                     //initCA(c, _r);
                                     CA c = ca.size(w, h);
                                     //Iterator<CA> cas = ((Multirule2D)_r).frames(c);
+                                    LOG.info("generating ca at "+c.getWidth()+"x"+c.getHeight()+"x"+c.getDepth());
                                     if(createGif) {
                                         Plane plane = c.createPlane();
                                         // ExecutorService pool = Executors.newFixedThreadPool(1);
-                                        System.err.println("using "+ccores+" cores");
+                                        LOG.info("using "+ccores+" cores");
                                         ExecutorService pool = Executors.newFixedThreadPool(ccores);
                                         Iterator<Plane> cas = c.compileRule().frameIterator(plane, pool, new GOptions(true, ccores, 1, frameWeight).metaMode(c.getMetaMode()));
                                         AnimatedGifEncoder age = new AnimatedGifEncoder();

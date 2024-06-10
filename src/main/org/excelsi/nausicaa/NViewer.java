@@ -99,10 +99,11 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
     @Override public void branch(CA c) {
         String name = ""+(1+_tabs.getTabCount());
-        Futures f = new Futures(this, this, _config, _timeline, c, new Random(), name);
+        Futures f = new Futures(this, this, _config, _timeline, c, new Random(), name, false);
         JPanel main = new JPanel(new BorderLayout());
         main.add(f, BorderLayout.CENTER);
         _tabs.addTab(name, main);
+        _tabs.setSelectedComponent(main);
     }
 
     public void pickRandom() {
@@ -154,7 +155,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
         JPanel main = new JPanel(new BorderLayout());
 
-        Futures f = new Futures(this, this, _config, _timeline, ca, new Random(), "1");
+        Futures f = new Futures(this, this, _config, _timeline, ca, new Random(), "1", true);
         _futures = f;
         main.add(f, BorderLayout.CENTER);
 
@@ -381,7 +382,12 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         };
         AbstractAction open = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.load(NViewer.this, _config);
+                _a.load(NViewer.this, _config, false);
+            }
+        };
+        AbstractAction opentab = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.load(NViewer.this, _config, true);
             }
         };
         AbstractAction save = new AbstractAction() {
@@ -392,11 +398,6 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         AbstractAction close = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 closeFutures();
-            }
-        };
-        AbstractAction editMeta = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _a.editMetadata(NViewer.this);
             }
         };
         AbstractAction exportImg = new AbstractAction() {
@@ -441,17 +442,16 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         JMenuItem oi = file.add(open);
         oi.setText("Open ...");
         oi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, shortcut));
+        JMenuItem oit = file.add(opentab);
+        oit.setText("Open in new tab ...");
+        oit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, shortcut | InputEvent.SHIFT_DOWN_MASK));
+//
         JMenuItem si = file.add(save);
         si.setText("Save ...");
         si.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, shortcut));
         JMenuItem cl = file.add(close);
         cl.setText("Close");
         cl.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));
-
-        file.addSeparator();
-        JMenuItem em = file.add(editMeta);
-        em.setText("Edit metadata ...");
-        em.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcut | InputEvent.SHIFT_DOWN_MASK));
 
         file.addSeparator();
         JMenuItem expImg = file.add(exportImg);
@@ -913,15 +913,6 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         final JCheckBoxMenuItem[] hack = new JCheckBoxMenuItem[8];
         JMenu auto = new JMenu("Automata");
 
-        //AbstractAction opentab = new AbstractAction() {
-            //public void actionPerformed(ActionEvent e) {
-                //newTab();
-            //}
-        //};
-        //JMenuItem openi = auto.add(opentab);
-        //openi.setText("Open");
-        //openi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, shortcut));
-//
         AbstractAction inf = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _a.info(NViewer.this);
@@ -949,12 +940,12 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         canc.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, shortcut));
         auto.addSeparator();
 
+        JMenu istate = new JMenu("Initial state");
+
         JCheckBoxMenuItem ran = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _init = Initializers.random;
                 _a.chooseRandom(NViewer.this, _config);
-                //_initializer = new RandomInitializer();
-                //setActiveCA(getActiveCA().initializer(_initializer));
                 hack[0].setState(true);
                 hack[1].setState(false);
                 hack[2].setState(false);
@@ -963,40 +954,18 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 hack[5].setState(false);
                 hack[6].setState(false);
                 hack[7].setState(false);
-                //_a.generate(NViewer.this);
             }
         });
-        auto.add(ran);
+        istate.add(ran);
         hack[0] = ran;
         ran.setText("Random initial state ...");
         ran.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, shortcut));
         ran.setState(_init==Initializers.random);
 
-        /*
-        AbstractAction fixa = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _init = Initializers.single;
-                _a.chooseSingle(NViewer.this, _config);
-                //_initializer = new SingleInitializer();
-                //setActiveCA(getActiveCA().initializer(_initializer));
-                hack[0].setState(false);
-                hack[1].setState(true);
-                hack[2].setState(false);
-                hack[3].setState(false);
-                hack[4].setState(false);
-                hack[5].setState(false);
-                hack[6].setState(false);
-                hack[7].setState(false);
-                //_a.generate(NViewer.this);
-            }
-        };
-        */
         JCheckBoxMenuItem fix = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _init = Initializers.single;
                 _a.chooseSingle(NViewer.this, _config);
-                //_initializer = new SingleInitializer();
-                //setActiveCA(getActiveCA().initializer(_initializer));
                 hack[0].setState(false);
                 hack[1].setState(true);
                 hack[2].setState(false);
@@ -1005,20 +974,18 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 hack[5].setState(false);
                 hack[6].setState(false);
                 hack[7].setState(false);
-                //_a.generate(NViewer.this);
             }
         });
         fix.setText("Fixed initial state");
         fix.setSelected(_init==Initializers.single);
         fix.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcut));
-        auto.add(fix);
+        istate.add(fix);
         hack[1] = fix;
 
         JCheckBoxMenuItem wrd = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _init = Initializers.word;
                 _a.chooseWord(NViewer.this);
-                //setActiveCA(getActiveCA().initializer(_initializer));
                 hack[0].setState(false);
                 hack[1].setState(false);
                 hack[2].setState(true);
@@ -1027,21 +994,17 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 hack[5].setState(false);
                 hack[6].setState(false);
                 hack[7].setState(false);
-                //hack[3].setState(false);
-                //_a.generate(NViewer.this);
             }
         });
-        auto.add(wrd);
+        istate.add(wrd);
         wrd.setText("Word initial state ...");
         wrd.setSelected(_init==Initializers.word);
-        //wrd.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcut));
         hack[2] = wrd;
 
         JCheckBoxMenuItem img = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _init = Initializers.image;
                 _a.chooseImage(NViewer.this, _config);
-                //setActiveCA(getActiveCA().initializer(_initializer));
                 hack[0].setState(false);
                 hack[1].setState(false);
                 hack[2].setState(false);
@@ -1050,51 +1013,17 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 hack[5].setState(false);
                 hack[6].setState(false);
                 hack[7].setState(false);
-                //_a.generate(NViewer.this);
             }
         });
-        auto.add(img);
+        istate.add(img);
         img.setText("Image initial state ...");
         img.setSelected(_init==Initializers.image);
-        //wrd.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcut));
         hack[3] = img;
-        /*
-        JCheckBoxMenuItem ara = new JCheckBoxMenuItem(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _init = Rule.Initialization.arabesque;
-                hack[0].setState(false);
-                hack[1].setState(false);
-                hack[2].setState(true);
-                hack[3].setState(false);
-                _a.generate(NViewer.this);
-            }
-        });
-        auto.add(ara);
-        hack[2] = ara;
-        ara.setText("Arabesque mode");
-        //ara.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, shortcut));
-        ara.setState(false);
-        ara.setEnabled("2".equals(_dimensions));
-        JCheckBoxMenuItem imagest = new JCheckBoxMenuItem(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                hack[0].setState(false);
-                hack[1].setState(false);
-                hack[2].setState(false);
-                hack[3].setState(true);
-                selectImageStateImage();
-            }
-        });
-        auto.add(imagest);
-        imagest.setText("Image initial state ...");
-        imagest.setSelected(_init==Rule.Initialization.image);
-        */
 
         JCheckBoxMenuItem gau = new JCheckBoxMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 _init = Initializers.random;
                 _a.chooseGaussian(NViewer.this, _config);
-                //_initializer = new RandomInitializer();
-                //setActiveCA(getActiveCA().initializer(_initializer));
                 hack[0].setState(false);
                 hack[1].setState(false);
                 hack[2].setState(false);
@@ -1103,10 +1032,9 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 hack[5].setState(false);
                 hack[6].setState(false);
                 hack[7].setState(false);
-                //_a.generate(NViewer.this);
             }
         });
-        auto.add(gau);
+        istate.add(gau);
         hack[4] = gau;
         gau.setText("Gaussian initial state ...");
         gau.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, shortcut));
@@ -1116,8 +1044,6 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             public void actionPerformed(ActionEvent e) {
                 _init = Initializers.random;
                 _a.chooseClusteredGaussian(NViewer.this, _config);
-                //_initializer = new RandomInitializer();
-                //setActiveCA(getActiveCA().initializer(_initializer));
                 hack[0].setState(false);
                 hack[1].setState(false);
                 hack[2].setState(false);
@@ -1126,10 +1052,9 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 hack[5].setState(true);
                 hack[6].setState(false);
                 hack[7].setState(false);
-                //_a.generate(NViewer.this);
             }
         });
-        auto.add(cgau);
+        istate.add(cgau);
         hack[5] = cgau;
         cgau.setText("Clustered gaussian initial state ...");
         cgau.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, shortcut));
@@ -1149,10 +1074,9 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 hack[7].setState(false);
             }
         });
-        auto.add(cai);
+        istate.add(cai);
         hack[6] = cai;
         cai.setText("CA initial state ...");
-        //cai.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcut));
         cai.setState(_init==Initializers.ca);
 
         JCheckBoxMenuItem custi = new JCheckBoxMenuItem(new AbstractAction() {
@@ -1169,23 +1093,13 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 hack[7].setState(true);
             }
         });
-        auto.add(custi);
+        istate.add(custi);
         hack[7] = custi;
         custi.setText("Custom initial state ...");
-        //cai.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, shortcut));
         custi.setState(_init==Initializers.custom);
 
+        auto.add(istate);
         auto.addSeparator();
-
-        AbstractAction re = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                Rand.newSeed();
-                _a.reroll(NViewer.this);
-            }
-        };
-        JMenuItem reroll = auto.add(re);
-        reroll.setText("Reroll");
-        reroll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, shortcut));
 
         AbstractAction size = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -1193,8 +1107,17 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             }
         };
         JMenuItem siz = auto.add(size);
-        siz.setText("Configure parameters ...");
+        siz.setText("Parameters ...");
         siz.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcut));
+
+        AbstractAction editMeta = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _a.editMetadata(NViewer.this);
+            }
+        };
+        JMenuItem em = auto.add(editMeta);
+        em.setText("Metadata ...");
+        em.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcut | InputEvent.SHIFT_DOWN_MASK));
 
         AbstractAction vars = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -1411,6 +1334,18 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             univer.setText("Translate to Universal");
         }
 
+        {
+            auto.addSeparator();
+            AbstractAction re = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    Rand.newSeed();
+                    _a.reroll(NViewer.this);
+                }
+            };
+            JMenuItem reroll = auto.add(re);
+            reroll.setText("Reroll");
+            reroll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, shortcut));
+        }
 
         bar.add(auto);
     }

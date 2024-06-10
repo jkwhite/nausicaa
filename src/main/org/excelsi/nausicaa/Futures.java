@@ -36,21 +36,18 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     private CA _ca;
 
 
-    //public Futures(int w, int h, Branch<World> b) {
-    public Futures(UIActions ui, Sizer sizer, Config config, Timeline timeline, CA ca, Random rand, String name) {
+    public Futures(UIActions ui, Sizer sizer, Config config, Timeline timeline, CA ca, Random rand, String name, boolean show) {
         _ui = ui;
         _sizer = sizer;
         _config = config;
         _timeline = timeline;
         _config.addListener(this);
-        //_w = w;
-        //_h = h;
         _random = rand;
         _name = name;
+        _show = show;
         setBackground(java.awt.Color.BLACK);
         setForeground(java.awt.Color.BLACK);
         _ca = ca;
-        //addBranch(b);
         reinit(true);
         addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {

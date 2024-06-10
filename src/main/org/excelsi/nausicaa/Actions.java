@@ -412,9 +412,9 @@ public class Actions {
         }
     }
 
-    public void load(NViewer v, Config config) {
+    public void load(NViewer v, Config config, boolean newTab) {
         JFileChooser f = new JFileChooser(config.getSaveDir());
-        f.setDialogTitle("Open automata");
+        f.setDialogTitle(newTab?"Open automata in new tab":"Open automata");
         f.setDialogType(f.OPEN_DIALOG);
         f.setMultiSelectionEnabled(false);
         int ret = f.showOpenDialog(v.getRoot());
@@ -425,7 +425,12 @@ public class Actions {
                 config.transact(()->{
                     config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth(),
                         ca.getPrelude(), ca.getWeight());
-                    v.setActiveCA(ca);
+                    if(newTab) {
+                        v.branch(ca);
+                    }
+                    else {
+                        v.setActiveCA(ca);
+                    }
                 });
                 v.getTemporary().associate(ca.getName()+"_file", f.getSelectedFile().toString());
             }
