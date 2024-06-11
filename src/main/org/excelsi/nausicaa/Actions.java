@@ -342,7 +342,13 @@ public class Actions {
                         break;
                 }
                 Rule rule = rs.random(rand).next();
-                CA ca = new CA(rule, pal, v.getActiveCA().getInitializer(), rand, 0,
+                CA ca = new CA(
+                        rule,
+                        pal,
+                        // v.getActiveCA().getInitializer(),
+                        v.getInitializer(),
+                        rand,
+                        0,
                         v.getConfig().getWidth(),
                         v.getConfig().getHeight(),
                         v.getConfig().getDepth(),

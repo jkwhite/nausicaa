@@ -20,7 +20,6 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
     private final Ruleset _origin;
     private final Pattern _p;
     private final Rule _meta;
-    //private final ComputedRule2d _meta;
 
 
     public ComputedRule2d(Pattern p) {

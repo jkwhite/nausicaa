@@ -67,6 +67,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 v.invalidate();
                 loadWindow(v.getConfig(), v, "main");
                 v.setVisible(true);
+                v.setFocusTraversalKeysEnabled(false);
             }
         });
     }
@@ -90,11 +91,24 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
     @Override
     public CA getActiveCA() {
-        return futures().getCA();
+        // use a fake temporary ca if none is set
+        if(hasFutures()) {
+            return futures().getCA()
+        }
+        else {
+            LOG.debug("using ephemeral active ca");
+            return createCA(_config);
+        }
     }
 
     @Override public void setActiveCA(CA ca) {
-        futures().setCA(ca);
+        if(hasFutures()) {
+            _tabs.setTitleAt(_tabs.getSelectedIndex(), ca.getName());
+            futures().setCA(ca);
+        }
+        else {
+            LOG.debug("no futures; skipped setting active ca");
+        }
     }
 
     @Override public void branch(CA c) {
@@ -102,12 +116,17 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         Futures f = new Futures(this, this, _config, _timeline, c, new Random(), name, false);
         JPanel main = new JPanel(new BorderLayout());
         main.add(f, BorderLayout.CENTER);
-        _tabs.addTab(name, main);
+        // _tabs.addTab(name, main);
+        _tabs.addTab(c.getName(), main);
         _tabs.setSelectedComponent(main);
     }
 
     public void pickRandom() {
         futures().pickRandom();
+    }
+
+    public Initializer getInitializer() {
+        return _initializer;
     }
 
     public void setInitializer(Initializer initializer) {
@@ -151,7 +170,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         int size = 1;
         Random rand = new Random();
         _random = rand;
-        CA ca = initCA();
+        CA ca = createCA(_config);
 
         JPanel main = new JPanel(new BorderLayout());
 
@@ -160,15 +179,13 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         main.add(f, BorderLayout.CENTER);
 
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("1", main);
+        // tabs.addTab("1", main);
+        tabs.addTab(ca.getName(), main);
         getContentPane().add(tabs);
         _tabs = tabs;
-
-        //getContentPane().add(main);
     }
 
     public Futures getFutures() {
-        // return _futures;
         return futures();
     }
 
@@ -200,18 +217,30 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         }
     }
 
-    private Futures futures() {
-        return (Futures) ((JPanel)_tabs.getSelectedComponent()).getComponent(0);
+    private boolean hasFutures() {
+        return _tabs.getTabCount()>0;
     }
 
-    private CA initCA() {
-        //final int w = 600, h = 600, d = 1;
-        //final int w = 300, h = 300, d = 1, pre = 0;
+    private Futures futures() {
+        if(_tabs.getTabCount()>0) {
+            return (Futures) ((JPanel)_tabs.getSelectedComponent()).getComponent(0);
+        }
+        else {
+            throw new RuntimeException("no futures");
+        }
+    }
+
+    private static CA createCA(Config config) {
+        // final int w = 300, h = 300, d = 1, pre=0;
+        final int
+            w = config.getWidth(),
+            h = config.getHeight(),
+            d = config.getDepth(),
+            pre = 0;
         final float weight = 1f;
-        //final int w = 100, h = 100, d = 100, pre=0;
-        final int w = 300, h = 300, d = 1, pre=0;
+
         //_config = new Config(w, h, d, weight);
-        int dims = 2;
+        int dims = 1;
         int size = 1;
         Random rand = new Random();
         Palette pal = Palette.random(2, rand, true);
@@ -223,8 +252,8 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         int colors = pal.getColorCount();
         //int colors = 2;
         org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors, Archetype.Neighborhood.moore, Values.discrete);
-        org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
-        org.excelsi.nausicaa.ca.Archetype a2 = new org.excelsi.nausicaa.ca.Archetype(2, size, colors);
+        // org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
+        // org.excelsi.nausicaa.ca.Archetype a2 = new org.excelsi.nausicaa.ca.Archetype(2, size, colors);
         //Ruleset rs = new IndexedRuleset1d(a);
         //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset2d(a2));
         //Ruleset rs = new IndexedRuleset2d(a);
@@ -416,15 +445,10 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             // }
         // };
         JMenuItem ni = file.add(newCA);
-        ni.setText("New CA ...");
+        ni.setText("New ...");
         ni.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, shortcut));
 
-
-
-        //JMenuItem niimg = file.add(newCAImage);
-        //niimg.setText("New from image...");
-
-        JMenu newimg = new JMenu("New CA from image");
+        JMenu newimg = new JMenu("New from image");
         file.add(newimg);
 
         JMenuItem niimgrgb = newimg.add(newCAImageRGB);
@@ -445,7 +469,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         JMenuItem oit = file.add(opentab);
         oit.setText("Open in new tab ...");
         oit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, shortcut | InputEvent.SHIFT_DOWN_MASK));
-//
+
         JMenuItem si = file.add(save);
         si.setText("Save ...");
         si.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, shortcut));
@@ -976,7 +1000,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 hack[7].setState(false);
             }
         });
-        fix.setText("Fixed initial state");
+        fix.setText("Fixed initial state ...");
         fix.setSelected(_init==Initializers.single);
         fix.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, shortcut));
         istate.add(fix);
@@ -1877,9 +1901,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 fhack[0].setText(nval?"Hide mutations":"Show mutations");
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        //_a.generate();
                         futures().setShow(nval);
-                        //_futures.revalidate();
                     }
                 });
             }
@@ -1891,7 +1913,6 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
         final JMenuItem peditor = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //_editor = !_editor;
                 togglePaletteEditor();
             }
         });
@@ -1924,7 +1945,6 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
         final JMenuItem conso = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                // _a.openConsole(NViewer.this, _config);
                 toggleConsole();
             }
         });
@@ -1941,12 +1961,35 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         //closef.setText("Close current futures");
         //window.add(closef);
 
+        window.addSeparator();
+
+        final JMenuItem nexttab = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _tabs.setSelectedIndex((1+_tabs.getSelectedIndex())%_tabs.getTabCount());
+            }
+        });
+        nexttab.setText("Next tab");
+        // tab doesn't work for some reason
+        // nexttab.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.CTRL_DOWN_MASK));
+        nexttab.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, shortcut));
+        window.add(nexttab);
+
+        final JMenuItem prevtab = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                int idx = _tabs.getSelectedIndex()-1;
+                _tabs.setSelectedIndex(idx<0?_tabs.getTabCount()-1:idx);
+            }
+        });
+        prevtab.setText("Previous tab");
+        prevtab.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, shortcut));
+        window.add(prevtab);
+
         bar.add(window);
     }
 
     private void closeFutures() {
         //System.err.println("TABS: "+_tabs.getTabCount()+", SEL: "+_tabs.getSelectedIndex());
-        if(_tabs.getTabCount()>1) {
+        if(_tabs.getTabCount()>0) {
             _tabs.removeTabAt(_tabs.getSelectedIndex());
         }
     }
