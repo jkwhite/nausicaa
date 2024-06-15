@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutorService;
 
 public class Actions {
     public void newCA(NViewer v) {
-        final JDialog d = new JDialog(v, "New automata");
+        final JDialog d = new JDialog(v, "New Automata");
         final Config config = v.getConfig();
 
         JPanel p = new JPanel(new BorderLayout());
@@ -100,11 +100,6 @@ public class Actions {
         top.add(comps);
 
         top.add(new JLabel("Language Variants"));
-        /*
-        final JComboBox lang = new JComboBox(Languages.catalog());
-        lang.setSelectedItem(config.getVariable("default_language", "Universal"));
-        top.add(lang);
-        */
         JPanel langp = new JPanel(new FlowLayout(FlowLayout.LEFT));
         final java.util.List<JCheckBox> langs = new ArrayList<>();
 
@@ -121,31 +116,6 @@ public class Actions {
         top.add(new JLabel("Neighborhood"));
         ButtonGroup nei = new ButtonGroup();
 
-        /*
-        AbstractAction von = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                neihack[0] = Archetype.Neighborhood.vonneumann;
-            }
-        };
-        JRadioButton rvon = new JRadioButton(von);
-        rvon.setText("von Neumann");
-        nei.add(rvon);
-
-        AbstractAction moo = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                neihack[0] = Archetype.Neighborhood.moore;
-            }
-        };
-        JRadioButton rmoo = new JRadioButton(moo);
-        rmoo.setText("Moore");
-        nei.add(rmoo);
-
-        JPanel neis = new JPanel();
-        neis.add(rvon);
-        neis.add(rmoo);
-        rmoo.setSelected(true);
-        neihack[0] = Archetype.Neighborhood.moore;
-        */
         JPanel neis = new JPanel(new FlowLayout(FlowLayout.LEFT));
         String defNei = config.getVariable("default_neighborhood", Archetype.Neighborhood.moore.name());
         for(Archetype.Neighborhood neighbor:EnumSet.allOf(Archetype.Neighborhood.class)) {
@@ -169,7 +139,7 @@ public class Actions {
         // Color kind
         final String[] colhack = new String[1];
         final JComponent[] idxhack = new JComponent[4];
-        top.add(new JLabel("Kind"));
+        top.add(new JLabel("Value Kind"));
         ButtonGroup kind = new ButtonGroup();
 
         AbstractAction rgb = new AbstractAction() {
@@ -364,10 +334,17 @@ public class Actions {
                         null,
                         caname,
                         cadesc);
-                v.setActiveCA(ca);
+                v.branch(ca);
             }
         });
         bot.add(ne);
+
+        de.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+            }
+        });
+        bot.add(de);
 
         p.add(bot, BorderLayout.SOUTH);
         d.getContentPane().add(p);
@@ -408,8 +385,7 @@ public class Actions {
             try {
                 config.setImgDir(f.getSelectedFile().getParent());
                 final CA ca = CA.fromImage(f.getSelectedFile().toString(), paletteMode, lang);
-                //config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth());
-                v.setActiveCA(ca);
+                v.branch(ca);
                 config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth(), ca.getPrelude());
             }
             catch(IOException e) {
@@ -947,6 +923,8 @@ public class Actions {
                 ms.setEnabled(!mutall.isSelected());
             }
         });
+        mutstage.setEnabled(!mutall.isSelected());
+        ms.setEnabled(!mutall.isSelected());
         top.add(new JLabel(""));
         top.add(new JLabel(""));
 

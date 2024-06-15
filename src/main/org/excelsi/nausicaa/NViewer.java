@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 
 public class NViewer extends JFrame implements UIActions, Sizer {
     private static final Logger LOG = LoggerFactory.getLogger(NViewer.class);
+    private static final boolean DEMO_MODE = false;
 
     private static int _width;
     private static int _height;
@@ -27,7 +28,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
     private Actions _a = new Actions();
     private static NViewer _instance;
     private Initializers _init = Initializers.random;
-    private Initializer _initializer;
+    private Initializer _initializer = Initializers.random.create();
     private Futures _futures;
     private Config _config;
     private Temporary _temporary;
@@ -73,7 +74,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
     }
 
     public NViewer() {
-        super("Multiverse");
+        super("Nausicaä");
     }
 
     @Override
@@ -93,7 +94,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
     public CA getActiveCA() {
         // use a fake temporary ca if none is set
         if(hasFutures()) {
-            return futures().getCA()
+            return futures().getCA();
         }
         else {
             LOG.debug("using ephemeral active ca");
@@ -170,17 +171,17 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         int size = 1;
         Random rand = new Random();
         _random = rand;
-        CA ca = createCA(_config);
-
-        JPanel main = new JPanel(new BorderLayout());
-
-        Futures f = new Futures(this, this, _config, _timeline, ca, new Random(), "1", true);
-        _futures = f;
-        main.add(f, BorderLayout.CENTER);
 
         JTabbedPane tabs = new JTabbedPane();
-        // tabs.addTab("1", main);
-        tabs.addTab(ca.getName(), main);
+        if(DEMO_MODE) {
+            CA ca = createCA(_config);
+            JPanel main = new JPanel(new BorderLayout());
+
+            Futures f = new Futures(this, this, _config, _timeline, ca, new Random(), "1", true);
+            _futures = f;
+            main.add(f, BorderLayout.CENTER);
+            tabs.addTab(ca.getName(), main);
+        }
         getContentPane().add(tabs);
         _tabs = tabs;
     }
@@ -411,12 +412,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         };
         AbstractAction open = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.load(NViewer.this, _config, false);
-            }
-        };
-        AbstractAction opentab = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _a.load(NViewer.this, _config, true);
+                _a.load(NViewer.this, _config, /* new tab */ true);
             }
         };
         AbstractAction save = new AbstractAction() {
@@ -462,13 +458,9 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         JMenuItem niimgcontchan = newimg.add(newCAImageContChan);
         niimgcontchan.setText("Continuous Channels");
 
-
         JMenuItem oi = file.add(open);
         oi.setText("Open ...");
         oi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, shortcut));
-        JMenuItem oit = file.add(opentab);
-        oit.setText("Open in new tab ...");
-        oit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, shortcut | InputEvent.SHIFT_DOWN_MASK));
 
         JMenuItem si = file.add(save);
         si.setText("Save ...");
@@ -505,10 +497,20 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         final NViewer v = this;
         hack[0] = true;
 
+        final AbstractAction rains = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _lastPaletteAction = this;
+                setActiveCA(getActiveCA().palette(applyPaletteOptions(Palette.rainbow(getActiveCA().getPalette().getColorCount(), blackZero(_config)), _config)));
+            }
+        };
+
         AbstractAction repeat = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 if(_lastPaletteAction!=null) {
                     _lastPaletteAction.actionPerformed(e);
+                }
+                else {
+                    rains.actionPerformed(e);
                 }
             }
         };
@@ -536,12 +538,6 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         JMenuItem rand = pal.add(rands);
         rand.setText("Random");
 
-        AbstractAction rains = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _lastPaletteAction = this;
-                setActiveCA(getActiveCA().palette(applyPaletteOptions(Palette.rainbow(getActiveCA().getPalette().getColorCount(), blackZero(_config)), _config)));
-            }
-        };
         JMenuItem rain = pal.add(rains);
         rain.setText("Rainbow");
 
@@ -951,8 +947,10 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 _a.debug(NViewer.this);
             }
         };
-        JMenuItem deb = auto.add(debug);
-        deb.setText("Debug");
+        if(DEMO_MODE) {
+            JMenuItem deb = auto.add(debug);
+            deb.setText("Debug");
+        }
 
         AbstractAction cancel = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -1123,36 +1121,6 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         custi.setState(_init==Initializers.custom);
 
         auto.add(istate);
-        auto.addSeparator();
-
-        AbstractAction size = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _a.resizeCA(NViewer.this);
-            }
-        };
-        JMenuItem siz = auto.add(size);
-        siz.setText("Parameters ...");
-        siz.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcut));
-
-        AbstractAction editMeta = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _a.editMetadata(NViewer.this);
-            }
-        };
-        JMenuItem em = auto.add(editMeta);
-        em.setText("Metadata ...");
-        em.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcut | InputEvent.SHIFT_DOWN_MASK));
-
-        AbstractAction vars = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                _a.configureVariables(NViewer.this);
-            }
-        };
-        JMenuItem vrs = auto.add(vars);
-        vrs.setText("Variables ...");
-        vrs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, shortcut | InputEvent.SHIFT_DOWN_MASK));
-
-        auto.addSeparator();
 
         {
             JMenu updateopt = new JMenu("Update mode");
@@ -1346,9 +1314,42 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             
             auto.add(extopt);
         }
-        {
-            auto.addSeparator();
 
+        auto.addSeparator();
+
+        {
+            AbstractAction size = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    _a.resizeCA(NViewer.this);
+                }
+            };
+            JMenuItem siz = auto.add(size);
+            siz.setText("Parameters ...");
+            siz.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcut));
+
+            AbstractAction editMeta = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    _a.editMetadata(NViewer.this);
+                }
+            };
+            JMenuItem em = auto.add(editMeta);
+            em.setText("Metadata ...");
+            em.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, shortcut | InputEvent.SHIFT_DOWN_MASK));
+
+            AbstractAction vars = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    _a.configureVariables(NViewer.this);
+                }
+            };
+            JMenuItem vrs = auto.add(vars);
+            vrs.setText("Variables ...");
+            vrs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, shortcut | InputEvent.SHIFT_DOWN_MASK));
+
+        }
+
+        auto.addSeparator();
+
+        {
             AbstractAction touni = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     Actions.translateToUniversal(NViewer.this);
@@ -2098,6 +2099,9 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                     toggleRuleEditor();
                 }
             };
+            JMenuItem tg = window.add(close);
+            tg.setText("Hide rule editor");
+            tg.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, shortcut));
             JMenuItem cl = window.add(close);
             cl.setText("Close");
             cl.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));

@@ -356,8 +356,7 @@ public class Config {
             gson.toJson(toJson(), w);
         }
         catch(IOException e) {
-            System.err.println("failed saving config to "+CONFIG_FILE+": "+e);
-            e.printStackTrace();
+            LOG.info("failed saving config to "+CONFIG_FILE+": "+e, e);
         }
     }
 
