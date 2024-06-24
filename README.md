@@ -421,7 +421,7 @@ be installed. On MacOS, it can be installed via the Homebrew package openjdk.
 The link in the most recent stable binary release contains a zipfile with the
 entire release.
 
-* v1.0: https://github.com/jkwhite/nausicaa/releases/tag/v1.0
+* v1.2: https://github.com/jkwhite/nausicaa/releases/tag/v1.2
 
 Depending on the host OS, this can then be executed however your OS normally executes
 programs. Typically that would be through one of the batch files in the `bin`
