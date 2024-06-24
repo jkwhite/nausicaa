@@ -130,7 +130,7 @@ application {
         }
     }
     mainClass='org.excelsi.nausicaa.Nausicaa'
-    version='1.1'
+    version='1.2'
     group='excelsiorg'
 }
 
@@ -158,7 +158,7 @@ setupBuilder {
     // optional, defaults to project name
     // application     = "My Application";
 
-    version         = "1.1.0";
+    version         = "1.2.0";
     appIdentifier   = "org.excelsi.nausicaa";
 
     // optional, defaults to {appIdentifier}-{version}
@@ -169,7 +169,7 @@ setupBuilder {
     mainClass       = "org.excelsi.nausicaa.Nausicaa";
     
     // main jar file in the installed structure, relative to root.
-    mainJar         = "libs/nausicaa-1.1.jar";
+    mainJar         = "libs/nausicaa-1.2.jar";
 
     destinationDir  = "";
 

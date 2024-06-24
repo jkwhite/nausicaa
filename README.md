@@ -1,148 +1,157 @@
+<!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
+
 # Table of contents
 
 - [Introduction to NausiCAä](#introduction-to-nausicaä)
 - [Concepts](#concepts)
-  - [Automata](#automata)
-  - [Rules](#rules)
-  - [Sequences](#sequences)
-  - [Neighborhoods](#neighborhoods)
-    - [Moore](#moore)
-    - [von Neumann](#von-neumann)
-    - [Circular](#circular)
-  - [Value Kinds](#value-kinds)
-    - [Discrete](#discrete)
-    - [Continuous](#continuous)
-    - [RGB](#rgb)
-    - [RGBA](#rgba)
-  - [Machine Elvish Language](#machine-elvish-language)
-    - [Incantation evaluation](#incantation-evaluation)
-    - [Compound codons](#compound-codons)
-    - [Language variants](#language-variants)
-    - [Variables](#variables)
+   * [Automata](#automata)
+   * [Rules](#rules)
+   * [Sequences](#sequences)
+   * [Neighborhoods](#neighborhoods)
+      + [Moore](#moore)
+      + [von Neumann](#von-neumann)
+      + [Circular](#circular)
+   * [Value Kinds](#value-kinds)
+      + [Discrete](#discrete)
+      + [Continuous](#continuous)
+      + [RGB](#rgb)
+      + [RGBA](#rgba)
+   * [Machine Elvish Language](#machine-elvish-language)
+      + [Incantation evaluation](#incantation-evaluation)
+      + [Compound codons](#compound-codons)
+      + [Language variants](#language-variants)
+         - [Classic](#classic)
+         - [Universal](#universal)
+         - [Circular](#circular-1)
+         - [Fractal](#fractal)
+      + [Variables](#variables)
 - [Running NausiCAä](#running-nausicaä)
-  - [Prerequisites](#prerequisites)
-  - [From Binary](#from-binary)
-  - [From Source](#from-source)
+   * [Prerequisites](#prerequisites)
+   * [From Binary](#from-binary)
+   * [From Source](#from-source)
 - [Using the NausiCAä GUI](#using-the-nausicaä-gui)
-  - [Configuration File](#configuration-file)
-  - [Main Window](#main-window)
-  - [Info Window](#info-window)
-  - [Basic Parameters Window](#basic-parameters-window)
-  - [Rule Editor Window](#rule-editor-window)
-  - [Palette Editor Window](#palette-editor-window)
-  - [File Menu](#file-menu)
-    - [New](#new)
-  - [Automata Menu](#automata-menu)
-    - [Initial State](#initial-state)
-      - [Random Initial State](#random-initial-state)
-      - [Fixed Initial State](#fixed-initial-state)
-      - [Word Initial State](#word-initial-state)
-      - [Image Initial State](#image-initial-state)
-      - [Gaussian Initial State](#gaussian-initial-state)
-      - [Clustered Gaussian Initial State](#clustered-gaussian-initial-state)
-      - [CA Initial State](#ca-initial-state)
-      - [Custom Initial State](#custom-initial-state)
-    - [Update Mode](#update-mode)
-    - [Edge Mode](#edge-mode)
-    - [External Force](#external-force)
-    - [Other Options](#other-options)
-  - [Animation Menu](#animation-menu)
-    - [Generate to disk](#generate-to-disk)
-  - [Palette Menu](#palette-menu)
-    - [Using a custom palette](#using-a-custom-palette)
-  - [Mutate Menu](#mutate-menu)
-    - [Making Mutations](#making-mutations)
-    - [Kinds of Mutators](#kinds-of-mutators)
-    - [Sequences, Stages, and Mutations](#sequences-stages-and-mutations)
-  - [Render Menu](#render-menu)
-    - [RGB compute mode](#rgb-compute-mode)
-    - [Meta compute mode](#meta-compute-mode)
-    - [Composition Mode](#composition-mode)
-  - [Functions Menu](#functions-menu)
-  - [View Menu](#view-menu)
-  - [Experimental Menu](#experimental-menu)
-  - [Window Menu](#window-menu)
-  - [Cheat Sheet: A Few Important Commands](#cheat-sheet-a-few-important-commands)
+   * [Configuration File](#configuration-file)
+   * [Main Window](#main-window)
+   * [Info Window](#info-window)
+   * [Basic Parameters Window](#basic-parameters-window)
+- [Metadata Window](#metadata-window)
+   * [Rule Editor Window](#rule-editor-window)
+   * [Palette Editor Window](#palette-editor-window)
+   * [File Menu](#file-menu)
+      + [New](#new)
+   * [Automata Menu](#automata-menu)
+      + [Initial State](#initial-state)
+         - [Random Initial State](#random-initial-state)
+         - [Fixed Initial State](#fixed-initial-state)
+         - [Word Initial State](#word-initial-state)
+         - [Image Initial State](#image-initial-state)
+         - [Gaussian Initial State](#gaussian-initial-state)
+         - [Clustered Gaussian Initial State](#clustered-gaussian-initial-state)
+         - [CA Initial State](#ca-initial-state)
+         - [Custom Initial State](#custom-initial-state)
+      + [Update Mode](#update-mode)
+      + [Edge Mode](#edge-mode)
+      + [External Force](#external-force)
+      + [Other Options](#other-options)
+   * [Animation Menu](#animation-menu)
+      + [Generate to disk](#generate-to-disk)
+   * [Palette Menu](#palette-menu)
+      + [Using a custom palette](#using-a-custom-palette)
+   * [Mutate Menu](#mutate-menu)
+      + [Making Mutations](#making-mutations)
+      + [Kinds of Mutators](#kinds-of-mutators)
+      + [Sequences, Stages, and Mutations](#sequences-stages-and-mutations)
+   * [Render Menu](#render-menu)
+      + [RGB compute mode](#rgb-compute-mode)
+      + [Meta compute mode](#meta-compute-mode)
+      + [Composition Mode](#composition-mode)
+   * [Functions Menu](#functions-menu)
+   * [View Menu](#view-menu)
+   * [Experimental Menu](#experimental-menu)
+   * [Window Menu](#window-menu)
+   * [Cheat Sheet: A Few Important Commands](#cheat-sheet-a-few-important-commands)
 - [Using NausiCAä as a library](#using-nausicaä-as-a-library)
 - [Reference Guide](#reference-guide)
-  - [Codon Catalog](#codon-catalog)
-    - [a (Constant)](#a-constant)
-    - [ba (Bitwise Left Rotate)](#ba-bitwise-left-rotate)
-    - [be (Greater Than)](#be-greater-than)
-    - [bo (Negate)](#bo-negate)
-    - [bu (Less Than)](#bu-less-than)
-    - [chi (Min)](#chi-min)
-    - [cho (Bandpass)](#cho-bandpass)
-    - [da (Data Block)](#da-data-block)
-    - [de (Hyperpolic Tangent)](#de-hyperpolic-tangent)
-    - [do (Duplicate)](#do-duplicate)
-    - [e (Avg N)](#e-avg-n)
-    - [ga (Abort)](#ga-abort)
-    - [ge (Push All Rotate)](#ge-push-all-rotate)
-    - [gi (Avg)](#gi-avg)
-    - [go (Push All)](#go-push-all)
-    - [gu (Count **DEPRECATED - BROKEN - Use `pu` instead**)](#gu-count-deprecated---broken---use-pu-instead)
-    - [ha (Exclamatory)](#ha-exclamatory)
-    - [he (Convolve)](#he-convolve)
-    - [hi (Histogram)](#hi-histogram)
-    - [ho (Divide)](#ho-divide)
-    - [hu (Supersymmetry)](#hu-supersymmetry)
-    - [i (Pow)](#i-pow)
-    - [ja (Jump)](#ja-jump)
-    - [ji (Skip N)](#ji-skip-n)
-    - [jo (Min N)](#jo-min-n)
-    - [jya (Relative Coordinate)](#jya-relative-coordinate)
-    - [ka (Bitwise Or)](#ka-bitwise-or)
-    - [ke (Greater)](#ke-greater)
-    - [ki (Push Surrounding)](#ki-push-surrounding)
-    - [ko (Bitwise Rotate Left)](#ko-bitwise-rotate-left)
-    - [ku (Bitwise Rotate Right)](#ku-bitwise-rotate-right)
-    - [kya (Coordinate)](#kya-coordinate)
-    - [ma (Equals)](#ma-equals)
-    - [me (Sum N)](#me-sum-n)
-    - [mi (Sum)](#mi-sum)
-    - [mo (Modulo)](#mo-modulo)
-    - [mu (Multiply)](#mu-multiply)
-    - [mya (Mandelbulb)](#mya-mandelbulb)
-    - [na (Lesser)](#na-lesser)
-    - [ne (Not Equals)](#ne-not-equals)
-    - [ni (Square Root)](#ni-square-root)
-    - [no (Push N)](#no-push-n)
-    - [nu (Cube Root)](#nu-cube-root)
-    - [nya (Mandelbrot)](#nya-mandelbrot)
-    - [o (Push Neighbor)](#o-push-neighbor)
-    - [pa (Push Cardinal)](#pa-push-cardinal)
-    - [pe (Absolute Value)](#pe-absolute-value)
-    - [pi (Filter)](#pi-filter)
-    - [po (Equals Array)](#po-equals-array)
-    - [pu (Count - Fixed)](#pu-count---fixed)
-    - [ra (If)](#ra-if)
-    - [ri (Max N)](#ri-max-n)
-    - [re (Sine)](#re-sine)
-    - [ro (Skip)](#ro-skip)
-    - [ru (Sigmoid)](#ru-sigmoid)
-    - [sa (Stop)](#sa-stop)
-    - [se (Not)](#se-not)
-    - [shi (Position)](#shi-position)
-    - [so (Not Intersects)](#so-not-intersects)
-    - [su (Subtract)](#su-subtract)
-    - [ta (Max)](#ta-max)
-    - [te (Time)](#te-time)
-    - [to (Bitwise And)](#to-bitwise-and)
-    - [tsu (Bitwise Xor)](#tsu-bitwise-xor)
-    - [wa (Most)](#wa-most)
-    - [wo (Least)](#wo-least)
-    - [u (Intersects)](#u-intersects)
-    - [ya (Self)](#ya-self)
-    - [yo (Intersects Self)](#yo-intersects-self)
-    - [yu (Fork)](#yu-fork)
-    - [za (Halt)](#za-halt)
-    - [ze (Random)](#ze-random)
-    - [zu (Non-zero)](#zu-non-zero)
-  - [Example automata](#example-automata)
-    - [The Game of Life](#the-game-of-life)
-    - [Circular neighborhoods](#circular-neighborhoods)
-    - [Mandelbulb](#mandelbulb)
+   * [Codon Catalog](#codon-catalog)
+      + [a (Constant)](#a-constant)
+      + [ba (Bitwise Left Rotate)](#ba-bitwise-left-rotate)
+      + [be (Greater Than)](#be-greater-than)
+      + [bo (Negate)](#bo-negate)
+      + [bu (Less Than)](#bu-less-than)
+      + [chi (Min)](#chi-min)
+      + [cho (Bandpass)](#cho-bandpass)
+      + [da (Data Block)](#da-data-block)
+      + [de (Hyperpolic Tangent)](#de-hyperpolic-tangent)
+      + [do (Duplicate)](#do-duplicate)
+      + [e (Avg N)](#e-avg-n)
+      + [ga (Abort)](#ga-abort)
+      + [ge (Push All Rotate)](#ge-push-all-rotate)
+      + [gi (Avg)](#gi-avg)
+      + [go (Push All)](#go-push-all)
+      + [gu (Count **DEPRECATED - BROKEN - Use `pu` instead**)](#gu-count-deprecated-broken-use-pu-instead)
+      + [ha (Exclamatory)](#ha-exclamatory)
+      + [he (Convolve)](#he-convolve)
+      + [hi (Histogram)](#hi-histogram)
+      + [ho (Divide)](#ho-divide)
+      + [hu (Supersymmetry)](#hu-supersymmetry)
+      + [i (Pow)](#i-pow)
+      + [ja (Jump)](#ja-jump)
+      + [ji (Skip N)](#ji-skip-n)
+      + [jo (Min N)](#jo-min-n)
+      + [jya (Relative Coordinate)](#jya-relative-coordinate)
+      + [ka (Bitwise Or)](#ka-bitwise-or)
+      + [ke (Greater)](#ke-greater)
+      + [ki (Push Surrounding)](#ki-push-surrounding)
+      + [ko (Bitwise Rotate Left)](#ko-bitwise-rotate-left)
+      + [ku (Bitwise Rotate Right)](#ku-bitwise-rotate-right)
+      + [kya (Coordinate)](#kya-coordinate)
+      + [ma (Equals)](#ma-equals)
+      + [me (Sum N)](#me-sum-n)
+      + [mi (Sum)](#mi-sum)
+      + [mo (Modulo)](#mo-modulo)
+      + [mu (Multiply)](#mu-multiply)
+      + [mya (Mandelbulb)](#mya-mandelbulb)
+      + [na (Lesser)](#na-lesser)
+      + [ne (Not Equals)](#ne-not-equals)
+      + [ni (Square Root)](#ni-square-root)
+      + [no (Push N)](#no-push-n)
+      + [nu (Cube Root)](#nu-cube-root)
+      + [nya (Mandelbrot)](#nya-mandelbrot)
+      + [o (Push Neighbor)](#o-push-neighbor)
+      + [pa (Push Cardinal)](#pa-push-cardinal)
+      + [pe (Absolute Value)](#pe-absolute-value)
+      + [pi (Filter)](#pi-filter)
+      + [po (Equals Array)](#po-equals-array)
+      + [pu (Count - Fixed)](#pu-count-fixed)
+      + [ra (If)](#ra-if)
+      + [ri (Max N)](#ri-max-n)
+      + [re (Sine)](#re-sine)
+      + [ro (Skip)](#ro-skip)
+      + [ru (Sigmoid)](#ru-sigmoid)
+      + [sa (Stop)](#sa-stop)
+      + [se (Not)](#se-not)
+      + [shi (Position)](#shi-position)
+      + [so (Not Intersects)](#so-not-intersects)
+      + [su (Subtract)](#su-subtract)
+      + [ta (Max)](#ta-max)
+      + [te (Time)](#te-time)
+      + [to (Bitwise And)](#to-bitwise-and)
+      + [tsu (Bitwise Xor)](#tsu-bitwise-xor)
+      + [wa (Most)](#wa-most)
+      + [wo (Least)](#wo-least)
+      + [u (Intersects)](#u-intersects)
+      + [ya (Self)](#ya-self)
+      + [yo (Intersects Self)](#yo-intersects-self)
+      + [yu (Fork)](#yu-fork)
+      + [za (Halt)](#za-halt)
+      + [ze (Random)](#ze-random)
+      + [zu (Non-zero)](#zu-non-zero)
+   * [Example automata](#example-automata)
+      + [The Game of Life](#the-game-of-life)
+      + [Other 2D automata](#other-2d-automata)
+      + [Circular neighborhoods](#circular-neighborhoods)
+      + [Using sequences](#using-sequences)
+      + [Mandelbulb](#mandelbulb)
 - [Bugs](#bugs)
 
 # Introduction to NausiCAä
@@ -1607,6 +1616,14 @@ Bug: This should probably not filter negative values, but alas.
 
 ## Example automata
 
+Some example kinds of automata have been reproduced below.
+
+You can also find more complex automata videos created with
+NausiCAä on the channels:
+
+* YouTube: https://www.youtube.com/@excelsiorg5126/videos
+* Vimeo: https://vimeopro.com/jkwhite/explorations-in-automatic-spaces
+
 ### The Game of Life
 
 Incantation:
@@ -1661,6 +1678,28 @@ other possible implementations that would be more efficient, like I mentioned
 above with the `du` syllable, and we could also avoid computing the unused
 branch by using `ja` (jump) and `za` (halt) syllables instead.
 
+### Other 2D automata
+
+A few additional 2D automata.
+
+"Infrastructure Building"
+
+``136/0.7266794730647169;1.177500966682681:kya kya bo ge ta ge to``
+
+![InfrastructureBuilding](assets/images/ca/infrastructure_building2-1.png)
+
+"Fractal Bubbles and Growing Chiralities"
+
+``90/0.06062264974050879;1.2621854231957927:ki u ki su ya ge bu ro4 ra nya e zu9 mi6 mi5 mi5``
+
+![FractalBubbles](assets/images/ca/fractal_bubbles_and_growing_chiralities1.png)
+
+"Flower of the Sun"
+
+``127/0.4275963042584565;1.011692219854403:ze mi kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni kya0+kya0+mu2+kya1+kya1+mu2+mi2+ni mi11 kya1 yu pa go gi yu ko``
+
+![FlowerOfTheSun](assets/images/ca/flowerofthesun4-1.png)
+
 ### Circular neighborhoods
 
 Selected examples of 2D circular neighborhoods of sizes 3-5.
@@ -1683,26 +1722,61 @@ Selected examples of 2D circular neighborhoods of sizes 3-5.
 
 ![Ringu](assets/images/ca/ex5.png)
 
+
+### Using sequences
+
+These examples use [Sequences](#sequences).
+
+"Plasmoria"
+
+```
+8/0.10699023686190517;0.9:ki hu hu ki ki zu8 hu o12
+8/0.02103008643143056;1.2770407481000805:ki ki no o12 ki do do zu o12
+8/0.007479068112474223;1.0344350114269145:ki no hu do zu6 zu ki
+```
+
+![Plasmoria](assets/images/ca/plasmoria2-1.png)
+
+"Bioluminous Glitch"
+
+```
+5/0.45819994332545555;1.2032942437605973:kya0 wo wo mi ku mi mi o4 pa ya ko kya1 wo wa
+4/1.0;0.9562614045563055:jya go ne go ri
+```
+
+![BioluminousGlitch](assets/images/ca/bioluminous_glitch2-1.png)
+
+
 ### Mandelbulb
 
 Simple discrete mappings of the Mandelbulb fractal.
 
 "Mandelbulb"
 
-```98:kya0 kya1 kya2 a100 a100 mya```
+``98:kya0 kya1 kya2 a100 a100 mya``
 
 ![Mandulbulb](assets/images/ca/mandelbulb1-1.png)
 
 "Mandelbulb Animated"
 
-```98:kya0 kya1 kya2 a10 a100 mya a-1000 a0 cho```
+``98:kya0 kya1 kya2 a10 a100 mya a-1000 a0 cho``
 
 ![Mandulbulb](assets/images/ca/o_mandelbulb2-1.gif)
 
+"Bulb slice in 2D"
+
+
+![Mandulbulb2d](assets/images/ca/mandelbulb2d-3.png)
+
+"The Desert Stars Are Bright Tonight"
+
+``81/0.7079684605220907;1.2319639843877077:a-2.0188958644866943 pu jya1 kya0+pe+kya0+pe+mi2+kya1+pe+kya1+pe+mi2+mi2+ni to i kya0+pe+kya0+pe+mi2+kya1+pe+kya1+pe+mi2+mi2+ni wa ho wa a24 ho hi ji``
+
+![DesertStars](assets/images/ca/desertstars3-3.png)
 
 # Bugs
 
-* This documentation is exceptionally incomplete.
+* This documentation is incomplete.
 
 * Building from source is probably not possible right now for anyone but me.
 The problem is with dependencies on other projects that I own that are not on
@@ -1729,5 +1803,11 @@ proprer GUI reporting.
 
 * 3D mode is quite brittle. It works fine at low limits, but pretty much anything
 can set it off. I am looking at alternatives to JavaFX screengraphs.
+
+* The Histogram codons use the library GNU Trove. Trove has a bug that causes
+its hashtables' internal data structures to become inconsistent, and this
+manifests in the 'hi' codon failing in otherwise-normal circumstances. I need
+to determine whether to keep this codon, or find a different way to use Trove
+that avoids the bug, or replace Trove altogether.
 
 +++ATH0

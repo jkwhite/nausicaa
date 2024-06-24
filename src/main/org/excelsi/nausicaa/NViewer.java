@@ -367,7 +367,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(null, 
                     "<html>Copyright (C) 2007-2024 John K White, dhcmrlchtdj@gmail.com<br/>Licensed under the terms of the GNU General Public License Version 3</html>", 
-                    "NausiCAä 1.0", 
+                    "NausiCAä 1.2", 
                     JOptionPane.INFORMATION_MESSAGE,
                     new ImageIcon(MacCustomizer.class.getResource("/na1_164.png"))
                 );

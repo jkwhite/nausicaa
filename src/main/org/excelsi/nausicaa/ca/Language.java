@@ -251,9 +251,11 @@ public class Language {
         lang._context = Json.bool(o, "context", true);
         lang._positioning = Json.bool(o, "positioning", true);
         lang._tape = Json.bool(o, "tape", true);
-        JsonObject dict = (JsonObject) o.get("dict");
-        for(Map.Entry<String,JsonElement> e:dict.entrySet()) {
-            lang.add(e.getKey(), Json.string(e.getValue()));
+        if(o.has("dict")) {
+            JsonObject dict = (JsonObject) o.get("dict");
+            for(Map.Entry<String,JsonElement> e:dict.entrySet()) {
+                lang.add(e.getKey(), Json.string(e.getValue()));
+            }
         }
         return lang;
     }

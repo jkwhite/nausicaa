@@ -315,7 +315,6 @@ public class Actions {
                 CA ca = new CA(
                         rule,
                         pal,
-                        // v.getActiveCA().getInitializer(),
                         v.getInitializer(),
                         rand,
                         0,
