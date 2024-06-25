@@ -544,7 +544,7 @@ space, rather than a collection of prior states as with 2D automata. Other
 than that difference, view rendering follows the same process as with 2D
 automata.
 
-# Metadata Window
+## Metadata Window
 
 Automata metadata is set with ``Automata | Metadata ... (⌘⇧K)``.
 This window also allows you to set a "name" and "description" for the
@@ -1616,7 +1616,8 @@ Bug: This should probably not filter negative values, but alas.
 
 ## Example automata
 
-Some example kinds of automata have been reproduced below.
+Some examples of the kinds of automata you can make with NausiCAä
+are reproduced below.
 
 You can also find more complex automata videos created with
 NausiCAä on the channels:
