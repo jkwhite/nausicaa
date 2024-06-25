@@ -34,7 +34,7 @@
    * [Main Window](#main-window)
    * [Info Window](#info-window)
    * [Basic Parameters Window](#basic-parameters-window)
-- [Metadata Window](#metadata-window)
+   * [Metadata Window](#metadata-window)
    * [Rule Editor Window](#rule-editor-window)
    * [Palette Editor Window](#palette-editor-window)
    * [File Menu](#file-menu)
