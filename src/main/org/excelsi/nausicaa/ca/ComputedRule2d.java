@@ -115,7 +115,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         int nworkers = c.getHeight()/block + (c.getHeight()%block>0?1:0);
         final Worker[] workers = new Worker[nworkers];
         final Pattern[] patterns = new Pattern[nworkers];
-        LOG.info("rule compute using "+workers.length+" workers on blocksize "+block+" with db "+opt.doubleBuffer());
+        LOG.info("rule compute using "+workers.length+" workers on blocksize "+block+" with "+opt);
         final Variables vars = new Variables() {
             @Override public Double weight() { return c.creator().getWeight(); }
         };
@@ -242,7 +242,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
             case 2:
             case 3:
             default:
-                LOG.info("generating prelude from "+start+" to "+end);
+                LOG.info(this+": generating prelude from "+start+" to "+end+" with "+opt);
                 final Iterator<Plane> ps = frameIterator(c, pool, opt);
                 for(int i=start;i<end;i++) {
                     ret = ps.next();

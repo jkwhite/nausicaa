@@ -117,7 +117,7 @@ application {
         "--add-opens","javafx.graphics/javafx.scene.layout=ALL-UNNAMED",
         "--add-opens","javafx.graphics/javafx.scene.shape=ALL-UNNAMED",
         "--add-opens","javafx.controls/javafx.scene.control=ALL-UNNAMED",
-        "-Dprism.verbose=true",
+        // "-Dprism.verbose=true",
         "-Dapple.laf.useScreenMenuBar=true",
         "-XX:-OmitStackTraceInFastThrow",
         "-Dapp.root=HACK_FOR_GRADLE"

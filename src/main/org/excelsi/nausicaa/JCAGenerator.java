@@ -314,8 +314,9 @@ public class JCAGenerator extends JDialog {
                                         System.err.println("using "+ccores+" cores");
                                         ExecutorService pool = Executors.newFixedThreadPool(ccores);
                                         if(scale==1f) {
-                                            System.err.println("skip scaling");
-                                            c.compileRule()
+                                            final Rule rule = c.compileRule();
+                                            LOG.info("generating unscaled with rule "+rule);
+                                            rule
                                                 .stream(c.createPlane(), pool, new GOptions(true, ccores, 1, frameWeight).metaMode(c.getMetaMode()))
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))
@@ -327,7 +328,9 @@ public class JCAGenerator extends JDialog {
                                         }
                                         else {
                                             System.err.println("scaling");
-                                            c.compileRule()
+                                            final Rule rule = c.compileRule();
+                                            LOG.info("generating scaled with rule "+rule);
+                                            rule
                                                 .stream(c.createPlane(), pool, new GOptions(true, ccores, 1, frameWeight).metaMode(c.getMetaMode()))
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))

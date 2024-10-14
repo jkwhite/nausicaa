@@ -47,13 +47,13 @@ public class GOptions {
         _vars = vars;
         _meta = meta;
         if(_parallel==1) {
-            LOG.debug("GOptions with parallel 1", new Exception());
+            // LOG.debug("GOptions with parallel 1", new Exception());
         }
     }
 
     public boolean doubleBuffer() { return _doubleBuffer; }
     public int parallel() { return _parallel; }
-    public int stride() { return _stride; }
+    // public int stride() { return _stride; }
     public double weight() { return _weight; }
     public int higherDim() { return _hd; }
     public ComputeMode computeMode() { return _compMode; }
@@ -82,5 +82,9 @@ public class GOptions {
 
     public GOptions variables(Variables vars) {
         return new GOptions(_doubleBuffer, _parallel, _stride, _weight, _hd, _compMode, vars, _meta);
+    }
+
+    @Override public String toString() {
+        return "GOptions::{db:"+_doubleBuffer+", par:"+_parallel+", s:"+_stride+", w:"+_weight+", hd:"+_hd+", comp:"+_compMode+", meta:"+_meta+", vars:"+_vars+"}";
     }
 }

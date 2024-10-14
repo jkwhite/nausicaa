@@ -211,6 +211,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             try {
                 w.setLocation(Integer.parseInt(dims[0]), Integer.parseInt(dims[1]));
                 w.setSize(Integer.parseInt(dims[2]), Integer.parseInt(dims[3]));
+                LOG.info("set size of "+name+" to "+w.getSize());
             }
             catch(Exception e) {
                 LOG.warn("ignoring malformed value for window_"+name+": '"+s+"'", e);
@@ -2048,17 +2049,19 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         if(_console==null) {
             Dimension d = getSize();
             _console = new JFrame("Console");
-            _console.setSize(d.width, d.height/3);
+            // _console.setSize(d.width, d.height);
+            loadWindow(getConfig(), _console, "console");
             _console.getContentPane().add(new Console(_console));
             _console.pack();
-            _console.setSize(d.width, d.height/3);
+            // _console.setSize(d.width, d.height);
             // _console.setLocationRelativeTo(this);
-            _console.setLocation(getLocation().x, 0);
-            loadWindow(getConfig(), _console, "console");
+            // _console.setLocation(getLocation().x, 0);
             _console.setVisible(true);
         }
         else {
+            saveWindow(getConfig(), _console, "console");
             _console.setVisible(!_console.isVisible());
+            _console = null;
         }
     }
 

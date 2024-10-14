@@ -185,7 +185,7 @@ top:        while(_state==State.animate) {
             //_log.debug("animating with plane impl "+p+" ("+p.getClass().getName()+")");
             _parallel = parallel;
             _frames = d.compileRule().frameIterator(p, pool,
-                new GOptions(true, _parallel, 0, weight)
+                new GOptions(true, _parallel, 1, weight)
                     .computeMode(ComputeMode.from(_config.<String>getVariable("rgb_computemode","combined")))
                     .metaMode(p.creator().getMetaMode())
                 );
@@ -208,7 +208,7 @@ top:        while(_state==State.animate) {
                 return;
             }
             final Plane frame = _frames.next();
-            if(++_fn%200==0) {
+            if(++_fn%100==0) {
                 _log.info("frame "+_fn);
             }
             frame.lockRead();

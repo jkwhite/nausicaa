@@ -68,7 +68,7 @@ public class Actions {
             }
         };
         JRadioButton rcomparr = new JRadioButton(comparr);
-        rcomparr.setText("Full Target");
+        rcomparr.setText("Rule Number");
         comp.add(rcomparr);
 
         AbstractAction compspars = new AbstractAction() {

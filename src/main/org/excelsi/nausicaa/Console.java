@@ -25,9 +25,9 @@ public class Console extends JComponent {
         _root = root;
         setLayout(new BorderLayout());
         _c = new JFXPanel();
-        // _c.setPreferredSize(new Dimension(800, 600));
-        // _c.setPreferredSize(root.getSize());
+        LOG.info("root size: "+root.getSize());
         setPreferredSize(root.getSize());
+        _c.setPreferredSize(root.getSize());
         add(_c, BorderLayout.CENTER);
         Platform.runLater(()->{ initConsole(); });
         Platform.setImplicitExit(false);
@@ -45,9 +45,13 @@ public class Console extends JComponent {
         sf.setMetaShell(ms);
 
         JfxTabs tabs = new JfxTabs(sf);
+        LOG.info("console psize: "+getPreferredSize());
+        tabs.setPrefWidth(getPreferredSize().width);
+        tabs.setPrefHeight(getPreferredSize().height);
         root.getChildren().add(tabs);
 
         JfxMetaConsole mc = new JfxMetaConsole();
+
         mc.setDelegate(tabs);
         mc.setShellFactory(sf);
 
@@ -56,9 +60,6 @@ public class Console extends JComponent {
             scene.getStylesheets().add(usercss);
         }
 
-        LOG.info("console psize: "+getPreferredSize());
-        tabs.setPrefWidth(getPreferredSize().width);
-        tabs.setPrefHeight(getPreferredSize().height);
         _c.setScene(scene);
 
         mc.newTerminal();
