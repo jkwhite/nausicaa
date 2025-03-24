@@ -103,7 +103,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         if(archetype().dims()==1) {
             return new Iterator<Plane>() {
                 @Override public boolean hasNext() { return false; }
-                @Override public Plane next() { throw new IllegalStateException(); }
+                @Override public Plane next() { return c; }
                 @Override public void remove() {}
             };
         }
