@@ -1622,7 +1622,7 @@ are reproduced below.
 You can also find more complex automata videos created with
 NausiCAä on the channels:
 
-* YouTube: https://www.youtube.com/@excelsiorg5126/videos
+* YouTube: https://www.youtube.com/@excelsiorg5126/playlists
 * Vimeo: https://vimeopro.com/jkwhite/explorations-in-automatic-spaces
 
 ### The Game of Life

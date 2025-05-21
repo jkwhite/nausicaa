@@ -96,13 +96,13 @@ public class RandomInitializer implements Initializer {
         switch(rule.dimensions()) {
             case 1:
                 for(int x=0;x<plane.getWidth();x++) {
-                    plane.setCell(x, 0, computeFloatColor(r, colors));
+                    plane.setCell(x, 0, computeDoubleColor(r, colors));
                 }
                 break;
             case 2:
                 for(int y=0;y<plane.getHeight();y++) {
                     for(int x=0;x<plane.getWidth();x++) {
-                        plane.setCell(x, y, computeFloatColor(r, colors));
+                        plane.setCell(x, y, computeDoubleColor(r, colors));
                     }
                 }
                 break;
@@ -110,7 +110,7 @@ public class RandomInitializer implements Initializer {
                 for(int y=0;y<plane.getHeight();y++) {
                     for(int x=0;x<plane.getWidth();x++) {
                         for(int z=0;z<plane.getDepth();z++) {
-                            plane.setCell(x, y, z, computeFloatColor(r, colors));
+                            plane.setCell(x, y, z, computeDoubleColor(r, colors));
                         }
                     }
                 }
@@ -134,6 +134,16 @@ public class RandomInitializer implements Initializer {
         }
         else {
             float v = ((float)(colors-1))*random.nextFloat();
+            return v;
+        }
+    }
+
+    private double computeDoubleColor(Random random, int colors) {
+        if(_params.zeroWeight>0f && random.nextInt(100000)<=100000f*_params.zeroWeight) {
+            return 0;
+        }
+        else {
+            double v = ((double)(colors-1))*random.nextDouble();
             return v;
         }
     }

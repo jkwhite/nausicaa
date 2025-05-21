@@ -42,7 +42,7 @@ dependencies {
     implementation 'net.sf.trove4j:trove4j:3.0.3'
     implementation 'excelsiorg:solace:1.0'
     implementation 'excelsiorg:gimmal:1.0'
-    implementation 'org.apache.groovy:groovy-all:4.0.15'
+    implementation 'org.apache.groovy:groovy-all:4.0.26'
     implementation 'imgscalr:imgscalr-lib:4.2'
     implementation 'Fxyz:Fxyz-Core:1.0'
     implementation 'Fxyz:Fxyz-lib:1.0'

@@ -367,7 +367,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         AbstractAction about = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(null, 
-                    "<html>Copyright (C) 2007-2024 John K White, dhcmrlchtdj@gmail.com<br/>Licensed under the terms of the GNU General Public License Version 3</html>", 
+                    "<html>Copyright (C) 2007-2025 John K White, dhcmrlchtdj@gmail.com<br/>Licensed under the terms of the GNU General Public License Version 3</html>", 
                     "NausiCAä 1.2", 
                     JOptionPane.INFORMATION_MESSAGE,
                     new ImageIcon(MacCustomizer.class.getResource("/na1_164.png"))
@@ -1561,17 +1561,21 @@ public class NViewer extends JFrame implements UIActions, Sizer {
     private void createFunctionsMenu(int shortcut, JMenuBar bar) {
         JMenu functions = new JMenu("Functions");
 
-        Functions fns = new Functions(new File(System.getProperty("app.root")+"/etc/functions"));
-        for(Functions.CAFunction fn:fns.catalog()) {
-            JMenuItem mfn = new JMenuItem(new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    _a.invokeFunction(NViewer.this, fn);
-                }
-            });
-            functions.add(mfn);
-            mfn.setText(fn.getName()+" ...");
+        try {
+            Functions fns = new Functions(new File(System.getProperty("app.root")+"/etc/functions"));
+            for(Functions.CAFunction fn:fns.catalog()) {
+                JMenuItem mfn = new JMenuItem(new AbstractAction() {
+                    public void actionPerformed(ActionEvent e) {
+                        _a.invokeFunction(NViewer.this, fn);
+                    }
+                });
+                functions.add(mfn);
+                mfn.setText(fn.getName()+" ...");
+            }
         }
-
+        catch(Error e) {
+            LOG.error("failed to load functions: "+e, e);
+        }
         bar.add(functions);
     }
 
