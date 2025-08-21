@@ -15,6 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 
+/**
+ * Note: ComputedRule2d is so named because it was originally intended to only
+ * handle 2d automata, however it actually handles all dimensions and is
+ * thus a misnomer now.
+ */
 public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
     private static final Logger LOG = LoggerFactory.getLogger(ComputedRule2d.class);
     private final Ruleset _origin;
@@ -62,10 +67,6 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
     public ComputedRule2d derive(Language lang) {
         return new ComputedRule2d(_p, new ComputedRuleset(archetype(), lang), _meta, null);
     }
-
-    //@Override public ComputedRule2d derive(Pattern.Transform transform) {
-        //return new ComputedRule2d(pattern().transform(transform), _origin, _meta!=null?_meta.derive(transform):null, getHyperrule());
-    //}
 
     @Override public Archetype archetype() {
         return _p.archetype();
@@ -236,6 +237,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                     vars,
                     c.creator().getComputeMode(), c.creator().getUpdateMode(),
                     c.creator().getExternalForce(), c.creator().getRandom());
+                // TODO: this is where 1d multithreading should happen
                 w.frame(p1);
                 ret = p1;
                 break;

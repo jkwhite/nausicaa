@@ -24,8 +24,14 @@ import javax.swing.AbstractAction;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public class Actions {
+    private static final Logger LOG = LoggerFactory.getLogger(Actions.class);
+
+
     public void newCA(NViewer v) {
         final JDialog d = new JDialog(v, "New Automata");
         final Config config = v.getConfig();
@@ -681,9 +687,9 @@ public class Actions {
             ComputedRule2d cr = (ComputedRule2d) r;
             p.addPair("Dimensions", r.archetype().dims());
             p.addPair("Value Colors", r.archetype().colors());
-            p.addPair("Neighborhood", r.archetype().neighborhood());
+            p.addPair("Neighborhood", r.archetype().neighborhood().getName());
             p.addPair("Neighbor Size", r.archetype().size());
-            p.addPair("Values", r.archetype().values());
+            p.addPair("Values", r.archetype().values().getName());
             p.addPair("Initializer", ca.getInitializer().humanize());
             p.addPair("Update", ca.getUpdateMode().humanize());
             p.addPair("Edge", ca.getEdgeMode().humanize());
@@ -2220,6 +2226,89 @@ public class Actions {
         d.setVisible(true);
     }
 
+    public void configureArchetype(NViewer v, Random rand) {
+        final Config config = v.getConfig();
+        final CA ca = v.getActiveCA();
+        final Rule r = ca.getRule();
+        final Archetype a = r.archetype();
+        final JDialog d = new JDialog(v, "Archetype");
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel top = new JPanel(new GridLayout(4,2));
+
+        top.add(new JLabel("Dimensions"));
+        final JComboBox dimens = new JComboBox(new String[]{"1","2","3"});
+        dimens.setSelectedItem(""+a.dims());
+        top.add(dimens);
+
+        top.add(new JLabel("Neighborhood Size"));
+        final JTextField siz = new JTextField();
+        siz.setText(""+a.size());
+        siz.setColumns(3);
+        top.add(siz);
+
+        // Neighborhood
+        final Archetype.Neighborhood[] neihack = new Archetype.Neighborhood[1];
+        top.add(new JLabel("Neighborhood"));
+        ButtonGroup nei = new ButtonGroup();
+
+        JPanel neis = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        String defNei = a.neighborhood().getName();
+        for(Archetype.Neighborhood neighbor:EnumSet.allOf(Archetype.Neighborhood.class)) {
+            AbstractAction von = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    neihack[0] = neighbor;
+                }
+            };
+            JRadioButton rvon = new JRadioButton(von);
+            rvon.setText(neighbor.getName());
+            nei.add(rvon);
+            if(neighbor.name().equalsIgnoreCase(defNei)) {
+                rvon.setSelected(true);
+                neihack[0] = neighbor;
+            }
+            neis.add(rvon);
+        }
+        top.add(neis);
+
+        top.add(new JLabel("Values"));
+        final JComboBox values = new JComboBox(new String[]{"Discrete", "Continuous"});
+        values.setSelectedItem(a.values().getName());
+        top.add(values);
+
+        p.add(top, BorderLayout.NORTH);
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton de = new JButton("Cancel");
+        d.getRootPane().setDefaultButton(ne);
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+                CA ca = v.getActiveCA();
+                Rule r = ca.getRule();
+                Archetype na = a.asDims(Integer.parseInt(dimens.getSelectedItem().toString()))
+                    .asValues(Values.from(values.getSelectedItem().toString()))
+                    .asNeighborhood(neihack[0])
+                    .asSize(Integer.parseInt(siz.getText()));
+                transformCA(v, config, rand, na);
+            }
+        });
+        de.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                d.dispose();
+            }
+        });
+        bot.add(ne);
+        bot.add(de);
+        p.add(bot, BorderLayout.SOUTH);
+        d.getContentPane().add(p);
+        Dimension dim = p.getPreferredSize();
+        dim.height += 40;
+        d.setSize(dim);
+        Things.centerWindow(d);
+        d.setVisible(true);
+    }
+
     private GenomeMutator _lastMutator;
     public void repeatLastMutation(NViewer v, Config config, Random rand) {
         mutate(v, config, rand, _lastMutator);
@@ -2304,6 +2393,22 @@ public class Actions {
                 .withGenomeMutator(m)
                 .withUpdateWeight(false) // otherwise weight xform might be chosen over genome mutator
             ).transform(ca));
+    }
+
+    public static void transformCA(final NViewer v, final Config config, final Random rand, final Archetype archetype) {
+        final CA ca = v.getActiveCA();
+        final Rule r = ca.getRule();
+        if(r instanceof Mutatable) {
+            final CA trans = ca.mutate(
+                (Rule)((Mutatable)r).mutate(
+                    createMutationFactor(ca, config, rand)
+                        .withUpdateArchetype(true)
+                        .withArchetype(archetype)
+                        .withGenomeMutator((cs,im,gf,m)->{})
+                ), rand
+            );
+            v.setActiveCA(trans);
+        }
     }
 
     public static void translateToUniversal(NViewer v) {

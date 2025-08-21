@@ -4,9 +4,13 @@ package org.excelsi.nausicaa.ca;
 import java.io.*;
 import java.util.*;
 //import org.yaml.snakeyaml.Yaml;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 public class GenomeParser {
+    private static final Logger LOG = LoggerFactory.getLogger(GenomeParser.class);
+
     private final Archetype _a;
     private final Language _lang;
     private MutationFactor _mf;
@@ -138,7 +142,8 @@ public class GenomeParser {
         throw new UnsupportedOperationException();
     }
 
-    private Pair<List<S>,Datamap> parseS(final String g) {
+    private static Pair<List<S>,Datamap> parseS(final String g) {
+        LOG.debug("parsing genome string '"+g+"'");
         final String[] gs = g.replace('\n',',').split(",");
         //final S[] ps = new S[gs.length];
         final List<S> ps = new ArrayList<>();
@@ -213,12 +218,12 @@ public class GenomeParser {
                 idx = -1;
             }
         }
-        //System.err.println("! params for '"+g+"': "+ps);
         return ps.toArray(new String[0]);
     }
     
     private Rule parse2(final String g, final Ruleset origin) {
-        Pair<List<S>,Datamap> pa = parseS(g);
+        // the 100: prefix is arbitrary, it just needs to be present in order to parse correctly
+        Pair<List<S>,Datamap> pa = parseS("100:"+g.replace('-',' '));
         List<S> ps = pa.one;
         Datamap dm = pa.two;
         SequencePattern.Sequence s = new SequencePattern.Sequence();

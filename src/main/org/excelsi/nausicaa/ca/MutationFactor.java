@@ -14,6 +14,7 @@ public final class MutationFactor {
     private float _transition;
     private boolean _symmetry;
     private boolean _weight;
+    private boolean _updateArchetype;
     private boolean _rule;
     private boolean _inits;
     private boolean _meta;
@@ -108,6 +109,11 @@ public final class MutationFactor {
         return this;
     }
 
+    public MutationFactor withUpdateArchetype(boolean a) {
+        _updateArchetype = a;
+        return this;
+    }
+
     public MutationFactor withRule(boolean r) {
         _rule = r;
         return this;
@@ -149,6 +155,10 @@ public final class MutationFactor {
 
     public boolean updateWeight() {
         return _weight;
+    }
+
+    public boolean updateArchetype() {
+        return _updateArchetype;
     }
 
     public boolean rule() {
@@ -204,6 +214,10 @@ public final class MutationFactor {
 
     public Archetype archetype() {
         return _archetype;
+    }
+
+    public boolean hasArchetype() {
+        return _archetype!=null;
     }
 
     public MutationFactor withGenomeMutator(GenomeMutator gm) {

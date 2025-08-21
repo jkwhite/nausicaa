@@ -242,6 +242,7 @@ public final class CA {
         final long st = System.currentTimeMillis();
         switch(r.dimensions()) {
             case 1:
+                // TODO: prelude should not be used for threaded frames
                 r.generate(p, 1, _h, pool, false, true, null, opt);
                 break;
             case 3:

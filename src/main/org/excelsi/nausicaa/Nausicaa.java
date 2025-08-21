@@ -45,6 +45,7 @@ public class Nausicaa {
                 org.excelsi.gimmal.AppFactory.main(dargs);
             }
             else {
+                System.err.println("launching NViewer.main");
                 NViewer.main(dargs);
             }
         }

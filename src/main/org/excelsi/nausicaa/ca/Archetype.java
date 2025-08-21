@@ -103,11 +103,23 @@ public final class Archetype {
     }
 
     public Archetype asDims(int dims) {
-        return new Archetype(dims, _size, _colors, _neighborhood);
+        return new Archetype(dims, _size, _colors, _neighborhood, _values);
     }
 
     public Archetype asColors(int colors) {
-        return new Archetype(_dims, _size, colors, _neighborhood);
+        return new Archetype(_dims, _size, colors, _neighborhood, _values);
+    }
+
+    public Archetype asValues(Values vals) {
+        return new Archetype(_dims, _size, _colors, _neighborhood, vals);
+    }
+
+    public Archetype asNeighborhood(Neighborhood n) {
+        return new Archetype(_dims, _size, _colors, n, _values);
+    }
+
+    public Archetype asSize(int s) {
+        return new Archetype(_dims, s, _colors, _neighborhood, _values);
     }
 
     /**

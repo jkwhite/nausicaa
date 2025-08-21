@@ -145,9 +145,9 @@ distributions {
     }
 }
 
-applicationDistribution.from("src/etc/") {
-    into "etc"
-}
+// applicationDistribution.from("src/etc/") {
+    // into "etc"
+// }
 
 setupBuilder {
     vendor          = "excelsiorg";

@@ -15,9 +15,14 @@ import org.excelsi.nausicaa.ca.IndexedRule;
 import org.excelsi.nausicaa.ca.Palette;
 import org.excelsi.nausicaa.ca.Genomic;
 import org.excelsi.nausicaa.ca.MutationFactor;
+import org.excelsi.nausicaa.ca.AbstractComputedRuleset;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 public class RuleEditor extends JComponent implements TimelineListener {
+    private static final Logger LOG = LoggerFactory.getLogger(RuleEditor.class);
     private UIActions _ui;
     private Rule _rule;
     private JTextArea _ruleText;
@@ -57,16 +62,32 @@ public class RuleEditor extends JComponent implements TimelineListener {
         }, 1000);
     }
 
+    public void focusIncantation() {
+        _ruleText.requestFocus();
+    }
+
     public void futureChanged() {
         removeAll();
         setLayout(new BorderLayout());
 
         final CA current = _ui.getActiveCA();
         _rule = current.getRule();
-        //JPanel scr = new JPanel(new FlowLayout());
         JPanel scr = new JPanel();
         BoxLayout bl = new BoxLayout(scr, BoxLayout.Y_AXIS);
         scr.setLayout(bl);
+        if(current.getRule().origin() instanceof AbstractComputedRuleset) {
+            JPanel insertions = new JPanel();
+            BoxLayout ins = new BoxLayout(insertions, BoxLayout.X_AXIS);
+            insertions.add(new JLabel("Insert"));
+            java.util.List<String> inserts = new ArrayList<>();
+            for(String opt:((AbstractComputedRuleset)current.getRule().origin()).language().dict().keySet()) {
+                inserts.add(opt);
+            }
+            LOG.info("built inserts: "+inserts);
+            JComboBox codons = new JComboBox(inserts.toArray(new String[0]));
+            insertions.add(codons);
+            scr.add(insertions);
+        }
 
         scr.add(new JLabel("Genome"));
 
@@ -76,6 +97,7 @@ public class RuleEditor extends JComponent implements TimelineListener {
             rule.setText(((Genomic)_rule).prettyGenome());
         }
         scr.add(new JScrollPane(rule));
+
         scr.add(new JLabel("Test Pattern"));
         final JTextArea pat = new JTextArea(3,80);
         scr.add(pat);
@@ -128,33 +150,6 @@ public class RuleEditor extends JComponent implements TimelineListener {
                 }
             }
         });
-        */
-        /*
-        scr.setLayout(new BoxLayout(scr, BoxLayout.Y_AXIS));
-        final int[] colors = current.getPalette().getColors();
-        _colors = new int[colors.length];
-        System.arraycopy(colors, 0, _colors, 0, colors.length);
-        JPanel cols = new JPanel();
-        for(int i=0;i<colors.length;i++) {
-            final CAEditor.Cell c = new CAEditor.Cell(colors[i]);
-            final int idx = i;
-            cols.add(c);
-            c.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent e) {
-                    java.awt.Color co = JColorChooser.showDialog(
-                        PaletteEditor.this, "New color", new java.awt.Color(_colors[idx]));
-                    int rgb = co.getRGB();
-                    _colors[idx] = (rgb&Colors.COLOR_MASK)|(_colors[idx]&Colors.ALPHA_MASK);
-                    c.setColor(_colors[idx]);
-                    _ui.doWait(new Runnable() {
-                        public void run() {
-                            _ui.setActiveCA(current.palette(new Palette(_colors)));
-                        }
-                    }, 1000);
-                }
-            });
-        }
-        add(cols, BorderLayout.CENTER);
         */
         add(scr, BorderLayout.CENTER);
         validate();

@@ -69,6 +69,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 loadWindow(v.getConfig(), v, "main");
                 v.setVisible(true);
                 v.setFocusTraversalKeysEnabled(false);
+                LOG.debug("started main window");
             }
         });
     }
@@ -233,7 +234,6 @@ public class NViewer extends JFrame implements UIActions, Sizer {
     }
 
     private static CA createCA(Config config) {
-        // final int w = 300, h = 300, d = 1, pre=0;
         final int
             w = config.getWidth(),
             h = config.getHeight(),
@@ -241,30 +241,16 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             pre = 0;
         final float weight = 1f;
 
-        //_config = new Config(w, h, d, weight);
         int dims = 1;
         int size = 1;
         Random rand = new Random();
         Palette pal = Palette.random(2, rand, true);
-        //Palette pal = Palette.grey(colors);
-        //Palette pal = Palette.rainbow(colors,true);
-        //Palette pal = new RGBAPalette();
-        //int colors = 1001;
-        //int colors = 1000;
         int colors = pal.getColorCount();
-        //int colors = 2;
         org.excelsi.nausicaa.ca.Archetype a = new org.excelsi.nausicaa.ca.Archetype(dims, size, colors, Archetype.Neighborhood.moore, Values.discrete);
-        // org.excelsi.nausicaa.ca.Archetype a1 = new org.excelsi.nausicaa.ca.Archetype(1, size, colors);
-        // org.excelsi.nausicaa.ca.Archetype a2 = new org.excelsi.nausicaa.ca.Archetype(2, size, colors);
-        //Ruleset rs = new IndexedRuleset1d(a);
-        //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset2d(a2));
-        //Ruleset rs = new IndexedRuleset2d(a);
         Language lang = Languages.universal();
         Ruleset rs = new ComputedRuleset(a, lang);
-        //Ruleset rs = new IndexedRuleset1d(a1, new IndexedRuleset1d(a1));
         Rule rule = rs.random(rand, new Implicate(a, new Datamap(), lang)).next();
         ComputeMode cmode = ComputeMode.combined;
-        //pal = new Palette(Colors.pack(0,0,0,255), Colors.pack(255,255,255,255));
         Varmap vm = new Varmap();
         CA ca = new CA(
                 rule,
@@ -352,6 +338,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         createExperimentalMenu(shortcut, bar);
         createWindowMenu(shortcut, bar);
         root().setJMenuBar(bar);
+        LOG.debug("created menu bar");
 
         try {
             Class.forName("org.excelsi.nausicaa.MacCustomizer").getMethod("run", new Class[]{JMenuBar.class}).invoke(null, new Object[]{bar});
@@ -1346,22 +1333,28 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             vrs.setText("Variables ...");
             vrs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, shortcut | InputEvent.SHIFT_DOWN_MASK));
 
+            AbstractAction arch = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    _a.configureArchetype(NViewer.this, _random);
+                }
+            };
+            JMenuItem arche = auto.add(arch);
+            arche.setText("Archetype ...");
         }
 
         auto.addSeparator();
 
-        {
-            AbstractAction touni = new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-                    Actions.translateToUniversal(NViewer.this);
-                }
-            };
-            JMenuItem univer = auto.add(touni);
-            univer.setText("Translate to Universal");
-        }
+        AbstractAction touni = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                Actions.translateToUniversal(NViewer.this);
+            }
+        };
+        JMenuItem univer = auto.add(touni);
+        univer.setText("To Universal");
+
+        auto.addSeparator();
 
         {
-            auto.addSeparator();
             AbstractAction re = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
                     Rand.newSeed();
@@ -2117,6 +2110,8 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             _reditor.setJMenuBar(bar);
 
             _reditor.setVisible(true);
+            // for some reason on mac the incantation area doesn't get focus initially
+            _ruleEditor.focusIncantation();
 
             _reditor.addWindowListener(new WindowAdapter() {
                 public void windowClosed(WindowEvent e) {

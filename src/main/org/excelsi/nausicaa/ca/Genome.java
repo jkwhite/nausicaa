@@ -100,7 +100,7 @@ public final class Genome {
             tries++;
             LOG.debug("genome mutate try "+tries);
             child = replicate(im, mf, gf, m);
-            same = child.equals(this);
+            same = !m.updateArchetype() && child.equals(this); // skip same check if rule disabled
             if(same) {
                 LOG.warn("child same as orig: "+this);
             }
@@ -125,19 +125,24 @@ public final class Genome {
 
     private Genome replicate(final Implicate im, final WeightedFactory<GenomeMutator> mutators, final GenomeFactory gf, final MutationFactor mf) {
         final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(im,false)));
-        float mult = mf.alpha()/20f;
-        int max = Math.max(1, (int) (mult*(1+mf.random().nextInt(Math.max(1,cs.size()/6)))));
-        //System.err.println("applying "+max+" mutators");
-        if(mf.genomeMutator()!=null) max = 1;
-        LOG.info("applying "+max+" mutators (alpha="+mf.alpha()+", mult="+mult+", size="+cs.size()+")");
-        for(int i=0;i<max;i++) {
-            final GenomeMutator m = mf.genomeMutator()!=null?mf.genomeMutator():mutators.random(mf.random());
-            //System.err.println("premutate "+m+": "+cs);
-            m.mutate(cs, im, gf, mf);
-            //System.err.println("posmutate "+m+": "+cs);
+        if(!mf.updateArchetype()) {
+            float mult = mf.alpha()/20f;
+            int max = Math.max(1, (int) (mult*(1+mf.random().nextInt(Math.max(1,cs.size()/6)))));
+            //System.err.println("applying "+max+" mutators");
+            if(mf.genomeMutator()!=null) max = 1;
+            LOG.info("applying "+max+" mutators (alpha="+mf.alpha()+", mult="+mult+", size="+cs.size()+")");
+            for(int i=0;i<max;i++) {
+                final GenomeMutator m = mf.genomeMutator()!=null?mf.genomeMutator():mutators.random(mf.random());
+                //System.err.println("premutate "+m+": "+cs);
+                m.mutate(cs, im, gf, mf);
+                //System.err.println("posmutate "+m+": "+cs);
+            }
+            if(mf.symmetry()) {
+                symmetry(im.archetype(), cs);
+            }
         }
-        if(mf.symmetry()) {
-            symmetry(im.archetype(), cs);
+        else {
+            LOG.info("rule mutation disabled, using original");
         }
         StringBuilder b = new StringBuilder();
         for(Codon c:cs) {

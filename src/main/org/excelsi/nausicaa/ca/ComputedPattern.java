@@ -384,7 +384,9 @@ public final class ComputedPattern implements Pattern, Mutatable, Humanizable {
 
     @Override public ComputedPattern mutate(MutationFactor m) {
         GenomeFactory gf = new GenomeFactory();
-        return new ComputedPattern(_a, _logic.mutate(new Implicate(_a, m.datamap(), m.language(), m.vars()), gf, m));
+        LOG.debug("new archetype: "+m.archetype());
+        return new ComputedPattern(m.archetype()!=null?m.archetype():_a,
+                _logic.mutate(new Implicate(m.archetype()!=null?m.archetype():_a, m.datamap(), m.language(), m.vars()), gf, m));
     }
 
     public interface RuleLogic extends Humanizable {

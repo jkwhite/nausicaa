@@ -191,9 +191,7 @@ public class Machine implements Humanizable {
         }
     }
 
-    //public Machine mutate(Archetype a, GenomeFactory gf, MutationFactor m) {
     public Machine mutate(Implicate im, GenomeFactory gf, MutationFactor m) {
-        //return new Machine(_a, _d, _g.mutate(new Implicate(_a, _d), gf, m));
         return new Machine(im, _g.mutate(im, gf, m));
     }
 

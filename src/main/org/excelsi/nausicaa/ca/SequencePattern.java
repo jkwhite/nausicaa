@@ -267,17 +267,20 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                         Double nw = s.weight;
                         Double ndec = s.decay;
                         if(m.stage()==-1 || i==m.stage()) {
-                            boolean typ = false;
-                            if(m.rule() && m.updateWeight()) {
-                                typ = m.random().nextBoolean();
+                            boolean doWeight = false;
+                            if(m.updateArchetype()) {
+                                doWeight = false;
+                            }
+                            else if(m.rule() && m.updateWeight()) {
+                                doWeight = m.random().nextBoolean();
                             }
                             else if(m.rule()) {
-                                typ = false;
+                                doWeight = false;
                             }
                             else if(m.updateWeight()) {
-                                typ = true;
+                                doWeight = true;
                             }
-                            if(typ) {
+                            if(doWeight) {
                                 np = (ComputedPattern)s.p.copy(dm);
                                 if(nw==null) {
                                     nw = m.random().nextDouble();
