@@ -18,6 +18,7 @@ public class MultiTransform implements Transform {
     private boolean _weightVariations;
     private boolean _paramVariations;
     private boolean _initializerVariations;
+    private boolean _archetypeVariations;
 
 
     public MultiTransform(Random rand, MutationFactor f) {
@@ -59,6 +60,11 @@ public class MultiTransform implements Transform {
         return this;
     }
 
+    public MultiTransform archetypeVariations(boolean v) {
+        _archetypeVariations = v;
+        return this;
+    }
+
     public CA transform(CA c) {
         for(int i=0;i<4;i++) {
             try {
@@ -96,6 +102,11 @@ public class MultiTransform implements Transform {
                     case 3:
                         if(_paramVariations) {
                             t = new ParameterTransform(_rand, _factor);
+                            break;
+                        }
+                    case 2:
+                        if(_archetypeVariations) {
+                            t = new ArchetypeTransform(_rand);
                             break;
                         }
                     case 1:

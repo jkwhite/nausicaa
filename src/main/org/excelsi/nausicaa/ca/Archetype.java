@@ -64,9 +64,10 @@ public final class Archetype {
         if(colors<2&&values!=Values.continuous) {
             throw new IllegalArgumentException("colors must be at least 2: "+colors);
         }
-        if(dims==1 && neighborhood==Neighborhood.vonneumann) {
-            throw new IllegalArgumentException("1-dimensional neighborhood cannot be vonneumann");
-        }
+        // TODO: why was this here?
+        // if(dims==1 && neighborhood==Neighborhood.vonneumann) {
+            // throw new IllegalArgumentException("1-dimensional neighborhood cannot be vonneumann");
+        // }
         _dims = dims;
         _size = size;
         _colors = colors;

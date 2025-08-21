@@ -1454,7 +1454,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         mutate.add(rotmeta);
         rotmeta.setText("Rotate Meta");
 
-        final JCheckBoxMenuItem[] mhack = new JCheckBoxMenuItem[6];
+        final JCheckBoxMenuItem[] mhack = new JCheckBoxMenuItem[7];
 
         mutate.addSeparator();
         JCheckBoxMenuItem incHueVariations = new JCheckBoxMenuItem(new AbstractAction() {
@@ -1521,6 +1521,19 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         incInitVariations.setText("Initializer variations");
         incInitVariations.setState(_config.getInitializerVariations());
         incInitVariations.setSelected(_config.getInitializerVariations());
+
+        JCheckBoxMenuItem incArchVariations = new JCheckBoxMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _config.setArchetypeVariations(!_config.getArchetypeVariations());
+                mhack[6].setState(!mhack[6].getState());
+                mhack[6].setSelected(!mhack[6].getState());
+            }
+        });
+        mutate.add(incArchVariations);
+        mhack[6] = incArchVariations;
+        incArchVariations.setText("Archetype variations");
+        incArchVariations.setState(_config.getArchetypeVariations());
+        incArchVariations.setSelected(_config.getArchetypeVariations());
 
         JMenuItem mparams = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {

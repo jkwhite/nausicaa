@@ -31,6 +31,7 @@ public class Config {
     private boolean _weightVariations = true;
     private boolean _paramVariations = true;
     private boolean _initializerVariations = true;
+    private boolean _archetypeVariations = false;
     private final Map<String,Object> _variables = new HashMap<>();
     private final Map<String,Varmap> _funcArgs = new HashMap<>();
     private String _saveDir = System.getProperty("user.home");
@@ -192,6 +193,15 @@ public class Config {
         return _initializerVariations;
     }
 
+    public void setArchetypeVariations(boolean archVariations) {
+        _archetypeVariations = archVariations;
+        notify("archetypeVariations");
+    }
+
+    public boolean getArchetypeVariations() {
+        return _archetypeVariations;
+    }
+
     public void setParamVariations(boolean paramVariations) {
         _paramVariations = paramVariations;
         notify("paramVariations");
@@ -330,6 +340,7 @@ public class Config {
         o.addProperty("weightVariations", _weightVariations);
         o.addProperty("initializerVariations", _weightVariations);
         o.addProperty("paramVariations", _paramVariations);
+        o.addProperty("archetypeVariations", _archetypeVariations);
         o.addProperty("saveDir", _saveDir);
         o.addProperty("langDir", _langDir);
         o.addProperty("imgDir", _imgDir);
@@ -383,6 +394,7 @@ public class Config {
             c._weightVariations = Json.bool(o, "weightVariations", true);
             c._initializerVariations = Json.bool(o, "initializerVariations", true);
             c._paramVariations = Json.bool(o, "paramVariations", true);
+            c._archetypeVariations = Json.bool(o, "archetypeVariations", true);
             c._saveDir = Json.string(o, "saveDir", c._saveDir);
             c._langDir = Json.string(o, "langDir", c._langDir);
             c._imgDir = Json.string(o, "imgDir", c._imgDir);
