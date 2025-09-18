@@ -222,8 +222,10 @@ public class GenomeParser {
     }
     
     private Rule parse2(final String g, final Ruleset origin) {
-        // the 100: prefix is arbitrary, it just needs to be present in order to parse correctly
-        Pair<List<S>,Datamap> pa = parseS("100:"+g.replace('-',' '));
+        // the 100: prefix is arbitrary, it just needs to be present
+        // in order to parse older versions correctly
+        final String fixed = g.indexOf(":")>0?g:"100:"+g.replace('-',' ');
+        Pair<List<S>,Datamap> pa = parseS(fixed);
         List<S> ps = pa.one;
         Datamap dm = pa.two;
         SequencePattern.Sequence s = new SequencePattern.Sequence();

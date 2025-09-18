@@ -136,12 +136,16 @@ public class JfxCA extends Group {
     }
 
     public Runnable precompute(Plane p, Runnable after) {
+        LOG.debug("creating runnable for precompute");
         return new Runnable() {
             @Override public void run() {
                 Runnable render = addPlane(p, false);
+                LOG.debug("queueing addPlane with "+render);
                 Platform.runLater(new Runnable() {
                     @Override public void run() {
+                        LOG.debug("running render");
                         render.run();
+                        LOG.debug("running after");
                         after.run();
                     }
                 });
@@ -201,7 +205,7 @@ public class JfxCA extends Group {
             List<Blobs.Blob> blobs = null;
             if(_render==Render.best) {
                 blobs = new Blobs().blobs(bp, Blobs.Mode.finite);
-                if(blobs.size()<40000) {
+                if(blobs.size()<50000) {
                     _render = Render.blob_mesh;
                 }
                 else if(blobs.size()<100000) {
@@ -604,8 +608,8 @@ public class JfxCA extends Group {
             PooledBox b = new PooledBox(_c, _scale, _scale, _scale);
             Material m = _materials.get(_c);
             b.setMaterial(m);
-            //b.setCache(true);
-            //b.setCacheHint(CacheHint.SCALE_AND_ROTATE);
+            b.setCache(true);
+            b.setCacheHint(CacheHint.SCALE_AND_ROTATE);
             //b.setDrawMode(DrawMode.LINE);
             return b;
         }

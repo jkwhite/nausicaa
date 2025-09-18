@@ -116,8 +116,12 @@ application {
         "--add-opens","javafx.graphics/javafx.scene.layout=ALL-UNNAMED",
         "--add-opens","javafx.graphics/javafx.scene.shape=ALL-UNNAMED",
         "--add-opens","javafx.controls/javafx.scene.control=ALL-UNNAMED",
-        // "-Dprism.verbose=true",
         "-Dapple.laf.useScreenMenuBar=true",
+        "-Dprism.verbose=true",
+        "-Dquantum.multithreaded=true",
+        "-Djavafx.animation.fullspeed=true",
+        "-Djavafx.animation.framerate=120",
+        "-Djavafx.animation.pulse=120",
         "-XX:-OmitStackTraceInFastThrow",
         "-Dapp.root=HACK_FOR_GRADLE"
         ]

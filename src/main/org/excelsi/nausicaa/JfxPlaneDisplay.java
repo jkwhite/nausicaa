@@ -20,6 +20,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import javax.swing.Icon;
 import javax.swing.JTextArea;
 import javax.swing.JDialog;
@@ -47,6 +48,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Sphere;
 import javafx.scene.shape.Box;
@@ -54,6 +56,8 @@ import javafx.scene.SceneAntialiasing;
 import javafx.scene.Camera;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.ParallelCamera;
+import javafx.scene.control.Label;
+import javafx.scene.control.TitledPane;
 import javafx.animation.RotateTransition;
 import javafx.animation.ScaleTransition;
 import javafx.util.Duration;
@@ -80,7 +84,6 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     private JFXPanel _img;
     private JScrollPane _show;
     private List<Animation> _animations = new ArrayList<Animation>();
-    // private RotateTransition _animations;
     private boolean _shown = true;
     private Rule _r;
     private CA _c;
@@ -114,21 +117,16 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         setBackground(Color.BLACK);
         p.setBackground(Color.BLACK);
         p.setForeground(Color.BLACK);
-        _label = new JLabel("NOTHING", javax.swing.SwingConstants.CENTER);
+        _label = new JLabel("", javax.swing.SwingConstants.CENTER);
         _label.setBackground(Color.BLACK);
-        _label.setForeground(Color.BLACK);
+        _label.setForeground(Color.WHITE);
         _img = new JFXPanel();
-        // _img.setPreferredSize(new Dimension(2*w, 2*h));
+        // _img.setDoubleBuffered(false);
         Dimension sd = cellSize();
         _img.setPreferredSize(new Dimension(sd.width-50, sd.height-50));
         p.add(_img, BorderLayout.CENTER);
-        // JScrollPane scr = new JScrollPane(p);
-        // scr.setBackground(Color.BLACK);
-        // scr.setForeground(Color.BLACK);
-        // add(scr, BorderLayout.CENTER);
-        // _show = scr;
+        p.add(_label, BorderLayout.SOUTH);
         add(p, BorderLayout.CENTER);
-        // _show = scr;
         Platform.runLater(()->{ initScene(); });
         Platform.setImplicitExit(false);
         LOG.debug("scheduled initScene");
@@ -172,17 +170,16 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     }
 
     private void initScene() {
-        System.err.println("running initScene");
+        LOG.debug("running initScene");
         final double INC = 5d;
         _root = new Group();
         _root.setScaleX(_scale);
         _root.setScaleY(_scale);
         _root.setScaleZ(_scale);
-        // final int sz = 300;
         final int sz = _opts.root()?900:300;
         Dimension sd = cellSize(); //_sizer.getAppSize();
         LOG.info("isRoot="+_opts.root());
-        Scene s = new Scene(_root, sd.width, sd.height, true, SceneAntialiasing.BALANCED);
+        Scene s = new Scene(_root, sd.width, sd.height, true, SceneAntialiasing.DISABLED /*BALANCED*/);
         s.setFill(javafx.scene.paint.Color.BLACK);
         final PerspectiveCamera cam = new PerspectiveCamera(false);
         // final ParallelCamera cam = new ParallelCamera();
@@ -193,26 +190,25 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         // cam.setTranslateY(-900);
         //cam.getTransforms().add(new Rotate(45, new Point3D(1,0,0)));
 
+
         Group rotParent2 = new Group();
         Group rotParent = new Group();
         Group parent = new Group();
-        // parent.setTranslateX((int)(sz*.8));
-        // parent.setTranslateY((int)(sz*.4));
         parent.setTranslateX(sd.width/2);
         parent.setTranslateY(sd.height/2);
         parent.setTranslateZ((int)(sz));
         parent.getTransforms().add(new Rotate(-45, new Point3D(1,0,0)));
 
-        //_jfxCa = new JfxCA(_ca);
-        //final Plane p = _ca.createPlane();
-        //_jfxCa.addPlane(p);
-        //parent.getChildren().add(_jfxCa);
+        // TitledPane tp = new TitledPane("Hollo Werld", parent);
+        // _root.getChildren().add(tp);
+// 
         _root.getChildren().add(parent);
         _parent = parent;
         parent.getChildren().add(rotParent2);
         rotParent2.getChildren().add(rotParent);
-        // parent.getChildren().add(rotParent);
         _rotParent = rotParent;
+
+        // parent.getChildren().add(new Label("Hollo Werld"));
 
         // Sphere sph = new Sphere(20);
         // sph.setTranslateZ(20);
@@ -411,31 +407,14 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         }
         _c = ca;
         if(Platform.isFxApplicationThread()) {
+            LOG.debug("setting ca: "+ca);
             _c = ca;
+            _label.setText(new Info(_c).summarize());
             if(_jfxCa!=null) {
-                //_parent.getChildren().remove(_jfxCa);
                 _rotParent.getChildren().remove(_jfxCa);
             }
-            _jfxCa = new JfxCA(ca, /*_scale* */SCALE_MULT, 40, JfxWorld.Render.blob_mesh);
-            // _jfxCa.setTranslateX(ca.getWidth()*_scale*SCALE_MULT/2);
-            // _jfxCa.setTranslateY(ca.getDepth()*_scale*SCALE_MULT/1.5);
-            // _jfxCa.setTranslateZ(-ca.getHeight()*_scale*SCALE_MULT/1.5);
-            _jfxCa.setTranslateX(ca.getWidth()*SCALE_MULT/2);
-            _jfxCa.setTranslateY(ca.getDepth()*SCALE_MULT/1.5);
-            _jfxCa.setTranslateZ(-ca.getHeight()*SCALE_MULT/1.5);
-            //_parent.getChildren().add(_jfxCa);
+            _jfxCa = createJfxCA(ca);
             _rotParent.getChildren().add(_jfxCa);
-            //RotateTransition t = new RotateTransition(Duration.millis(36000), _jfxCa);
-            //t.setByAngle(360);
-            //t.setCycleCount(t.INDEFINITE);
-            //t.play();
-            //RotateTransition t = new RotateTransition(Duration.millis(72000), _jfxCa);
-            //t.setByAngle(360);
-            //t.setCycleCount(t.INDEFINITE);
-            //t.play();
-
-            //Platform.runLater(()->{_jfxCa.clear();});
-            //PAR1
             setPlane(_c.createPlane(pool, opt));
         }
         else {
@@ -460,11 +439,18 @@ public class JfxPlaneDisplay extends PlaneDisplay {
                                 plane.unlockRead();
                             }
                         }
+                        LOG.debug("setPlane complete");
                     }
                 });
-            // LOG.debug("queuing setPlane", new Exception());
+            LOG.debug("queuing setPlane");
             // Platform.runLater(r);
-            Pools.adhoc().submit(compute);
+            Future f = Pools.adhoc().submit(compute);
+            try {
+                f.get();
+            }
+            catch(Exception e) {
+                throw new RuntimeException(e);
+            }
             _queue++;
         }
         else {
@@ -479,7 +465,6 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         if(_scale!=scale) {
             double signed = 0.5d * (_scale < scale ? 1d : -1d);
             _scale = scale;
-            // setCA(_c);
             if(_scaler==null) {
                 _scaler = new ScaleTransition(Duration.millis(1000), _root);
             }
@@ -492,9 +477,6 @@ public class JfxPlaneDisplay extends PlaneDisplay {
             _scaler.setToX(_scale);
             _scaler.setToY(_scale);
             _scaler.setToZ(_scale);
-            // _scaler.setByX(signed);
-            // _scaler.setByY(signed);
-            // _scaler.setByZ(signed);
             _scaler.play();
         }
     }
@@ -563,5 +545,43 @@ public class JfxPlaneDisplay extends PlaneDisplay {
                         cameraPosition.getX(), 
                         cameraPosition.getY(), 
                         cameraPosition.getZ()));
+    }
+
+    private JfxCA createJfxCA(CA ca) {
+        JfxCA jfxCa = new JfxCA(ca, SCALE_MULT, 40, JfxWorld.Render.best);
+        jfxCa.setTranslateX(ca.getWidth()*SCALE_MULT/2);
+        jfxCa.setTranslateY(ca.getDepth()*SCALE_MULT/1.5);
+        jfxCa.setTranslateZ(-ca.getHeight()*SCALE_MULT/1.5);
+        new MouseRotator(jfxCa);
+        return jfxCa;
+    }
+
+    private static class MouseRotator {
+        private final Rotate _rx;
+        private final Rotate _ry;
+        private double _x;
+        private double _y;
+
+
+        public MouseRotator(Node n) {
+            _rx = new Rotate(0, new Point3D(0,0,1));
+            _ry = new Rotate(0, new Point3D(1,0,0));
+            n.getTransforms().add(_rx);
+            n.getTransforms().add(_ry);
+
+            n.setOnMousePressed(e->{
+                _x = e.getSceneX();
+                _y = e.getSceneY();
+            });
+            n.setOnMouseDragged(e->{
+                double cx = e.getSceneX();
+                double cy = e.getSceneY();
+                // LOG.trace("x:"+_x+", y:"+_y+", cx: "+cx+", cy: "+cy);
+                double dx = cx-_x;
+                double dy = _y-cy;
+                _rx.setAngle(dx/2.0);
+                _ry.setAngle(dy/2.0);
+            });
+        }
     }
 }

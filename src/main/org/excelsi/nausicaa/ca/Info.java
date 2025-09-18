@@ -20,6 +20,14 @@ public class Info {
         return _ca.getPalette().getColorCount();
     }
 
+    public String summarize() {
+        String text = _ca.getRule().humanize();
+        if(text.length()>42) {
+            text = "..."+text.substring(text.length()-42,text.length());
+        }
+        return text;
+    }
+
     @Override public String toString() {
         return colors()+"/"+b10Id();
     }

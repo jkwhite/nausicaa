@@ -2263,7 +2263,7 @@ public class Actions {
             JRadioButton rvon = new JRadioButton(von);
             rvon.setText(neighbor.getName());
             nei.add(rvon);
-            if(neighbor.name().equalsIgnoreCase(defNei)) {
+            if(neighbor.getName().equalsIgnoreCase(defNei)) {
                 rvon.setSelected(true);
                 neihack[0] = neighbor;
             }

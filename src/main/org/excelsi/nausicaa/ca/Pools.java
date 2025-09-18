@@ -5,10 +5,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 
 public class Pools {
+    private static final Logger LOG = LoggerFactory.getLogger(Pools.class);
+
     private static final ExecutorService ADHOC = Executors.newFixedThreadPool(4, new ThreadFactory() {
         public Thread newThread(Runnable r) {
+            LOG.debug("spawning new thread for "+r);
             Thread t = new Thread(r);
             t.setDaemon(true);
             return t;

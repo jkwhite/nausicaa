@@ -28,7 +28,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import javax.imageio.ImageIO;
 import java.awt.image.*;
-//import org.excelsi.rlyehian.Codec;
 import com.google.gson.*;
 
 import org.slf4j.LoggerFactory;
@@ -857,7 +856,7 @@ public final class CA {
     }
 
     @Override public String toString() {
-        return "ca::{w:"+_w+", h:"+_h+", c:"+_r.archetype().colors()+"}";
+        return "ca::{w:"+_w+", h:"+_h+", d:"+_d+", pre:"+_prelude+", c:"+_r.archetype().colors()+"}";
     }
 
     private Random branchRandom() {

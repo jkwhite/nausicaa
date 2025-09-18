@@ -168,15 +168,7 @@ public class SwingPlaneDisplay extends PlaneDisplay {
         _rend = new Rendering()
             .composition(Rendering.Composition.from(_config.getVariable("composite_mode","front")));
         setPlane(_c.createPlane(pool, opt));
-        Info i = new Info(_c);
-        Rule r = ca.getRule();
-        String text = r.humanize();
-        _meta.setToolTipText("");
-        if(text.length()>42) {
-            _meta.setToolTipText(text);
-            text = "..."+text.substring(text.length()-42,text.length());
-        }
-        _meta.setText(text);
+        _meta.setText(new Info(_c).summarize());
     }
 
     public void setPlane(Plane plane) {

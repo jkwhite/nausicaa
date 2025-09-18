@@ -196,14 +196,12 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     }
 
     public void tick(Rule r) {
-        //Branch<World> child = getBranch().grow(new World(r, World.getSize(), World.getSize()), "");
-        //addBranch(child);
-        //_timeline.notifyListeners(new TimelineEvent("tick"));
-        _ca = mutate(_ca);
+        CA nca = mutate(_ca);
+        LOG.debug("tick mutated "+_ca+" into "+nca);
+        _ca = nca;
         NViewer.getUIActions().doWait(new Runnable() {
             public void run() {
                 reroll(_lastInit);
-                //_timeline.notifyListeners(new TimelineEvent("tock"));
             }
         }, _show?0:500);
     }
@@ -217,9 +215,6 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     }
 
     private void tick(final PlaneDisplay d, final boolean mutate, final boolean branch) {
-        //Branch<World> child = getBranch().grow(new World(d.getRule(), World.getSize(), World.getSize()), "");
-        //addBranch(child);
-        //_timeline.notifyListeners(new TimelineEvent("tick"));
         Worker.instance().push(new Runnable() {
             public void run() {
                 for(int i=0;i<4;i++) {
@@ -237,17 +232,19 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                     NViewer.getUIActions().branch(d.getCA());
                 }
                 else {
-                    /*NViewer.getUIActions()*/_ui.doWait(new Runnable() {
+                    _ui.doWait(new Runnable() {
                         public void run() {
-                            if(mutate) {
-                                _ca = mutate(d.getCA());
-                            }
-                            else {
-                                _ca = d.getCA();
-                            }
+                            CA nca = mutate ? _ca = mutate(d.getCA()) : d.getCA();
+                            // if(mutate) {
+                                // _ca = mutate(d.getCA());
+                            // }
+                            // else {
+                                // _ca = d.getCA();
+                            // }
+                            LOG.debug("tick mutated "+_ca+" into "+nca);
+                            _ca = nca;
                             _config.setWeight(_ca.getWeight());
                             reroll(_lastInit);
-                            //_timeline.notifyListeners(new TimelineEvent("tock"));
                         }
                     }, _show?0:500);
                 }
@@ -498,15 +495,13 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         _timeline.notifyListeners(new TimelineEvent("tick"));
         java.util.List<Thread> threads = new ArrayList<Thread>();
         _lastInit = init;
-        //final ExecutorService pool = Pools.named("compute", 3);
         final ExecutorService pool = Pools.prelude();
         final boolean useHistory = _config.getBooleanVariable("mutator_neverrepeat",false);
         final GOptions opt = new GOptions(true, _show?1:Pools.preludeSize(), 0, _ca.getWeight() /*getFrameWeight()*/);
         if(_show) {
             int width = getCAWidth() > 60 ? getCAWidth()/3-10 : getCAWidth();
             int height = getCAHeight() > 60 ? getCAHeight()/3-10 : getCAHeight();
-            final CA ca = _ca.size(width,height,getCADepth(),getCAPrelude());
-            //final Vector<Long> created = new Vector<Long>();
+            final CA ca = _ca.size(width,height,getCADepth() > 60 ? getCADepth()/3-10 : getCADepth(),getCAPrelude());
             Thread tdm = new Thread() {
                 public void run() {
                     _displays[4].setCA(ca, pool, opt);
