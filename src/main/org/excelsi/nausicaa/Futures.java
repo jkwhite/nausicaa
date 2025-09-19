@@ -16,13 +16,11 @@ import org.excelsi.nausicaa.ca.*;
 
 public class Futures extends JComponent implements ConfigListener, PlaneDisplayProvider, PlanescapeProvider {
     private static final Logger LOG = LoggerFactory.getLogger(Futures.class);
-    //private int _w, _h;
+
     private boolean _show = true;
-    //private java.util.List<Branch<World>> _timeline = new LinkedList<Branch<World>>();
     private PlaneDisplay[] _displays;
     private int _current = -1;
     private float _scale = 1.0f;
-    //private Rule.Initialization _lastInit;
     private Initializer _lastInit;
     private Random _random;
     private final String _name;
@@ -157,22 +155,6 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         return _enableAnimations;
     }
 
-    public void toggleEditor() {
-        /*
-        if(_editor!=null) {
-            _editor.setVisible(false);
-            _editor = null;
-        }
-        else {
-            _editor = new JFrame("Editor");
-            _editor.getContentPane().add(new CAEditor(this));
-            _editor.pack();
-            _editor.setSize(_editor.getContentPane().getPreferredSize());
-            _editor.setVisible(true);
-        }
-        */
-    }
-
     public void setCA(CA ca) {
         final int width = getCAWidth();
         final int height = getCAHeight();
@@ -181,7 +163,6 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         NViewer.getUIActions().doWait(new Runnable() {
             public void run() {
                 reroll(_lastInit);
-                //_timeline.notifyListeners(new TimelineEvent("tock"));
             }
         }, _show?0:500);
     }
@@ -235,12 +216,6 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                     _ui.doWait(new Runnable() {
                         public void run() {
                             CA nca = mutate ? _ca = mutate(d.getCA()) : d.getCA();
-                            // if(mutate) {
-                                // _ca = mutate(d.getCA());
-                            // }
-                            // else {
-                                // _ca = d.getCA();
-                            // }
                             LOG.debug("tick mutated "+_ca+" into "+nca);
                             _ca = nca;
                             _config.setWeight(_ca.getWeight());
@@ -253,7 +228,6 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     }
 
     private MutationFactor createMutationFactor(CA ca) {
-        //return MutationFactor.defaultFactor().withAlpha(Integer.parseInt(_config.getVariable("mutator_alpha", "20")));
         MutationFactor mf = Actions.createMutationFactor(ca, _config, _random);
         return mf;
     }
@@ -271,12 +245,10 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     }
 
     public int getCAWidth() {
-        //return _w;
         return _config.getWidth();
     }
 
     public int getCAHeight() {
-        //return _h;
         return _config.getHeight();
     }
 
@@ -295,24 +267,6 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     public float getFrameWeight() {
         return _config.getFloatVariable("weight", 1f);
     }
-
-    /*
-    public void setCASize(int w, int h) {
-        if(w!=_w||h!=_h) {
-            _w = w;
-            _h = h;
-            Worker.instance().push(new Runnable() {
-                public void run() {
-                    NViewer.getUIActions().doWait(new Runnable() {
-                        public void run() {
-                            reinit();
-                        }
-                    }, 1000);
-                }
-            });
-        }
-    }
-    */
 
     public void setScale(final float scale) {
         if(_scale!=scale) {
@@ -380,13 +334,10 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                 depth = _config.getDepth() > 60 ? getCADepth()/3 : getCADepth();
                 prelude = _config.getPrelude();
             }
-            // int depth = _ca.getDepth() > 60 ? _ca.getDepth()/3-10 : _ca.getDepth();
-            // int prelude = _ca.getPrelude();
             double weight = _ca.getWeight();
             //WHAT
             _ca = _ca.size(width, height, depth, prelude).weight(weight);
             PlaneDisplay root = createPlaneDisplay(_ca, false);
-            //PlaneDisplay root = createPlaneDisplay(_ca.size(width, height, depth, prelude));
             root.setScale(_scale);
             for(int i=0;i<_displays.length;i++) {
                 if(i==4) {
@@ -409,8 +360,6 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         else {
             futures.setLayout(new GridLayout(1, 1));
             _displays = new PlaneDisplay[1];
-            // final int width = getCAWidth();
-            // final int height = getCAHeight();
             int width, height, depth, prelude;
             if(overrideConfig) {
                 width = _ca.getWidth();
@@ -435,8 +384,6 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     }
 
     private PlaneDisplay createPlaneDisplay(final CA ca, boolean root) {
-        //GOptions g = new GOptions(true, 1, 0, ca.getWeight(), 0, ca.getComputeMode())
-            //.computeMode(ComputeMode.from(_config.<String>getVariable("rgb_computemode","combined")));
         GOptions g = new GOptions(true, _config.getIntVariable("animation_computeCores",1), 0, ca.getWeight(), 0, ca.getComputeMode())
             .metaMode(ca.getMetaMode());
         PlaneDisplay d;
@@ -451,15 +398,6 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                 return new SwingPlaneDisplay(ca, g, _config);
         }
     }
-
-    /*
-    private Rule createMutation(Rule root) {
-        System.err.println("orig: "+root);
-        Rule m = root.origin().random(_random).next();
-        System.err.println("mut: "+m);
-        return m;
-    }
-    */
 
     public void setShow(boolean show) {
         if(_show!=show) {
@@ -519,14 +457,12 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                             CA nca;
                             int tries = 0;
                             do {
-                                //System.err.print(".");
                                 nca = mutate(ca);
                                 ++tries;
                                 if(true||tries%10==0) {
                                     LOG.debug("tried mutation "+tries+" times");
                                 }
                             } while(useHistory && History.named(_name).contains(nca) && tries<100);
-                            //System.err.println();
                             if(reroll) {
                                 nca = nca.seed();
                             }

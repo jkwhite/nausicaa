@@ -177,7 +177,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         _root.setScaleY(_scale);
         _root.setScaleZ(_scale);
         final int sz = _opts.root()?900:300;
-        Dimension sd = cellSize(); //_sizer.getAppSize();
+        Dimension sd = cellSize();
         LOG.info("isRoot="+_opts.root());
         Scene s = new Scene(_root, sd.width, sd.height, true, SceneAntialiasing.DISABLED /*BALANCED*/);
         s.setFill(javafx.scene.paint.Color.BLACK);
@@ -185,11 +185,6 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         // final ParallelCamera cam = new ParallelCamera();
         cam.setFarClip(12000);
         s.setCamera(cam);
-
-        // cam.setTranslateX(-600);
-        // cam.setTranslateY(-900);
-        //cam.getTransforms().add(new Rotate(45, new Point3D(1,0,0)));
-
 
         Group rotParent2 = new Group();
         Group rotParent = new Group();
@@ -199,9 +194,6 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         parent.setTranslateZ((int)(sz));
         parent.getTransforms().add(new Rotate(-45, new Point3D(1,0,0)));
 
-        // TitledPane tp = new TitledPane("Hollo Werld", parent);
-        // _root.getChildren().add(tp);
-// 
         _root.getChildren().add(parent);
         _parent = parent;
         parent.getChildren().add(rotParent2);
@@ -364,14 +356,12 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         return _img;
     }
 
-    private Icon _oldIcon;
     public void toggleShow() {
         if(_shown) {
-            _oldIcon = _label.getIcon();
-            _label.setIcon(null);
+            _img.setVisible(true);
         }
         else {
-            _label.setIcon(_oldIcon);
+            _img.setVisible(false);
         }
         _shown = ! _shown;
         invalidate();
@@ -410,6 +400,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
             LOG.debug("setting ca: "+ca);
             _c = ca;
             _label.setText(new Info(_c).summarize());
+            _img.setVisible(true);
             if(_jfxCa!=null) {
                 _rotParent.getChildren().remove(_jfxCa);
             }

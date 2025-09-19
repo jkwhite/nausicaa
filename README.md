@@ -765,15 +765,21 @@ frequency.
 
 ### Other Options
 
-* Reroll: Sets a new seed value for this automata's random source and resets
-the lattice.
-* Configure parameters: Displays a dialog for setting lattice width, height,
+* Parameters: Displays a dialog for setting lattice width, height,
 depth, and prelude (number of iterations to run before displaying initial lattice)
+* Metadata: Displays a dialog for setting a name and description.
 * Variables: Displays a dialog for setting variables, if any have been defined.
 See [Variables](#variables) for details about how to use variables.
+* Archetype: Displays a dialog for changing various aspects of the automata
+that were initially set when the automata was created, including dimensionality,
+neighborhood, and value type.
+
 * Translate to Universal: If the automata's language (as chosen at creation)
 was not `Universal`, then this translates the automata's genome into the universal
 language. It's not very useful, really, and might be removed in the future.
+
+* Reroll: Sets a new seed value for this automata's random source and resets
+the lattice.
 
 ## Animation Menu
 
@@ -854,7 +860,8 @@ Mutations can be applied in several ways:
 * By using the ``Mutations`` menu to specifically select a type of
 incantation mutation.
 * By enabling other kinds of mutations like *Weight variations*,
-*Hue variations*, *Parameter variations*, and *Initializer variations*,
+*Hue variations*, *Parameter variations*, *Initializer variations*,
+and *Archetype variations*
 which are found under the ``Mutations`` menu. When enabled, these
 mutations will also show up as randomly-generated mutations in the main
 window.

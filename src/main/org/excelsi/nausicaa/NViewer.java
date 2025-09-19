@@ -1350,7 +1350,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             }
         };
         JMenuItem univer = auto.add(touni);
-        univer.setText("To Universal");
+        univer.setText("Translate to Universal");
 
         auto.addSeparator();
 
