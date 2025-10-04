@@ -331,7 +331,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             else {
                 width = getCAWidth() > 60 ? getCAWidth()/3-10 : getCAWidth();
                 height = getCAHeight() > 60 ? getCAHeight()/3-10 : getCAHeight();
-                depth = _config.getDepth() > 60 ? getCADepth()/3 : getCADepth();
+                depth = _config.getDepth() > 60 ? getCADepth()/3-10 : getCADepth();
                 prelude = _config.getPrelude();
             }
             double weight = _ca.getWeight();
@@ -439,7 +439,8 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         if(_show) {
             int width = getCAWidth() > 60 ? getCAWidth()/3-10 : getCAWidth();
             int height = getCAHeight() > 60 ? getCAHeight()/3-10 : getCAHeight();
-            final CA ca = _ca.size(width,height,getCADepth() > 60 ? getCADepth()/3-10 : getCADepth(),getCAPrelude());
+            int depth = getCADepth() > 60 ? getCADepth()/3-10 : getCADepth();
+            final CA ca = _ca.size(width,height,depth,getCAPrelude());
             Thread tdm = new Thread() {
                 public void run() {
                     _displays[4].setCA(ca, pool, opt);

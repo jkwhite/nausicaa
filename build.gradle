@@ -96,7 +96,7 @@ sourceSets {
 }
 
 javafx {
-    version = '21'
+    version = '25'
     modules = [ 'javafx.base', 'javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.swing', 'javafx.web' ]
 }
 
@@ -155,7 +155,7 @@ distributions {
 
 setupBuilder {
     vendor          = "excelsiorg";
-    copyright       = "Copyright © 2024 excelsiorg"
+    copyright       = "Copyright © 2025 excelsiorg"
     description     = "Nausicaa";
     
     // optional, defaults to project name

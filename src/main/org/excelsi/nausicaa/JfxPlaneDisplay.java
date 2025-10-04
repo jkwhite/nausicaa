@@ -396,16 +396,19 @@ public class JfxPlaneDisplay extends PlaneDisplay {
             throw new IllegalArgumentException("null ca");
         }
         _c = ca;
+        LOG.debug("setting ca: "+ca);
         if(Platform.isFxApplicationThread()) {
-            LOG.debug("setting ca: "+ca);
             _c = ca;
             _label.setText(new Info(_c).summarize());
-            _img.setVisible(true);
+            if(!_img.isVisible()) {
+                _img.setVisible(true);
+            }
             if(_jfxCa!=null) {
                 _rotParent.getChildren().remove(_jfxCa);
             }
             _jfxCa = createJfxCA(ca);
             _rotParent.getChildren().add(_jfxCa);
+            // TODO: should not run on jfx thread
             setPlane(_c.createPlane(pool, opt));
         }
         else {
@@ -552,6 +555,8 @@ public class JfxPlaneDisplay extends PlaneDisplay {
         private final Rotate _ry;
         private double _x;
         private double _y;
+        private double _lastAngleX = 0d;
+        private double _lastAngleY = 0d;
 
 
         public MouseRotator(Node n) {
@@ -570,8 +575,12 @@ public class JfxPlaneDisplay extends PlaneDisplay {
                 // LOG.trace("x:"+_x+", y:"+_y+", cx: "+cx+", cy: "+cy);
                 double dx = cx-_x;
                 double dy = _y-cy;
-                _rx.setAngle(dx/2.0);
-                _ry.setAngle(dy/2.0);
+                _rx.setAngle(_lastAngleX+dx/2.0); // 2.0 arbitrary scaling factor
+                _ry.setAngle(_lastAngleY+dy/2.0);
+            });
+            n.setOnMouseReleased(e->{
+                _lastAngleX = _rx.getAngle();
+                _lastAngleY = _ry.getAngle();
             });
         }
     }

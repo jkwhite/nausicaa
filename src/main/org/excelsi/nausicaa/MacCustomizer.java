@@ -15,10 +15,6 @@ public class MacCustomizer {
         boolean isMacOS = System.getProperty("os.name").contains("Mac OS");
         System.err.println("ismac "+isMacOS);
         if (isMacOS) {
-            // MRJApplicationUtils.registerAboutHandler(macController);
-            //MRJApplicationUtils.registerPrefsHandler(macController);
-            // MRJApplicationUtils.registerQuitHandler(macController);
-
             Desktop desktop = Desktop.getDesktop();
 
             desktop.setAboutHandler(e -> macController.handleAbout());
@@ -33,7 +29,7 @@ public class MacCustomizer {
     public static class MacOSXController implements MRJAboutHandler, MRJQuitHandler, MRJPrefsHandler {
         public void handleAbout() {
             JOptionPane.showMessageDialog(null, 
-                "<html>Copyright (C) 2007-2024 John K White, dhcmrlchtdj@gmail.com<br/>Licensed under the terms of the GNU General Public License Version 3</html>", 
+                "<html>Copyright (C) 2007-2025 JK White, dhcmrlchtdj@gmail.com<br/>Licensed under the terms of the GNU General Public License Version 3</html>", 
                 "NausiCAä 1.2", 
                 JOptionPane.INFORMATION_MESSAGE,
                 new ImageIcon(MacCustomizer.class.getResource("/na1_164.png")));

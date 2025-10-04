@@ -47,6 +47,7 @@ public class RuleEditor extends JComponent implements TimelineListener {
 
     public void disconnect() {
         _timeline.removeTimelineListener(this);
+        LOG.debug("removed rule editor as timeline listener");
     }
 
     public void commit() {
