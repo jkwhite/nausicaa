@@ -3591,11 +3591,11 @@ public class Codons {
         @Override public boolean supports(Values v) { return true; }
 
         @Override public void op(int[] p, IntTape t, Pattern.Ctx ctx) {
-            if(++_cnt%1000==0) LOG.debug("executing placeholder '"+_name+"'");
+            if(++_cnt%10000==0) LOG.debug("executing placeholder '"+_name+"'");
         }
 
         @Override public void op(double[] p, FloatTape t, Pattern.Ctx ctx) {
-            if(++_cnt%1000==0) LOG.debug("executing placeholder '"+_name+"'");
+            if(++_cnt%10000==0) LOG.debug("executing placeholder '"+_name+"'");
         }
     }
 

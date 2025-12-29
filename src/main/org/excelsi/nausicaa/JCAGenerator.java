@@ -194,6 +194,7 @@ public class JCAGenerator extends JDialog {
                     final int skipFrames = Integer.parseInt(skipframes.getText());
                     config.setVariable("generatorFramerate", skipframes.getText());
                     config.setVariable("generatorSkipframes", skipframes.getText());
+                    config.setVariable("generatorCores", Integer.toString(ccores));
                     //_lastWidth = w;
                     //_lastHeight = h;
                     final JProgressBar prog = new JProgressBar(1, h);
