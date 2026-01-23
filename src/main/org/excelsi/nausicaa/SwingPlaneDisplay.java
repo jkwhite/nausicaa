@@ -160,7 +160,7 @@ public class SwingPlaneDisplay extends PlaneDisplay {
     }
 
     public void setCA(CA ca) {
-        setCA(ca, Pools.prelude(), _gopt);
+        setCA(ca, Pools.shared("animation_computeCores", _config.getIntVariable("animation_computeCores", 4)), _gopt);
     }
 
     public void setCA(CA ca, ExecutorService pool, GOptions opt) {
@@ -286,12 +286,12 @@ public class SwingPlaneDisplay extends PlaneDisplay {
             throw new IllegalArgumentException("null initializer");
         }
         _c.setInitializer(i);
-        setPlane(_c.createPlane(Pools.prelude(), _gopt));
+        setPlane(_c.createPlane(Pools.shared("animation_computeCores", _config.getIntVariable("animation_computeCores", 4)), _gopt));
     }
 
     public void generate(Initializer i) {
         _c.setInitializer(i);
-        setPlane(_c.createPlane(Pools.prelude(), _gopt));
+        setPlane(_c.createPlane(Pools.shared("animation_computeCores", _config.getIntVariable("animation_computeCores", 4)), _gopt));
     }
 
     @Override public void save(String file, Rendering r) throws java.io.IOException {

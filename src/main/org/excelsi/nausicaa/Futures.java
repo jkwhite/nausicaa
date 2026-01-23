@@ -433,9 +433,9 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         _timeline.notifyListeners(new TimelineEvent("tick"));
         java.util.List<Thread> threads = new ArrayList<Thread>();
         _lastInit = init;
-        final ExecutorService pool = Pools.prelude();
+        final ExecutorService pool = Pools.shared("animation_computeCores", _config.getIntVariable("animation_computeCores", 4));
         final boolean useHistory = _config.getBooleanVariable("mutator_neverrepeat",false);
-        final GOptions opt = new GOptions(true, _show?1:Pools.preludeSize(), 0, _ca.getWeight() /*getFrameWeight()*/);
+        final GOptions opt = new GOptions(true, _show?1:_config.getIntVariable("animation_computeCores", 4), 0, _ca.getWeight() /*getFrameWeight()*/);
         if(_show) {
             int width = getCAWidth() > 60 ? getCAWidth()/3-10 : getCAWidth();
             int height = getCAHeight() > 60 ? getCAHeight()/3-10 : getCAHeight();

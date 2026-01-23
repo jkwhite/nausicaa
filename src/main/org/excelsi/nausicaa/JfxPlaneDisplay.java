@@ -388,7 +388,7 @@ public class JfxPlaneDisplay extends PlaneDisplay {
     }
 
     public void setCA(CA ca) {
-        setCA(ca, Pools.prelude(), _gopt!=null?_gopt:new GOptions(true,1,0,1f));
+        setCA(ca, Pools.shared("animation_computeCores", 4), _gopt!=null?_gopt:new GOptions(true,1,0,1f));
     }
 
     public void setCA(CA ca, ExecutorService pool, GOptions opt) {
