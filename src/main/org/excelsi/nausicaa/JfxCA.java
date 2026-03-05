@@ -205,7 +205,7 @@ public class JfxCA extends Group {
             List<Blobs.Blob> blobs = null;
             if(_render==Render.best) {
                 blobs = new Blobs().blobs(bp, Blobs.Mode.finite);
-                if(blobs.size()<50000) {
+                if(blobs.size()<35000) {
                     _render = Render.blob_mesh;
                 }
                 else if(blobs.size()<100000) {

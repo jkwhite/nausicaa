@@ -168,7 +168,7 @@ public class ClusteredGaussianInitializer implements Initializer {
                     low = idx * (colors / maxPoints);
                     high = (1+idx) * (colors / maxPoints)-1;
             }
-            return random.nextInt(high-low)+low;
+            return random.nextInt(Math.max(1, high-low))+low;
         }
     }
 

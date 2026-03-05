@@ -20,6 +20,7 @@ public class Pools {
             LOG.debug("spawning new thread for "+r);
             Thread t = new Thread(r);
             t.setDaemon(true);
+            t.setName("adhoc");
             return t;
         }
     });

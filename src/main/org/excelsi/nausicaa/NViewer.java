@@ -2048,6 +2048,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 public void windowClosing(WindowEvent e) {
                     _pehack.setText("Show palette editor");
                     _peditor = null;
+                    _paletteEditor.disconnect();
                 }
             });
         }
@@ -2187,6 +2188,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 public void windowClosing(WindowEvent e) {
                     _lehack.setText("Show language editor");
                     _leditor = null;
+                    _langEditor.disconnect();
                 }
             });
         }

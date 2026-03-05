@@ -12,6 +12,7 @@ public class Languages {
     public static String[] catalog() {
         return new String[]{
             "Classic",
+            "Positioning",
             "Universal",
             "Circular",
             // "Symmetric2d",
@@ -25,6 +26,8 @@ public class Languages {
         switch(name) {
             case "Universal":
                 return universal();
+            case "Positioning":
+                return positioning();
             case "Classic":
                 return classic();
             case "Circular":
@@ -49,8 +52,13 @@ public class Languages {
         return Language.union(ls.toArray(new Language[0]));
     }
 
+    public static Language positioning() {
+        return new Language("Positioning")
+            .contextual(true)
+            .positioning(true);
+    }
+
     public static Language universal() {
-        // return new Universal();
         return new Language("Universal")
             .deterministic(true)
             .nondeterministic(true)
@@ -70,10 +78,7 @@ public class Languages {
 
     public static Language circular() {
         return new Language("Circular")
-            // .deterministic(true)
-            // .nondeterministic(true)
             .contextual(true)
-            // .tape(true)
             .add("circle","kya0+kya0+mu2+kya1+kya1+mu2+mi2+ni")
             .add("blitx","jya0+a200+mu2+re+a5+mu2")
             .add("blity","jya1+a200+mu2+re+a5+mu2")
@@ -83,8 +88,6 @@ public class Languages {
 
     public static Language fractal() {
         return new Language("Fractal")
-            // .deterministic(true)
-            // .nondeterministic(true)
             .contextual(true)
             .add("mandelbrot","kya0+kya1+a100+a100+nya")
             .add("mandelbulb","kya0+kya1+kya2+a100+a100+mya")
@@ -148,6 +151,12 @@ public class Languages {
             .add("uf", s("go zu zu7 zu2 bo bo mu mu na ke nu mu"))
             .add("ug", s("yu bo o8 nu ka o10 ka mu bo bo na ki zu ya ho ya mi6 ka chi11"))
             .add("uh", s("yu bo o8 nu ka o10 ka bo bo na ki zu ya ho ya mi6 ka chi11 yu"))
+            ;
+    }
+
+    public static Language sections() {
+        return new Language("Sections")
+            .add("a", "go+a8+ze+ri")
             ;
     }
 
