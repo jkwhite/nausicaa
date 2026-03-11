@@ -205,26 +205,14 @@ public class JCAGenerator extends JDialog {
                     main.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
                     gene.add(main, BorderLayout.CENTER);
                     final JButton[] hack = new JButton[1];
+                    final boolean[] cancelHack = {false};
 
                     final Thread builder = new Thread() {
                         public void run() {
                             try {
                                 if(rule.dimensions()==1) {
-                                    //CA c = new CA(w, h);
-                                    //initCA(c, _r);
                                     CA c = ca.size(w, h);
                                     Plane plane = c.createPlane();
-                                    /*
-                                    rule.generate(c, 1, h-1, false, false, new Rule.Updater() {
-                                        public void update(Rule r, int start, int current, int end) {
-                                            prog.setValue(current);
-                                        }
-
-                                        public long interval() {
-                                            return -1;
-                                        }
-                                    });
-                                    */
                                     if(!Thread.currentThread().isInterrupted()) {
                                         SwingUtilities.invokeLater(new Runnable() {
                                             public void run() {
@@ -252,14 +240,10 @@ public class JCAGenerator extends JDialog {
                                     boolean bb = bigbounce.isSelected();
                                     String ext = (createMp4||createWebm)?".jpg":".png";
                                     ext = ".png";
-                                    //CA c = new CA(w, h);
-                                    //initCA(c, _r);
                                     CA c = ca.size(w, h);
-                                    //Iterator<CA> cas = ((Multirule2D)_r).frames(c);
                                     LOG.info("generating ca at "+c.getWidth()+"x"+c.getHeight()+"x"+c.getDepth());
                                     if(createGif) {
                                         Plane plane = c.createPlane();
-                                        // ExecutorService pool = Executors.newFixedThreadPool(1);
                                         LOG.info("using "+ccores+" cores");
                                         ExecutorService pool = Executors.newFixedThreadPool(ccores);
                                         Iterator<Plane> cas = c.compileRule().frameIterator(plane, pool, new GOptions(true, ccores, 1, frameWeight).metaMode(c.getMetaMode()));
@@ -311,14 +295,13 @@ public class JCAGenerator extends JDialog {
                                         pool.shutdown();
                                     }
                                     else {
-                                        //Plane p0 = c.createPlane();
-                                        System.err.println("using "+ccores+" cores");
                                         ExecutorService pool = Executors.newFixedThreadPool(ccores);
                                         if(scale==1f) {
                                             final Rule rule = c.compileRule();
                                             LOG.info("generating unscaled with rule "+rule);
                                             rule
                                                 .stream(c.createPlane(), pool, new GOptions(true, ccores, 1, frameWeight).metaMode(c.getMetaMode()))
+                                                .takeWhile(p -> !cancelHack[0])
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))
                                                 .map(Pipeline.toBufferedImage("p", "b", rend))
@@ -328,11 +311,11 @@ public class JCAGenerator extends JDialog {
                                                 );
                                         }
                                         else {
-                                            System.err.println("scaling");
                                             final Rule rule = c.compileRule();
                                             LOG.info("generating scaled with rule "+rule);
                                             rule
                                                 .stream(c.createPlane(), pool, new GOptions(true, ccores, 1, frameWeight).metaMode(c.getMetaMode()))
+                                                .takeWhile(p -> !cancelHack[0])
                                                 .limit(numFrames)
                                                 .map(Pipeline.context("p", "i", Pipeline.identifier()))
                                                 .map(Pipeline.toBufferedImage("p", "b", rend))
@@ -343,25 +326,6 @@ public class JCAGenerator extends JDialog {
                                                     .andThen((p)->prog.setValue(p.<Long>get("i").intValue()))
                                                 );
                                         }
-
-                                        /*
-                                        for(int i=0;i<numFrames;i++) {
-                                            if(Thread.currentThread().isInterrupted()) {
-                                                break;
-                                            }
-                                            if(intermediate&&(!createGif||createMp4||createWebm)) {
-                                                if(scale!=1f) {
-                                                    plane = plane.scale(scale);
-                                                }
-                                                plane.save(selfile+"-"+(rever?numFrames-i-1:i)+ext);
-                                            }
-                                            if(Thread.currentThread().isInterrupted()) {
-                                                break;
-                                            }
-                                            prog.setValue(i);
-                                            plane = cas.next();
-                                        }
-                                        */
                                     }
                                     if(createWebm) {
                                         // ffmpeg -y -r 30 -f image2 -threads 4 -i frame-%d.png -c:v libvpx -crf 4 -b:v 12M -qmin 0 -qmax 50 -deadline best output.webm
@@ -448,6 +412,7 @@ public class JCAGenerator extends JDialog {
                             task.setText("Canceling");
                             cancel.setEnabled(false);
                             builder.interrupt();
+                            cancelHack[0] = true;
                         }
                     });
                     hack[0] = cancel;
