@@ -408,7 +408,7 @@ public class Actions {
         if(ret==f.APPROVE_OPTION) {
             try {
                 config.setSaveDir(f.getSelectedFile().getParent());
-                final CA ca = CA.fromFile(f.getSelectedFile().toString(), "text");
+                final CA ca = CA.fromFile(f.getSelectedFile().toString(), f.getSelectedFile().toString().endsWith(".gz")?"binary":"text");
                 config.transact(()->{
                     config.setSize(ca.getWidth(), ca.getHeight(), ca.getDepth(),
                         ca.getPrelude(), ca.getWeight());
@@ -650,6 +650,17 @@ public class Actions {
         String filename = v.getTemporary().resolve(ca.getName()+"_file", "No file");
         p.addPair("Name", ca.getName()+" ["+filename+"]");
         p.addPair("Description", ca.getDescription().length()>0?ca.getDescription():"(No description)");
+        p.addPair("Dimensions", ca.archetype().dims());
+        p.addPair("Size", ca.getWidth()+"x"+ca.getHeight()+"x"+ca.getDepth());
+        p.addPair("Prelude", ca.getPrelude());
+        p.addPair("Value Colors", ca.archetype().colors());
+        p.addPair("Neighborhood", ca.archetype().neighborhood().getName());
+        p.addPair("Neighbor Size", ca.archetype().size());
+        p.addPair("Values", ca.archetype().values().getName());
+        p.addPair("Initializer", ca.getInitializer().humanize());
+        p.addPair("Update", ca.getUpdateMode().humanize());
+        p.addPair("Edge", ca.getEdgeMode().humanize());
+        p.addPair("External Force", ca.getExternalForce().humanize());
         final StringBuilder additional = new StringBuilder();
         if(r instanceof IndexedRule) {
             final String b64 = ca.toBase64();
@@ -685,15 +696,6 @@ public class Actions {
         }
         else if(r instanceof ComputedRule2d) {
             ComputedRule2d cr = (ComputedRule2d) r;
-            p.addPair("Dimensions", r.archetype().dims());
-            p.addPair("Value Colors", r.archetype().colors());
-            p.addPair("Neighborhood", r.archetype().neighborhood().getName());
-            p.addPair("Neighbor Size", r.archetype().size());
-            p.addPair("Values", r.archetype().values().getName());
-            p.addPair("Initializer", ca.getInitializer().humanize());
-            p.addPair("Update", ca.getUpdateMode().humanize());
-            p.addPair("Edge", ca.getEdgeMode().humanize());
-            p.addPair("External Force", ca.getExternalForce().humanize());
             p.addPair("Language", ((AbstractComputedRuleset)cr.origin()).language().toDescription());
             p.addPair("Genome", cr.humanize());
             String expanded = new GenomeParser(r.archetype(), ((ComputedRuleset)r.origin()).language()).info(cr.archetype(), cr.genome()).toString();
@@ -2540,17 +2542,19 @@ public class Actions {
         String capt = String.format("\"%s\"\n\n%s\n\n",
             ca.getName(),
             ca.getDescription().length()>0?ca.getDescription():"No description.");
-        final String fmt = "%s, %d colors, %s neighborhood of %s %d, %s values, %s updates, %s edge, initialized with %s";
+        final String fmt = "%s, %d colors, %dx%dx%d, %s neighborhood of %s %d, %s values, %s updates, %s edge, initialized with %s, %d iterations";
         capt += String.format(fmt,
             dimension2Text(r.archetype().dims()),
             r.archetype().colors(),
+            ca.getWidth(), ca.getHeight(), ca.getDepth(),
             r.archetype().neighborhood().getName(),
             r.archetype().neighborhood()==Archetype.Neighborhood.circular?"radius":"size",
             r.archetype().size(),
             r.archetype().values(),
             ca.getUpdateMode().humanize().toLowerCase(),
             ca.getEdgeMode().humanize().toLowerCase(),
-            ca.getInitializer().humanize().toLowerCase()
+            ca.getInitializer().humanize().toLowerCase(),
+            ca.getPrelude()
         );
         if(! (ca.getExternalForce() instanceof ExternalForce.NopExternalForce) ) {
             capt += ", external force of "+ca.getExternalForce().humanize();
