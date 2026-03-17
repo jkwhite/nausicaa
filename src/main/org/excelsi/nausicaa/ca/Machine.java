@@ -81,9 +81,6 @@ public class Machine implements Humanizable {
         return new Machine(new Implicate(_a, dm, _lang, _vars), _g, _trace);
     }
 
-    //public int compute(final int[] p) {
-    //}
-
     // WEIGHT IS ALPHA
     public void compute(final IO io) {
         int execCount = 0;
@@ -92,7 +89,6 @@ public class Machine implements Humanizable {
             _ti.reset();
             final int[] p = io.ii;
             for(int i=0;i<_prg.length;i++) {
-                //long st = System.currentTimeMillis();
                 if(++execCount>MAX_INSTRUCTIONS) {
                     if(++_computeCount%10000==0) LOG.warn("******* EXEC LIMIT BREAK *******");
                     break;
@@ -102,18 +98,11 @@ public class Machine implements Humanizable {
                     System.err.println("Codon: "+_prg[i]);
                 }
                 _prg[i].op(p, _ti, ctx);
-                //long en = System.currentTimeMillis();
-                //if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
-                //_inst[i] += en-st;
                 if(_ti.stopped()) break;
                 if(_ti.jumped()!=0) {
                     int j = _ti.jumped() % _prg.length;
-                    //if(j<0) j=0; //throw new IllegalStateException("negative jump: "+j);
                     i += j;
                     if(i<0) i=0;
-                    //System.err.println("jumped by "+j);
-                    //if(i<_prg.length-1) System.err.println("next inst: "+_prg[i+1]);
-                    //else System.err.println("end of the line");
                     _ti.jump(0);
                 }
             }
@@ -138,7 +127,6 @@ public class Machine implements Humanizable {
             //89:wa ta na na go ge no kya1 kya0 wo hu hu ga ke gu kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni e kya0 ke tsu he ka ki re ko ko kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni do jya2 jya1 chi gi4 gi4 gu hu gi2 hu kya1 a24 a14 o4 no sa do re o6 mi mi jya2 kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni ru be ku kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni hu ta sa wa tsu kya1 ku wa u wo wa wo ya u o4 na kya1 ho kya1 pa hu ji u ku ta kya kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni no u kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni ta ge kya0+kya0+mu2+kya1+kya1+mu2+mi2+ni pa ru ku hu ma wo ku ku ku ta mo hi yu o4 ke ni u u tsu wa wa su re po ho ho go ki ge wa za i kya2 ni ku jya1 u ra ke to gu ma hi ko za go o3 o4 u ro8 kya2 bi e u ke kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni mi go ki su ge a14 pe o4 e nu su e bi kya0+kya0+mi2+kya1+kya1+mi2+mi2+ni ku ke mi hu wo ri po re o4 be do bu ku sa kya a88.73789620399475 kya1 o0 mi do o5 e me hu o3 kya1 chi wo ho ta o2 u i gu su ru go wo po a26.38485622406006 ya tsu tsu bu gi o2 ke jya me ya ri tsu a23 de o0 bu
             if(_trace) System.err.println("Final Tape: "+_ti);
             int res = _ti.pop();
-            //if(res<0) res=-res;
             res = res % _a.colors();
             if(res<0) {
                 res = _a.colors()+res;
@@ -151,7 +139,6 @@ public class Machine implements Humanizable {
             _tf.reset();
             final double[] p = io.fi;
             for(int i=0;i<_prg.length;i++) {
-                //long st = System.currentTimeMillis();
                 if(++execCount>MAX_INSTRUCTIONS) {
                     if(++_computeCount%1000==0) LOG.warn("******* EXEC LIMIT BREAK *******");
                     break;
@@ -161,16 +148,11 @@ public class Machine implements Humanizable {
                     System.err.println("Codon: "+_prg[i]);
                 }
                 _prg[i].op(p, _tf, ctx);
-                //long en = System.currentTimeMillis();
-                //if(en-st>10) System.err.println("too long: "+(en-st)+" "+_prg[i]);
-                //_inst[i] += en-st;
                 if(_tf.stopped()) break;
                 if(_tf.jumped()!=0) {
                     int j = _tf.jumped() % _prg.length;
-                    //if(j<0) j=0; //throw new IllegalStateException("negative jump: "+j);
                     i += j;
                     if(i<0) i=0;
-                    //System.err.println("jumped by "+j);
                     _tf.jump(0);
                 }
             }
@@ -180,13 +162,7 @@ public class Machine implements Humanizable {
             if(res>_a.colors()-1d) {
                 res = res % (_a.colors()-1);
             }
-            /*
-            res = res % (_a.colors()-1);
-            if(res<0) {
-                res = _a.colors()+res-1;
-            }
-            */
-            if(_trace) System.err.println("Final: "+res);
+            // if(_trace) System.err.println("Final: "+res);
             io.fo = res;
         }
     }

@@ -181,6 +181,7 @@ public class JCAGenerator extends JDialog {
                 if(ret==f.APPROVE_OPTION) {
                     String _dir = f.getSelectedFile().getParentFile().toString();
                     config.setGenDir(_dir);
+                    ca.record("Generating frames using '"+f.getSelectedFile()+"'");
                     final JDialog gene = new JDialog(root, "Generating");
                     JPanel main = new JPanel(new BorderLayout());
                     final JLabel task = new JLabel("Building automata");

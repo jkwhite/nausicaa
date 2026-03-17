@@ -36,12 +36,14 @@ public class NViewer extends JFrame implements UIActions, Sizer {
     private JFrame _peditor;
     private JFrame _reditor;
     private JFrame _leditor;
+    private JFrame _history;
     private PaletteEditor _paletteEditor;
     private RuleEditor _ruleEditor;
     private LangEditor _langEditor;
     private JMenuItem _pehack;
     private JMenuItem _rehack;
     private JMenuItem _lehack;
+    private JMenuItem _histohack;
     private Random _random;
 
 
@@ -1955,6 +1957,17 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
         window.addSeparator();
 
+        final JMenuItem histo = new JMenuItem(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                toggleHistory();
+            }
+        });
+        _histohack = histo;
+        histo.setText("Show history");
+        window.add(histo);
+
+        window.addSeparator();
+
         final JMenuItem conso = new JMenuItem(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 toggleConsole();
@@ -1963,15 +1976,6 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         conso.setText("Toggle console ...");
         conso.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, shortcut | InputEvent.SHIFT_DOWN_MASK));
         window.add(conso);
-
-        //final JMenuItem closef = new JMenuItem(new AbstractAction() {
-            //public void actionPerformed(ActionEvent e) {
-                //closeFutures();
-            //}
-        //});
-        //closef.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));
-        //closef.setText("Close current futures");
-        //window.add(closef);
 
         window.addSeparator();
 
@@ -2000,7 +2004,6 @@ public class NViewer extends JFrame implements UIActions, Sizer {
     }
 
     private void closeFutures() {
-        //System.err.println("TABS: "+_tabs.getTabCount()+", SEL: "+_tabs.getSelectedIndex());
         if(_tabs.getTabCount()>0) {
             _tabs.removeTabAt(_tabs.getSelectedIndex());
         }
@@ -2060,19 +2063,55 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         if(_console==null) {
             Dimension d = getSize();
             _console = new JFrame("Console");
-            // _console.setSize(d.width, d.height);
             loadWindow(getConfig(), _console, "console");
             _console.getContentPane().add(new Console(_console));
             _console.pack();
-            // _console.setSize(d.width, d.height);
-            // _console.setLocationRelativeTo(this);
-            // _console.setLocation(getLocation().x, 0);
             _console.setVisible(true);
         }
         else {
             saveWindow(getConfig(), _console, "console");
             _console.setVisible(!_console.isVisible());
             _console = null;
+        }
+    }
+
+    private void toggleHistory() {
+        if(_history==null) {
+            JFrame h = new JFrame("History");
+            InfoPanel p = new InfoPanel();
+            loadWindow(getConfig(), h, "history");
+            for(Events.Event e:getActiveCA().getHistory().events()) {
+                p.addPair(""+new java.util.Date(e.timestamp()), e.desc());
+            }
+            p.done();
+            h.getContentPane().add(p);
+            h.pack();
+            h.setVisible(true);
+            _histohack.setText("Hide history");
+            _history = h;
+            _history.addWindowListener(new WindowAdapter() {
+                public void windowClosed(WindowEvent e) {
+                    if(_history!=null) {
+                        saveWindow(getConfig(), _history, "history");
+                        _histohack.setText("Show history");
+                        _history = null;
+                    }
+                }
+
+                public void windowClosing(WindowEvent e) {
+                    if(_history!=null) {
+                        saveWindow(getConfig(), _history, "history");
+                        _histohack.setText("Show history");
+                        _history = null;
+                    }
+                }
+            });
+        }
+        else {
+            saveWindow(getConfig(), _history, "history");
+            _history.setVisible(false);
+            _history = null;
+            _histohack.setText("Show history");
         }
     }
 
@@ -2195,44 +2234,6 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         _lehack.setText(_leditor!=null?"Hide language editor":"Show language editor");
     }
 
-    /*
-    private static void runCA(Pattern2 p, CA2 ca, int size, int colors, int w, int h) {
-        ca.setCell(w/2, 0, 1);
-        int[] row = new int[2+w];
-
-        int[] prev = new int[2*size+1];
-
-        int[] pow = new int[p.length()];
-        for(int i=0;i<pow.length;i++) {
-            pow[pow.length-1-i] = (int) Math.pow(colors, i);
-        }
-
-        byte[] pattern = new byte[prev.length];
-        System.err.println("model: "+ca.getRaster().getSampleModel());
-        int[] first = new int[w];
-        ca.getBlock(first, 0, 0, w, 1);
-        //for(int i=0;i<first.length;i++) {
-            //System.err.println(first[i]+" ");
-        //}
-        //System.err.println();
-        for(int i=1;i<h;i++) {
-            //System.err.println(i);
-            //ca.getBlock(row, j-size, i-1, prev.length, 1);
-            for(int j=0;j<w;j++) {
-                ca.getBlock(prev, j-size, i-1, prev.length, 1);
-                int idx = 0;
-                for(int k=0;k<prev.length;k++) {
-                    pattern[k] = (byte) (prev[k]);
-                    //idx += prev[k] * pow[pow.length - 1 - k];
-                    idx += prev[k] * pow[k];
-                }
-                //System.err.print(i+","+j+" idx="+idx+", p="+formatPattern(pattern)+" => "+p.next(idx));
-                //System.err.println();
-                ca.setCell(j, i, p.next(idx));
-            }
-        }
-    }
-    */
 
     private static String formatPattern(byte... ps) {
         StringBuilder b = new StringBuilder();

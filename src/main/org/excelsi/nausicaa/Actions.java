@@ -457,6 +457,7 @@ public class Actions {
                         return;
                     }
                 }
+                ca.record("Saved to '"+file+"'");
                 ca.save(file.toString(), "text");
                 v.getTemporary().associate(ca.getName()+"_file", file.toString());
             }
@@ -545,31 +546,13 @@ public class Actions {
             try(PrintWriter w = new PrintWriter(new BufferedWriter(new FileWriter(f.getSelectedFile().toString())))) {
                 config.setSaveDir(f.getSelectedFile().getParent());
                 plane.export(w);
+                getActiveCA().record("Exported as '"+f.getSelectedFile()+"'");
             }
             catch(IOException e) {
                 showError(v, "Failed to save "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);
             }
         }
     }
-
-    /*
-    public void exportRule(NViewer v, Config config) { JFileChooser f = new JFileChooser(config.getDir());
-        f.setDialogTitle("Export rule");
-        f.setDialogType(f.SAVE_DIALOG);
-        f.setMultiSelectionEnabled(false);
-        int ret = f.showSaveDialog(v.getRoot());
-        final Rule rule = v.getActiveCA().getRule();
-        if(ret==f.APPROVE_OPTION) {
-            try(PrintWriter w = new PrintWriter(new BufferedWriter(new FileWriter(f.getSelectedFile().toString())))) {
-                config.setDir(f.getSelectedFile().getParent());
-                rule.write(w);
-            }
-            catch(IOException e) {
-                showError(v, "Failed to save "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);
-            }
-        }
-    }
-    */
 
     public void debug(NViewer v) {
         final Plane p = v.getPlaneDisplayProvider().getActivePlane();
@@ -725,11 +708,11 @@ public class Actions {
         i.setVisible(true);
     }
 
-    public void cancel(NViewer v) {
-    }
-
-    public void generate(NViewer v) {
-    }
+    // public void cancel(NViewer v) {
+    // }
+// 
+    // public void generate(NViewer v) {
+    // }
 
     public void reroll(NViewer v) {
         final Config config = v.getConfig();
