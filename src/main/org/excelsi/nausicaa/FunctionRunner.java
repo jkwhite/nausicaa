@@ -22,6 +22,7 @@ public class FunctionRunner extends JDialog {
     public FunctionRunner(final JFrame root, final CA ca, final MutationFactor mf, final ExecutorService pool, final GOptions opt, final Rendering rend, final Varmap vars, final Functions.CAFunction fn) {
         super(root, "Executing "+fn.getName());
 
+        ca.record("Mogrifying with "+fn.getName());
         final JProgressBar prog = new JProgressBar(1, 100);
         prog.setValue(0);
         final JLabel task = new JLabel("Running...");

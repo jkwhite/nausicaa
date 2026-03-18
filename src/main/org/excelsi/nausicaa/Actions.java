@@ -472,7 +472,6 @@ public class Actions {
 
     public void editMetadata(NViewer v) {
         final CA ca = v.getActiveCA();
-        // final JFrame m = new JFrame("Edit metadata");
         final JDialog d = new JDialog(v, "Metadata");
 
         InfoPanel p = new InfoPanel();
@@ -496,7 +495,11 @@ public class Actions {
                 // TODO: technically if the name changes then any
                 // old keys in v.getTemporary() should be cleared,
                 // but practically this doesn't matter.
-                v.setActiveCA(ca.name(name.getText()).description(desc.getText()));
+                v.setActiveCA(
+                    ca.copy()
+                    .name(name.getText())
+                    .description(desc.getText())
+                );
             }
         });
         de.addActionListener(new AbstractAction() {
@@ -521,13 +524,12 @@ public class Actions {
         f.setDialogType(f.SAVE_DIALOG);
         f.setMultiSelectionEnabled(false);
         int ret = f.showSaveDialog(v.getRoot());
-        // CA ca = v.getActiveCA();
-        // Plane plane = v.getPlaneDisplayProvider().getActivePlane();
         PlaneDisplay plane = v.getPlaneDisplayProvider().getActivePlaneDisplay();
         if(ret==f.APPROVE_OPTION) {
             try {
                 config.setImgDir(f.getSelectedFile().getParent());
                 plane.save(f.getSelectedFile().toString(), v.getPlaneDisplayProvider().getActivePlaneDisplay().getRendering());
+                plane.getCA().record("Exported to '"+f.getSelectedFile()+"'");
             }
             catch(IOException e) {
                 showError(v, "Failed to save "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);
