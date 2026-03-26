@@ -386,30 +386,30 @@ public final class CA {
 
     public CA mutate(Rule r, Random om) {
         if(r instanceof IndexedRule) {
-            return new CA(r, _p.matchCapacity(r.colorCount(), om), _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, _history.fork());
+            return new CA(r, _p.matchCapacity(r.colorCount(), om), _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, branchHistory());
         }
         else {
-            return new CA(r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, _history.fork());
+            return new CA(r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, branchHistory());
         }
     }
 
     public CA size(int w, int h) {
         CA meta = _meta!=null?_meta.size(w,h):null;
-        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta, _name, _desc, branchHistory());
     }
 
     public CA size(int w, int h, int d) {
         CA meta = _meta!=null?_meta.size(w,h,d):null;
-        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta, _name, _desc, branchHistory());
     }
 
     public CA size(int w, int h, int d, int prelude) {
         CA meta = _meta!=null?_meta.size(w,h,d,prelude):null;
-        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d, prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, w, h, d, prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta, _name, _desc, branchHistory());
     }
 
     public CA copy() {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, branchHistory());
     }
 
     public CA seed() {
@@ -417,66 +417,66 @@ public final class CA {
     }
 
     public CA seed(long seed) {
-        return new CA(_r, _p, _i, branchRandom(), seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, branchHistory());
     }
 
     public CA palette(Palette p) {
-        return new CA(_r, p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, _history.fork());
+        return new CA(_r, p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, branchHistory());
     }
 
     public CA initializer(Initializer i) {
-        return new CA(_r, _p, i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, branchHistory());
     }
 
     public CA prelude(int pre) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, pre, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, pre, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, branchHistory());
     }
 
     public CA coda(int coda) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, branchHistory());
     }
 
     public CA weight(double weight) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, branchHistory());
     }
 
     public CA computeMode(ComputeMode cmode) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, branchHistory());
     }
 
     public CA metaMode(MetaMode mmode) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, mmode, _umode, _emode, _ef, _vars, _meta, _name, _desc, branchHistory());
     }
 
     public CA updateMode(UpdateMode umode) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, umode, _emode, _ef, _vars, _meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, umode, _emode, _ef, _vars, _meta, _name, _desc, branchHistory());
     }
 
     public CA edgeMode(EdgeMode emode) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, emode, _ef, _vars, _meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, emode, _ef, _vars, _meta, _name, _desc, branchHistory());
     }
 
     public CA externalForce(ExternalForce ef) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, ef, _vars, _meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, ef, _vars, _meta, _name, _desc, branchHistory());
     }
 
     public CA vars(Varmap v) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, v, _meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, v, _meta, _name, _desc, branchHistory());
     }
 
     public CA meta(CA meta) {
         if(meta==this) {
             throw new IllegalArgumentException("strange loop");
         }
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta, _name, _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, meta, _name, _desc, branchHistory());
     }
 
     public CA name(String name) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, name!=null?name:"Nameless", _desc, _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, name!=null?name:"Nameless", _desc, branchHistory());
     }
 
     public CA description(String desc) {
-        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, desc!=null?desc:"", _history.fork());
+        return new CA(_r, _p, _i, branchRandom(), _seed, _w, _h, _d, _prelude, _weight, _coda, _cmode, _mmode, _umode, _emode, _ef, _vars, _meta, _name, desc!=null?desc:"", branchHistory());
     }
 
     public Initializer getInitializer() {
@@ -895,5 +895,9 @@ public final class CA {
 
     private Random branchRandom() {
         return new Random();
+    }
+
+    private Events branchHistory() {
+        return _history!=null?_history.fork():new Events();
     }
 }

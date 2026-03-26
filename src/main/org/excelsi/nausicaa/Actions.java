@@ -548,7 +548,7 @@ public class Actions {
             try(PrintWriter w = new PrintWriter(new BufferedWriter(new FileWriter(f.getSelectedFile().toString())))) {
                 config.setSaveDir(f.getSelectedFile().getParent());
                 plane.export(w);
-                getActiveCA().record("Exported as '"+f.getSelectedFile()+"'");
+                plane.creator().record("Exported as '"+f.getSelectedFile()+"'");
             }
             catch(IOException e) {
                 showError(v, "Failed to save "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);
@@ -710,9 +710,9 @@ public class Actions {
         i.setVisible(true);
     }
 
-    // public void cancel(NViewer v) {
-    // }
-// 
+    public void cancel(NViewer v) {
+    }
+
     // public void generate(NViewer v) {
     // }
 
