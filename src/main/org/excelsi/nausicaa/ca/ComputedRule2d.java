@@ -36,40 +36,26 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
     }
 
     public ComputedRule2d(Pattern p, Ruleset origin, Rule metarule, Rule hyper) {
-        //super(p, hyper);
         super(1,1);
         _p = p;
-        //System.err.println("################# ORIGIN: "+origin);
         _origin = origin!=null?origin:new ComputedRuleset(p.archetype());
         _meta = null;
     }
 
-    //@Override public IndexedRule getMetarule() {
-        //return _meta;
-        //throw new UnsupportedOperationException();
-    //}
-//
-    //@Override public IndexedRule withMetarule(IndexedRule meta) {
-        //return new IndexedRule2d(pattern(), _origin, (IndexedRule2d) meta, getHyperrule());
-        //throw new UnsupportedOperationException();
-    //}
-//
-    //@Override public IndexedRule withHyperrule(IndexedRule hyper) {
-        //return new IndexedRule2d(pattern(), _origin, _meta, hyper);
-        //throw new UnsupportedOperationException();
-    //}
-
     public ComputedRule2d derive(Pattern pattern) {
-        //return new ComputedRule2d(pattern, _origin, _meta, getHyperrule());
-        return new ComputedRule2d(pattern, _origin, _meta, null);
+        return derive(pattern, language(), pattern.archetype());
     }
 
     public ComputedRule2d derive(Language lang) {
-        return new ComputedRule2d(_p, new ComputedRuleset(archetype(), lang), _meta, null);
+        return derive(_p, lang, archetype());
     }
 
     @Override public Archetype archetype() {
         return _p.archetype();
+    }
+
+    public Language language() {
+        return ((AbstractComputedRuleset)_origin).language();
     }
 
     @Override public int dimensions() {
@@ -254,12 +240,13 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         return ret;
     }
 
-    @Override public Mutatable mutate(MutationFactor m) {
+    @Override public Mutatable mutate(final MutationFactor m) {
         return derive(
             (Pattern)
-                ((Mutatable)_p).mutate(
-                    m.withLanguage(((AbstractComputedRuleset)_origin).language())
-                    ));
+                ((Mutatable)_p).mutate(m.withLanguage(language())),
+                language(),
+                m.hasArchetype()?m.archetype():archetype());
+
     }
 
     @Override public String humanize() {
@@ -308,6 +295,10 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
 
     protected final Pattern createPattern(final ExecutorService pool) {
         return _p.copy();
+    }
+
+    private ComputedRule2d derive(Pattern pattern, Language lang, Archetype arch) {
+        return new ComputedRule2d(pattern, new ComputedRuleset(arch, lang), _meta, null);
     }
 
     public static Rule fromJson(JsonElement e) {

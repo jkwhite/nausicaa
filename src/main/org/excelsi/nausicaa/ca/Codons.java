@@ -2773,15 +2773,11 @@ public class Codons {
 
         @Override public void op(double[] p, FloatTape t, Pattern.Ctx c) {
             double v = (double) Math.ceil(t.pop());
-            //System.err.println("set jump by "+v);
-            //t.jump(Math.abs((int)v));
             t.jump((int)v);
         }
     }
 
     public static class Rand implements Codon {
-        //private static final Random R = new Random();
-
         @Override public Codon copy() { return new Rand(); }
 
         @Override public String code() {

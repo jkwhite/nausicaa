@@ -94,15 +94,12 @@ public class ClusteredGaussianInitializer implements Initializer {
                     }
                     break;
                 case 3:
-                    //IntBlockPlane bp = (IntBlockPlane) plane;
                     ctr[0] = r.nextInt(plane.getWidth());
                     ctr[1] = r.nextInt(plane.getHeight());
                     ctr[2] = r.nextInt(plane.getHeight());
                     final int points3 = (int)(rad*rad*rad*_params.density);
-                    System.err.println("computing "+points3+" points");
                     for(int j=0;j<points3;j++) {
                         point(r, ctr, max, rad, pnt);
-                        //System.err.println("("+pnt[0]+","+pnt[1]+","+pnt[2]+")");
                         pen.setCell(pnt[0], pnt[1], pnt[2], colors[computeColor(r, colors.length, i, _params.maxPoints)]);
                     }
                     break;
