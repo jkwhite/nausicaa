@@ -356,7 +356,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         AbstractAction about = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(null, 
-                    "<html>Copyright (C) 2007-2025 JK White, dhcmrlchtdj@gmail.com<br/>Licensed under the terms of the GNU General Public License Version 3</html>", 
+                    "<html>Copyright (C) 2007-2026 JK White, dhcmrlchtdj@gmail.com<br/>Licensed under the terms of the GNU General Public License Version 3</html>", 
                     "NausiCAä 1.2", 
                     JOptionPane.INFORMATION_MESSAGE,
                     new ImageIcon(MacCustomizer.class.getResource("/na1_164.png"))
@@ -1346,13 +1346,30 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
         auto.addSeparator();
 
-        AbstractAction touni = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                Actions.translateToUniversal(NViewer.this);
-            }
-        };
-        JMenuItem univer = auto.add(touni);
-        univer.setText("Translate to Universal");
+        // remove temporarily as this doesn't really do anything
+        // AbstractAction touni = new AbstractAction() {
+            // public void actionPerformed(ActionEvent e) {
+                // Actions.translateToUniversal(NViewer.this);
+            // }
+        // };
+        // JMenuItem univer = auto.add(touni);
+        // univer.setText("Translate to Universal");
+
+        {
+            final JMenuItem anno = new JMenuItem(new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    final String annotation = JOptionPane.showInputDialog(NViewer.this, 
+                        "Annotation",
+                        "Add annotation",
+                        JOptionPane.QUESTION_MESSAGE);
+                    if(annotation!=null) {
+                        getActiveCA().record(annotation);
+                    }
+                }
+            });
+            anno.setText("Annotate ...");
+            auto.add(anno);
+        }
 
         auto.addSeparator();
 
@@ -1965,7 +1982,6 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         _histohack = histo;
         histo.setText("Show history");
         window.add(histo);
-
         window.addSeparator();
 
         final JMenuItem conso = new JMenuItem(new AbstractAction() {
@@ -2078,13 +2094,18 @@ public class NViewer extends JFrame implements UIActions, Sizer {
     private void toggleHistory() {
         if(_history==null) {
             JFrame h = new JFrame("History");
-            InfoPanel p = new InfoPanel();
             loadWindow(getConfig(), h, "history");
-            for(Events.Event e:getActiveCA().getHistory().events()) {
-                p.addPair(""+new java.util.Date(e.timestamp()), e.desc());
+            if(getActiveCA().getHistory().size()==0) {
+                h.getContentPane().add(new JLabel("No events"));
             }
-            p.done();
-            h.getContentPane().add(p);
+            else {
+                InfoPanel p = new InfoPanel();
+                for(Events.Event e:getActiveCA().getHistory().events()) {
+                    p.addPair(""+new java.util.Date(e.timestamp()), e.desc());
+                }
+                p.done();
+                h.getContentPane().add(p);
+            }
             h.pack();
             h.setVisible(true);
             _histohack.setText("Hide history");
@@ -2106,6 +2127,19 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                     }
                 }
             });
+            int shortcut = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+            JMenuBar bar = new JMenuBar();
+            JMenu window = new JMenu("Window");
+            AbstractAction close = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    toggleHistory();
+                }
+            };
+            bar.add(window);
+            JMenuItem cl = window.add(close);
+            cl.setText("Close");
+            cl.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, shortcut));
+            h.setJMenuBar(bar);
         }
         else {
             saveWindow(getConfig(), _history, "history");

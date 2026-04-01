@@ -53,6 +53,10 @@ public class Events {
         _es.add(e);
     }
 
+    public int size() {
+        return _es.size();
+    }
+
     public List<Event> events() {
         return _es;
     }

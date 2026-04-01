@@ -457,7 +457,7 @@ public class Actions {
                         return;
                     }
                 }
-                ca.record("Saved to '"+file+"'");
+                ca.record("Saved to '"+file.getName()+"'");
                 ca.save(file.toString(), "text");
                 v.getTemporary().associate(ca.getName()+"_file", file.toString());
             }
@@ -529,7 +529,7 @@ public class Actions {
             try {
                 config.setImgDir(f.getSelectedFile().getParent());
                 plane.save(f.getSelectedFile().toString(), v.getPlaneDisplayProvider().getActivePlaneDisplay().getRendering());
-                plane.getCA().record("Exported to '"+f.getSelectedFile()+"'");
+                plane.getCA().record("Exported to '"+f.getSelectedFile().getName()+"'");
             }
             catch(IOException e) {
                 showError(v, "Failed to save "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);
@@ -548,7 +548,7 @@ public class Actions {
             try(PrintWriter w = new PrintWriter(new BufferedWriter(new FileWriter(f.getSelectedFile().toString())))) {
                 config.setSaveDir(f.getSelectedFile().getParent());
                 plane.export(w);
-                plane.creator().record("Exported as '"+f.getSelectedFile()+"'");
+                plane.creator().record("Exported as '"+f.getSelectedFile().getName()+"'");
             }
             catch(IOException e) {
                 showError(v, "Failed to save "+f.getSelectedFile()+": "+e.getClass().getName()+": "+e.getMessage(), e);

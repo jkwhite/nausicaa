@@ -368,7 +368,7 @@ public final class CA {
         return _history;
     }
 
-    public void record(String event) {
+    public void record(final String event) {
         _history.add(new Events.Event(System.currentTimeMillis(), event));
     }
 
