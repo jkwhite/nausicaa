@@ -689,7 +689,7 @@ public class Actions {
             additional.append("\n\nExpanded form:\n").append(expanded);
         }
         p.addPair("Palette", createColorPanel(ca.getPalette()));
-        p.addPair("Caption", createText(createCaption(ca, additional.toString()), 10, true));
+        p.addPair("Caption", createText(createCaption(ca, v.getPlaneDisplayProvider().getActivePlaneDisplay().getRendering(), additional.toString()), 10, true));
         p.done();
         i.getContentPane().add(p);
         int shortcut = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -2522,12 +2522,12 @@ public class Actions {
         }
     }
 
-    private static String createCaption(CA ca, String additional) {
+    private static String createCaption(CA ca, Rendering rend, String additional) {
         final Rule r = ca.getRule();
         String capt = String.format("\"%s\"\n\n%s\n\n",
             ca.getName(),
             ca.getDescription().length()>0?ca.getDescription():"No description.");
-        final String fmt = "%s, %d colors, %dx%dx%d, %s neighborhood of %s %d, %s values, %s updates, %s edge, initialized with %s, %d iterations";
+        final String fmt = "%s, %d colors, %dx%dx%d, %s neighborhood of %s %d, %s values, %s updates, %s edge, initialized with %s, %s rendering, prelude %d";
         capt += String.format(fmt,
             dimension2Text(r.archetype().dims()),
             r.archetype().colors(),
@@ -2539,6 +2539,7 @@ public class Actions {
             ca.getUpdateMode().humanize().toLowerCase(),
             ca.getEdgeMode().humanize().toLowerCase(),
             ca.getInitializer().humanize().toLowerCase(),
+            rend.humanize(),
             ca.getPrelude()
         );
         if(! (ca.getExternalForce() instanceof ExternalForce.NopExternalForce) ) {
@@ -2555,7 +2556,7 @@ public class Actions {
             capt += additional;
         }
         if(ca.getMeta()!=null) {
-            capt = capt+"\n\nWith meta "+createCaption(ca.getMeta(), null);
+            capt = capt+"\n\nWith meta "+createCaption(ca.getMeta(), rend, null);
         }
         return capt;
     }

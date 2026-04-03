@@ -1,7 +1,7 @@
 package org.excelsi.nausicaa.ca;
 
 
-public class Rendering {
+public class Rendering implements Humanizable {
     public enum Composition {
         front, truefront, back, wavg, revwavg, channel, avg, multiply, difference;
 
@@ -46,5 +46,29 @@ public class Rendering {
 
     public Rendering composition(Composition comp) {
         return new Rendering(comp);
+    }
+
+    @Override public String humanize() {
+        switch(_comp) {
+            case front:
+                return "front";
+            case truefront:
+                return "truefront";
+            case back:
+                return "back";
+            case wavg:
+                return "weighted-avg";
+            case revwavg:
+                return "reverse-weighted-avg";
+            case avg:
+                return "avg";
+            case channel:
+                return "channel";
+            case multiply:
+                return "multiply";
+            case difference:
+                return "difference";
+        }
+        return "unknown";
     }
 }
