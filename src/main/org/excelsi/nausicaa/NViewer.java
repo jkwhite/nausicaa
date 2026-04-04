@@ -1267,7 +1267,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             auto.add(edgeopt);
         }
         {
-            JMenu extopt = new JMenu("External Force");
+            JMenu extopt = new JMenu("External force");
             final JCheckBoxMenuItem[] exthack = new JCheckBoxMenuItem[3];
             JCheckBoxMenuItem extnop = new JCheckBoxMenuItem(new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
@@ -2176,7 +2176,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 }
             };
             JMenuItem st = genome.add(set);
-            st.setText("Set");
+            st.setText("Set genome");
             st.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, shortcut));
             bar.add(genome);
 

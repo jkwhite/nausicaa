@@ -76,6 +76,22 @@ public class RuleEditor extends JComponent implements TimelineListener {
         JPanel scr = new JPanel();
         BoxLayout bl = new BoxLayout(scr, BoxLayout.Y_AXIS);
         scr.setLayout(bl);
+
+        scr.add(new JLabel("Genome"));
+
+        final JTextArea rule = new JTextArea(10,80);
+        _ruleText = rule;
+        if(_rule instanceof Genomic) {
+            final String gen = ((Genomic)_rule).prettyGenome();
+            rule.setText(gen);
+            int nls = 0;
+            for(int i=0;i<gen.length();i++) {
+                if(gen.charAt(i)=='\n') nls++;
+            }
+            rule.setRows(Math.max(10, Math.min(20,nls)));
+        }
+        scr.add(new JScrollPane(rule));
+
         if(current.getRule().origin() instanceof AbstractComputedRuleset) {
             JPanel insertions = new JPanel();
             BoxLayout ins = new BoxLayout(insertions, BoxLayout.X_AXIS);
@@ -90,15 +106,8 @@ public class RuleEditor extends JComponent implements TimelineListener {
             scr.add(insertions);
         }
 
-        scr.add(new JLabel("Genome"));
-
-        final JTextArea rule = new JTextArea(10,80);
-        _ruleText = rule;
-        if(_rule instanceof Genomic) {
-            rule.setText(((Genomic)_rule).prettyGenome());
-        }
-        scr.add(new JScrollPane(rule));
-
+        /*
+        TODO: either improve test pattern or remove it entirely
         scr.add(new JLabel("Test Pattern"));
         final JTextArea pat = new JTextArea(3,80);
         scr.add(pat);
@@ -132,6 +141,8 @@ public class RuleEditor extends JComponent implements TimelineListener {
         });
         testp.setText("Test");
         scr.add(testp);
+        */
+
         /*
         rule.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
