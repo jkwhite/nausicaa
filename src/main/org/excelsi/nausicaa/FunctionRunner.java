@@ -22,7 +22,7 @@ public class FunctionRunner extends JDialog {
     public FunctionRunner(final JFrame root, final CA ca, final MutationFactor mf, final ExecutorService pool, final GOptions opt, final Rendering rend, final Varmap vars, final Functions.CAFunction fn) {
         super(root, "Executing "+fn.getName());
 
-        ca.record("Mogrifying with "+fn.getName());
+        ca.record("Mogrifying with "+fn.getName()+" and "+vars);
         final JProgressBar prog = new JProgressBar(1, 100);
         prog.setValue(0);
         final JLabel task = new JLabel("Running...");
@@ -48,7 +48,6 @@ public class FunctionRunner extends JDialog {
         Font font = task.getFont();
         task.setFont(font.deriveFont(font.getSize()-2f));
 
-        //prog.setIndeterminate(true);
         main.add(prog, BorderLayout.NORTH);
         main.add(task, BorderLayout.WEST);
         main.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

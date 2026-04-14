@@ -214,10 +214,6 @@ public class Functions {
             _b.setVariable("_api", api);
             _b.setVariable("_args", args);
             _s.evaluate("run(_ca, _args, _api)");
-            //_gs.setVariable("_ca", ca);
-            //_gs.setVariable("_api", api);
-            //_gs.setVariable("_args", args);
-            //_gs.evaluate("run(_ca, _args, _api)");
             LOG.info("done running param with args: "+args);
         }
     }
