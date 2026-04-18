@@ -14,4 +14,5 @@ public interface UIActions {
     void branch(CA c);
     PlaneDisplayProvider getPlaneDisplayProvider();
     PlanescapeProvider getPlanescapeProvider();
+    void toggleRuleEditor();
 }

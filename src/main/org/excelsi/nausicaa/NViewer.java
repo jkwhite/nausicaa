@@ -2149,7 +2149,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         }
     }
 
-    private void toggleRuleEditor() {
+    @Override public void toggleRuleEditor() {
         if(_reditor!=null) {
             _ruleEditor.disconnect();
             _ruleEditor = null;
@@ -2176,8 +2176,8 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                 }
             };
             JMenuItem st = genome.add(set);
-            st.setText("Set genome");
-            st.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, shortcut));
+            st.setText("Update genome");
+            st.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, shortcut));
             bar.add(genome);
 
             JMenu window = new JMenu("Window");

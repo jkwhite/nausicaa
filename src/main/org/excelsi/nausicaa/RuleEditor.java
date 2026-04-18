@@ -27,7 +27,6 @@ public class RuleEditor extends JComponent implements TimelineListener {
     private Rule _rule;
     private JTextArea _ruleText;
     private JFrame _root;
-    // private int[] _colors;
     private final Timeline _timeline;
     private final MutationFactor _f;
 
@@ -92,6 +91,32 @@ public class RuleEditor extends JComponent implements TimelineListener {
         }
         scr.add(new JScrollPane(rule));
 
+        JPanel bot = new JPanel();
+        JButton ne = new JButton("Ok");
+        JButton upd = new JButton("Update");
+        JButton de = new JButton("Cancel");
+
+        ne.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                commit();
+                _ui.toggleRuleEditor();
+            }
+        });
+        upd.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                commit();
+            }
+        });
+        de.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _ui.toggleRuleEditor();
+            }
+        });
+        bot.add(ne);
+        bot.add(upd);
+        bot.add(de);
+        /*
+        TODO: Need to figure out languages first before this is really useful
         if(current.getRule().origin() instanceof AbstractComputedRuleset) {
             JPanel insertions = new JPanel();
             BoxLayout ins = new BoxLayout(insertions, BoxLayout.X_AXIS);
@@ -105,6 +130,7 @@ public class RuleEditor extends JComponent implements TimelineListener {
             insertions.add(codons);
             scr.add(insertions);
         }
+        */
 
         /*
         TODO: either improve test pattern or remove it entirely
@@ -164,10 +190,7 @@ public class RuleEditor extends JComponent implements TimelineListener {
         });
         */
         add(scr, BorderLayout.CENTER);
+        add(bot, BorderLayout.SOUTH);
         validate();
-        if(getParent()!=null) {
-            Dimension dim = getParent().getPreferredSize();
-            _root.setSize(16+dim.width, 4*24+dim.height);
-        }
     }
 }
