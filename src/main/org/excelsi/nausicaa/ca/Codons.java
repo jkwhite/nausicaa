@@ -23,77 +23,99 @@ public class Codons {
     public static final String INTERSECT = "u";
     public static final String AVG_N = "e";
     public static final String PUSH = "o";
+
     public static final String OR = "ka";
     public static final String PUSH_SURROUND = "ki";
     public static final String ROT_RIGHT = "ku";
     public static final String GREATER = "ke";
     public static final String ROT_LEFT = "ko";
-    public static final String EQUAL = "ma";
-    public static final String SUM = "mi";
-    public static final String MULTIPLY = "mu";
-    public static final String SUM_N = "me";
-    public static final String MOD = "mo";
-    public static final String MAX = "ta";
-    public static final String MIN = "chi";
-    public static final String XOR = "tsu";
-    public static final String TIME = "te";
-    public static final String AND = "to";
-    public static final String LESSER = "na";
-    public static final String SQRT = "ni";
-    public static final String CBRT = "nu";
-    public static final String NOT_EQUAL = "ne";
-    public static final String PUSH_N = "no";
-    public static final String PUSH_S = "ya";
-    public static final String FORK = "yu";
-    public static final String INTERSECT_S = "yo";
+
     public static final String STOP = "sa";
     public static final String POS = "shi";
     public static final String SUBTRACT = "su";
     public static final String NOT = "se";
     public static final String NOT_INTERSECT = "so";
-    public static final String ABORT = "ga";
-    public static final String AVG = "gi";
-    public static final String COUNT = "gu";
-    public static final String COUNT_FIXED = "pu";
-    public static final String PUSH_ALL_ROT = "ge";
-    public static final String PUSH_ALL = "go";
-    public static final String JUMP = "ja";
-    public static final String SKIP_N = "ji";
-    public static final String MIN_N = "jo";
-    public static final String IF = "ra";
-    public static final String MAX_N = "ri";
-    public static final String SIGMOID = "ru";
-    public static final String SIN = "re";
-    public static final String SKIP = "ro";
-    public static final String HALT = "za";
-    public static final String NON_ZERO = "zu";
-    public static final String RAND = "ze";
-    public static final String DATA = "da";
-    public static final String TANH = "de";
-    public static final String DUPLICATE = "do";
+
+    public static final String MAX = "ta";
+    public static final String MIN = "chi";
+    public static final String XOR = "tsu";
+    public static final String TIME = "te";
+    public static final String AND = "to";
+
+    public static final String LESSER = "na";
+    public static final String SQRT = "ni";
+    public static final String CBRT = "nu";
+    public static final String NOT_EQUAL = "ne";
+    public static final String PUSH_N = "no";
+
     public static final String EXCLAMATORY = "ha";
     public static final String HISTO = "hi";
     public static final String SUPERSYMMETRY = "hu";
     public static final String CONVOLVE = "he";
     public static final String DIVIDE = "ho";
+
+    public static final String EQUAL = "ma";
+    public static final String SUM = "mi";
+    public static final String MULTIPLY = "mu";
+    public static final String SUM_N = "me";
+    public static final String MOD = "mo";
+
+    public static final String PUSH_S = "ya";
+    public static final String FORK = "yu";
+    public static final String INTERSECT_S = "yo";
+
+    public static final String IF = "ra";
+    public static final String MAX_N = "ri";
+    public static final String SIGMOID = "ru";
+    public static final String SIN = "re";
+    public static final String SKIP = "ro";
+
+    public static final String MOST = "wa";
+    public static final String LEAST = "wo";
+
+    public static final String ABORT = "ga";
+    public static final String AVG = "gi";
+    public static final String COUNT = "gu";
+    public static final String PUSH_ALL_ROT = "ge";
+    public static final String PUSH_ALL = "go";
+
+    public static final String HALT = "za";
+    public static final String NON_ZERO = "zu";
+    public static final String RAND = "ze";
+    public static final String TIME_CTX = "zo";
+
+    public static final String DATA = "da";
+    public static final String SKIP_N = "ji";
+    public static final String TANH = "de";
+    public static final String DUPLICATE = "do";
+
     public static final String ROT_VEC_N = "ba";
     public static final String COS = "bi";
     public static final String LT = "bu";
     public static final String GT = "be";
     public static final String NEGATE = "bo";
+
     public static final String PUSH_CARDINAL = "pa";
     public static final String FILTER = "pi";
+    public static final String COUNT_FIXED = "pu";
     public static final String ABS = "pe";
     public static final String EQUAL_A = "po";
-    public static final String MOST = "wa";
-    public static final String LEAST = "wo";
+
+    public static final String JUMP = "ja";
+    public static final String MIN_N = "jo";
+
     public static final String COORD = "kya";
     public static final String COORD_REL = "jya";
+
     public static final String COORD_CIRC = "ryu";
     public static final String COORD_CIRC_REL = "ryo";
+
     public static final String MANDELBROT = "nya";
+
     public static final String MANDELBULB = "mya";
+
     public static final String BANDPASS = "cho";
+
     public static final String LIFE = "life";
     public static final String HODGE = "hodge";
     public static final String SLIME = "slime";
@@ -229,6 +251,8 @@ public class Codons {
                     return new SkipN();
                 case NON_ZERO:
                     return new Nonzero(p);
+                case TIME_CTX:
+                    return new TimeCtx();
                 case TIME:
                     return new Time();
                 case HISTO:
@@ -1789,6 +1813,34 @@ public class Codons {
 
         @Override public void tick() {
             _t++;
+        }
+    }
+
+    public static class TimeCtx implements Codon {
+        @Override public Codon copy() {
+            return new TimeCtx();
+        }
+
+        @Override public String code() {
+            return TIME_CTX;
+        }
+
+        @Override public boolean usesPattern() {
+            return false;
+        }
+
+        @Override public boolean usesContext() {
+            return true;
+        }
+
+        @Override public boolean supports(Values v) { return true; }
+
+        @Override public void op(int[] p, IntTape t, Pattern.Ctx c) {
+            t.push(c.time);
+        }
+
+        @Override public void op(double[] p, FloatTape t, Pattern.Ctx c) {
+            t.push(c.time);
         }
     }
 

@@ -58,6 +58,7 @@ public class WorkerDiscrete implements Worker {
         _pctx.c = new int[3];
         _pctx.cr = new double[3];
         _pctx.r = r;
+        _pctx.time = 0;
         _stats = new Stats();
 
         _pow = new int[_wp.archetype().sourceLength()];
@@ -66,7 +67,7 @@ public class WorkerDiscrete implements Worker {
         }
     }
 
-    public Stats getStats() { return _stats; }
+    @Override public Stats getStats() { return _stats; }
 
     private void validate(IntPlane p) {
         for(int i=0;i<p.getWidth();i++) {
@@ -139,7 +140,7 @@ public class WorkerDiscrete implements Worker {
         System.err.println(b);
     }
 
-    public void frame(final Plane ip1, final Plane ip2) {
+    @Override public void frame(final Plane ip1, final Plane ip2) {
         final long startTime = System.currentTimeMillis();
         if(_useDepth) {
             frame3d((IntBlockPlane)ip1, (IntBlockPlane)ip2);
@@ -198,7 +199,7 @@ public class WorkerDiscrete implements Worker {
         //System.err.println("set "+counts+" cells");
     }
 
-    public void frame(final Plane ic) {
+    @Override public void frame(final Plane ic) {
         if(_wp.archetype().dims()!=1) {
             throw new IllegalStateException("1-arity frame method only compatible with 1d rules");
         }
@@ -235,6 +236,10 @@ public class WorkerDiscrete implements Worker {
             _wp.tick();
             _ef.apply(c, _r);
         }
+    }
+
+    @Override public void tick() {
+        _pctx.time++;
     }
 
     public void frame(final Plane ip1, final Plane ip2, final Plane imeta) {

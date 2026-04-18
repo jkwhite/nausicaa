@@ -62,6 +62,7 @@ public class WorkerContinuous implements Worker {
         _pctx.c = new int[3];
         _pctx.cr = new double[3];
         _pctx.r = r;
+        _pctx.time = 0;
         _stats = new Stats();
 
         //_pow = new int[_wp.archetype().sourceLength()];
@@ -251,6 +252,10 @@ public class WorkerContinuous implements Worker {
             _wp.tick();
             _ef.apply(c, _r);
         }
+    }
+
+    @Override public void tick() {
+        _pctx.time++;
     }
 
     public void frame(final Plane ip1, final Plane ip2, final Plane imeta) {

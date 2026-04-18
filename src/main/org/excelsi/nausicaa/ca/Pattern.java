@@ -28,6 +28,6 @@ public interface Pattern {
         /** random */
         public Random r;
         /** time step */
-        public long time;
+        public int time;
     }
 }

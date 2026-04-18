@@ -102,6 +102,7 @@ public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
                 try {
                     for(int i=0;i<futures.length;i++) {
                         futures[i].get();
+                        workers[i].tick();
                     }
                 }
                 catch(InterruptedException|ExecutionException e) {
@@ -141,6 +142,7 @@ public class IndexedRule2d extends AbstractIndexedRule implements IndexedRule {
             tmp = p1;
             p1 = p2;
             p2 = tmp;
+            w.tick();
             p.tick();
         }
         return c;
