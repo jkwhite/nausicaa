@@ -135,6 +135,7 @@
       + [su (Subtract)](#su-subtract)
       + [ta (Max)](#ta-max)
       + [te (Time)](#te-time)
+      + [zo (Contextual Time)](#zo-contexual-time)
       + [to (Bitwise And)](#to-bitwise-and)
       + [tsu (Bitwise Xor)](#tsu-bitwise-xor)
       + [wa (Most)](#wa-most)
@@ -1534,7 +1535,24 @@ is optional; if not specified, all values on the stack are considered
 
 Syntax: `te`
 
-Pushes the current iteration count, starting from 0. **Note that for animated
+Pushes the current iteration count for the current incantation, starting from 0.
+Note that in a multi-stage automata, each stage retains its own value of `te`.
+
+**Note that for animated
+automata, this value will only be consistent over the duration of a single
+animation execution. If the animation is stopped and started again, time will
+reset to 0. For step animation, the value will always be 0.**
+
+### zo (Contextual Time)
+
+Syntax: `zo`
+
+Pushes the current iteration count over all incantations, starting from 0.
+Note that in a multi-stage automata, the value of `zo` applies globally,
+unlike `te`. For example, in the two-stage automata `10:zo, 10:zo`, cell
+values will always increase monotonically.
+
+**Note that for animated
 automata, this value will only be consistent over the duration of a single
 animation execution. If the animation is stopped and started again, time will
 reset to 0. For step animation, the value will always be 0.**

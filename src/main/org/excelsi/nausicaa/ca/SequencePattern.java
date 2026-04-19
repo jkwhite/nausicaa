@@ -11,27 +11,29 @@ import org.slf4j.Logger;
 
 
 public class SequencePattern extends Enloggened implements Pattern, Mutatable, Humanizable, Genomic, Variables {
-    private static final Logger LOG = LoggerFactory.getLogger(CA.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SequencePattern.class);
     private static final Random R = new Random();
-    private static final int[] OFFSETS = new int[30059];
+    private static final double[] PCT = new double[30059];
     static {
-        for(int i=0;i<OFFSETS.length;i++) {
-            OFFSETS[i] = R.nextInt(4);
+        for(int i=0;i<PCT.length;i++) {
+            PCT[i] = R.nextDouble();
         }
     }
 
     private final Sequence _s;
     private Pattern[] _p = new Pattern[2];
     private float _trans;
-    private int _samples = 1;
-    private int _idx;
-    private int _offsetIdx;
+    // private int _samples = 1;
+    // private int _idx;
+    // private int _offsetIdx;
     private int _thresh;
+    private int _pctIdx;
+    private double _chance;
+    private boolean _inTrans;
 
 
     public SequencePattern(Sequence s) {
         this(s, 0.1f);
-        //Thread.dumpStack();
     }
 
     public SequencePattern(Sequence s, float trans) {
@@ -40,8 +42,10 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
         _p[1] = _s.next();
         _trans = trans;
         _thresh = (int)(trans*_s.peek());
-        //System.err.println("** created with threshold "+_thresh+" from "+trans);
-        //Thread.dumpStack();
+        _chance = 1f;
+        _inTrans = false;
+        LOG.debug("sequence pattern created with threshold "+_thresh+" from "+trans);
+        // Thread.dumpStack();
     }
 
     @Override public Archetype archetype() {
@@ -60,29 +64,25 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
         return new SequencePattern(_s.mutate(m), m.transition());
     }
 
+    private int zeroes, ones;
     @Override public void tick() {
-        //System.err.println("ratio: "+_all+" pats, "+_cnt+" new pats, "+_samples+" samples");
-        //_all = 0;
-        //_cnt = 0;
-        int t = _s.tick();
+        final int t = _s.tick();
         if(t<_thresh) {
-            //_samples = t;
-            //_samples = (int)Math.sqrt(t);
-            float x = (float)t/_thresh;
-            float s = _thresh*(1f+(float)Math.tanh(6f*x-3f));
-            //System.err.println("samples: "+s);
-            _samples = Math.max(2, (int)s);
+            double pct = (double)t/(double)_thresh;
+            _chance = 1.01d*1d/(1d+Math.exp(-40d*(pct-0.5d)))-0.005d;
+            LOG.debug("last 0,1:"+zeroes+", "+ones+", chance: "+_chance);
+
+            _inTrans = true;
+            zeroes = 0; ones = 0;
         }
         if(t==0) {
             _p[0] = _s.pattern();
             _p[1] = _s.next();
-            _thresh = (int)(_trans*_s.peek());
-            _samples = 1;
-            _idx = 0;
-            //System.err.println("t0 for transition "+_trans);
-            //LOG.debug("t0 for transition "+_trans);
-            //_idx = OFFSETS[t%OFFSETS.length];
-            //_idx = R.nextInt(OFFSETS.length);
+            // _thresh = (int)(_trans*_s.peek());
+            // _samples = 1;
+            // _idx = 0;
+            _chance = 1f;
+            _inTrans = false;
         }
     }
 
@@ -98,32 +98,28 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
     private long _cnt;
     private long _all;
     @Override public int next(int pattern, int[] p2, Ctx ctx) {
-        if(_samples!=1) {
-            if(++_idx>=_samples) {
-                _idx = OFFSETS[_offsetIdx];
-                if(++_offsetIdx==OFFSETS.length) _offsetIdx = 0;
-            }
+        int ix=0;
+        if(_inTrans) {
+            final double pct = PCT[_pctIdx];
+            if(++_pctIdx==PCT.length) _pctIdx = 0;
+            ix = pct<_chance?0:1;
         }
-        final int ix = _idx==1?1:0;
-        //++_all;
-        //_cnt+=ix;
-        //if(++_stats%100000==0) {
-        //}
         return _p[ix].next(pattern, p2, ctx);
     }
 
     @Override public double next(int pattern, double[] p2, Ctx ctx) {
-        if(_samples!=1) {
-            if(++_idx>=_samples) {
-                _idx = OFFSETS[_offsetIdx];
-                if(++_offsetIdx==OFFSETS.length) _offsetIdx = 0;
+        int ix=0;
+        if(_inTrans) {
+            final double pct = PCT[_pctIdx];
+            if(++_pctIdx==PCT.length) _pctIdx = 0;
+            ix = pct<_chance?0:1;
+            if(ix==0) {
+                zeroes++;
+            }
+            else {
+                ones++;
             }
         }
-        final int ix = _idx==1?1:0;
-        //++_all;
-        //_cnt+=ix;
-        //if(++_stats%100000==0) {
-        //}
         return _p[ix].next(pattern, p2, ctx);
     }
 
@@ -198,7 +194,6 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
         }
 
         public int tick() {
-            //pattern().tick();
             sentry().tick();
             if(--_t==0) {
                 ++_i;
