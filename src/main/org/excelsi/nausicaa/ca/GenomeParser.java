@@ -69,38 +69,6 @@ public class GenomeParser {
         return new Info(info);
     }
 
-    public Rule toUniversal(final Rule r) {
-        String g = ((Genomic)r).genome();
-        Pair<List<S>,Datamap> pa = parseS(g);
-        List<S> ps = pa.one;
-        Datamap dm = pa.two;
-        SequencePattern.Sequence s = new SequencePattern.Sequence();
-        Language universal = Languages.universal();
-        for(S seq:ps) {
-            if(seq.n==null) {
-                Codon[] cs = new Genome(seq.g).codons(new Implicate(_a, pa.two, _lang));
-                StringBuilder tr = new StringBuilder();
-                for(Codon c:cs) {
-                    tr.append(c.code()).append(" ");
-                }
-                s.s(seq.c, seq.weight[0], seq.weight[1], new ComputedPattern(_a,
-                    new ComputedPattern.MachineElf(new Machine(new Implicate(_a, dm, universal), new Genome(tr.toString().trim().replace('+',' '), 2), _mf.trace()))));
-            }
-            else {
-                s.d(seq.n, dm.find(seq.n));
-            }
-        }
-        SequencePattern sp;
-        if(_mf!=null) {
-            sp = new SequencePattern(s, _mf.transition());
-        }
-        else {
-            sp = new SequencePattern(s);
-        }
-        ComputedRuleset rs = new ComputedRuleset(_a, universal);
-        return new ComputedRule2d(sp, rs);
-    }
-
     public static Varmap createVarmap(final String g) {
         Varmap m = new Varmap(parseParams(g));
         //System.err.println("created varmap: "+m);

@@ -1346,15 +1346,6 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
         auto.addSeparator();
 
-        // remove temporarily as this doesn't really do anything
-        // AbstractAction touni = new AbstractAction() {
-            // public void actionPerformed(ActionEvent e) {
-                // Actions.translateToUniversal(NViewer.this);
-            // }
-        // };
-        // JMenuItem univer = auto.add(touni);
-        // univer.setText("Translate to Universal");
-
         {
             final JMenuItem anno = new JMenuItem(new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {

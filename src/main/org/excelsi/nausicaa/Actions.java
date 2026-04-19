@@ -2398,14 +2398,6 @@ public class Actions {
         }
     }
 
-    public static void translateToUniversal(NViewer v) {
-        CA ca = v.getActiveCA();
-        Rule r = ca.getRule();
-        Rule uni = GenomeParser.forRule(r).toUniversal(r);
-        ca = ca.mutate(uni, null);
-        v.setActiveCA(ca);
-    }
-
     public static MutationFactor createMutationFactor(CA ca, Config config, Random r) {
         return createMutationFactor(ca, config, r, false);
     }
