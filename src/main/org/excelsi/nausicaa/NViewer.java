@@ -2151,7 +2151,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
             _reditor = new JFrame("Rule Editor");
             _reditor.setLocation(_root.getLocation().x, _root.getLocation().y);
             _ruleEditor = new RuleEditor(_reditor, this, _timeline,
-                Actions.createMutationFactor(getActiveCA(), _config, _random));
+                Actions.createParameters(getActiveCA(), _config, _random, false));
             _reditor.getContentPane().add(_ruleEditor);
             _reditor.pack();
             Dimension dim = _reditor.getContentPane().getPreferredSize();

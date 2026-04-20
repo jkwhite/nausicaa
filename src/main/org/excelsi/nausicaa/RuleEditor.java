@@ -14,7 +14,7 @@ import org.excelsi.nausicaa.ca.CA;
 import org.excelsi.nausicaa.ca.IndexedRule;
 import org.excelsi.nausicaa.ca.Palette;
 import org.excelsi.nausicaa.ca.Genomic;
-import org.excelsi.nausicaa.ca.MutationFactor;
+import org.excelsi.nausicaa.ca.Parameters;
 import org.excelsi.nausicaa.ca.AbstractComputedRuleset;
 
 import org.slf4j.LoggerFactory;
@@ -23,19 +23,20 @@ import org.slf4j.Logger;
 
 public class RuleEditor extends JComponent implements TimelineListener {
     private static final Logger LOG = LoggerFactory.getLogger(RuleEditor.class);
-    private UIActions _ui;
+    private final UIActions _ui;
     private Rule _rule;
     private JTextArea _ruleText;
-    private JFrame _root;
+    private JTextField _trans;
+    private final JFrame _root;
     private final Timeline _timeline;
-    private final MutationFactor _f;
+    private final Parameters _params;
 
 
-    public RuleEditor(JFrame root, UIActions ui, Timeline timeline, MutationFactor f) {
+    public RuleEditor(JFrame root, UIActions ui, Timeline timeline, Parameters p) {
         _root = root;
         _ui = ui;
         _timeline = timeline;
-        _f = f;
+        _params = p;
         timeline.addTimelineListener(this);
         futureChanged();
     }
@@ -55,7 +56,9 @@ public class RuleEditor extends JComponent implements TimelineListener {
                 String g = _ruleText.getText();
                 int caret = _ruleText.getCaretPosition();
                 final CA current = _ui.getActiveCA();
-                _ui.setActiveCA(current.mutate(_rule.origin().create(g, _f), _ui.getActiveCA().getRandom()));
+                final float trans = Float.valueOf(_trans.getText());
+                _ui.setActiveCA(current.mutate(_rule.origin()
+                    .create(g, _params.transition(trans)), _ui.getActiveCA().getRandom()));
                 _ruleText.requestFocus();
                 _ruleText.setCaretPosition(caret);
             }
@@ -76,10 +79,11 @@ public class RuleEditor extends JComponent implements TimelineListener {
         BoxLayout bl = new BoxLayout(scr, BoxLayout.Y_AXIS);
         scr.setLayout(bl);
 
-        scr.add(new JLabel("Genome"));
+        JPanel in = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        in.add(new JLabel("Incantation"));
+        scr.add(in);
 
         final JTextArea rule = new JTextArea(10,80);
-        _ruleText = rule;
         if(_rule instanceof Genomic) {
             final String gen = ((Genomic)_rule).prettyGenome();
             rule.setText(gen);
@@ -90,8 +94,18 @@ public class RuleEditor extends JComponent implements TimelineListener {
             rule.setRows(Math.max(10, Math.min(20,nls)));
         }
         scr.add(new JScrollPane(rule));
+        _ruleText = rule;
 
-        JPanel bot = new JPanel();
+        if(_rule instanceof ComputedRule2d) {
+            JPanel params = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            params.add(new JLabel("Transition"));
+            _trans = new JTextField(8);
+            _trans.setText(Float.toString(((ComputedRule2d)_rule).transition()));
+            params.add(_trans);
+            scr.add(params);
+        }
+
+        JPanel bot = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton ne = new JButton("Ok");
         JButton upd = new JButton("Update");
         JButton de = new JButton("Cancel");

@@ -3,10 +3,14 @@ package org.excelsi.nausicaa.ca;
 
 public class ComputedRuleset extends AbstractComputedRuleset {
     public ComputedRuleset(final Archetype a) {
-        super(a, Languages.universal());
+        this(a, Languages.universal());
     }
 
     public ComputedRuleset(final Archetype a, final Language lang) {
-        super(a, lang);
+        this(a, lang, 0f);
+    }
+
+    public ComputedRuleset(final Archetype a, final Language lang, final float transition) {
+        super(a, lang, transition);
     }
 }

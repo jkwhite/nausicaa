@@ -11,7 +11,6 @@ public final class MutationFactor {
     private Predicate<Archetype> _validator;
     private String _mode = "normal";
     private int _stage;
-    private float _transition;
     private boolean _symmetry;
     private boolean _weight;
     private boolean _updateArchetype;
@@ -83,20 +82,7 @@ public final class MutationFactor {
     }
 
     public int stage() {
-        //if(_stage==0) {
-            //System.err.println("************* ZERO STAGE ***********");
-            //Thread.dumpStack();
-        //}
         return _stage;
-    }
-
-    public float transition() {
-        return _transition;
-    }
-
-    public MutationFactor withTransition(float t) {
-        _transition = t;
-        return this;
     }
 
     public MutationFactor withSymmetry(boolean s) {

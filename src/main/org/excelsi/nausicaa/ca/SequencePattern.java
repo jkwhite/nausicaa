@@ -23,9 +23,6 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
     private final Sequence _s;
     private Pattern[] _p = new Pattern[2];
     private float _trans;
-    // private int _samples = 1;
-    // private int _idx;
-    // private int _offsetIdx;
     private int _thresh;
     private int _pctIdx;
     private double _chance;
@@ -33,7 +30,7 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
 
 
     public SequencePattern(Sequence s) {
-        this(s, 0.1f);
+        this(s, 0f);
     }
 
     public SequencePattern(Sequence s, float trans) {
@@ -45,7 +42,6 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
         _chance = 1f;
         _inTrans = false;
         LOG.debug("sequence pattern created with threshold "+_thresh+" from "+trans);
-        // Thread.dumpStack();
     }
 
     @Override public Archetype archetype() {
@@ -61,26 +57,27 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
     }
 
     @Override public Mutatable mutate(MutationFactor m) {
-        return new SequencePattern(_s.mutate(m), m.transition());
+        return new SequencePattern(_s.mutate(m), _trans);
     }
 
-    private int zeroes, ones;
+    // private int zeroes, ones;
     @Override public void tick() {
         final int t = _s.tick();
         if(t<_thresh) {
             double pct = (double)t/(double)_thresh;
-            _chance = 1.01d*1d/(1d+Math.exp(-40d*(pct-0.5d)))-0.005d;
-            LOG.debug("last 0,1:"+zeroes+", "+ones+", chance: "+_chance);
+            // this sigmoid gives a nice smooth transition with long
+            // flat ends, the 1.01 and 0.005 are to make sure it goes
+            // inclusively from 0-100%
+            _chance = 1.01d*1d/(1d+Math.exp(-10d*(pct-0.5d)))-0.005d;
+            // LOG.debug("last 0,1:"+zeroes+", "+ones+", chance: "+_chance);
 
             _inTrans = true;
-            zeroes = 0; ones = 0;
+            // zeroes = 0; ones = 0;
         }
         if(t==0) {
             _p[0] = _s.pattern();
             _p[1] = _s.next();
-            // _thresh = (int)(_trans*_s.peek());
-            // _samples = 1;
-            // _idx = 0;
+            _thresh = (int)(_trans*_s.peek());
             _chance = 1f;
             _inTrans = false;
         }
@@ -94,9 +91,6 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
         throw new UnsupportedOperationException();
     }
 
-    private long _stats;
-    private long _cnt;
-    private long _all;
     @Override public int next(int pattern, int[] p2, Ctx ctx) {
         int ix=0;
         if(_inTrans) {
@@ -113,12 +107,13 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
             final double pct = PCT[_pctIdx];
             if(++_pctIdx==PCT.length) _pctIdx = 0;
             ix = pct<_chance?0:1;
-            if(ix==0) {
-                zeroes++;
-            }
-            else {
-                ones++;
-            }
+            // debug stuff
+            // if(ix==0) {
+                // zeroes++;
+            // }
+            // else {
+                // ones++;
+            // }
         }
         return _p[ix].next(pattern, p2, ctx);
     }
@@ -201,8 +196,6 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                     _i = 0;
                 }
                 final SEntry s = _s.get(_i); 
-                //System.err.println("switched to pattern "+_i+": "+s.p);
-                //LOG.debug("switched to pattern "+_i+": "+s.p);
                 LOG.trace("switched to pattern "+_i);
                 _t = s.t;
                 s.reset();
@@ -319,7 +312,7 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
                     for(int i=0;i<_s.size();i++) {
                         if(i!=m.stage()) {
                             Archetype a2 = _s.get(i).p.archetype();
-                            ns.add(new SEntry(m.random().nextInt(70)+70, _s.get(i).weight, _s.get(i).decay, (ComputedPattern)_s.get(i).p.copy(dm)));
+                            ns.add(new SEntry(_s.get(i).t, _s.get(i).weight, _s.get(i).decay, (ComputedPattern)_s.get(i).p.copy(dm)));
                         }
                     }
                     break;

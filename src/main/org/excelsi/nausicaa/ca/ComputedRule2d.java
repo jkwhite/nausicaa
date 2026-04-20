@@ -43,11 +43,12 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
     }
 
     public ComputedRule2d derive(Pattern pattern) {
-        return derive(pattern, language(), pattern.archetype());
+        return derive(pattern, language(), pattern.archetype(),
+            pattern instanceof SequencePattern?((SequencePattern)pattern).transition():transition());
     }
 
     public ComputedRule2d derive(Language lang) {
-        return derive(_p, lang, archetype());
+        return derive(_p, lang, archetype(), transition());
     }
 
     @Override public Archetype archetype() {
@@ -56,6 +57,10 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
 
     public Language language() {
         return ((AbstractComputedRuleset)_origin).language();
+    }
+
+    public float transition() {
+        return ((AbstractComputedRuleset)_origin).transition();
     }
 
     @Override public int dimensions() {
@@ -246,7 +251,8 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
             (Pattern)
                 ((Mutatable)_p).mutate(m.withLanguage(language())),
                 language(),
-                m.hasArchetype()?m.archetype():archetype());
+                m.hasArchetype()?m.archetype():archetype(),
+                ((SequencePattern)_p).transition());
 
     }
 
@@ -298,8 +304,8 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
         return _p.copy();
     }
 
-    private ComputedRule2d derive(Pattern pattern, Language lang, Archetype arch) {
-        return new ComputedRule2d(pattern, new ComputedRuleset(arch, lang), _meta, null);
+    private ComputedRule2d derive(Pattern pattern, Language lang, Archetype arch, float transition) {
+        return new ComputedRule2d(pattern, new ComputedRuleset(arch, lang, transition), _meta, null);
     }
 
     public static Rule fromJson(JsonElement e) {
@@ -307,29 +313,19 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
     }
 
     public static Rule fromJson(JsonElement e, Varmap vars) {
-        JsonObject o = (JsonObject) e;
-        Archetype a = Archetype.fromJson(o.get("archetype"));
-        String genome = Json.string(o, "genome");
+        final JsonObject o = (JsonObject) e;
+        final Archetype a = Archetype.fromJson(o.get("archetype"));
+        final String genome = Json.string(o, "genome");
         MutationFactor mf = null;
-        if(o.has("transition")) {
-            mf = new MutationFactor().withTransition(Json.flot(o, "transition", 0.1f));
-        }
-        else {
-            mf = new MutationFactor();
-        }
+        final float transition = Json.flot(o, "transition", 0f);
+        mf = new MutationFactor();
         mf.withVars(vars);
-        Language lang;
-        if(o.has("language")) {
-            lang = Language.fromJson(o.get("language"));
-        }
-        else {
-            lang = Languages.universal();
-        }
+        final Language lang = o.has("language")?Language.fromJson(o.get("language")):Languages.universal();
         if(mf!=null) {
-            return new ComputedRuleset(a, lang).create(genome, mf);
+            return new ComputedRuleset(a, lang, transition).create(genome, mf);
         }
         else {
-            return new ComputedRuleset(a, lang).create(genome);
+            return new ComputedRuleset(a, lang, transition).create(genome);
         }
     }
 }

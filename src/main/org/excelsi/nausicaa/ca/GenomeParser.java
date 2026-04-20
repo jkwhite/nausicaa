@@ -13,22 +13,25 @@ public class GenomeParser {
 
     private final Archetype _a;
     private final Language _lang;
-    private MutationFactor _mf;
+    private final float _transition;
+    private Parameters _params;
 
 
-    public GenomeParser(Archetype a, Language lang) {
+    public GenomeParser(Archetype a, Language lang, float transition) {
         _a = a;
         _lang = lang;
+        _transition = transition;
     }
 
-    public GenomeParser mutationFactor(MutationFactor mf) {
-        _mf = mf;
+    public GenomeParser parameters(Parameters p) {
+        _params = p;
         return this;
     }
 
     public static GenomeParser forRule(Rule r) {
         return new GenomeParser(r.archetype(),
-            ((AbstractComputedRuleset)r.origin()).language());
+            ((AbstractComputedRuleset)r.origin()).language(),
+            ((AbstractComputedRuleset)r.origin()).transition());
     }
 
     public Rule parse(final String g, final Ruleset origin) {
@@ -71,7 +74,6 @@ public class GenomeParser {
 
     public static Varmap createVarmap(final String g) {
         Varmap m = new Varmap(parseParams(g));
-        //System.err.println("created varmap: "+m);
         return m;
     }
 
@@ -96,17 +98,6 @@ public class GenomeParser {
     }
 
     private Rule parse3(final String g, final Ruleset origin) {
-        /*
-        final String pre = "--- !!org.excelsi.nausicaa.ca.GenomeParser$Data\n"+g;
-
-        Data d = null;
-        try {
-            d = (Data) new Yaml().load(new StringReader(pre));
-        }
-        catch(Exception e) {
-            throw new IllegalArgumentException(e.toString(), e);
-        }
-        */
         throw new UnsupportedOperationException();
     }
 
@@ -202,21 +193,14 @@ public class GenomeParser {
                 s.s(seq.c, seq.weight[0], seq.weight[1], new ComputedPattern(_a,
                     new ComputedPattern.MachineElf(
                         new Machine(
-                            new Implicate(_a, dm, _lang, _mf!=null?_mf.vars():new Varmap()),
-                            new Genome(seq.g, 2), _mf!=null?_mf.trace():false))));
+                            new Implicate(_a, dm, _lang, _params!=null?_params.vars():new Varmap()),
+                            new Genome(seq.g, 2), _params!=null?_params.trace():false))));
             }
             else {
                 s.d(seq.n, dm.find(seq.n));
             }
         }
-        SequencePattern sp;
-        if(_mf!=null) {
-            sp = new SequencePattern(s, _mf.transition());
-        }
-        else {
-            sp = new SequencePattern(s);
-        }
-        return new ComputedRule2d(sp, origin);
+        return new ComputedRule2d(new SequencePattern(s, _params!=null?_params.transition():_transition), origin);
     }
 
     public static final class Data {

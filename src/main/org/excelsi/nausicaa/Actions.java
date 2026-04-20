@@ -310,7 +310,7 @@ public class Actions {
                                 lnames.add(l.getText());
                             }
                         }
-                        rs = new ComputedRuleset(a, lnames.isEmpty()?new Language():Languages.union(lnames.toArray(new String[0])));
+                        rs = new ComputedRuleset(a, lnames.isEmpty()?new Language():Languages.union(lnames.toArray(new String[0])), 0f);
                         break;
                     case "sparse":
                     case "array":
@@ -682,8 +682,12 @@ public class Actions {
         else if(r instanceof ComputedRule2d) {
             ComputedRule2d cr = (ComputedRule2d) r;
             p.addPair("Language", ((AbstractComputedRuleset)cr.origin()).language().toDescription());
+            p.addPair("Transition", ((AbstractComputedRuleset)cr.origin()).transition());
             p.addPair("Genome", cr.humanize());
-            String expanded = new GenomeParser(r.archetype(), ((ComputedRuleset)r.origin()).language()).info(cr.archetype(), cr.genome()).toString();
+            String expanded = new GenomeParser(r.archetype(),
+                    ((ComputedRuleset)r.origin()).language(),
+                    ((ComputedRuleset)r.origin()).transition()
+                ).info(cr.archetype(), cr.genome()).toString();
             p.addPair("Codons",
                 createText(expanded, 10, true));
             additional.append("\n\nExpanded form:\n").append(expanded);
@@ -920,12 +924,6 @@ public class Actions {
         top.add(new JLabel(""));
         top.add(new JLabel(""));
 
-        top.add(new JLabel("Transition factor"));
-        final JTextField tf = new JTextField();
-        tf.setText(config.getVariable("mutator_transition", "0.5"));
-        tf.setColumns(3);
-        top.add(tf);
-
         top.add(new JLabel("Attempt symmetry"));
         final JCheckBox as = new JCheckBox();
         as.setSelected("true".equals(config.getVariable("mutator_symmetry", "false")));
@@ -967,7 +965,6 @@ public class Actions {
                 else {
                     config.setVariable("mutator_stage", ms.getText());
                 }
-                config.setVariable("mutator_transition", tf.getText());
                 config.setVariable("mutator_symmetry", ""+as.isSelected());
                 config.setVariable("mutator_meta", ""+meta.isSelected());
                 config.setVariable("mutator_bonding", ""+bonding.isSelected());
@@ -2398,6 +2395,13 @@ public class Actions {
         }
     }
 
+    public static Parameters createParameters(CA ca, Config config, Random r, boolean trace) {
+        return new Parameters()
+            .vars(ca.getVars())
+            .transition(ca.getRule() instanceof ComputedRule2d?((ComputedRule2d)ca.getRule()).transition():0f)
+            .trace(trace);
+    }
+
     public static MutationFactor createMutationFactor(CA ca, Config config, Random r) {
         return createMutationFactor(ca, config, r, false);
     }
@@ -2409,7 +2413,6 @@ public class Actions {
             .withAlpha(Integer.parseInt(config.getVariable("mutator_alpha", "20")))
             .withStage("*".equals(stage)?-1:Integer.parseInt(stage))
             .withRandom(r)
-            .withTransition(Float.parseFloat(config.getVariable("mutator_transition", "0.5")))
             .withSymmetry("true".equals(config.getVariable("mutator_symmetry", "false")))
             .withMeta("true".equals(config.getVariable("mutator_meta", "false")))
             .withUpdateWeight(config.getWeightVariations())
@@ -2424,7 +2427,6 @@ public class Actions {
             .withValidator((a)->{
                 return a.colors()<mc;
             });
-        //System.err.println("####### stage: "+mf.stage());
         return mf;
     }
 
