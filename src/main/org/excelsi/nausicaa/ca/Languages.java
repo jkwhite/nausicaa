@@ -10,20 +10,35 @@ public class Languages {
     }
 
     public static String[] catalog() {
+        // pattern
+        // deterministic
+        // non-deterministic
+        // positioning
+        // move tape
+        // circular
+        // fractal
+        // cell location
         return new String[]{
-            "Classic",
+            "Pattern",
+            "Deterministic",
+            "Nondeterministic",
+            "Location",
             "Positioning",
-            "Universal",
             "Circular",
-            // "Symmetric2d",
             "Fractal"
-            //"Symmetric3d",
-            //"Menagerie"
         };
     }
 
     public static Language named(String name) {
         switch(name) {
+            case "Pattern":
+                return pattern();
+            case "Deterministic":
+                return deterministic();
+            case "Location":
+                return location();
+            case "Nondeterministic":
+                return nondeterministic();
             case "Universal":
                 return universal();
             case "Positioning":
@@ -54,17 +69,40 @@ public class Languages {
 
     public static Language positioning() {
         return new Language("Positioning")
-            .contextual(true)
-            .positioning(true);
+            .positioning(true)
+            .tape(true);
     }
 
     public static Language universal() {
         return new Language("Universal")
+            .pattern(true)
             .deterministic(true)
             .nondeterministic(true)
             .contextual(true)
+            .location(true)
             .positioning(true)
             .tape(true);
+    }
+
+    public static Language pattern() {
+        return new Language("Pattern")
+            .pattern(true);
+    }
+
+    public static Language deterministic() {
+        return new Language("Deterministic")
+            .deterministic(true);
+    }
+
+    public static Language nondeterministic() {
+        return new Language("Nondeterministic")
+            .nondeterministic(true);
+    }
+
+    public static Language location() {
+        return new Language("Location")
+            .contextual(true)
+            .location(true);
     }
 
     public static Language classic() {
@@ -79,6 +117,7 @@ public class Languages {
     public static Language circular() {
         return new Language("Circular")
             .contextual(true)
+            .location(true)
             .add("circle","kya0+kya0+mu2+kya1+kya1+mu2+mi2+ni")
             .add("blitx","jya0+a200+mu2+re+a5+mu2")
             .add("blity","jya1+a200+mu2+re+a5+mu2")
@@ -88,7 +127,7 @@ public class Languages {
 
     public static Language fractal() {
         return new Language("Fractal")
-            .contextual(true)
+            .location(true)
             .add("mandelbrot","kya0+kya1+a100+a100+nya")
             .add("mandelbulb","kya0+kya1+kya2+a100+a100+mya")
             ;

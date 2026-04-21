@@ -10,9 +10,11 @@ public class Language {
     private final String _name;
     private final Map<String,String> _lang;
     private final Map<String,String> _rev;
+    private boolean _pattern = false;
     private boolean _deterministic = false;
     private boolean _nondeterministic = false;
     private boolean _context = false;
+    private boolean _location = false;
     private boolean _positioning = false;
     private boolean _tape = false;
 
@@ -42,6 +44,15 @@ public class Language {
         return _lang;
     }
 
+    public boolean pattern() {
+        return _pattern;
+    }
+
+    public Language pattern(boolean p) {
+        _pattern = p;
+        return this;
+    }
+
     public boolean deterministic() {
         return _deterministic;
     }
@@ -69,6 +80,15 @@ public class Language {
         return this;
     }
 
+    public boolean location() {
+        return _location;
+    }
+
+    public Language location(boolean l) {
+        _location = l;
+        return this;
+    }
+
     public boolean positioning() {
         return _positioning;
     }
@@ -88,9 +108,11 @@ public class Language {
     }
 
     public boolean accept(Codon c) {
+        if(!_pattern && c.usesPattern()) return false;
         if(!_deterministic && c.deterministic()) return false;
         if(!_nondeterministic && !c.deterministic()) return false;
         if(!_context && c.usesContext()) return false;
+        if(!_location && c.usesLocation()) return false;
         if(!_positioning && c.positioning()) return false;
         if(!_tape && c.usesTape()) return false;
 
@@ -109,8 +131,11 @@ public class Language {
         n.setLength(n.length()-1);
         final Language u = new Language(n.toString());
         for(Language l:ls) {
-            u.positioning(u.positioning()||l.positioning())
+            u.pattern(u.pattern()||l.pattern())
+            .positioning(u.positioning()||l.positioning())
             .contextual(u.contextual()||l.contextual())
+            .location(u.location()||l.location())
+            .tape(u.tape()||l.tape())
             .deterministic(u.deterministic()||l.deterministic())
             .nondeterministic(u.nondeterministic()||l.nondeterministic());
             u._lang.putAll(l._lang);
@@ -195,8 +220,10 @@ public class Language {
 
     public String toDescription() {
         StringBuilder b = new StringBuilder(name()).append(" (");
+        if(pattern()) b.append("pattern, ");
         if(deterministic()) b.append("deterministic, ");
         if(nondeterministic()) b.append("nondeterministic, ");
+        if(location()) b.append("location, ");
         if(contextual()) b.append("contextual, ");
         if(positioning()) b.append("positioning, ");
         if(tape()) b.append("tape, ");
@@ -219,6 +246,7 @@ public class Language {
         o.addProperty("deterministic", _deterministic);
         o.addProperty("nondeterministic", _nondeterministic);
         o.addProperty("context", _context);
+        o.addProperty("location", _location);
         o.addProperty("positioning", _positioning);
         o.addProperty("tape", _tape);
         JsonObject dict = new JsonObject();
@@ -246,9 +274,12 @@ public class Language {
         JsonObject o = (JsonObject) el;
         final String name = Json.string(o, "name", "Unknown");
         Language lang = new Language(name);
+        // defaults are all true for forward compatibility
+        lang._pattern = Json.bool(o, "pattern", true);
         lang._deterministic = Json.bool(o, "deterministic", true);
         lang._nondeterministic = Json.bool(o, "nondeterministic", true);
         lang._context = Json.bool(o, "context", true);
+        lang._location = Json.bool(o, "location", true);
         lang._positioning = Json.bool(o, "positioning", true);
         lang._tape = Json.bool(o, "tape", true);
         if(o.has("dict")) {

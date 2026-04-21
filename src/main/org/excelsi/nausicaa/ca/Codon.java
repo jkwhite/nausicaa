@@ -13,11 +13,19 @@ public interface Codon {
     Codon copy();
     String code();
     boolean usesPattern();
+    /** whether this codon uses values from the context */
     default boolean usesContext() { return false; }
+    /** whether this codon uses location values only from the context */
+    default boolean usesLocation() { return false; }
+    /** whether this codon accesses tape values via pop/peek */
     default boolean usesTape() { return false; }
-    default boolean reversible() { return true; }
-    default boolean symmetric() { return true; }
+    /** purpose unclear */
+    default boolean reversible() { return false; }
+    /** whether this codon is rotationally symmetric with respect to the pattern */
+    default boolean symmetric() { return false; }
+    /** whether this codon will always produce the same value given the same pattern and context */
     default boolean deterministic() { return true; }
+    /** whether this codon moves the tape head directly, outside of push/pop */
     default boolean positioning() { return false; }
     default String generate(Random r) {
         return code();

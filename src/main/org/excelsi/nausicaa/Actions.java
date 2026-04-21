@@ -2541,6 +2541,7 @@ public class Actions {
         }
         if(r instanceof ComputedRule2d) {
             ComputedRule2d cr = (ComputedRule2d) r;
+            capt += ", transition "+cr.transition();
             capt += "\n\nIncantation:\n"+cr.prettyGenome();
         }
         else {

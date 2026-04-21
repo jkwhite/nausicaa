@@ -102,6 +102,7 @@ public class Codons {
     public static final String EQUAL_A = "po";
 
     public static final String JUMP = "ja";
+    public static final String TIME_EPOCH = "je";
     public static final String MIN_N = "jo";
 
     public static final String COORD = "kya";
@@ -253,6 +254,8 @@ public class Codons {
                     return new Nonzero(p);
                 case TIME_CTX:
                     return new TimeCtx();
+                case TIME_EPOCH:
+                    return new TimeEpoch();
                 case TIME:
                     return new Time();
                 case HISTO:
@@ -341,7 +344,7 @@ public class Codons {
                 case ABS:
                     return new Abs();
                 default:
-                    throw new IllegalStateException("unknown opcode '"+code+"'");
+                    throw new IllegalStateException("unknown codon '"+code+"'");
             }
         }
     }
@@ -754,9 +757,9 @@ public class Codons {
             return SUM;
         }
 
-        @Override public boolean usesPattern() {
-            return false;
-        }
+        @Override public boolean usesPattern() { return false; }
+
+        @Override public boolean usesTape() { return true; }
 
         @Override public boolean reversible() { return true; }
 
@@ -1796,8 +1799,6 @@ public class Codons {
         @Override public boolean usesContext() {
             // while Time does not technically use context,
             // it effectively does as that is what _t represents.
-            // eventually Time should migrate to using Pattern.Context's
-            // time tracker instead of keeping its own.
             return true;
         }
 
@@ -1841,6 +1842,32 @@ public class Codons {
 
         @Override public void op(double[] p, FloatTape t, Pattern.Ctx c) {
             t.push(c.time);
+        }
+    }
+
+    public static class TimeEpoch implements Codon {
+        @Override public Codon copy() {
+            return new TimeEpoch();
+        }
+
+        @Override public String code() {
+            return TIME_EPOCH;
+        }
+
+        @Override public boolean usesPattern() { return false; }
+
+        @Override public boolean usesContext() { return true; }
+
+        @Override public boolean deterministic() { return false; }
+
+        @Override public boolean supports(Values v) { return true; }
+
+        @Override public void op(int[] p, IntTape t, Pattern.Ctx c) {
+            t.push((int)System.currentTimeMillis());
+        }
+
+        @Override public void op(double[] p, FloatTape t, Pattern.Ctx c) {
+            t.push((double)System.currentTimeMillis());
         }
     }
 
@@ -2891,6 +2918,8 @@ public class Codons {
 
         @Override public boolean usesContext() { return true; }
 
+        @Override public boolean usesLocation() { return true; }
+
         @Override public void op(int[] p, IntTape t, Pattern.Ctx ctx) {
             if(_c==-1) {
                 for(int i=0;i<ctx.c.length;i++) {
@@ -2943,6 +2972,8 @@ public class Codons {
         @Override public boolean deterministic() { return true; }
 
         @Override public boolean usesContext() { return true; }
+
+        @Override public boolean usesLocation() { return true; }
 
         @Override public void op(int[] p, IntTape t, Pattern.Ctx ctx) {
             if(_c==-1) {
@@ -3691,6 +3722,7 @@ public class Codons {
         private final boolean _usesTape;
         private final boolean _deterministic;
         private final boolean _usesContext;
+        private final boolean _location;
         private final boolean _unstable;
         private final boolean _positioning;
 
@@ -3700,6 +3732,7 @@ public class Codons {
             boolean ut = false;
             boolean det = true;
             boolean uctx = false;
+            boolean loc = false;
             boolean unst = false;
             boolean pos = false;
             for(Codon c:cs) {
@@ -3715,6 +3748,9 @@ public class Codons {
                 if(c.usesContext()) {
                     uctx = true;
                 }
+                if(c.usesLocation()) {
+                    loc = true;
+                }
                 if(c.positioning()) {
                     pos = true;
                 }
@@ -3726,6 +3762,7 @@ public class Codons {
             _usesTape = ut;
             _deterministic = det;
             _usesContext = uctx;
+            _location = loc;
             _unstable = unst;
             _positioning = pos;
         }
@@ -3749,10 +3786,11 @@ public class Codons {
 
         @Override public boolean usesContext() { return _usesContext; }
         @Override public boolean usesPattern() { return _usesPattern; }
+        @Override public boolean usesLocation() { return _location; }
         @Override public boolean usesTape() { return _usesTape; }
         @Override public boolean deterministic() { return _deterministic; }
-        @Override public boolean supports(Values v) { return true; }
         @Override public boolean positioning() { return _positioning; }
+        @Override public boolean supports(Values v) { return true; }
 
         @Override public void op(int[] p, IntTape t, Pattern.Ctx ctx) {
             for(int i=0;i<_cs.length;i++) {
