@@ -27,6 +27,7 @@ public class RuleEditor extends JComponent implements TimelineListener {
     private Rule _rule;
     private JTextArea _ruleText;
     private JTextField _trans;
+    private JLabel _error;
     private final JFrame _root;
     private final Timeline _timeline;
     private final Parameters _params;
@@ -50,19 +51,28 @@ public class RuleEditor extends JComponent implements TimelineListener {
         LOG.debug("removed rule editor as timeline listener");
     }
 
-    public void commit() {
-        _ui.doWait(new Runnable() {
-            public void run() {
-                String g = _ruleText.getText();
-                int caret = _ruleText.getCaretPosition();
-                final CA current = _ui.getActiveCA();
-                final float trans = Float.valueOf(_trans.getText());
-                _ui.setActiveCA(current.mutate(_rule.origin()
-                    .create(g, _params.transition(trans)), _ui.getActiveCA().getRandom()));
-                _ruleText.requestFocus();
-                _ruleText.setCaretPosition(caret);
-            }
-        }, 1000);
+    public boolean commit() {
+        try {
+            _ui.doWait(new Runnable() {
+                public void run() {
+                    String g = _ruleText.getText();
+                    int caret = _ruleText.getCaretPosition();
+                    final CA current = _ui.getActiveCA();
+                    final float trans = Float.valueOf(_trans.getText());
+                    _ui.setActiveCA(current.mutate(_rule.origin()
+                        .create(g, _params.transition(trans)), _ui.getActiveCA().getRandom()));
+                    _ruleText.requestFocus();
+                    _ruleText.setCaretPosition(caret);
+                    _error.setText("");
+                }
+            }, 1000);
+        }
+        catch(Exception e) {
+            _error.setText("Error: "+e.getMessage());
+            LOG.warn("failed setting rule text: "+e.getMessage(), e);
+            return false;
+        }
+        return true;
     }
 
     public void focusIncantation() {
@@ -96,6 +106,11 @@ public class RuleEditor extends JComponent implements TimelineListener {
         scr.add(new JScrollPane(rule));
         _ruleText = rule;
 
+        JPanel errp = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        _error = new JLabel("");
+        errp.add(_error);
+        scr.add(errp);
+
         if(_rule instanceof ComputedRule2d) {
             JPanel params = new JPanel(new FlowLayout(FlowLayout.LEFT));
             params.add(new JLabel("Transition"));
@@ -112,8 +127,9 @@ public class RuleEditor extends JComponent implements TimelineListener {
 
         ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                commit();
-                _ui.toggleRuleEditor();
+                if(commit()) {
+                    _ui.toggleRuleEditor();
+                }
             }
         });
         upd.addActionListener(new AbstractAction() {

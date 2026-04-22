@@ -15,4 +15,5 @@ public interface UIActions {
     PlaneDisplayProvider getPlaneDisplayProvider();
     PlanescapeProvider getPlanescapeProvider();
     void toggleRuleEditor();
+    void toggleLangEditor();
 }

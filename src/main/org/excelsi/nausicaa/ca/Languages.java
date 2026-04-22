@@ -10,14 +10,6 @@ public class Languages {
     }
 
     public static String[] catalog() {
-        // pattern
-        // deterministic
-        // non-deterministic
-        // positioning
-        // move tape
-        // circular
-        // fractal
-        // cell location
         return new String[]{
             "Pattern",
             "Deterministic",

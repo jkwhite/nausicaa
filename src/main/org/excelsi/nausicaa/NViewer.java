@@ -2208,7 +2208,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         _rehack.setText(_reditor!=null?"Hide rule editor":"Show rule editor");
     }
 
-    private void toggleLangEditor() {
+    @Override public void toggleLangEditor() {
         if(_leditor!=null) {
             _langEditor.disconnect();
             _langEditor = null;

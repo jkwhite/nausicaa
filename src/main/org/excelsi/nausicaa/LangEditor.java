@@ -45,7 +45,6 @@ public class LangEditor extends JComponent implements TimelineListener {
         final CA current = _ui.getActiveCA();
         _rule = current.getRule();
         _lang = ((AbstractComputedRuleset)_rule.origin()).language();
-        //JPanel scr = new JPanel(new FlowLayout());
         JPanel scr = new JPanel();
         BoxLayout bl = new BoxLayout(scr, BoxLayout.Y_AXIS);
         scr.setLayout(bl);
@@ -59,46 +58,71 @@ public class LangEditor extends JComponent implements TimelineListener {
 
         scr.add(new JLabel("Dictionary"));
 
-        //final JTextField rule = new JTextField(50);
         final JTextArea dict = new JTextArea(10,80);
-        //if(_rule instanceof Genomic) {
-            //rule.setText(((Genomic)_rule).prettyGenome());
-        //}
         String text = buildText(_lang);
         dict.setText(text);
 
         scr.add(new JScrollPane(dict));
+        JPanel check = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        final JCheckBox pat = new JCheckBox("Pattern");
+        pat.setSelected(_lang.pattern());
+        check.add(pat);
 
         final JCheckBox det = new JCheckBox("Deterministic");
         det.setSelected(_lang.deterministic());
-        scr.add(det);
+        check.add(det);
 
         final JCheckBox ndet = new JCheckBox("Nondeterministic");
         ndet.setSelected(_lang.nondeterministic());
-        scr.add(ndet);
+        check.add(ndet);
 
         final JCheckBox ctx = new JCheckBox("Contextual");
         ctx.setSelected(_lang.contextual());
-        scr.add(ctx);
+        check.add(ctx);
+
+        final JCheckBox loc = new JCheckBox("Location");
+        loc.setSelected(_lang.location());
+        check.add(loc);
+
+        final JCheckBox tap = new JCheckBox("Tape");
+        tap.setSelected(_lang.tape());
+        check.add(tap);
 
         final JCheckBox pos = new JCheckBox("Positioning");
         pos.setSelected(_lang.positioning());
-        scr.add(pos);
+        check.add(pos);
+
+        scr.add(check);
 
         add(scr, BorderLayout.CENTER);
 
         JPanel bot = new JPanel();
+        JButton ok = new JButton("Ok");
         JButton ne = new JButton("Update");
+        JButton de = new JButton("Cancel");
         JButton exp = new JButton("Export ...");
         JButton imp = new JButton("Import ...");
-        //JButton de = new JButton("Cancel");
+        bot.add(ok);
         bot.add(ne);
+        bot.add(de);
         bot.add(exp);
         bot.add(imp);
         add(bot, BorderLayout.SOUTH);
+        ok.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                updateCA(name, dict, pat, det, ndet, ctx, loc, tap, pos);
+                _ui.toggleLangEditor();
+            }
+        });
         ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                updateCA(name, dict, det, ndet, ctx, pos);
+                updateCA(name, dict, pat, det, ndet, ctx, loc, tap, pos);
+            }
+        });
+        de.addActionListener(new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                _ui.toggleLangEditor();
             }
         });
         exp.addActionListener(new AbstractAction() {
@@ -162,11 +186,9 @@ public class LangEditor extends JComponent implements TimelineListener {
         }
     }
 
-    private void updateCA(JTextField name, JTextArea dict, JCheckBox det, JCheckBox ndet, JCheckBox ctx, JCheckBox pos) {
+    private void updateCA(JTextField name, JTextArea dict, JCheckBox pat, JCheckBox det, JCheckBox ndet, JCheckBox ctx, JCheckBox loc, JCheckBox tap, JCheckBox pos) {
         String d = dict.getText();
-        Language nlang = parseLang(name.getText(), d, det.isSelected(), ndet.isSelected(), ctx.isSelected(), pos.isSelected());
-        //System.err.println("*** FACTOR: "+_f.transition());
-        //_ui.setActiveCA(current.mutate(_rule.origin().create(g, _f), _ui.getActiveCA().getRandom()));
+        Language nlang = parseLang(name.getText(), d, pat.isSelected(), det.isSelected(), ndet.isSelected(), ctx.isSelected(), loc.isSelected(), tap.isSelected(), pos.isSelected());
         updateCA(nlang);
         dict.setText(d);
         dict.requestFocus();
@@ -186,7 +208,7 @@ public class LangEditor extends JComponent implements TimelineListener {
         return dict.toString();
     }
 
-    private Language parseLang(String name, String dict, boolean det, boolean ndet, boolean ctx, boolean pos) {
+    private Language parseLang(String name, String dict, boolean pat, boolean det, boolean ndet, boolean ctx, boolean loc, boolean tap, boolean pos) {
         Language lang = new Language(name);
         for(String ent:dict.split("\\n")) {
             if(ent.trim().length()>0) {
@@ -194,10 +216,13 @@ public class LangEditor extends JComponent implements TimelineListener {
                 lang.add(kv[0].trim(), kv[1].trim());
             }
         }
-        lang.deterministic(det);
-        lang.nondeterministic(ndet);
-        lang.contextual(ctx);
-        lang.positioning(pos);
+        lang.pattern(pat)
+            .deterministic(det)
+            .nondeterministic(ndet)
+            .contextual(ctx)
+            .location(loc)
+            .tape(tap)
+            .positioning(pos);
         return lang;
     }
 }
