@@ -183,7 +183,12 @@ public class GenomeParser {
     private Rule parse2(final String g, final Ruleset origin) {
         // the 100: prefix is arbitrary, it just needs to be present
         // in order to parse older versions correctly
-        final String fixed = (g.indexOf(":")>0?g:"100:"+g).replace('-',' ');
+        String fixed = (g.indexOf(":")>0?g:"100:"+g);
+        if(fixed.indexOf(' ')==0 && fixed.indexOf('-')>0) {
+            // detects genomes in the old format of a-b-c without affecting
+            // constants of the old format a8.3E-4
+            fixed = fixed.replace('-',' ');
+        }
         Pair<List<S>,Datamap> pa = parseS(fixed);
         List<S> ps = pa.one;
         Datamap dm = pa.two;
