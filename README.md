@@ -136,6 +136,7 @@
       + [ta (Max)](#ta-max)
       + [te (Time)](#te-time)
       + [zo (Contextual Time)](#zo-contexual-time)
+      + [je (Epoch Time)](#je-epoch-time)
       + [to (Bitwise And)](#to-bitwise-and)
       + [tsu (Bitwise Xor)](#tsu-bitwise-xor)
       + [wa (Most)](#wa-most)
@@ -1556,6 +1557,12 @@ values will always increase monotonically.
 automata, this value will only be consistent over the duration of a single
 animation execution. If the animation is stopped and started again, time will
 reset to 0. For step animation, the value will always be 0.**
+
+### je (Epoch Time)
+
+Syntax: `je`
+
+Pushes the current epoch time (milliseconds since January 1, 1970).
 
 ### to (Bitwise And)
 
