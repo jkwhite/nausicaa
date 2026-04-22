@@ -21,9 +21,13 @@ public class Info {
     }
 
     public String summarize() {
+        return summarize(-1);
+    }
+
+    public String summarize(final int trim) {
         String text = _ca.getRule().humanize();
-        if(text.length()>42) {
-            text = "..."+text.substring(text.length()-42,text.length());
+        if(trim>0 && text.length()>trim) {
+            text = "..."+text.substring(text.length()-trim,text.length());
         }
         return text;
     }
