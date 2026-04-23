@@ -2190,7 +2190,7 @@ public class Actions {
                 Rule r = ca.getRule();
                 if(r instanceof Genomic) {
                     ca = ca.mutate(r.origin().create(((Genomic)r).genome(),
-                        createMutationFactor(ca, config, v.getRandom())), ca.getRandom());
+                        new Parameters().vars(vn)), ca.getRandom());
                 }
                 v.setActiveCA(ca);
             }
@@ -2201,6 +2201,7 @@ public class Actions {
             }
         });
         bot.add(ne);
+        bot.add(de);
         p.add(bot, BorderLayout.SOUTH);
         d.getContentPane().add(p);
         Dimension dim = p.getPreferredSize();
