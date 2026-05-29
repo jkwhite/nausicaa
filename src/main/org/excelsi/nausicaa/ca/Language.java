@@ -285,7 +285,19 @@ public class Language {
         if(o.has("dict")) {
             JsonObject dict = (JsonObject) o.get("dict");
             for(Map.Entry<String,JsonElement> e:dict.entrySet()) {
-                lang.add(e.getKey(), Json.string(e.getValue()));
+                final JsonElement v = e.getValue();
+                // older formats stored language dict values as arrays
+                if(v instanceof JsonArray) {
+                    final StringBuilder sv = new StringBuilder();
+                    for(JsonElement ve:(JsonArray)v) {
+                        sv.append(Json.string(ve)).append("+");
+                    }
+                    sv.setLength(sv.length()-1);
+                    lang.add(e.getKey(), sv.toString());
+                }
+                else {
+                    lang.add(e.getKey(), Json.string(v));
+                }
             }
         }
         return lang;
