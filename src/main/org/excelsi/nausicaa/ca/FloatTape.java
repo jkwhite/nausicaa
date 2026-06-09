@@ -80,8 +80,9 @@ public final class FloatTape {
                     _i = (int)v;
                 }
                 else {
+                    // final int ts = _s;
                     _s = -1;
-                    throw new IllegalArgumentException("v "+v+" not in ("+_s+","+_i+")");
+                    // throw new IllegalArgumentException("v "+v+" not in ("+ts+","+_i+")");
                 }
             }
             _s = -1;
