@@ -206,6 +206,7 @@ public class GenomeParser {
                 s.d(seq.n, dm.find(seq.n));
             }
         }
+        LOG.debug("creating computed rule with params "+_params+" and trans "+_transition);
         return new ComputedRule2d(new SequencePattern(s, _params!=null?_params.transition():_transition), origin);
     }
 
