@@ -97,7 +97,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
     public CA getActiveCA() {
         // use a fake temporary ca if none is set
         if(hasFutures()) {
-            return futures().getCA();
+            return futures().getOriginalCA();
         }
         else {
             LOG.debug("using ephemeral active ca");

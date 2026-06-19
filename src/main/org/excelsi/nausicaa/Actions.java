@@ -38,7 +38,7 @@ public class Actions {
 
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JPanel top = new JPanel(new GridLayout(10,2));
+        final JPanel top = new JPanel(new GridLayout(12,2));
 
         top.add(new JLabel("Name"));
         final JTextField name = new JTextField();
@@ -57,11 +57,41 @@ public class Actions {
         dimens.setSelectedItem(config.getVariable("default_dimensions", "1"));
         top.add(dimens);
 
-        top.add(new JLabel("Neighborhood Size"));
+        // Size
+        final JTextField wid = new JTextField(""+config.getWidth(), 6);
+        final JTextField hei = new JTextField(""+config.getHeight(), 6);
+        final JTextField dep = new JTextField(""+config.getDepth(), 6);
+        {
+            top.add(new JLabel("Size (WxHxD)"));
+            final JPanel sizes = new JPanel();
+            // final BoxLayout sizel = new BoxLayout(sizes, BoxLayout.X_AXIS);
+            final FlowLayout sizel = new FlowLayout(FlowLayout.LEFT);
+            sizes.setLayout(sizel);
+            sizes.add(wid);
+            sizes.add(new JLabel("x"));
+            sizes.add(hei);
+            sizes.add(new JLabel("x"));
+            sizes.add(dep);
+            top.add(sizes);
+        }
+
+        // Prelude
+        final JTextField prel = new JTextField();
+        {
+            top.add(new JLabel("Prelude"));
+            prel.setText(""+config.getPrelude());
+            prel.setColumns(6);
+            top.add(prel);
+        }
+
+        // Neighborhood Size
         final JTextField siz = new JTextField();
-        siz.setText(config.getVariable("default_size", "1"));
-        siz.setColumns(3);
-        top.add(siz);
+        {
+            top.add(new JLabel("Neighborhood Size"));
+            siz.setText(config.getVariable("default_size", "1"));
+            siz.setColumns(3);
+            top.add(siz);
+        }
 
         // Compute
         final String[] comphack = new String[1];
@@ -261,22 +291,29 @@ public class Actions {
                 final String caname = name.getText();
                 final String cadesc = desc.getText();
                 final Integer dims = Integer.parseInt(dimens.getSelectedItem().toString());
+                final Integer width = Integer.parseInt(wid.getText());
+                final Integer height = Integer.parseInt(hei.getText());
+                final Integer depth = Integer.parseInt(dep.getText());
+                final Integer prelude = Integer.parseInt(prel.getText());
                 final Integer colors = Integer.parseInt(mc.getText());
                 final Integer pcolors = Integer.parseInt(pmc.getText());
                 final Integer size = Integer.parseInt(siz.getText());
                 // String lng = lang.getSelectedItem().toString();
                 //LANGTODO
-                for(JCheckBox l:langs) {
-                    config.setVariable("language_"+l.getText(), l.isSelected()?"true":"false");
-                }
-                // String lng = "Universal";
-                config.setVariable("default_dimensions", dimens.getSelectedItem().toString());
-                config.setVariable("default_colors", mc.getText());
-                config.setVariable("default_palettecolors", pmc.getText());
-                config.setVariable("default_size", siz.getText());
-                config.setVariable("default_kind", colhack[0]);
-                // config.setVariable("default_language", lng);
-                config.setVariable("default_neighborhood", neihack[0].name());
+                config.transact(()->{
+                    for(JCheckBox l:langs) {
+                        config.setVariable("language_"+l.getText(), l.isSelected()?"true":"false");
+                    }
+                    // String lng = "Universal";
+                    config.setVariable("default_dimensions", dimens.getSelectedItem().toString());
+                    config.setVariable("default_colors", mc.getText());
+                    config.setVariable("default_palettecolors", pmc.getText());
+                    config.setVariable("default_size", siz.getText());
+                    config.setSize(width, height, depth, prelude);
+                    config.setVariable("default_kind", colhack[0]);
+                    // config.setVariable("default_language", lng);
+                    config.setVariable("default_neighborhood", neihack[0].name());
+                });
                 Random rand = new Random();
                 Palette pal;
                 boolean usePalColors;
@@ -324,10 +361,10 @@ public class Actions {
                         v.getInitializer(),
                         rand,
                         0,
-                        v.getConfig().getWidth(),
-                        v.getConfig().getHeight(),
-                        v.getConfig().getDepth(),
-                        v.getConfig().getPrelude(),
+                        width,
+                        height,
+                        depth,
+                        prelude,
                         v.getConfig().getWeight(),
                         0,
                         ComputeMode.combined,
@@ -2072,6 +2109,7 @@ public class Actions {
 
     public void resizeCA(NViewer v) {
         final Config config = v.getConfig();
+        final CA ca = v.getActiveCA();
         final JDialog d = new JDialog(v, "Parameters");
         JPanel p = new JPanel(new BorderLayout());
         p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -2079,7 +2117,7 @@ public class Actions {
 
         top.add(new JLabel("Width"));
         final JTextField width = new JTextField();
-        width.setText(""+config.getWidth());
+        width.setText(""+ca.getWidth());
         width.setColumns(6);
         JPanel wp = new JPanel();
         wp.add(width);
@@ -2089,7 +2127,7 @@ public class Actions {
         JPanel hp = new JPanel();
         top.add(new JLabel("Height"));
         final JTextField height = new JTextField();
-        height.setText(""+config.getHeight());
+        height.setText(""+ca.getHeight());
         height.setColumns(6);
         hp.add(height);
         hp.add(new JLabel("px"));
@@ -2098,7 +2136,7 @@ public class Actions {
         top.add(new JLabel("Depth"));
         JPanel dp = new JPanel();
         final JTextField depth = new JTextField();
-        depth.setText(""+config.getDepth());
+        depth.setText(""+ca.getDepth());
         depth.setColumns(6);
         dp.add(depth);
         dp.add(new JLabel("px"));
@@ -2107,7 +2145,7 @@ public class Actions {
         top.add(new JLabel("Prelude"));
         JPanel pp = new JPanel();
         final JTextField prelude = new JTextField();
-        prelude.setText(""+config.getPrelude());
+        prelude.setText(""+ca.getPrelude());
         prelude.setColumns(6);
         pp.add(prelude);
         pp.add(new JLabel("steps"));
@@ -2123,10 +2161,12 @@ public class Actions {
         ne.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 d.dispose();
-                config.setSize(Integer.parseInt(width.getText()),
+                v.setActiveCA(ca.size(
+                    Math.max(1, Integer.parseInt(width.getText())),
                     Math.max(1, Integer.parseInt(height.getText())),
                     Math.max(1, Integer.parseInt(depth.getText())),
-                    Math.max(0, Integer.parseInt(prelude.getText())));
+                    Math.max(0, Integer.parseInt(prelude.getText()))
+                ));
             }
         });
         de.addActionListener(new AbstractAction() {

@@ -32,6 +32,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     private ViewType _viewType = ViewType.view2d;
     private boolean _enableAnimations;
     private CA _ca;
+    private CA _origCA;
 
 
     public Futures(UIActions ui, Sizer sizer, Config config, Timeline timeline, CA ca, Random rand, String name, boolean show) {
@@ -46,6 +47,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         setBackground(java.awt.Color.BLACK);
         setForeground(java.awt.Color.BLACK);
         _ca = ca;
+        _origCA = ca;
         reinit(true);
         addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
@@ -156,9 +158,11 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
     }
 
     public void setCA(CA ca) {
-        final int width = getCAWidth();
-        final int height = getCAHeight();
-        _ca = ca.size(width, height, getCADepth(), getCAPrelude());
+        _origCA = ca;
+        // final int width = getCAWidth();
+        // final int height = getCAHeight();
+        // _ca = ca.size(width, height, getCADepth(), getCAPrelude());
+        _ca = ca;
         _lastInit = _ca.getInitializer();
         NViewer.getUIActions().doWait(new Runnable() {
             public void run() {
@@ -217,6 +221,9 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                         public void run() {
                             CA nca = mutate ? _ca = mutate(d.getCA()) : d.getCA();
                             LOG.debug("tick mutated "+_ca+" into "+nca);
+                            // RESIZE
+                            // hack to keep size correct on mutant
+                            _origCA = nca.size(_origCA.getWidth(), _origCA.getHeight(), _origCA.getDepth());
                             _ca = nca;
                             _config.setWeight(_ca.getWeight());
                             reroll(_lastInit);
@@ -293,6 +300,10 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         return _scale;
     }
 
+    public void reinit() {
+        reinit(false);
+    }
+
     private void reinit(boolean overrideConfig) {
         if(_displays!=null) {
             for(PlaneDisplay d:_displays) {
@@ -309,19 +320,13 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         JComponent futures = this;
         JSplitPane split = null;
         final int edsize = 100;
-        if(false) {
-            setLayout(new BorderLayout());
-            futures = new JPanel();
-            split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-            split.setOneTouchExpandable(true);
-            split.setRightComponent(futures);
-            add(split, BorderLayout.CENTER);
-        }
         _lastInit = _ca.getInitializer();
         if(_show) {
             futures.setLayout(new GridLayout(3, 3, 0, 0));
             _displays = new PlaneDisplay[9];
             int width, height, depth, prelude;
+            //RESIZE
+            overrideConfig = true;
             if(overrideConfig) {
                 width = _ca.getWidth() > 60 ? _ca.getWidth()/3 : _ca.getWidth();
                 height = _ca.getHeight() > 60 ? _ca.getHeight()/3 : _ca.getHeight();
@@ -361,10 +366,12 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             futures.setLayout(new GridLayout(1, 1));
             _displays = new PlaneDisplay[1];
             int width, height, depth, prelude;
+            //RESIZE
+            overrideConfig = true;
             if(overrideConfig) {
-                width = _ca.getWidth();
-                height = _ca.getHeight();
-                depth = _ca.getDepth();
+                width = _origCA.getWidth();
+                height = _origCA.getHeight();
+                depth = _origCA.getDepth();
                 prelude = _ca.getPrelude();
             }
             else {
@@ -416,6 +423,15 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         return _ca;
     }
 
+    /**
+     * Gets the original CA with which this Futures
+     * was initialized, before any modifications resulting
+     * from variation resizing etc.
+     */
+    public CA getOriginalCA() {
+        return _origCA;
+    }
+
     public Rule getRule() {
         return _ca.getRule();
     }
@@ -437,10 +453,11 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
         final boolean useHistory = _config.getBooleanVariable("mutator_neverrepeat",false);
         final GOptions opt = new GOptions(true, _show?1:_config.getIntVariable("animation_computeCores", 4), 0, _ca.getWeight() /*getFrameWeight()*/);
         if(_show) {
-            int width = getCAWidth() > 60 ? getCAWidth()/3-10 : getCAWidth();
-            int height = getCAHeight() > 60 ? getCAHeight()/3-10 : getCAHeight();
-            int depth = getCADepth() > 60 ? getCADepth()/3-10 : getCADepth();
-            final CA ca = _ca.size(width,height,depth,getCAPrelude());
+            // RESIZE
+            int width = _origCA.getWidth() > 60 ? _origCA.getWidth()/3-10 : _origCA.getWidth();
+            int height = _origCA.getHeight() > 60 ? _origCA.getHeight()/3-10 : _origCA.getHeight();
+            int depth = _origCA.getDepth() > 60 ? _origCA.getDepth()/3-10 : _origCA.getDepth();
+            final CA ca = _ca.size(width,height,depth,_ca.getPrelude());
             Thread tdm = new Thread() {
                 public void run() {
                     _displays[4].setCA(ca, pool, opt);
@@ -480,10 +497,11 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             }
         }
         else {
-            int width = getCAWidth();
-            int height = getCAHeight();
-            final CA ca = _ca.size(width,height,getCADepth(),getCAPrelude());
-            _ca = ca;
+            //RESIZE
+            // int width = getCAWidth();
+            // int height = getCAHeight();
+            // final CA ca = _ca.size(width,height,getCADepth(),getCAPrelude());
+            // _ca = ca;
             _displays[0].setCA(_ca, pool, opt);
             if(reroll) {
                 _displays[0].reroll(init);
