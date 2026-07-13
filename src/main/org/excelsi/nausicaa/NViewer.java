@@ -2095,7 +2095,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
                     p.addPair(""+new java.util.Date(e.timestamp()), e.desc());
                 }
                 p.done();
-                h.getContentPane().add(p);
+                h.getContentPane().add(new JScrollPane(p));
             }
             h.pack();
             h.setVisible(true);
