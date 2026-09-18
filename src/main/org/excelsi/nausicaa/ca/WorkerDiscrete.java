@@ -42,7 +42,6 @@ public class WorkerDiscrete implements Worker {
         _wp = p;
         _vars = vars;
         _usesSource = _wp.usesSource();
-        LOG.info("usesSource: "+_usesSource);
         _size = _wp.archetype().size();
         final int colors = _wp.archetype().colors();
         _prev = new int[_wp.archetype().sourceLength()];
@@ -153,7 +152,6 @@ public class WorkerDiscrete implements Worker {
         final IntPlane p2 = (IntPlane) ip2;
         //validate(p1);
         int counts = 0;
-        //System.err.println(String.format("dims: %d,%d,%d,%d", _y1, _y2, _x1, _x2));
         int mw = p1.getWidth()/2;
         int mh = p1.getHeight()/2;
         int tw = p1.getWidth();
@@ -169,7 +167,6 @@ public class WorkerDiscrete implements Worker {
                 }
                 else {
                     _weight = _vars.weight(ip1, j, i, 0);
-                    //System.err.println("got w for "+j+","+i+":"+_weight);
                 }
                 _oWeight = 1d - _weight;
                 if(_umode!=null&&!_umode.update(p1, j, i, 0, _vars)) {
@@ -195,8 +192,6 @@ public class WorkerDiscrete implements Worker {
         final long endTime = System.currentTimeMillis();
         _stats.timeMsec += (endTime-startTime);
         _stats.frames++;
-        //mutateRule();
-        //System.err.println("set "+counts+" cells");
     }
 
     @Override public void frame(final Plane ic) {
@@ -214,8 +209,6 @@ public class WorkerDiscrete implements Worker {
         int[] prev = new int[2*size+1];
         int[] pattern = new int[prev.length];
 
-        //final Pattern p = createPattern(pool);
-        //System.err.println("created pattern: "+p);
         for(int i=_y1;i<_y2;i++) {
             _pctx.c[1]=i-c.getHeight()/2;
             for(int j=0;j<w;j++) {
@@ -229,10 +222,8 @@ public class WorkerDiscrete implements Worker {
                     final int ov = pattern[pattern.length/2];
                     final int nv = (int) ((_oWeight*ov)+(_weight*v));
                     c.setCell(j, i, nv);
-                    //System.err.print(".");
                 }
             }
-            //mutateRule(p);
             _wp.tick();
             _ef.apply(c, _r);
         }
@@ -247,7 +238,6 @@ public class WorkerDiscrete implements Worker {
         final IntPlane p2 = (IntPlane) ip2;
         final IntPlane meta = (IntPlane) imeta;
         int counts = 0;
-        //System.err.println(String.format("dims: %d,%d,%d,%d", _y1, _y2, _x1, _x2));
         int mw = p1.getWidth()/2;
         int mh = p1.getHeight()/2;
         int tw = p1.getWidth();
@@ -256,26 +246,15 @@ public class WorkerDiscrete implements Worker {
         for(int i=_y1;i<_y2;i++) {
             for(int j=_x1;j<_x2;j++) {
                 counts++;
-                //System.err.println(String.format("working: %d,%d", j, i));
                 p1.getBlock(_prev, j-_size, i-1, /*dx*/ 3, /*dy*/ 3, 0);
                 int idx = 0;
                 for(int k=0;k<_prev.length;k++) {
                     _pattern[k] = (int) (_prev[k]);
                     idx += _prev[k] * _pow[k];
-                    //System.err.println(String.format("prev[%d]=%d, pow[%d]=%d", k, _prev[k], k, _pow[k]));
                 }
-                //System.err.println(idx+" ");
-                //p2.setCell(j, i, _wp.next(idx));
-                //TODO HERE
-                //p2.setCell(j, i, _wp.next(idx, distance(tw, th, mw, mh, i, j)));
-                //int off = meta.getCell(j, i);
-                //toff += off;
-                //p2.setCell(j, i, _wp.next(idx, off));
             }
         }
         mutateRule();
-        //System.err.println("set "+counts+" cells");
-        //System.err.println("total offsets: "+toff);
     }
 
     private final int distance(int tw, int th, int mw, int mh, int i, int j) {

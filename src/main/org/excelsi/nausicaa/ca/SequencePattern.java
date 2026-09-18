@@ -41,7 +41,6 @@ public class SequencePattern extends Enloggened implements Pattern, Mutatable, H
         _thresh = (int)(trans*_s.peek());
         _chance = 1f;
         _inTrans = false;
-        LOG.debug("sequence pattern created with threshold "+_thresh+" from "+trans);
     }
 
     @Override public Archetype archetype() {

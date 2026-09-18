@@ -100,6 +100,7 @@ public class Machine implements Humanizable {
                 _prg[i].op(p, _ti, ctx);
                 if(_ti.stopped()) break;
                 if(_ti.jumped()!=0) {
+                    // retrieve new location and set i, then clear jump
                     int j = _ti.jumped() % _prg.length;
                     i += j;
                     if(i<0) i=0;
@@ -150,6 +151,7 @@ public class Machine implements Humanizable {
                 _prg[i].op(p, _tf, ctx);
                 if(_tf.stopped()) break;
                 if(_tf.jumped()!=0) {
+                    // retrieve new location and set i, then clear jump
                     int j = _tf.jumped() % _prg.length;
                     i += j;
                     if(i<0) i=0;

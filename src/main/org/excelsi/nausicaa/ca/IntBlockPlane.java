@@ -150,6 +150,7 @@ public class IntBlockPlane extends AbstractIntPlane implements Sliceable {
 
     @Override public int[] getBlock(int[] into, int x, int y, int z, int dx, int dy, int dz, int offset) {
         //System.err.println("x="+x+", y="+y+", z="+z+", dx="+dx+", dy="+dy+", dz="+dz);
+        // TODO: could be optimized to avoid so many calls to getCell
         int idx=offset;
         for(int i=x;i<x+dx;i++) {
             for(int j=y;j<y+dy;j++) {

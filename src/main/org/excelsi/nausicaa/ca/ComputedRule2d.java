@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 
 /**
  * Note: ComputedRule2d is so named because it was originally intended to only
- * handle 2d automata, however it actually handles all dimensions and is
+ * handle 2d automata, however it actually handles all dimensions (1,2,3) and is
  * thus a misnomer now.
  */
 public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
@@ -195,7 +195,7 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
                 else {
                     p2 = p1.copy();
                 }
-                if(++count%500==0) {
+                if(++count%100==0) {
                     for(int i=0;i<workers.length;i++) {
                         LOG.info("worker "+i+" stat: "+workers[i].getStats());
                     }
@@ -238,7 +238,12 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
             default:
                 LOG.info(this+": generating prelude from "+start+" to "+end+" with "+opt);
                 final Iterator<Plane> ps = frameIterator(c, pool, opt);
+                long lastLog = 0;
                 for(int i=start;i<end;i++) {
+                    if(System.currentTimeMillis()-lastLog>60*1000) {
+                        LOG.debug("prelude frame "+i);
+                        lastLog = System.currentTimeMillis();
+                    }
                     ret = ps.next();
                 }
                 break;
@@ -271,8 +276,6 @@ public class ComputedRule2d extends AbstractRule implements Mutatable, Genomic {
     }
 
     @Override public Varmap vars() {
-        //System.err.println("is_gen: "+(_p instanceof Genomic));
-        //System.err.println("** pat: "+_p);
         return _p instanceof Genomic ? ((Genomic)_p).vars() : new Varmap();
     }
 

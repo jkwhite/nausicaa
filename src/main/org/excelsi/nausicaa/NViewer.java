@@ -801,17 +801,22 @@ public class NViewer extends JFrame implements UIActions, Sizer {
         bar.add(pal);
     }
 
+    JMenuItem _animate;
     private void createAnimationMenu(int shortcut, JMenuBar bar) {
         JMenu auto = new JMenu("Animation");
 
-        AbstractAction an = new AbstractAction() {
+        _animate = auto.add(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.animate(NViewer.this, _timeline, -1);
+                if(_a.toggleAnimate(NViewer.this, _timeline, -1)) {
+                    _animate.setText("Stop animation");
+                }
+                else {
+                    _animate.setText("Start animation");
+                }
             }
-        };
-        JMenuItem animate = auto.add(an);
-        animate.setText("Animate");
-        animate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, shortcut));
+        });
+        _animate.setText("Start animation");
+        _animate.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, shortcut));
 
         AbstractAction ant = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -823,7 +828,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
         AbstractAction stp = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.animate(NViewer.this, _timeline, 1);
+                _a.toggleAnimate(NViewer.this, _timeline, 1);
             }
         };
         JMenuItem stepone = auto.add(stp);

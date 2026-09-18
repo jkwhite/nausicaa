@@ -45,7 +45,6 @@ public final class Genome {
     public Codon[] codons(Implicate i, boolean resolveParams) {
         final List<Codon> ops = new ArrayList<>();
         final String sep = _v==1?"-":" ";
-        //LOG.debug("resolveParams="+resolveParams);
         for(final String op:(resolveParams?replaceParams(_c, i):_c).split(sep)) {
             ops.add(Codons.codon(op, i));
         }
@@ -54,9 +53,7 @@ public final class Genome {
 
     public Genome prune(Implicate im) {
         final LinkedList<Codon> cs = new LinkedList(Arrays.asList(codons(im,false)));
-        //System.err.println("prune init codons: "+cs);
         while(cs.size()>1) {
-            //if(!cs.get(0).usesPattern()) {
             if(cs.get(0).usesTape()) {
                 cs.remove(0);
             }
@@ -64,7 +61,6 @@ public final class Genome {
                 break;
             }
         }
-        //System.err.println("prune final codons: "+cs);
         return fromCodons(cs, im.language());
     }
 
@@ -112,8 +108,6 @@ public final class Genome {
     private String replaceParams(String g, Implicate i) {
         final String P_START = Varmap.P_START;
         final String P_END = Varmap.P_END;
-        LOG.debug("replaceParams vars: "+i.vars());
-        //Thread.dumpStack();
         for(String p:GenomeParser.createVarmap(g).names()) {
             String v = i.vars().get(p);
             if(!"".equals(v)) {

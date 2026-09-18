@@ -763,7 +763,10 @@ public class Actions {
     }
 
     private Animation _a;
-    public void animate(NViewer v, Timeline timeline, int frames) {
+    /**
+     * @return true if animation was started; false if animation was stopped
+     */
+    public boolean toggleAnimate(NViewer v, Timeline timeline, int frames) {
         if(_a!=null&&_a.isAlive()) {
             _a.stopAnimation();
             _a = null;
@@ -772,6 +775,7 @@ public class Actions {
             _a = new Animation(v.getConfig(), v.getPlanescapeProvider(), timeline, frames);
             _a.start();
         }
+        return _a!=null;
     }
 
     public void chooseAnimFrames(final NViewer v, final Timeline timeline) {
@@ -796,7 +800,7 @@ public class Actions {
                 d.dispose();
                 int frames = Integer.parseInt(fr.getText());
                 v.getConfig().setVariable("animation_nframes", fr.getText());
-                animate(v, timeline, frames);
+                toggleAnimate(v, timeline, frames);
             }
         });
         bot.add(ne);
@@ -1007,7 +1011,7 @@ public class Actions {
                 config.setVariable("mutator_bonding", ""+bonding.isSelected());
                 config.setVariable("mutator_intrabond", ""+intrabond.isSelected());
                 config.setVariable("mutator_neverrepeat", ""+rp.isSelected());
-                config.notify("mutator");
+                config.notify("mutator_params");
             }
         });
         de.addActionListener(new AbstractAction() {

@@ -106,6 +106,9 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
                 _ca.reseed(c.getSeed());
                 reroll(_lastInit);
                 break;
+            case "mutator_params":
+                // lazy ignore param changes
+                break;
         }
     }
 
@@ -458,6 +461,7 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             int height = _origCA.getHeight() > 60 ? _origCA.getHeight()/3-10 : _origCA.getHeight();
             int depth = _origCA.getDepth() > 60 ? _origCA.getDepth()/3-10 : _origCA.getDepth();
             final CA ca = _ca.size(width,height,depth,_ca.getPrelude());
+            ca.setInitializer(init);
             Thread tdm = new Thread() {
                 public void run() {
                     _displays[4].setCA(ca, pool, opt);
@@ -502,13 +506,16 @@ public class Futures extends JComponent implements ConfigListener, PlaneDisplayP
             // int height = getCAHeight();
             // final CA ca = _ca.size(width,height,getCADepth(),getCAPrelude());
             // _ca = ca;
+
+            _ca.setInitializer(init);
             _displays[0].setCA(_ca, pool, opt);
-            if(reroll) {
-                _displays[0].reroll(init);
-            }
-            else {
-                _displays[0].generate(init);
-            }
+            // DOUBLE INIT FIX
+            // if(reroll) {
+                // _displays[0].reroll(init);
+            // }
+            // else {
+                // _displays[0].generate(init);
+            // }
         }
         // TODO: thread leak
         for(Thread t:threads) {

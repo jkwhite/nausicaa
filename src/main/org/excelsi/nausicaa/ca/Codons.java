@@ -1049,7 +1049,7 @@ public class Codons {
 
         @Override public void op(double[] p, FloatTape t, Pattern.Ctx c) {
             double v = t.pop();
-            if(v==0) {
+            if(v==0d) {
                 t.stop();
             }
         }
