@@ -807,7 +807,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
         _animate = auto.add(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if(_a.toggleAnimate(NViewer.this, _timeline, -1)) {
+                if(_a.animate(NViewer.this, _timeline, -1)) {
                     _animate.setText("Stop animation");
                 }
                 else {
@@ -828,7 +828,7 @@ public class NViewer extends JFrame implements UIActions, Sizer {
 
         AbstractAction stp = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                _a.toggleAnimate(NViewer.this, _timeline, 1);
+                _a.animate(NViewer.this, _timeline, 1);
             }
         };
         JMenuItem stepone = auto.add(stp);

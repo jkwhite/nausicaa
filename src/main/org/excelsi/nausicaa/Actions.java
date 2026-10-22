@@ -763,10 +763,7 @@ public class Actions {
     }
 
     private Animation _a;
-    /**
-     * @return true if animation was started; false if animation was stopped
-     */
-    public boolean toggleAnimate(NViewer v, Timeline timeline, int frames) {
+    public boolean animate(NViewer v, Timeline timeline, int frames) {
         if(_a!=null&&_a.isAlive()) {
             _a.stopAnimation();
             _a = null;
@@ -800,7 +797,7 @@ public class Actions {
                 d.dispose();
                 int frames = Integer.parseInt(fr.getText());
                 v.getConfig().setVariable("animation_nframes", fr.getText());
-                toggleAnimate(v, timeline, frames);
+                animate(v, timeline, frames);
             }
         });
         bot.add(ne);
